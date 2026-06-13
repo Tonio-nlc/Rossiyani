@@ -12,12 +12,11 @@ import { prisma } from "@/lib/prisma";
 export type HomeReviewWord = {
   label: string;
   href: string;
-  count?: number;
 };
 
 export type HomeReviewToday = {
   words: HomeReviewWord[];
-  moreCount: number;
+  totalCount: number;
 };
 
 export type HomeFeaturedLesson = {
@@ -29,10 +28,10 @@ export type HomeFeaturedLesson = {
 };
 
 export type HomeJournalData = {
+  hasImportedTexts: boolean;
   todaysDiscovery: TodaysDiscovery | null;
   review: HomeReviewToday;
   featuredLesson: HomeFeaturedLesson | null;
-  readHref: string;
   srsHref: string;
 };
 
@@ -47,12 +46,6 @@ const FEATURED_LESSON_SLUGS = [
   "register-vy-debutant",
   "expressions-konechno",
 ] as const;
-
-function reviewCountForLemma(lemma: string, index: number): number | undefined {
-  const hash = lemma.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  const count = (hash + index) % 4;
-  return count > 1 ? count : undefined;
-}
 
 function extractLessonDescription(content: string, categoryLabel: string): string {
   const blocks = content
@@ -114,20 +107,19 @@ export async function getHomeJournalData(textCount: number): Promise<HomeJournal
 
   const reviewStart = dayBucket % Math.max(1, lemmaPool.length - 5);
   const reviewLemmas = lemmaPool.slice(reviewStart, reviewStart + 5);
-  const reviewWords: HomeReviewWord[] = reviewLemmas.map((item, index) => ({
+  const reviewWords: HomeReviewWord[] = reviewLemmas.map((item) => ({
     label: item.lemma.toUpperCase(),
     href: lemmaPath(item.lemma, item.partOfSpeech),
-    count: reviewCountForLemma(item.lemma, index),
   }));
 
   return {
+    hasImportedTexts: textCount > 0,
     todaysDiscovery,
     review: {
       words: reviewWords,
-      moreCount: Math.max(0, lemmaPool.length - reviewWords.length),
+      totalCount: lemmaPool.length,
     },
     featuredLesson: pickFeaturedLesson(dayBucket),
-    readHref: textCount > 0 ? "/reader" : "/import",
     srsHref: "/explorer/lemmas",
   };
 }

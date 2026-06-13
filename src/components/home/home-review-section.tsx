@@ -4,40 +4,45 @@ import type { HomeReviewToday } from "@/features/home";
 
 type HomeReviewSectionProps = {
   review: HomeReviewToday;
+  srsHref: string;
 };
 
-export function HomeReviewSection({ review }: HomeReviewSectionProps) {
+export function HomeReviewSection({ review, srsHref }: HomeReviewSectionProps) {
+  if (review.totalCount === 0) {
+    return null;
+  }
+
   return (
     <section>
       <p className="home-section-label">To review today</p>
 
-      {review.words.length > 0 ? (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {review.words.map((word) => (
-            <Link
-              key={word.href}
-              href={word.href}
-              className="focus-kb inline-flex items-center gap-1 rounded-full border border-[var(--hairline)] px-3 py-1.5 font-reader text-sm text-[var(--ink)] transition hover:border-[var(--hairline-strong)]"
-            >
-              {word.label}
-              {word.count ? (
-                <span className="text-[var(--ink-muted)]">×{word.count}</span>
-              ) : null}
-            </Link>
-          ))}
-        </div>
-      ) : (
-        <p className="mt-4 text-sm text-[var(--ink-muted)]">No words queued yet.</p>
-      )}
+      <p className="mt-4 font-reader text-[clamp(1.75rem,4vw,2.25rem)] leading-none tracking-tight text-[var(--ink)]">
+        {review.totalCount} cards waiting
+      </p>
 
-      {review.moreCount > 0 ? (
-        <Link
-          href="/explorer/lemmas"
-          className="focus-kb mt-3 inline-block text-sm text-[var(--ink-secondary)] hover:text-[var(--ink)]"
-        >
-          +{review.moreCount} more
-        </Link>
+      {review.words.length > 0 ? (
+        <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+          {review.words.map((word) => (
+            <li key={word.href}>
+              <Link
+                href={word.href}
+                className="focus-kb font-reader text-sm tracking-[0.12em] text-[var(--ink-secondary)] transition hover:text-[var(--ink)]"
+              >
+                {word.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
       ) : null}
+
+      <div className="mt-8">
+        <Link
+          href={srsHref}
+          className="focus-kb inline-flex items-center justify-center bg-[var(--ink)] px-8 py-3.5 text-sm font-medium text-[var(--paper)] transition hover:opacity-90"
+        >
+          Continue SRS →
+        </Link>
+      </div>
     </section>
   );
 }

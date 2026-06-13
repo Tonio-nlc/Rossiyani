@@ -47,7 +47,7 @@ export function DiscoveryActions({ discovery }: DiscoveryActionsProps) {
           href={discovery.readExamplesHref}
           className="focus-kb text-[var(--ink)] transition hover:text-[var(--color-link)]"
         >
-          Read →
+          Read examples →
         </Link>
       </li>
       <li>

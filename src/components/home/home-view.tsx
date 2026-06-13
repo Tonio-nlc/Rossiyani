@@ -1,41 +1,43 @@
 import type { HomeJournalData } from "@/features/home";
 import type { TextListItem } from "@/features/texts";
+import { isDisplayableLibraryText } from "@/lib/home/displayable-text";
 
-import { HomeFeaturedSection } from "./home-featured-section";
-import { HomePracticeSection } from "./home-practice-section";
-import { HomePrimaryActions } from "./home-primary-actions";
+import { HomeContinueReading } from "./home-continue-reading";
+import { HomeFeaturedLesson } from "./home-featured-lesson";
+import { HomeRecentDiscoveries } from "./home-recent-discoveries";
 import { HomeReviewSection } from "./home-review-section";
 import { HomeTodaysDiscovery } from "./home-todays-discovery";
+import { HomeWelcome } from "./home-welcome";
 
 type HomeViewProps = {
   journal: HomeJournalData;
   texts: TextListItem[];
 };
 
-function HomeDivider() {
-  return <hr className="my-[var(--layout-gap)] border-0 border-t border-[var(--hairline)]" />;
-}
-
 export function HomeView({ journal, texts }: HomeViewProps) {
-  return (
-    <div className="pb-[var(--space-2)]">
-      <HomeTodaysDiscovery discovery={journal.todaysDiscovery} />
+  const displayTexts = texts.filter(isDisplayableLibraryText);
 
-      <div className="mt-6">
-        <HomePrimaryActions srsHref={journal.srsHref} readHref={journal.readHref} />
+  if (!journal.hasImportedTexts) {
+    return (
+      <div className="pb-[var(--layout-section-gap)]">
+        <HomeWelcome />
       </div>
+    );
+  }
 
-      <HomeDivider />
+  return (
+    <div className="flex flex-col gap-[var(--layout-section-gap)] pb-[var(--layout-section-gap)]">
+      {journal.todaysDiscovery ? (
+        <HomeTodaysDiscovery discovery={journal.todaysDiscovery} />
+      ) : null}
 
-      <HomeReviewSection review={journal.review} />
+      <HomeReviewSection review={journal.review} srsHref={journal.srsHref} />
 
-      <HomeDivider />
+      <HomeContinueReading texts={displayTexts} />
 
-      <HomeFeaturedSection lesson={journal.featuredLesson} texts={texts} />
+      {journal.featuredLesson ? <HomeFeaturedLesson lesson={journal.featuredLesson} /> : null}
 
-      <HomeDivider />
-
-      <HomePracticeSection />
+      <HomeRecentDiscoveries />
     </div>
   );
 }
