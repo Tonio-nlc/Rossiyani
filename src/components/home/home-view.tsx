@@ -30,7 +30,7 @@ export function HomeView({ journal, texts }: HomeViewProps) {
 
       <HomeDivider />
 
-      <HomePracticeSection />
+      <HomePracticeSection practice={journal.featuredPractice} />
     </div>
   );
 }

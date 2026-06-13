@@ -9,6 +9,12 @@ export {
   getTodaysInsight,
 } from "./get-home-data";
 export { getHomeJournalData } from "./get-home-journal-data";
+export { pickFeaturedPractice } from "./pick-featured-practice";
+export type {
+  HomeFeaturedPractice,
+  HomeFeaturedPracticeSource,
+  PickFeaturedPracticeInput,
+} from "./pick-featured-practice";
 export type {
   HomeAtlasTopic,
   HomeCollectionLink,

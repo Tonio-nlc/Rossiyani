@@ -5,9 +5,16 @@ import {
 } from "@/features/manual";
 
 import { lemmaPath } from "@/components/explorer/explorer-routes";
+import { getDateKey } from "@/features/discovery/discovery-seed";
 import { getTodaysDiscovery } from "@/features/discovery";
 import type { TodaysDiscovery } from "@/features/discovery";
+import { getLearnerContext } from "@/features/discovery/get-learner-context";
 import { prisma } from "@/lib/prisma";
+
+import { pickFeaturedPractice } from "./pick-featured-practice";
+import type { HomeFeaturedPractice } from "./pick-featured-practice";
+
+export type { HomeFeaturedPractice } from "./pick-featured-practice";
 
 export type HomeReviewWord = {
   label: string;
@@ -32,6 +39,7 @@ export type HomeJournalData = {
   todaysDiscovery: TodaysDiscovery | null;
   review: HomeReviewToday;
   featuredLesson: HomeFeaturedLesson | null;
+  featuredPractice: HomeFeaturedPractice;
   reviewHref: string;
 };
 
@@ -112,7 +120,9 @@ function pickFeaturedLesson(): HomeFeaturedLesson | null {
 }
 
 export async function getHomeJournalData(): Promise<HomeJournalData> {
-  const [todaysDiscovery, lemmaPool] = await Promise.all([
+  const dateKey = getDateKey();
+
+  const [todaysDiscovery, lemmaPool, { signals }] = await Promise.all([
     getTodaysDiscovery(),
     prisma.knowledgeLemma.findMany({
       where: { occurrenceCount: { gt: 0 } },
@@ -120,6 +130,7 @@ export async function getHomeJournalData(): Promise<HomeJournalData> {
       take: 40,
       select: { lemma: true, partOfSpeech: true },
     }),
+    getLearnerContext(dateKey),
   ]);
 
   const reviewStart =
@@ -131,6 +142,12 @@ export async function getHomeJournalData(): Promise<HomeJournalData> {
     count: reviewCountForLemma(item.lemma, index),
   }));
 
+  const featuredPractice = await pickFeaturedPractice({
+    todaysDiscovery,
+    signals,
+    reviewLemmas: reviewLemmas.map((item) => item.lemma),
+  });
+
   return {
     todaysDiscovery,
     review: {
@@ -138,6 +155,7 @@ export async function getHomeJournalData(): Promise<HomeJournalData> {
       moreCount: Math.max(0, lemmaPool.length - reviewWords.length),
     },
     featuredLesson: pickFeaturedLesson(),
+    featuredPractice,
     reviewHref: "/explorer/lemmas",
   };
 }
