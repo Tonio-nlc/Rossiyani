@@ -10,7 +10,7 @@ export function HomeFeaturedLessonCard({ lesson }: HomeFeaturedLessonCardProps) 
   return (
     <Link
       href={lesson.href}
-      className="focus-kb group block border border-[var(--hairline)] px-4 py-4 transition hover:border-[var(--hairline-strong)]"
+      className="focus-kb group flex h-full flex-col border border-[var(--hairline)] px-4 py-4 transition hover:border-[var(--hairline-strong)]"
     >
       <p className="home-section-label">Featured lesson</p>
       <h3 className="mt-2 font-reader text-lg leading-snug text-[var(--ink)] group-hover:text-[var(--color-link)]">
@@ -20,7 +20,7 @@ export function HomeFeaturedLessonCard({ lesson }: HomeFeaturedLessonCardProps) 
       <p className="mt-2 text-metadata text-[var(--ink-muted)]">
         {lesson.levelLabel} · {lesson.readingMinutes} min
       </p>
-      <p className="mt-2 text-sm text-[var(--ink-secondary)] group-hover:text-[var(--color-link)]">
+      <p className="mt-auto pt-2 text-sm text-[var(--ink-secondary)] group-hover:text-[var(--color-link)]">
         Open lesson →
       </p>
     </Link>

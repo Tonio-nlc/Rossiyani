@@ -9,6 +9,7 @@ export {
   getTodaysInsight,
 } from "./get-home-data";
 export { getHomeJournalData } from "./get-home-journal-data";
+export { pickFeaturedLesson } from "./pick-featured-lesson";
 export { pickFeaturedPractice } from "./pick-featured-practice";
 export type {
   HomeFeaturedPractice,
@@ -26,8 +27,8 @@ export type {
   HomeWorkspaceStats,
 } from "./get-home-data";
 export type {
-  HomeJournalData,
   HomeFeaturedLesson,
+  HomeJournalData,
   HomeReviewToday,
   HomeReviewWord,
 } from "./get-home-journal-data";
