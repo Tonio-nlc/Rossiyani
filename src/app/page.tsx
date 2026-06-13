@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const texts = await listTexts();
-  const journal = await getHomeJournalData(texts.length);
+  const journal = await getHomeJournalData();
 
   return <HomeView journal={journal} texts={texts} />;
 }

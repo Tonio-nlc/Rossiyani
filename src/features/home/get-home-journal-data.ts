@@ -12,11 +12,12 @@ import { prisma } from "@/lib/prisma";
 export type HomeReviewWord = {
   label: string;
   href: string;
+  count?: number;
 };
 
 export type HomeReviewToday = {
   words: HomeReviewWord[];
-  totalCount: number;
+  moreCount: number;
 };
 
 export type HomeFeaturedLesson = {
@@ -28,11 +29,10 @@ export type HomeFeaturedLesson = {
 };
 
 export type HomeJournalData = {
-  hasImportedTexts: boolean;
   todaysDiscovery: TodaysDiscovery | null;
   review: HomeReviewToday;
   featuredLesson: HomeFeaturedLesson | null;
-  srsHref: string;
+  reviewHref: string;
 };
 
 /** Curated lessons surfaced on the homepage — rotated daily. */
@@ -46,6 +46,12 @@ const FEATURED_LESSON_SLUGS = [
   "register-vy-debutant",
   "expressions-konechno",
 ] as const;
+
+function reviewCountForLemma(lemma: string, index: number): number | undefined {
+  const hash = lemma.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const count = (hash + index) % 4;
+  return count > 1 ? count : undefined;
+}
 
 function extractLessonDescription(content: string, categoryLabel: string): string {
   const blocks = content
@@ -92,7 +98,7 @@ function pickFeaturedLesson(dayBucket: number): HomeFeaturedLesson | null {
   };
 }
 
-export async function getHomeJournalData(textCount: number): Promise<HomeJournalData> {
+export async function getHomeJournalData(): Promise<HomeJournalData> {
   const dayBucket = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
 
   const [todaysDiscovery, lemmaPool] = await Promise.all([
@@ -107,19 +113,19 @@ export async function getHomeJournalData(textCount: number): Promise<HomeJournal
 
   const reviewStart = dayBucket % Math.max(1, lemmaPool.length - 5);
   const reviewLemmas = lemmaPool.slice(reviewStart, reviewStart + 5);
-  const reviewWords: HomeReviewWord[] = reviewLemmas.map((item) => ({
+  const reviewWords: HomeReviewWord[] = reviewLemmas.map((item, index) => ({
     label: item.lemma.toUpperCase(),
     href: lemmaPath(item.lemma, item.partOfSpeech),
+    count: reviewCountForLemma(item.lemma, index),
   }));
 
   return {
-    hasImportedTexts: textCount > 0,
     todaysDiscovery,
     review: {
       words: reviewWords,
-      totalCount: lemmaPool.length,
+      moreCount: Math.max(0, lemmaPool.length - reviewWords.length),
     },
     featuredLesson: pickFeaturedLesson(dayBucket),
-    srsHref: "/explorer/lemmas",
+    reviewHref: "/explorer/lemmas",
   };
 }
