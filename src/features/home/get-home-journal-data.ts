@@ -35,7 +35,7 @@ export type HomeJournalData = {
   reviewHref: string;
 };
 
-/** Curated lessons surfaced on the homepage — rotated daily. */
+/** Editor-picked lessons for the homepage featured card. */
 const FEATURED_LESSON_SLUGS = [
   "accent-deplacement",
   "motion-ezdit-vs-exhat",
@@ -73,34 +73,45 @@ function extractLessonDescription(content: string, categoryLabel: string): strin
   return categoryLabel;
 }
 
-function pickFeaturedLesson(dayBucket: number): HomeFeaturedLesson | null {
+function toFeaturedLesson(summary: ReturnType<typeof listLessonSummaries>[number]): HomeFeaturedLesson {
+  const full = getLessonBySlug(summary.slug);
+  const categoryLabel = MANUAL_CATEGORY_LABELS[summary.category];
+
+  return {
+    title: summary.title,
+    description: full
+      ? extractLessonDescription(full.content, categoryLabel)
+      : categoryLabel,
+    readingMinutes: summary.estimatedReadingTime,
+    levelLabel: summary.level.toUpperCase(),
+    href: `/manual/lecons/${summary.slug}`,
+  };
+}
+
+function pickFeaturedLesson(): HomeFeaturedLesson | null {
   const summaries = listLessonSummaries();
   if (summaries.length === 0) {
     return null;
   }
 
-  const curated = FEATURED_LESSON_SLUGS.map((slug) => summaries.find((lesson) => lesson.slug === slug))
-    .filter((lesson): lesson is NonNullable<typeof lesson> => Boolean(lesson));
+  for (const slug of FEATURED_LESSON_SLUGS) {
+    const editorPick = summaries.find((lesson) => lesson.slug === slug);
+    if (editorPick) {
+      return toFeaturedLesson(editorPick);
+    }
+  }
 
-  const pool = curated.length > 0 ? curated : summaries;
-  const picked = pool[dayBucket % pool.length]!;
-  const full = getLessonBySlug(picked.slug);
-  const categoryLabel = MANUAL_CATEGORY_LABELS[picked.category];
+  const popular = [...summaries].sort((left, right) => {
+    if (right.keywords.length !== left.keywords.length) {
+      return right.keywords.length - left.keywords.length;
+    }
+    return left.difficulty - right.difficulty;
+  })[0]!;
 
-  return {
-    title: picked.title,
-    description: full
-      ? extractLessonDescription(full.content, categoryLabel)
-      : categoryLabel,
-    readingMinutes: picked.estimatedReadingTime,
-    levelLabel: picked.level.toUpperCase(),
-    href: `/manual/lecons/${picked.slug}`,
-  };
+  return toFeaturedLesson(popular);
 }
 
 export async function getHomeJournalData(): Promise<HomeJournalData> {
-  const dayBucket = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-
   const [todaysDiscovery, lemmaPool] = await Promise.all([
     getTodaysDiscovery(),
     prisma.knowledgeLemma.findMany({
@@ -111,7 +122,8 @@ export async function getHomeJournalData(): Promise<HomeJournalData> {
     }),
   ]);
 
-  const reviewStart = dayBucket % Math.max(1, lemmaPool.length - 5);
+  const reviewStart =
+    Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % Math.max(1, lemmaPool.length - 5);
   const reviewLemmas = lemmaPool.slice(reviewStart, reviewStart + 5);
   const reviewWords: HomeReviewWord[] = reviewLemmas.map((item, index) => ({
     label: item.lemma.toUpperCase(),
@@ -125,7 +137,7 @@ export async function getHomeJournalData(): Promise<HomeJournalData> {
       words: reviewWords,
       moreCount: Math.max(0, lemmaPool.length - reviewWords.length),
     },
-    featuredLesson: pickFeaturedLesson(dayBucket),
+    featuredLesson: pickFeaturedLesson(),
     reviewHref: "/explorer/lemmas",
   };
 }

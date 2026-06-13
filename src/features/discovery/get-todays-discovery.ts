@@ -1,5 +1,3 @@
-import type { FeaturedCandidate } from "@prisma/client";
-
 import {
   collocationPath,
   conceptPath,
@@ -9,41 +7,17 @@ import {
 import { practicePath } from "@/lib/practice/constants";
 import { prisma } from "@/lib/prisma";
 
-import { getDateKey } from "./discovery-seed";
+import { getDateKey, discoverySeed, hashString, seededIndex } from "./discovery-seed";
 import { getLearnerContext } from "./get-learner-context";
+import {
+  isCuratedCandidateId,
+  loadCandidateById,
+  loadCandidatePool,
+} from "./load-candidate-pool";
 import { parseJsonStringArray } from "./parse-json-array";
 import { pickTypeForSeed, scoreCandidate } from "./score-candidate";
-import { discoverySeed, hashString, seededIndex } from "./discovery-seed";
 import type { FeaturedCandidateRow, TodaysDiscovery } from "./types";
-import {
-  DISCOVERY_TYPE_LABELS,
-  DISCOVERY_TYPE_WEIGHTS,
-  MIN_QUALITY_SCORE,
-} from "./types";
-
-function toRow(candidate: FeaturedCandidate): FeaturedCandidateRow {
-  return {
-    id: candidate.id,
-    type: candidate.type,
-    lemma: candidate.lemma,
-    frequency: candidate.frequency,
-    register: candidate.register,
-    difficulty: candidate.difficulty,
-    topics: candidate.topics,
-    relations: candidate.relations,
-    qualityScore: candidate.qualityScore,
-    lastFeatured: candidate.lastFeatured,
-    manualPriority: candidate.manualPriority,
-    subtitle: candidate.subtitle,
-    explanation: candidate.explanation,
-    exampleRussian: candidate.exampleRussian,
-    exampleTranslation: candidate.exampleTranslation,
-    explorerHref: candidate.explorerHref,
-    practiceHref: candidate.practiceHref,
-    readExamplesHref: candidate.readExamplesHref,
-    partOfSpeech: candidate.partOfSpeech,
-  };
-}
+import { DISCOVERY_TYPE_LABELS, DISCOVERY_TYPE_WEIGHTS } from "./types";
 
 function defaultExplorerHref(candidate: FeaturedCandidateRow): string {
   if (candidate.explorerHref) {
@@ -160,23 +134,6 @@ function selectCandidate(
   return tieBand[seededIndex(seed, tieBand.length)] ?? scored[0]?.candidate ?? null;
 }
 
-async function loadCandidateById(id: string): Promise<FeaturedCandidateRow | null> {
-  const candidate = await prisma.featuredCandidate.findUnique({ where: { id } });
-  return candidate ? toRow(candidate) : null;
-}
-
-async function loadCandidatePool(): Promise<FeaturedCandidateRow[]> {
-  const candidates = await prisma.featuredCandidate.findMany({
-    where: {
-      validated: true,
-      qualityScore: { gte: MIN_QUALITY_SCORE },
-    },
-    orderBy: [{ qualityScore: "desc" }, { frequency: "desc" }],
-  });
-
-  return candidates.map(toRow);
-}
-
 export async function getTodaysDiscovery(): Promise<TodaysDiscovery | null> {
   const dateKey = getDateKey();
   const { learnerId, signals, cachedDiscovery } = await getLearnerContext(dateKey);
@@ -201,10 +158,12 @@ export async function getTodaysDiscovery(): Promise<TodaysDiscovery | null> {
   }
 
   if (!cachedDiscovery) {
-    await prisma.featuredCandidate.update({
-      where: { id: selected.id },
-      data: { lastFeatured: new Date() },
-    });
+    if (!isCuratedCandidateId(selected.id)) {
+      await prisma.featuredCandidate.update({
+        where: { id: selected.id },
+        data: { lastFeatured: new Date() },
+      });
+    }
   }
 
   return toDiscoveryView(selected, dateKey);

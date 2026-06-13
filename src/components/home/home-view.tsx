@@ -3,7 +3,6 @@ import type { TextListItem } from "@/features/texts";
 
 import { HomeFeaturedSection } from "./home-featured-section";
 import { HomePracticeSection } from "./home-practice-section";
-import { HomeQuickAccess } from "./home-quick-access";
 import { HomeReviewSection } from "./home-review-section";
 import { HomeTodaysDiscovery } from "./home-todays-discovery";
 
@@ -32,10 +31,6 @@ export function HomeView({ journal, texts }: HomeViewProps) {
       <HomeDivider />
 
       <HomePracticeSection />
-
-      <HomeDivider />
-
-      <HomeQuickAccess />
     </div>
   );
 }
