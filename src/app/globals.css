@@ -1,0 +1,697 @@
+@import "tailwindcss";
+
+/* ─── Rossiyani Design System v2 — Editorial Foundations ───
+   Source of truth: design/design-system.md
+   Phase 3 — Foundations. Do not add decorative tokens here.
+────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Paper & surfaces */
+  --paper: #f6f4ef;
+  --surface-primary: #fcfbf8;
+  --surface-secondary: #f0ece4;
+
+  /* Ink */
+  --ink: #1f1f1d;
+  --ink-secondary: #66635f;
+  --ink-muted: #8a867f;
+  --ink-disabled: #b7b2aa;
+
+  /* Semantic — meaning only, never decoration */
+  --color-link: #5f768d;
+  --color-grammar: #74806f;
+  --color-culture: #b39255;
+  --color-exception: #8a4c43;
+
+  /* Hairlines */
+  --hairline: rgba(31, 31, 29, 0.1);
+  --hairline-strong: rgba(31, 31, 29, 0.16);
+
+  /* Layout rhythm */
+  --layout-max: 1400px;
+  --layout-padding-inline: clamp(1.25rem, 4vw, 4rem);
+  --layout-gap: clamp(1rem, 2vw, 2.5rem);
+  --layout-section-gap: clamp(2rem, 5vw, 6rem);
+  --content-max: 1200px;
+  --reading-max: min(760px, 100%);
+  --annotation-max: 320px;
+  --sidebar-width: 200px;
+  --header-height: 4.5rem;
+
+  /* Spacing scale (8px base) */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+  --space-7: 96px;
+
+  /* Radius — restrained */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Typography */
+  --font-editorial: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", monospace;
+
+  /* Type scale */
+  --text-hero: clamp(3rem, 8vw, 6rem);
+  --text-page: clamp(2.5rem, 4vw, 4rem);
+  --text-section: clamp(1.5rem, 3vw, 2rem);
+  --text-subsection: clamp(1.25rem, 2vw, 1.5rem);
+  --text-body: clamp(1rem, 1.5vw, 1.125rem);
+  --text-body-sm: clamp(1rem, 1.5vw, 1rem);
+  --text-caption: clamp(0.8125rem, 1.2vw, 0.875rem);
+  --text-meta: clamp(0.6875rem, 1vw, 0.75rem);
+
+  /* Motion — fade & slide only */
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* Legacy aliases — mapped to v2 tokens during migration */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --muted: var(--ink-muted);
+  --surface: var(--surface-primary);
+  --surface-elevated: var(--surface-secondary);
+  --border: var(--hairline);
+  --border-strong: var(--hairline-strong);
+  --accent-violet: var(--color-link);
+  --accent-violet-bright: var(--color-link);
+  --accent-cyan: var(--color-grammar);
+  --accent-cyan-bright: var(--color-grammar);
+  --error: var(--color-exception);
+  --success: var(--color-grammar);
+  --shadow-soft: none;
+  --shadow-glow: none;
+  --reader-font: var(--font-editorial);
+  --ui-font: var(--font-ui);
+  --radius-xl: var(--radius-lg);
+  --ease-out: var(--ease-editorial);
+
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --font-family-reader: var(--font-editorial);
+  --font-family-ui: var(--font-ui);
+  --font-family-mono: var(--font-mono);
+}
+
+/* ─── Base ─── */
+html {
+  overflow-x: clip;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-body-sm);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+  min-width: 0;
+}
+
+.font-reader {
+  font-family: var(--font-editorial);
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+.font-mono-ling {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  letter-spacing: 0.01em;
+}
+
+/* ─── Editorial typography utilities ─── */
+.text-eyebrow {
+  font-size: var(--text-meta);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.text-metadata {
+  font-size: var(--text-caption);
+  color: var(--ink-secondary);
+  line-height: 1.5;
+}
+
+.home-section-label {
+  font-size: clamp(0.6875rem, 1vw, 0.875rem);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+/* Russian text — prevent horizontal overflow */
+.break-russian {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.editorial-shell {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: var(--layout-max);
+  padding-inline: var(--layout-padding-inline);
+}
+
+.editorial-title {
+  font-family: var(--font-editorial);
+  font-size: var(--text-page);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  color: var(--ink);
+}
+
+.editorial-hero {
+  font-family: var(--font-editorial);
+  font-size: var(--text-hero);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  color: var(--ink);
+}
+
+.editorial-section-title {
+  font-family: var(--font-editorial);
+  font-size: var(--text-section);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.editorial-intro {
+  max-width: var(--reading-max);
+  font-size: var(--text-body);
+  line-height: 1.7;
+  color: var(--ink-secondary);
+}
+
+/* ─── Structure ─── */
+.hairline {
+  border: none;
+  border-top: 1px solid var(--hairline);
+  margin: 0;
+}
+
+.editorial-section {
+  padding-block: var(--space-5);
+}
+
+.editorial-section + .editorial-section {
+  border-top: 1px solid var(--hairline);
+}
+
+.editorial-reading-column {
+  max-width: var(--reading-max);
+}
+
+.editorial-content-column {
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+/* ─── Surfaces — flat, paper, no elevation tricks ─── */
+.surface-elevated {
+  background: var(--surface-secondary);
+}
+
+.surface-primary {
+  background: var(--surface-primary);
+}
+
+/* ─── Links — editorial, not startup ─── */
+.link-editorial {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color var(--duration-fast) ease;
+}
+
+.link-editorial:hover {
+  color: var(--ink);
+}
+
+/* ─── Buttons — quiet, almost invisible ─── */
+.btn-primary {
+  background: var(--ink);
+  color: var(--surface-primary);
+  border-radius: var(--radius-pill);
+  transition: opacity var(--duration-normal) ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.88;
+}
+
+.btn-primary:active {
+  opacity: 0.82;
+}
+
+.btn-primary:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+}
+
+.btn-interactive {
+  transition:
+    opacity var(--duration-normal) ease,
+    color var(--duration-normal) ease,
+    background var(--duration-normal) ease;
+}
+
+.btn-interactive:active {
+  opacity: 0.85;
+}
+
+/* ─── Legacy card class — neutralized (Phase 3) ─── */
+.card-hover {
+  transition:
+    border-color var(--duration-normal) ease,
+    background var(--duration-normal) ease;
+}
+
+.card-hover:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--hairline-strong);
+}
+
+.chip-transition {
+  transition:
+    color var(--duration-normal) ease,
+    border-color var(--duration-normal) ease,
+    background var(--duration-normal) ease;
+}
+
+.chip-transition:active {
+  opacity: 0.85;
+}
+
+/* ─── Semantic text colors ─── */
+.text-link {
+  color: var(--color-link);
+}
+
+.text-grammar {
+  color: var(--color-grammar);
+}
+
+.text-culture {
+  color: var(--color-culture);
+}
+
+.text-exception {
+  color: var(--color-exception);
+}
+
+/* ─── Animations — fade & slide only ─── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up var(--duration-slow) var(--ease-editorial) forwards;
+  opacity: 0;
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.animate-fade-out {
+  animation: fade-out 0.28s var(--ease-editorial) forwards;
+  pointer-events: none;
+}
+
+@keyframes sentence-translation-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-sentence-translation-fade {
+  animation: sentence-translation-fade var(--duration-normal) var(--ease-editorial) forwards;
+  opacity: 0;
+}
+
+@keyframes microscope-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-microscope-in {
+  animation: microscope-in var(--duration-slow) var(--ease-editorial) forwards;
+}
+
+@keyframes stem-reveal {
+  from {
+    opacity: 0;
+    transform: translateX(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-stem-reveal {
+  animation: stem-reveal 0.4s var(--ease-editorial) forwards;
+}
+
+@keyframes ending-pop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-ending-pop {
+  animation: ending-pop var(--duration-slow) var(--ease-editorial) forwards;
+  opacity: 0;
+}
+
+.animate-ending-glow {
+  animation: none;
+}
+
+@keyframes word-select {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-word-select {
+  animation: word-select 0.3s ease-out;
+}
+
+@keyframes shared-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-shared-enter {
+  animation: shared-enter 0.3s var(--ease-editorial) forwards;
+  opacity: 0;
+}
+
+.word-hover-preview {
+  animation: shared-enter 0.15s ease forwards;
+}
+
+@keyframes search-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-search-in {
+  animation: search-fade-in 0.2s ease forwards;
+}
+
+.panel-transition {
+  transition: opacity var(--duration-normal) ease;
+}
+
+@keyframes microscope-slide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-microscope-slide {
+  animation: microscope-slide var(--duration-slow) var(--ease-editorial) forwards;
+  opacity: 0;
+}
+
+.microscope-panel {
+  background: var(--paper);
+}
+
+.declension-cell {
+  transition:
+    border-color var(--duration-normal) ease,
+    background var(--duration-normal) ease;
+}
+
+.declension-cell:hover {
+  transform: none;
+}
+
+.reader-fullscreen {
+  width: 100%;
+  min-width: 0;
+}
+
+.mobile-nav-safe {
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 640px) {
+  .mobile-nav-safe {
+    padding-bottom: 0;
+  }
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in var(--duration-slow) var(--ease-editorial) forwards;
+}
+
+@keyframes success-pop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-success-pop {
+  animation: success-pop var(--duration-slow) var(--ease-editorial) forwards;
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0.55;
+  }
+}
+
+.skeleton-shimmer {
+  background: var(--surface-secondary);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.focus-kb:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+}
+
+/* ─── Manual prose — editorial chapter ─── */
+.manual-prose {
+  color: var(--ink);
+  line-height: 1.75;
+  font-size: var(--text-body);
+  max-width: var(--reading-max);
+}
+
+.manual-prose h2 {
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-2);
+  font-family: var(--font-editorial);
+  font-size: var(--text-subsection);
+  font-weight: 600;
+  color: var(--ink);
+  scroll-margin-top: calc(var(--header-height) + 1rem);
+}
+
+.manual-prose h2:first-child {
+  margin-top: 0;
+}
+
+.manual-prose h3,
+.manual-prose strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.manual-prose p {
+  margin: var(--space-2) 0;
+  color: var(--ink);
+}
+
+.manual-prose ul,
+.manual-prose ol {
+  margin: var(--space-2) 0;
+  padding-left: 1.25rem;
+  color: var(--ink-secondary);
+}
+
+.manual-prose li {
+  margin: 0.35rem 0;
+}
+
+.manual-prose li::marker {
+  color: var(--ink-muted);
+}
+
+.manual-prose table {
+  width: 100%;
+  margin: var(--space-3) 0;
+  border-collapse: collapse;
+  font-size: var(--text-body-sm);
+}
+
+.manual-prose th,
+.manual-prose td {
+  border: 1px solid var(--hairline);
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+}
+
+.manual-prose th {
+  background: var(--surface-secondary);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.manual-prose td {
+  color: var(--ink-secondary);
+}
+
+.manual-prose hr {
+  margin: var(--space-4) 0;
+  border: none;
+  border-top: 1px solid var(--hairline);
+}
+
+.manual-prose a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.manual-prose code {
+  border-radius: var(--radius-sm);
+  background: var(--surface-secondary);
+  padding: 0.1rem 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+.manual-prose blockquote {
+  margin: var(--space-2) 0;
+  border-left: 2px solid var(--color-culture);
+  padding-left: var(--space-2);
+  color: var(--ink-secondary);
+  font-style: italic;
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-out,
+  .animate-sentence-translation-fade,
+  .animate-microscope-in,
+  .animate-microscope-slide,
+  .animate-stem-reveal,
+  .animate-ending-pop,
+  .animate-word-select,
+  .animate-search-in,
+  .animate-shared-enter,
+  .animate-toast-in,
+  .animate-success-pop,
+  .skeleton-shimmer,
+  .word-hover-preview,
+  .panel-transition,
+  .card-hover,
+  .card-hover:hover,
+  .btn-interactive:active,
+  .declension-cell:hover {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

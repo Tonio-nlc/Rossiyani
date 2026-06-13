@@ -1,0 +1,62 @@
+[
+  {
+    "type": "CONSTRUCTION",
+    "lemma": "несмотря на",
+    "subtitle": "in spite of",
+    "explanation": "Introduces a contrast — something happens despite an obstacle.",
+    "exampleRussian": "Несмотря на дождь, мы пошли гулять.",
+    "exampleTranslation": "In spite of the rain, we went for a walk.",
+    "frequency": 120,
+    "register": "neutral",
+    "difficulty": "B1",
+    "topics": ["conversation", "contrast"],
+    "relations": ["на", "хотя"],
+    "qualityScore": 95,
+    "manualPriority": 10
+  },
+  {
+    "type": "EXPRESSION",
+    "lemma": "как дела?",
+    "subtitle": "how are you?",
+    "explanation": "The everyday check-in — informal, warm, and essential in spoken Russian.",
+    "exampleRussian": "Привет! Как дела?",
+    "exampleTranslation": "Hi! How are you?",
+    "frequency": 200,
+    "register": "informal",
+    "difficulty": "A1",
+    "topics": ["conversation"],
+    "relations": ["привет"],
+    "qualityScore": 88,
+    "manualPriority": 7
+  },
+  {
+    "type": "EXPRESSION",
+    "lemma": "ничего страшного",
+    "subtitle": "it's nothing / no worries",
+    "explanation": "Softens mistakes and reassures — a calm, native way to dismiss concern.",
+    "exampleRussian": "Опоздал? Ничего страшного.",
+    "exampleTranslation": "You're late? No worries.",
+    "frequency": 95,
+    "register": "informal",
+    "difficulty": "A2",
+    "topics": ["conversation"],
+    "relations": ["страшный", "ничего"],
+    "qualityScore": 87,
+    "manualPriority": 6
+  },
+  {
+    "type": "EXPRESSION",
+    "lemma": "конечно",
+    "subtitle": "of course",
+    "explanation": "Agreement without hesitation — one of the most natural affirmations in speech.",
+    "exampleRussian": "— Можешь помочь? — Конечно.",
+    "exampleTranslation": "— Can you help? — Of course.",
+    "frequency": 180,
+    "register": "neutral",
+    "difficulty": "A1",
+    "topics": ["conversation"],
+    "relations": [],
+    "qualityScore": 86,
+    "manualPriority": 5
+  }
+]

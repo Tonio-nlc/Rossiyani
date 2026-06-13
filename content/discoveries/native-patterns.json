@@ -1,0 +1,32 @@
+[
+  {
+    "type": "NATIVE_PHRASE",
+    "lemma": "давай(те)",
+    "subtitle": "let's / come on",
+    "explanation": "The Swiss army knife of spoken Russian — suggestion, encouragement, or farewell depending on tone.",
+    "exampleRussian": "Давай, рассказывай!",
+    "exampleTranslation": "Come on, tell me!",
+    "frequency": 190,
+    "register": "informal",
+    "difficulty": "A2",
+    "topics": ["conversation"],
+    "relations": ["давайте"],
+    "qualityScore": 88,
+    "manualPriority": 7
+  },
+  {
+    "type": "CONVERSATION",
+    "lemma": "ладно",
+    "subtitle": "okay / fine",
+    "explanation": "Closes negotiation — agreement, resignation, or a gentle change of subject.",
+    "exampleRussian": "Ладно, договорились.",
+    "exampleTranslation": "Okay, it's agreed.",
+    "frequency": 160,
+    "register": "informal",
+    "difficulty": "A2",
+    "topics": ["conversation"],
+    "relations": ["хорошо"],
+    "qualityScore": 87,
+    "manualPriority": 6
+  }
+]

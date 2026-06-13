@@ -1,0 +1,50 @@
+[
+  {
+    "type": "WORD",
+    "lemma": "добираться",
+    "subtitle": "to get to (with effort)",
+    "explanation": "Completes the motion verb family — reaching a destination, often with difficulty or multiple steps.",
+    "exampleRussian": "Мне нужно добраться до аэропорта к восьми.",
+    "exampleTranslation": "I need to get to the airport by eight.",
+    "frequency": 88,
+    "register": "neutral",
+    "difficulty": "B1",
+    "topics": ["motion"],
+    "relations": ["ехать", "идти", "ходить", "поехать"],
+    "qualityScore": 90,
+    "manualPriority": 8,
+    "partOfSpeech": "verb"
+  },
+  {
+    "type": "WORD",
+    "lemma": "оказывается",
+    "subtitle": "it turns out",
+    "explanation": "Marks a discovery mid-conversation — when something becomes clear as you speak.",
+    "exampleRussian": "Оказывается, он уже уехал.",
+    "exampleTranslation": "It turns out he already left.",
+    "frequency": 72,
+    "register": "neutral",
+    "difficulty": "B1",
+    "topics": ["conversation"],
+    "relations": ["оказаться"],
+    "qualityScore": 88,
+    "manualPriority": 7,
+    "partOfSpeech": "verb"
+  },
+  {
+    "type": "WORD",
+    "lemma": "вообще",
+    "subtitle": "generally / at all",
+    "explanation": "A discourse particle that generalizes, intensifies, or softens — context decides the shade.",
+    "exampleRussian": "Ты вообще понимаешь, о чём речь?",
+    "exampleTranslation": "Do you even understand what we're talking about?",
+    "frequency": 150,
+    "register": "informal",
+    "difficulty": "B1",
+    "topics": ["conversation"],
+    "relations": [],
+    "qualityScore": 87,
+    "manualPriority": 6,
+    "partOfSpeech": "adverb"
+  }
+]

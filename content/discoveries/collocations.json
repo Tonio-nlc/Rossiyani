@@ -1,0 +1,32 @@
+[
+  {
+    "type": "COLLOCATION",
+    "lemma": "принимать решение",
+    "subtitle": "to make a decision",
+    "explanation": "Decisions are 'accepted' in Russian, not 'made' — a high-frequency verb–noun pair.",
+    "exampleRussian": "Он долго принимал решение.",
+    "exampleTranslation": "He took a long time to make a decision.",
+    "frequency": 75,
+    "register": "neutral",
+    "difficulty": "B1",
+    "topics": ["conversation"],
+    "relations": ["решение", "принять"],
+    "qualityScore": 86,
+    "manualPriority": 6
+  },
+  {
+    "type": "COLLOCATION",
+    "lemma": "обращать внимание",
+    "subtitle": "to pay attention",
+    "explanation": "Literally 'turn attention' — the standard way to say noticing or heeding something.",
+    "exampleRussian": "Обратите внимание на детали.",
+    "exampleTranslation": "Pay attention to the details.",
+    "frequency": 68,
+    "register": "formal",
+    "difficulty": "B1",
+    "topics": ["conversation"],
+    "relations": ["внимание"],
+    "qualityScore": 84,
+    "manualPriority": 5
+  }
+]

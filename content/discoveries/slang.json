@@ -1,0 +1,32 @@
+[
+  {
+    "type": "SLANG",
+    "lemma": "жиза",
+    "subtitle": "so true / relatable",
+    "explanation": "Internet slang for instant recognition — when something feels painfully accurate.",
+    "exampleRussian": "Когда будильник звонит в понедельник — жиза.",
+    "exampleTranslation": "When the alarm goes off on Monday — so relatable.",
+    "frequency": 45,
+    "register": "slang",
+    "difficulty": "B2",
+    "topics": ["internet"],
+    "relations": ["мем", "реально"],
+    "qualityScore": 92,
+    "manualPriority": 9
+  },
+  {
+    "type": "SLANG",
+    "lemma": "кринж",
+    "subtitle": "cringe",
+    "explanation": "Borrowed internet slang for second-hand embarrassment — widely used among younger speakers.",
+    "exampleRussian": "Это было такой кринж.",
+    "exampleTranslation": "That was so cringe.",
+    "frequency": 30,
+    "register": "slang",
+    "difficulty": "B2",
+    "topics": ["internet"],
+    "relations": ["стремно"],
+    "qualityScore": 85,
+    "manualPriority": 5
+  }
+]

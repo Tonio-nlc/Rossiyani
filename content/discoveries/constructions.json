@@ -1,0 +1,47 @@
+[
+  {
+    "type": "CONSTRUCTION",
+    "lemma": "несмотря на",
+    "subtitle": "in spite of",
+    "explanation": "Introduces a contrast — something happens despite an obstacle.",
+    "exampleRussian": "Несмотря на усталость, она закончила работу.",
+    "exampleTranslation": "In spite of being tired, she finished the work.",
+    "frequency": 120,
+    "register": "neutral",
+    "difficulty": "B1",
+    "topics": ["contrast", "conversation"],
+    "relations": ["хотя", "на"],
+    "qualityScore": 95,
+    "manualPriority": 10
+  },
+  {
+    "type": "CONSTRUCTION",
+    "lemma": "чтобы",
+    "subtitle": "so that / in order to",
+    "explanation": "Purpose clause — links an action to its intended outcome.",
+    "exampleRussian": "Я пришёл раньше, чтобы успеть.",
+    "exampleTranslation": "I came early so that I would make it in time.",
+    "frequency": 210,
+    "register": "neutral",
+    "difficulty": "B1",
+    "topics": ["grammar", "purpose"],
+    "relations": ["что", "для"],
+    "qualityScore": 90,
+    "manualPriority": 8
+  },
+  {
+    "type": "CONSTRUCTION",
+    "lemma": "хотя",
+    "subtitle": "although",
+    "explanation": "Concessive clause — acknowledges a fact that does not prevent the main idea.",
+    "exampleRussian": "Хотя было холодно, мы гуляли.",
+    "exampleTranslation": "Although it was cold, we went for a walk.",
+    "frequency": 140,
+    "register": "neutral",
+    "difficulty": "B1",
+    "topics": ["contrast"],
+    "relations": ["несмотря на"],
+    "qualityScore": 89,
+    "manualPriority": 7
+  }
+]

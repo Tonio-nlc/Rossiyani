@@ -1,0 +1,572 @@
+// Rossiyani V2 — Interactive Russian reading platform
+// Precomputed linguistic database + Knowledge Graph.
+// AI is used only during import; reader reads from DB.
+// See docs/ARCHITECTURE.md and src/domain/README.md.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum CefrLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  Native
+}
+
+enum Register {
+  neutral
+  informal
+  formal
+  literary
+  slang
+}
+
+enum PartOfSpeech {
+  noun
+  verb
+  adjective
+  pronoun
+  adverb
+  numeral
+  preposition
+  conjunction
+  particle
+  interjection
+}
+
+enum WordFrequency {
+  VERY_COMMON
+  COMMON
+  UNCOMMON
+  RARE
+}
+
+enum FrequencyTier {
+  TOP_500
+  TOP_1000
+  TOP_3000
+  BEYOND_TOP_3000
+}
+
+enum PhraseGroupType {
+  COLLOCATION
+  FIXED_EXPRESSION
+  NATIVE_CONSTRUCTION
+}
+
+enum KnowledgeConceptCategory {
+  GRAMMATICAL_CASE
+  GRAMMAR_PATTERN
+  PREPOSITION_PATTERN
+  CONSTRUCTION
+  SEMANTIC
+  OTHER
+}
+
+enum KnowledgeReviewStatus {
+  PENDING
+  CANONICAL
+  REJECTED
+}
+
+enum FeaturedCandidateType {
+  WORD
+  EXPRESSION
+  CONSTRUCTION
+  COLLOCATION
+  GRAMMAR
+  SLANG
+  CONVERSATION
+  REGIONAL
+  NATIVE_PHRASE
+}
+
+enum ImportJobStatus {
+  PENDING
+  PROCESSING
+  PAUSED
+  COMPLETED
+  FAILED
+}
+
+enum ImportJobItemStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  SKIPPED_DUPLICATE
+}
+
+model Text {
+  id          String     @id @default(cuid())
+  title       String
+  level       CefrLevel
+  source      String?
+  contentHash String?    @unique
+  createdAt   DateTime   @default(now())
+  sentences   Sentence[]
+}
+
+model Sentence {
+  id                 String                     @id @default(cuid())
+  textId             String
+  text               Text                       @relation(fields: [textId], references: [id], onDelete: Cascade)
+  position           Int
+  russianText        String
+  literalTranslation String
+  naturalTranslation String
+  russianLogic       String
+  orderExplanation   String
+  nativeUsageNotes   String
+  register           Register
+  /// 1 = very easy, 2 = easy, 3 = intermediate, 4 = difficult, 5 = advanced/native
+  difficultyScore    Int
+  needsReview        Boolean                    @default(false)
+  reviewMessage      String?
+  /// Full pipeline output JSON (SentenceAnalysisOutput) — source of truth for rehydration.
+  analysisJson       String?
+  /// Syntax tree / dependency analysis produced at import.
+  syntaxAnalysisJson String?
+  /// Cultural notes array JSON: [{ title, explanation }]
+  culturalNotesJson  String?
+  words              Word[]
+  phraseGroups       PhraseGroup[]
+  conceptLinks       KnowledgeConceptSentence[]
+  phraseLinks        KnowledgePhraseSentence[]
+
+  @@unique([textId, position])
+  @@index([textId])
+  @@index([difficultyScore])
+  @@index([register])
+}
+
+model Word {
+  id            String          @id @default(cuid())
+  sentenceId    String
+  sentence      Sentence        @relation(fields: [sentenceId], references: [id], onDelete: Cascade)
+  /// FK to canonical KnowledgeForm — reader resolves from graph, not AI.
+  formId        String?
+  form          KnowledgeForm?  @relation(fields: [formId], references: [id], onDelete: SetNull)
+  position      Int
+  original      String
+  lemma         String
+  stressMarked  String
+  stem          String
+  ending        String
+  partOfSpeech  PartOfSpeech
+  case          String?
+  gender        String?
+  number        String?
+  tense         String?
+  aspect        String?
+  explanation              String
+  /// Canonical French gloss for this occurrence (from AI import).
+  translationCanonical     String?
+  translationAlternatives  Json?
+  frequency                WordFrequency?
+  frequencyTier            FrequencyTier?
+
+  @@unique([sentenceId, position])
+  @@index([sentenceId])
+  @@index([formId])
+  @@index([frequency])
+  @@index([frequencyTier])
+}
+
+model PhraseGroup {
+  id            String           @id @default(cuid())
+  sentenceId    String
+  sentence      Sentence         @relation(fields: [sentenceId], references: [id], onDelete: Cascade)
+  /// FK to canonical KnowledgePhrase (Expression or Collocation).
+  phraseId      String?
+  phrase        KnowledgePhrase? @relation(fields: [phraseId], references: [id], onDelete: SetNull)
+  type          PhraseGroupType
+  label         String
+  explanation   String
+  startPosition Int
+  endPosition   Int
+
+  @@index([sentenceId])
+  @@index([phraseId])
+}
+
+// ---------------------------------------------------------------------------
+// LinguisticLibrary — cross-text reusable knowledge (see docs/LINGUISTIC_LIBRARY.md)
+// ---------------------------------------------------------------------------
+
+model KnowledgeLemma {
+  id                   String                @id @default(cuid())
+  lemma                String
+  partOfSpeech         PartOfSpeech
+  stressMarked         String
+  frequency            WordFrequency?
+  frequencyTier        FrequencyTier?
+  occurrenceCount      Int                   @default(0)
+  canonicalExplanation String?
+  frenchComparison     String?
+  reviewStatus         KnowledgeReviewStatus @default(PENDING)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  forms                KnowledgeForm[]
+  occurrences          KnowledgeOccurrence[]
+  conceptLinks         KnowledgeLemmaConcept[]
+  phraseLinks          KnowledgeLemmaPhrase[]
+
+  @@unique([lemma, partOfSpeech])
+  @@index([lemma])
+  @@index([occurrenceCount])
+}
+
+model KnowledgeForm {
+  id                   String                @id @default(cuid())
+  lemmaId              String
+  lemma                KnowledgeLemma        @relation(fields: [lemmaId], references: [id], onDelete: Cascade)
+  originalKey          String                @unique
+  original             String
+  stressMarked         String
+  stem                 String
+  ending               String
+  partOfSpeech         PartOfSpeech
+  case                 String?
+  gender               String?
+  number               String?
+  tense                String?
+  aspect               String?
+  explanation          String
+  canonicalExplanation String?
+  hitCount             Int                   @default(1)
+  occurrenceCount      Int                   @default(0)
+  reviewStatus         KnowledgeReviewStatus @default(PENDING)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  occurrences          KnowledgeOccurrence[]
+  words                Word[]
+
+  @@index([lemmaId])
+  @@index([ending])
+  @@index([occurrenceCount])
+}
+
+model KnowledgeEnding {
+  id                   String                   @id @default(cuid())
+  endingKey            String                   @unique
+  ending               String
+  caseKey              String
+  /// FK to KnowledgeCase — Case → Endings relation.
+  caseId               String?
+  caseNode             KnowledgeCase?           @relation(fields: [caseId], references: [id], onDelete: SetNull)
+  partOfSpeech         PartOfSpeech?
+  explanationFr        String
+  canonicalExplanation String?
+  hitCount             Int                      @default(1)
+  reviewStatus         KnowledgeReviewStatus    @default(PENDING)
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  conceptLinks         KnowledgeEndingConcept[]
+
+  @@index([ending])
+  @@index([caseKey])
+  @@index([caseId])
+}
+
+model KnowledgePhrase {
+  id                   String                    @id @default(cuid())
+  labelKey             String                    @unique
+  label                String
+  type                 PhraseGroupType
+  explanation          String
+  canonicalExplanation String?
+  hitCount             Int                       @default(1)
+  occurrenceCount      Int                       @default(0)
+  reviewStatus         KnowledgeReviewStatus     @default(PENDING)
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @updatedAt
+  phraseOccurrences    KnowledgePhraseOccurrence[]
+  conceptLinks         KnowledgePhraseConcept[]
+  lemmaLinks           KnowledgeLemmaPhrase[]
+  sentenceLinks        KnowledgePhraseSentence[]
+  phraseGroups         PhraseGroup[]
+
+  @@index([type])
+  @@index([occurrenceCount])
+}
+
+model KnowledgeSentence {
+  id              String   @id @default(cuid())
+  russianTextKey  String   @unique
+  russianText     String
+  analysisJson    String
+  needsReview     Boolean  @default(false)
+  hitCount        Int      @default(1)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// KnowledgeGraph — canonical pedagogical graph (see docs/KNOWLEDGE_GRAPH.md)
+// ---------------------------------------------------------------------------
+
+model KnowledgeConcept {
+  id                   String                   @id @default(cuid())
+  conceptKey           String                   @unique
+  title                String
+  canonicalExplanation String
+  category             KnowledgeConceptCategory
+  frenchComparison     String?
+  commonMistakesJson   String?
+  reviewStatus         KnowledgeReviewStatus    @default(PENDING)
+  hitCount             Int                      @default(0)
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  caseNode             KnowledgeCase?
+  lemmaLinks           KnowledgeLemmaConcept[]
+  endingLinks          KnowledgeEndingConcept[]
+  phraseLinks          KnowledgePhraseConcept[]
+  relatedFrom          KnowledgeConceptRelation[] @relation("ConceptFrom")
+  relatedTo            KnowledgeConceptRelation[] @relation("ConceptTo")
+  sentenceLinks        KnowledgeConceptSentence[]
+
+  @@index([category])
+  @@index([reviewStatus])
+}
+
+model KnowledgeConceptRelation {
+  id            String           @id @default(cuid())
+  fromConceptId String
+  toConceptId   String
+  relationType  String
+  fromConcept   KnowledgeConcept @relation("ConceptFrom", fields: [fromConceptId], references: [id], onDelete: Cascade)
+  toConcept     KnowledgeConcept @relation("ConceptTo", fields: [toConceptId], references: [id], onDelete: Cascade)
+
+  @@unique([fromConceptId, toConceptId, relationType])
+  @@index([fromConceptId])
+  @@index([toConceptId])
+}
+
+model KnowledgeCase {
+  id                   String                @id @default(cuid())
+  caseKey              String                @unique
+  titleFr              String
+  canonicalExplanation String?
+  reviewStatus         KnowledgeReviewStatus @default(PENDING)
+  hitCount             Int                   @default(0)
+  conceptId            String?               @unique
+  concept              KnowledgeConcept?     @relation(fields: [conceptId], references: [id], onDelete: SetNull)
+  endings              KnowledgeEnding[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+}
+
+model KnowledgeLemmaConcept {
+  id        String           @id @default(cuid())
+  lemmaId   String
+  conceptId String
+  lemma     KnowledgeLemma   @relation(fields: [lemmaId], references: [id], onDelete: Cascade)
+  concept   KnowledgeConcept @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+
+  @@unique([lemmaId, conceptId])
+  @@index([lemmaId])
+  @@index([conceptId])
+}
+
+model KnowledgeEndingConcept {
+  id        String           @id @default(cuid())
+  endingId  String
+  conceptId String
+  ending    KnowledgeEnding  @relation(fields: [endingId], references: [id], onDelete: Cascade)
+  concept   KnowledgeConcept @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+
+  @@unique([endingId, conceptId])
+  @@index([endingId])
+  @@index([conceptId])
+}
+
+model KnowledgePhraseConcept {
+  id        String           @id @default(cuid())
+  phraseId  String
+  conceptId String
+  phrase    KnowledgePhrase  @relation(fields: [phraseId], references: [id], onDelete: Cascade)
+  concept   KnowledgeConcept @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+
+  @@unique([phraseId, conceptId])
+  @@index([phraseId])
+  @@index([conceptId])
+}
+
+/// Cross-text word occurrence — example sentences attached to the graph.
+model KnowledgeOccurrence {
+  id                  String         @id @default(cuid())
+  formId              String
+  lemmaId             String
+  sentenceKey         String
+  sentenceRussian     String
+  naturalTranslation  String?
+  textId              String?
+  textTitle           String?
+  wordInstanceId      String?
+  wordPosition        Int
+  explanationSnapshot String
+  createdAt           DateTime       @default(now())
+  form                KnowledgeForm  @relation(fields: [formId], references: [id], onDelete: Cascade)
+  lemma               KnowledgeLemma @relation(fields: [lemmaId], references: [id], onDelete: Cascade)
+
+  @@unique([formId, sentenceKey, wordPosition])
+  @@index([lemmaId])
+  @@index([formId])
+  @@index([sentenceKey])
+  @@index([textId])
+}
+
+/// Lemma → Expression/Collocation (KnowledgePhrase).
+model KnowledgeLemmaPhrase {
+  id       String          @id @default(cuid())
+  lemmaId  String
+  phraseId String
+  lemma    KnowledgeLemma  @relation(fields: [lemmaId], references: [id], onDelete: Cascade)
+  phrase   KnowledgePhrase @relation(fields: [phraseId], references: [id], onDelete: Cascade)
+
+  @@unique([lemmaId, phraseId])
+  @@index([lemmaId])
+  @@index([phraseId])
+}
+
+/// Concept → Sentence (Knowledge Graph).
+model KnowledgeConceptSentence {
+  id         String           @id @default(cuid())
+  conceptId  String
+  sentenceId String
+  concept    KnowledgeConcept @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  sentence   Sentence         @relation(fields: [sentenceId], references: [id], onDelete: Cascade)
+
+  @@unique([conceptId, sentenceId])
+  @@index([conceptId])
+  @@index([sentenceId])
+}
+
+/// Expression/Collocation → Sentence (Knowledge Graph).
+model KnowledgePhraseSentence {
+  id         String          @id @default(cuid())
+  phraseId   String
+  sentenceId String
+  phrase     KnowledgePhrase @relation(fields: [phraseId], references: [id], onDelete: Cascade)
+  sentence   Sentence        @relation(fields: [sentenceId], references: [id], onDelete: Cascade)
+
+  @@unique([phraseId, sentenceId])
+  @@index([phraseId])
+  @@index([sentenceId])
+}
+
+/// Cross-text phrase occurrence — collocations and constructions with examples.
+model KnowledgePhraseOccurrence {
+  id                 String          @id @default(cuid())
+  phraseId           String
+  sentenceKey        String
+  sentenceRussian    String
+  naturalTranslation String?
+  textId             String?
+  textTitle          String?
+  startPosition      Int
+  endPosition        Int
+  createdAt          DateTime        @default(now())
+  phrase             KnowledgePhrase @relation(fields: [phraseId], references: [id], onDelete: Cascade)
+
+  @@unique([phraseId, sentenceKey, startPosition])
+  @@index([phraseId])
+  @@index([sentenceKey])
+  @@index([textId])
+}
+
+// ---------------------------------------------------------------------------
+// Industrial import — bulk queue (see docs/KNOWLEDGE_PIPELINE.md)
+// ---------------------------------------------------------------------------
+
+model ImportJob {
+  id                 String          @id @default(cuid())
+  name               String
+  status             ImportJobStatus @default(PENDING)
+  totalFiles         Int             @default(0)
+  processedFiles     Int             @default(0)
+  failedFiles        Int             @default(0)
+  skippedDuplicates  Int             @default(0)
+  sentencesProcessed Int             @default(0)
+  knowledgeHits      Int             @default(0)
+  knowledgeMisses    Int             @default(0)
+  aiCalls            Int             @default(0)
+  errorsJson         String?
+  startedAt          DateTime?
+  completedAt        DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  items              ImportJobItem[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ImportJobItem {
+  id           String              @id @default(cuid())
+  jobId        String
+  job          ImportJob           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  position     Int
+  fileName     String
+  title        String
+  level        CefrLevel
+  source       String?
+  filePath     String?
+  contentHash  String
+  status       ImportJobItemStatus @default(PENDING)
+  textId       String?
+  errorMessage String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@unique([jobId, fileName])
+  @@index([jobId, status])
+  @@index([contentHash])
+}
+
+// ---------------------------------------------------------------------------
+// Homepage — curated daily discovery pool (see design/todays-discovery)
+// ---------------------------------------------------------------------------
+
+model FeaturedCandidate {
+  id                 String                @id @default(cuid())
+  type               FeaturedCandidateType
+  lemma              String
+  frequency          Int                   @default(0)
+  register           Register              @default(neutral)
+  difficulty         CefrLevel             @default(B1)
+  /// JSON string[] — thematic tags (motion, internet, conversation, …)
+  topics             Json                  @default("[]")
+  /// JSON string[] — related lemmas, structures, or concept keys
+  relations          Json                  @default("[]")
+  qualityScore       Int                   @default(50)
+  lastFeatured       DateTime?
+  manualPriority     Int                   @default(0)
+  /// Editorial gate — only validated entries appear in Today's Discovery.
+  validated          Boolean               @default(false)
+  subtitle           String?
+  explanation        String?
+  exampleRussian     String?
+  exampleTranslation String?
+  explorerHref       String?
+  practiceHref       String?
+  readExamplesHref   String?
+  partOfSpeech       PartOfSpeech?
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  @@index([type])
+  @@index([qualityScore])
+  @@index([lemma])
+  @@index([lastFeatured])
+  @@index([validated])
+}
