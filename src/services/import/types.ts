@@ -24,8 +24,12 @@ export type ImportRussianTextResult = {
 };
 
 export type ImportPipelineOptions = {
-  /** Delay between AI calls to reduce rate-limit risk (ms). */
+  /** Delay between sentence batches to reduce rate-limit risk (ms). Default 0. */
   delayBetweenSentencesMs?: number;
+  /** Max sentences per single AI request. Default 12. */
+  analysisBatchSize?: number;
+  /** Parallel sentence persistence workers. Default 4. */
+  sentenceConcurrency?: number;
   /** Mutable metrics accumulator for bulk import / reporting. */
   metrics?: ImportRunMetrics;
   /** Skip import when contentHash already exists in Text table. */

@@ -1,4 +1,5 @@
 import { callAnthropicMessages } from "../clients/anthropic-client";
+import { requestBatchSentenceAnalysis } from "../request-batch-analysis";
 import { requestSentenceAnalysis } from "../request-analysis";
 import type { SentenceAnalysisInput, SentenceAnalysisOutput } from "../schemas";
 
@@ -19,12 +20,23 @@ export class ClaudeProvider implements AIProvider {
     this.model = options?.model ?? process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-20250514";
   }
 
-  analyzeSentence(input: SentenceAnalysisInput): Promise<SentenceAnalysisOutput> {
-    return requestSentenceAnalysis(input, {
+  private analysisConfig() {
+    return {
       apiKey: this.apiKey,
       model: this.model,
       providerLabel: "Claude",
       callModel: callAnthropicMessages,
-    });
+    };
+  }
+
+  analyzeSentence(input: SentenceAnalysisInput): Promise<SentenceAnalysisOutput> {
+    return requestSentenceAnalysis(input, this.analysisConfig());
+  }
+
+  async analyzeSentencesBatch(
+    inputs: SentenceAnalysisInput[],
+  ): Promise<SentenceAnalysisOutput[]> {
+    const result = await requestBatchSentenceAnalysis(inputs, this.analysisConfig());
+    return result.analyses;
   }
 }

@@ -13,13 +13,14 @@ import {
 import { ImportTranslationTracker } from "@/lib/diagnostics/import-translation-tracker";
 import { logImportError, logImportPhase, logPrismaError } from "@/lib/diagnostics";
 import { isMeaningfulSentence } from "@/lib/import/is-meaningful-sentence";
+import { runWithConcurrency } from "@/lib/import/run-with-concurrency";
 import { computeContentHash } from "@/lib/hash/content-hash";
 import { prisma } from "@/lib/prisma";
 import { buildMinimalAnalysis } from "@/services/ai/build-minimal-analysis";
 import type { AnalysisStatus } from "@/services/ai/schemas";
 import type { SentencePipelineContext, TextPipelineResult, ImportSegmentStats } from "@/domain/pipeline";
 import type { AIProvider } from "@/services/ai";
-import { analyzeWithKnowledge } from "@/services/knowledge";
+import { analyzeBatchWithKnowledge } from "@/services/knowledge";
 import {
   applyQualityToAnalysis,
   sanitizeSentenceText,
@@ -42,7 +43,15 @@ import {
   runSyntaxStage,
 } from "./stages";
 
-const DEFAULT_DELAY_MS = 300;
+const DEFAULT_DELAY_MS = 0;
+const DEFAULT_SENTENCE_CONCURRENCY = 4;
+const DEFAULT_ANALYSIS_BATCH_SIZE = 12;
+
+type PreparedSegment = {
+  sentenceIndex: number;
+  rawRussianText: string;
+  sanitizedText: string;
+};
 
 function createSentenceContext(
   textId: string,
@@ -70,9 +79,54 @@ function createSentenceContext(
   };
 }
 
+function prepareSegments(
+  sentenceTexts: string[],
+  invalidSurfaces: string[],
+): PreparedSegment[] {
+  const prepared: PreparedSegment[] = [];
+
+  for (let index = 0; index < sentenceTexts.length; index += 1) {
+    const rawRussianText = sentenceTexts[index]!;
+    const sentenceIndex = index + 1;
+
+    const sanitizedText = auditPipelineStepSync(
+      "sanitizeSentence",
+      "pipeline-orchestrator.ts:prepare",
+      {
+        sentenceIndex,
+        russianTextLength: rawRussianText.length,
+        preview: auditPreviewText(rawRussianText),
+        invalidSurfaceCount: invalidSurfaces.length,
+      },
+      () => sanitizeSentenceText(rawRussianText, invalidSurfaces),
+      (result) => ({
+        sanitizedLength: result.length,
+        preview: auditPreviewText(result),
+        changed: result !== rawRussianText,
+      }),
+    );
+
+    if (!isMeaningfulSentence(sanitizedText)) {
+      recordPipelineStep({
+        step: "analyzeWithKnowledge",
+        status: "skipped",
+        location: "pipeline-orchestrator.ts:meaningless",
+        sentenceIndex,
+        input: { reason: "meaningless segment" },
+        output: { skipped: true },
+      });
+      continue;
+    }
+
+    prepared.push({ sentenceIndex, rawRussianText, sanitizedText });
+  }
+
+  return prepared;
+}
+
 /**
- * Full import pipeline: Text → Segmentation → … → Knowledge Graph.
- * AI is invoked only inside analyzeWithKnowledge (cache miss).
+ * Full import pipeline: Text → Segmentation → batch analysis → parallel persistence.
+ * AI is invoked in batches inside analyzeBatchWithKnowledge (cache miss only).
  */
 export async function runTextImportPipeline(
   input: ImportRussianTextInput,
@@ -91,7 +145,7 @@ export async function runTextImportPipeline(
     recordPipelineStep({
       step: "import",
       status: "success",
-      location: "pipeline-orchestrator.ts:88",
+      location: "pipeline-orchestrator.ts:import",
       input: {
         title: input.title,
         level: input.level,
@@ -100,9 +154,7 @@ export async function runTextImportPipeline(
         rawTextLength: input.rawText.length,
         preview: auditPreviewText(input.rawText),
       },
-      output: {
-        contentHash,
-      },
+      output: { contentHash },
     });
 
     if (options?.skipDuplicates !== false) {
@@ -139,7 +191,7 @@ export async function runTextImportPipeline(
       recordPipelineStep({
         step: "segmentSentences",
         status: "failure",
-        location: "pipeline-orchestrator.ts:131",
+        location: "pipeline-orchestrator.ts:segment",
         output: { sentenceCount: 0 },
         error: { message: "Aucune phrase détectée dans le texte fourni." },
       });
@@ -148,7 +200,7 @@ export async function runTextImportPipeline(
 
     const qualityReport = await auditPipelineStep(
       "lexicalValidation",
-      "pipeline-orchestrator.ts:140",
+      "pipeline-orchestrator.ts:lexical",
       { cleanedTextLength: cleanedText.length },
       () => validateImportTextLexical(cleanedText),
       (report) => ({
@@ -165,23 +217,14 @@ export async function runTextImportPipeline(
         `Qualité lexicale : ${qualityReport.knownCount} connus, ${qualityReport.unknownCount} nouveaux, ${qualityReport.suspiciousCount} suspects, ${qualityReport.invalidCount} ignorés.`,
       );
     }
-    let wordCount = 0;
-    let phraseGroupCount = 0;
-    let sentencesNeedingReview = 0;
-    const translationTracker = new ImportTranslationTracker();
-    const segmentStats: ImportSegmentStats = {
-      total: sentenceTexts.length,
-      complete: 0,
-      partial: 0,
-      failed: 0,
-      lost: 0,
-    };
+
+    const preparedSegments = prepareSegments(sentenceTexts, qualityReport.invalidSurfaces);
 
     let text;
     try {
       text = await auditPipelineStep(
         "textCreate",
-        "pipeline-orchestrator.ts:164",
+        "pipeline-orchestrator.ts:textCreate",
         { title: input.title, level: input.level, contentHash },
         () =>
           prisma.text.create({
@@ -199,81 +242,62 @@ export async function runTextImportPipeline(
       throw error;
     }
 
-    const delayMs = options?.delayBetweenSentencesMs ?? DEFAULT_DELAY_MS;
+    const analysisByText = await analyzeBatchWithKnowledge(
+      preparedSegments.map((segment) => segment.sanitizedText),
+      provider,
+      {
+        metrics,
+        batchSize: options?.analysisBatchSize ?? DEFAULT_ANALYSIS_BATCH_SIZE,
+      },
+    );
+
+    const translationTracker = new ImportTranslationTracker();
+    const segmentStats: ImportSegmentStats = {
+      total: preparedSegments.length,
+      complete: 0,
+      partial: 0,
+      failed: 0,
+      lost: 0,
+    };
+
+    let wordCount = 0;
+    let phraseGroupCount = 0;
+    let sentencesNeedingReview = 0;
     let storedPosition = 0;
 
-    for (let i = 0; i < sentenceTexts.length; i++) {
-      const russianText = sentenceTexts[i]!;
-      const sentenceIndex = i + 1;
-      setCurrentSentenceIndex(sentenceIndex);
+    const segmentsWithPosition = preparedSegments.map((segment, index) => ({
+      ...segment,
+      storagePosition: index,
+    }));
 
-      if (storedPosition > 0 && delayMs > 0) {
+    const sentenceConcurrency = options?.sentenceConcurrency ?? DEFAULT_SENTENCE_CONCURRENCY;
+    const delayMs = options?.delayBetweenSentencesMs ?? DEFAULT_DELAY_MS;
+
+    await runWithConcurrency(segmentsWithPosition, sentenceConcurrency, async (segment) => {
+      if (delayMs > 0) {
         await sleep(delayMs);
       }
 
-      const sanitizedText = auditPipelineStepSync(
-        "sanitizeSentence",
-        "pipeline-orchestrator.ts:196",
-        {
-          sentenceIndex,
-          russianTextLength: russianText.length,
-          preview: auditPreviewText(russianText),
-          invalidSurfaceCount: qualityReport.invalidSurfaces.length,
-        },
-        () => sanitizeSentenceText(russianText, qualityReport.invalidSurfaces),
-        (result) => ({
-          sanitizedLength: result.length,
-          preview: auditPreviewText(result),
-          changed: result !== russianText,
-        }),
-      );
+      setCurrentSentenceIndex(segment.sentenceIndex);
 
-      if (!isMeaningfulSentence(sanitizedText)) {
-        translationTracker.recordSkippedSegment();
-        logImportPhase("segment skipped — not meaningful", {
-          sentenceIndex,
-          preview: auditPreviewText(sanitizedText),
-        });
-        recordPipelineStep({
-          step: "analyzeWithKnowledge",
-          status: "skipped",
-          location: "pipeline-orchestrator.ts:228",
-          sentenceIndex,
-          input: { reason: "meaningless segment" },
-          output: { skipped: true },
-        });
-        continue;
-      }
-
-      let analysis;
-      try {
-        analysis = await analyzeWithKnowledge(sanitizedText, provider, {
-          metrics,
-          sentenceIndex,
-        });
-      } catch (error) {
-        logImportError("analyzeWithKnowledge", error, {
-          sentenceIndex,
-          russianText: sanitizedText,
-        });
-        recordPipelineFailure(
-          "analyzeWithKnowledge",
-          "pipeline-orchestrator.ts:218",
-          { sentenceIndex, russianText: auditPreviewText(sanitizedText) },
-          error,
-        );
-        const message = error instanceof Error ? error.message : "Erreur inconnue";
-        warnings.push(`Phrase ${sentenceIndex}: analyse IA en échec — enregistrement partiel.`);
-        analysis = buildMinimalAnalysis({
-          russianText: sanitizedText,
+      let analysis =
+        analysisByText.get(segment.sanitizedText) ??
+        buildMinimalAnalysis({
+          russianText: segment.sanitizedText,
           status: "failed",
-          reason: message,
+          reason: "Analyse indisponible après traitement groupé.",
         });
+
+      analysis = applyQualityToAnalysis(analysis, qualityReport);
+
+      if (segment.sanitizedText !== segment.rawRussianText) {
+        analysis = { ...analysis, russianText: segment.sanitizedText };
       }
 
       const chunkStatus: AnalysisStatus = analysis.analysisStatus ?? (
         analysis.words.length > 0 ? "complete" : "partial"
       );
+
       if (chunkStatus === "complete") {
         segmentStats.complete += 1;
       } else if (chunkStatus === "partial") {
@@ -282,39 +306,24 @@ export async function runTextImportPipeline(
         segmentStats.failed += 1;
       }
 
-      logImportPhase("chunk import status", {
-        chunk: sentenceIndex,
-        status: chunkStatus,
-        reason: analysis.words.length === 0 ? "words_empty" : undefined,
-        wordCount: analysis.words.length,
-        saved: true,
-      });
-
-      analysis = applyQualityToAnalysis(analysis, qualityReport);
-      recordPipelineStep({
-        step: "applyQuality",
-        status: "success",
-        location: "pipeline-orchestrator.ts:232",
-        sentenceIndex,
-        input: { wordCount: analysis.words.length },
-        output: { needsReview: analysis.needsReview ?? false },
-      });
-
-      if (sanitizedText !== russianText) {
-        analysis = { ...analysis, russianText: sanitizedText };
-      }
-
       if (analysis.needsReview) {
         sentencesNeedingReview += 1;
       }
 
-      if (analysis.russianText.trim() !== russianText.trim()) {
+      if (analysis.russianText.trim() !== segment.rawRussianText.trim()) {
         warnings.push(
-          `Phrase ${sentenceIndex}: le texte renvoyé par l'IA diffère légèrement de l'original.`,
+          `Phrase ${segment.sentenceIndex}: le texte renvoyé par l'IA diffère légèrement de l'original.`,
         );
       }
 
-      let ctx = createSentenceContext(text.id, input.title, storedPosition, russianText);
+      const position = segment.storagePosition;
+
+      let ctx = createSentenceContext(
+        text.id,
+        input.title,
+        position,
+        segment.rawRussianText,
+      );
       ctx = runMorphologyStage(ctx, analysis);
       ctx = runFixedExpressionsStage(ctx, analysis);
       ctx = runCollocationsStage(ctx, analysis);
@@ -330,12 +339,12 @@ export async function runTextImportPipeline(
         const kgOutput = await runKnowledgeGraphStage(storedCtx, analysis, storageOutput);
 
         await translationTracker.recordSentence({
-          sentenceIndex,
+          sentenceIndex: segment.sentenceIndex,
           analysis,
           knowledgeConcepts: kgOutput.conceptsLinked,
         });
 
-        storedPosition += 1;
+        storedPosition = Math.max(storedPosition, position + 1);
         wordCount += analysis.words.length;
         phraseGroupCount += storageOutput.phraseGroupCount;
       } catch (error) {
@@ -349,41 +358,46 @@ export async function runTextImportPipeline(
           segmentStats.failed -= 1;
         }
         logImportError("pipeline storage/graph", error, {
-          sentenceIndex,
+          sentenceIndex: segment.sentenceIndex,
           textId: text.id,
         });
         recordPipelineFailure(
           "storage",
-          "pipeline-orchestrator.ts:278",
-          { sentenceIndex, textId: text.id },
+          "pipeline-orchestrator.ts:storage",
+          { sentenceIndex: segment.sentenceIndex, textId: text.id },
           error,
         );
-        warnings.push(`Phrase ${sentenceIndex}: enregistrement impossible — ${error instanceof Error ? error.message : "erreur"}.`);
+        warnings.push(
+          `Phrase ${segment.sentenceIndex}: enregistrement impossible — ${error instanceof Error ? error.message : "erreur"}.`,
+        );
       }
-    }
+    });
 
     setCurrentSentenceIndex(undefined);
 
     const sentenceCount = await prisma.sentence.count({ where: { textId: text.id } });
     setImportPipelineMeta({ storedSentenceCount: sentenceCount });
 
-    if (sentenceCount === 0 && sentenceTexts.length > 0) {
+    if (sentenceCount === 0 && preparedSegments.length > 0) {
       logImportPhase("finalize: emergency persist — no sentences saved", {
         textId: text.id,
-        segmentCount: sentenceTexts.length,
+        segmentCount: preparedSegments.length,
       });
-      for (let i = 0; i < sentenceTexts.length; i++) {
-        const emergencyText = sentenceTexts[i]!.trim();
-        if (!emergencyText) {
-          continue;
-        }
+      for (const segment of preparedSegments) {
         const emergencyAnalysis = buildMinimalAnalysis({
-          russianText: emergencyText,
+          russianText: segment.sanitizedText,
           status: "failed",
           reason: "Enregistrement d'urgence — analyse indisponible.",
         });
         try {
-          let ctx = createSentenceContext(text.id, input.title, storedPosition, emergencyText);
+          const position = storedPosition;
+          storedPosition += 1;
+          let ctx = createSentenceContext(
+            text.id,
+            input.title,
+            position,
+            segment.rawRussianText,
+          );
           ctx = { ...ctx, analysis: emergencyAnalysis };
           ctx = runMorphologyStage(ctx, emergencyAnalysis);
           ctx = runFixedExpressionsStage(ctx, emergencyAnalysis);
@@ -398,12 +412,14 @@ export async function runTextImportPipeline(
             emergencyAnalysis,
           );
           await runKnowledgeGraphStage(storedCtx, emergencyAnalysis, storageOutput);
-          storedPosition += 1;
           segmentStats.failed += 1;
-          warnings.push(`Segment ${i + 1}: enregistré en mode dégradé.`);
+          warnings.push(`Segment ${segment.sentenceIndex}: enregistré en mode dégradé.`);
         } catch (emergencyError) {
           segmentStats.lost += 1;
-          logImportError("emergency persist", emergencyError, { index: i + 1, textId: text.id });
+          logImportError("emergency persist", emergencyError, {
+            index: segment.sentenceIndex,
+            textId: text.id,
+          });
         }
       }
     }

@@ -1,4 +1,5 @@
 import { callOpenAIChat } from "../clients/openai-client";
+import { requestBatchSentenceAnalysis } from "../request-batch-analysis";
 import { requestSentenceAnalysis } from "../request-analysis";
 import type { SentenceAnalysisInput, SentenceAnalysisOutput } from "../schemas";
 
@@ -19,12 +20,23 @@ export class OpenAIProvider implements AIProvider {
     this.model = options?.model ?? process.env.OPENAI_MODEL ?? "gpt-4o";
   }
 
-  analyzeSentence(input: SentenceAnalysisInput): Promise<SentenceAnalysisOutput> {
-    return requestSentenceAnalysis(input, {
+  private analysisConfig() {
+    return {
       apiKey: this.apiKey,
       model: this.model,
       providerLabel: "OpenAI",
       callModel: callOpenAIChat,
-    });
+    };
+  }
+
+  analyzeSentence(input: SentenceAnalysisInput): Promise<SentenceAnalysisOutput> {
+    return requestSentenceAnalysis(input, this.analysisConfig());
+  }
+
+  async analyzeSentencesBatch(
+    inputs: SentenceAnalysisInput[],
+  ): Promise<SentenceAnalysisOutput[]> {
+    const result = await requestBatchSentenceAnalysis(inputs, this.analysisConfig());
+    return result.analyses;
   }
 }

@@ -47,6 +47,44 @@ export class KnowledgeLookupService {
     };
   }
 
+  /** Batch sentence cache lookup — one query for many texts. */
+  async lookupSentencesBatch(
+    russianTexts: string[],
+  ): Promise<KnowledgeSentenceLookupResult[]> {
+    if (russianTexts.length === 0) {
+      return [];
+    }
+
+    const keyByText = new Map(
+      russianTexts.map((text) => [text, sentenceLookupKey(text)] as const),
+    );
+    const keys = [...new Set(keyByText.values())];
+
+    const rows = await prisma.knowledgeSentence.findMany({
+      where: { russianTextKey: { in: keys } },
+    });
+
+    const rowByKey = new Map(rows.map((row) => [row.russianTextKey, row]));
+
+    return russianTexts.map((text) => {
+      const key = keyByText.get(text)!;
+      const row = rowByKey.get(key);
+
+      if (!row) {
+        return { hit: false, complete: false, analysis: null, source: "miss" as const };
+      }
+
+      const analysis = parseSentenceAnalysisOutput(JSON.parse(row.analysisJson));
+
+      return {
+        hit: true,
+        complete: !row.needsReview,
+        analysis,
+        source: "cache" as const,
+      };
+    });
+  }
+
   async lookupForm(original: string): Promise<KnowledgeFormLookupResult | null> {
     const key = formLookupKey(original);
     const row = await prisma.knowledgeForm.findUnique({

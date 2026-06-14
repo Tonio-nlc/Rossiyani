@@ -19,24 +19,36 @@ export async function runStorageStage(
   const sortedWords = [...analysis.words].sort((a, b) => a.position - b.position);
 
   const formIdByPosition = new Map<number, string>();
+  const originalKeys = sortedWords.map((word) => formLookupKey(word.original));
+  const forms =
+    originalKeys.length > 0
+      ? await prisma.knowledgeForm.findMany({
+          where: { originalKey: { in: originalKeys } },
+          select: { id: true, originalKey: true },
+        })
+      : [];
+  const formIdByKey = new Map(forms.map((form) => [form.originalKey, form.id]));
   for (const word of sortedWords) {
-    const form = await prisma.knowledgeForm.findUnique({
-      where: { originalKey: formLookupKey(word.original) },
-      select: { id: true },
-    });
-    if (form) {
-      formIdByPosition.set(word.position, form.id);
+    const formId = formIdByKey.get(formLookupKey(word.original));
+    if (formId) {
+      formIdByPosition.set(word.position, formId);
     }
   }
 
   const phraseIdByLabel = new Map<string, string>();
+  const phraseKeys = analysis.phraseGroups.map((group) => phraseLookupKey(group.label));
+  const phrases =
+    phraseKeys.length > 0
+      ? await prisma.knowledgePhrase.findMany({
+          where: { labelKey: { in: phraseKeys } },
+          select: { id: true, labelKey: true },
+        })
+      : [];
+  const phraseIdByKey = new Map(phrases.map((phrase) => [phrase.labelKey, phrase.id]));
   for (const group of analysis.phraseGroups) {
-    const phrase = await prisma.knowledgePhrase.findUnique({
-      where: { labelKey: phraseLookupKey(group.label) },
-      select: { id: true },
-    });
-    if (phrase) {
-      phraseIdByLabel.set(group.label, phrase.id);
+    const phraseId = phraseIdByKey.get(phraseLookupKey(group.label));
+    if (phraseId) {
+      phraseIdByLabel.set(group.label, phraseId);
     }
   }
 
