@@ -28,7 +28,7 @@ export type { HomeFeaturedLesson } from "./pick-featured-lesson";
 export type HomeJournalData = {
   todaysDiscovery: TodaysDiscovery | null;
   review: HomeReviewToday;
-  featuredLesson: HomeFeaturedLesson;
+  featuredLesson: HomeFeaturedLesson | null;
   featuredPractice: HomeFeaturedPractice;
   reviewHref: string;
 };

@@ -107,10 +107,10 @@ function findDiscoveryLinkedLesson(
  * 2. Lesson linked to Today's Discovery
  * 3. First available lesson
  */
-export function pickFeaturedLesson(discovery: TodaysDiscovery | null): HomeFeaturedLesson {
+export function pickFeaturedLesson(discovery: TodaysDiscovery | null): HomeFeaturedLesson | null {
   const summaries = listLessonSummaries();
   if (summaries.length === 0) {
-    throw new Error("No manual lessons available for homepage featured lesson.");
+    return null;
   }
 
   const dayBucket = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
