@@ -15,6 +15,12 @@ import { prisma } from "@/lib/prisma";
 import { PHRASE_GROUP_TYPE_LABELS } from "@/types/domain";
 
 import {
+  enrichConceptPage,
+  enrichCuratedPage,
+  enrichLemmaCuratedPage,
+  enrichPhraseKnowledgePage,
+} from "./enrich-page-data";
+import {
   curatedCandidateHref,
   CURATED_TYPE_LABELS,
   genericDescriptionForCurated,
@@ -22,6 +28,7 @@ import {
 } from "./paths";
 import {
   findCuratedByRelation,
+  findCuratedCandidateExact,
   getPopularCuratedConstructions,
 } from "./curated-lookup";
 import { phraseTypeLabel } from "./resolve-phrase";
@@ -32,7 +39,6 @@ import type {
   ExplorerEntityPick,
   PhraseRouteHint,
 } from "./types";
-import { buildMetadataLine } from "./types";
 
 async function fetchRelatedPhrasePicks(
   label: string,
@@ -52,14 +58,18 @@ async function fetchRelatedPhrasePicks(
     select: { label: true, type: true },
   });
 
-  return phrases.map((phrase) => ({
-    label: phrase.label,
-    href:
-      phrase.type === "COLLOCATION"
-        ? collocationPath(phrase.label)
-        : expressionPath(phrase.label),
-    meta: PHRASE_GROUP_TYPE_LABELS[phrase.type],
-  }));
+  return phrases.map((phrase) => {
+    const curated = findCuratedCandidateExact(phrase.label);
+    return {
+      label: phrase.label,
+      href:
+        phrase.type === "COLLOCATION"
+          ? collocationPath(phrase.label)
+          : expressionPath(phrase.label),
+      typeBadge: PHRASE_GROUP_TYPE_LABELS[phrase.type],
+      translation: curated?.subtitle ?? undefined,
+    };
+  });
 }
 
 function curatedRelations(candidate: FeaturedCandidateRow): string[] {
@@ -88,6 +98,7 @@ async function resolveRelationPicks(relations: string[]): Promise<ExplorerEntity
       picks.push({
         label: lemma.lemma,
         href: lemmaPath(lemma.lemma, lemma.partOfSpeech),
+        typeBadge: "Word",
       });
       continue;
     }
@@ -98,12 +109,15 @@ async function resolveRelationPicks(relations: string[]): Promise<ExplorerEntity
     });
     if (phrase) {
       seen.add(key);
+      const curated = findCuratedCandidateExact(phrase.label);
       picks.push({
         label: phrase.label,
         href:
           phrase.type === "COLLOCATION"
             ? collocationPath(phrase.label)
             : expressionPath(phrase.label),
+        typeBadge: PHRASE_GROUP_TYPE_LABELS[phrase.type],
+        translation: curated?.subtitle ?? undefined,
       });
       continue;
     }
@@ -114,7 +128,8 @@ async function resolveRelationPicks(relations: string[]): Promise<ExplorerEntity
       picks.push({
         label: curated.lemma,
         href: curatedCandidateHref(curated),
-        meta: CURATED_TYPE_LABELS[curated.type],
+        typeBadge: CURATED_TYPE_LABELS[curated.type],
+        translation: curated.subtitle ?? undefined,
       });
     }
   }
@@ -138,7 +153,15 @@ function buildContinueExploring(
   relatedGrammar: ExplorerEntityPick[],
   relationPicks: ExplorerEntityPick[],
 ): ExplorerEntityPick[] {
-  const merged = dedupePicks([...relatedExpressions, ...relatedGrammar, ...relationPicks]);
+  const merged = dedupePicks([
+    ...relatedExpressions.map((pick) => ({ ...pick, reason: pick.reason ?? "Similar meaning" })),
+    ...relationPicks.map((pick) => ({
+      ...pick,
+      reason: pick.reason ?? "Commonly learned together",
+    })),
+    ...relatedGrammar.map((pick) => ({ ...pick, reason: pick.reason ?? "Grammar neighbour" })),
+  ]);
+
   if (merged.length >= 4) {
     return merged.slice(0, 4);
   }
@@ -146,7 +169,9 @@ function buildContinueExploring(
   const popular = getPopularCuratedConstructions(4 - merged.length).map((candidate) => ({
     label: candidate.lemma,
     href: curatedCandidateHref(candidate),
-    meta: candidate.subtitle ?? undefined,
+    translation: candidate.subtitle ?? undefined,
+    typeBadge: CURATED_TYPE_LABELS[candidate.type],
+    reason: "Editor's pick",
   }));
 
   return dedupePicks([...merged, ...popular]).slice(0, 4);
@@ -176,6 +201,7 @@ export async function buildEntityPageFromPhraseKnowledge(
   const relatedGrammar = knowledge.concepts.map((concept) => ({
     label: concept.title,
     href: conceptPath(concept.conceptKey),
+    typeBadge: "Grammar",
   }));
   const relationPicks = await resolveRelationPicks([]);
 
@@ -184,6 +210,7 @@ export async function buildEntityPageFromPhraseKnowledge(
       ? knowledge.exampleSentences.map((sentence) => ({ russian: sentence }))
       : relatedExpressions.slice(0, 4).map((item) => ({
           russian: item.label,
+          translation: item.translation,
         }));
 
   const relatedTexts: ExplorerEntityExample[] = knowledge.relatedTexts.map((text) => ({
@@ -199,11 +226,13 @@ export async function buildEntityPageFromPhraseKnowledge(
 
   const typeLabel = phraseTypeLabel(knowledge.type);
 
-  return {
+  const base: ExplorerEntityPageData = {
     kind: phraseKind(routeHint),
     label: knowledge.label,
     translation: undefined,
-    metadataLine: buildMetadataLine(typeLabel),
+    typeLabel,
+    badges: [],
+    metadataLine: typeLabel,
     description:
       knowledge.canonicalExplanation?.trim() || genericDescriptionForPhraseType(knowledge.type),
     examples,
@@ -212,9 +241,12 @@ export async function buildEntityPageFromPhraseKnowledge(
     relatedTexts,
     relatedLessons,
     continueExploring: buildContinueExploring(relatedExpressions, relatedGrammar, relationPicks),
+    textCount: knowledge.seenInTexts,
     practiceStructure: knowledge.label,
     breadcrumb: breadcrumbForPhrase(routeHint, knowledge.label),
   };
+
+  return enrichPhraseKnowledgePage(base, knowledge);
 }
 
 export async function buildEntityPageFromCuratedPhrase(
@@ -222,9 +254,10 @@ export async function buildEntityPageFromCuratedPhrase(
   routeHint: PhraseRouteHint,
 ): Promise<ExplorerEntityPageData> {
   const relationPicks = await resolveRelationPicks(curatedRelations(curated));
-  const relatedGrammar = curated.type === "GRAMMAR"
-    ? [{ label: curated.lemma, href: conceptPath(curated.lemma) }]
-    : [];
+  const relatedGrammar =
+    curated.type === "GRAMMAR"
+      ? [{ label: curated.lemma, href: conceptPath(curated.lemma), typeBadge: "Grammar" }]
+      : [];
 
   const relatedExpressions = relationPicks.filter(
     (pick) => pick.href.includes("/expressions/") || pick.href.includes("/collocations/"),
@@ -238,17 +271,21 @@ export async function buildEntityPageFromCuratedPhrase(
           translation: curated.exampleTranslation || undefined,
         },
       ]
-    : relationPicks.slice(0, 4).map((item) => ({ russian: item.label }));
+    : relationPicks.slice(0, 4).map((item) => ({
+        russian: item.label,
+        translation: item.translation,
+      }));
 
   const relatedLessons = findLemmaRelatedLessons(curated.lemma, []);
-
   const typeLabel = CURATED_TYPE_LABELS[curated.type] ?? curated.type;
 
-  return {
+  const base: ExplorerEntityPageData = {
     kind: phraseKind(routeHint),
     label: curated.lemma,
     translation: curated.subtitle ?? undefined,
-    metadataLine: buildMetadataLine(typeLabel, curated.difficulty as CefrLevel),
+    typeLabel,
+    badges: [],
+    metadataLine: typeLabel,
     description: curated.explanation?.trim() || genericDescriptionForCurated(curated),
     examples,
     relatedExpressions: dedupePicks([...relatedExpressions, ...relatedWords]).slice(0, 8),
@@ -260,9 +297,12 @@ export async function buildEntityPageFromCuratedPhrase(
       relatedGrammar,
       relationPicks,
     ),
+    textCount: 0,
     practiceStructure: curated.lemma,
     breadcrumb: breadcrumbForPhrase(routeHint, curated.lemma),
   };
+
+  return enrichCuratedPage(base, curated);
 }
 
 export async function buildEntityPageFromLemmaCurated(
@@ -277,15 +317,21 @@ export async function buildEntityPageFromLemmaCurated(
           translation: curated.exampleTranslation || undefined,
         },
       ]
-    : relationPicks.slice(0, 4).map((item) => ({ russian: item.label }));
+    : relationPicks.slice(0, 4).map((item) => ({
+        russian: item.label,
+        translation: item.translation,
+      }));
 
   const relatedLessons = findLemmaRelatedLessons(curated.lemma, []);
+  const typeLabel = CURATED_TYPE_LABELS.WORD;
 
-  return {
+  const base: ExplorerEntityPageData = {
     kind: "lemma",
     label: curated.lemma,
     translation: curated.subtitle ?? undefined,
-    metadataLine: buildMetadataLine(CURATED_TYPE_LABELS.WORD, curated.difficulty as CefrLevel),
+    typeLabel,
+    badges: [],
+    metadataLine: typeLabel,
     description: curated.explanation?.trim() || genericDescriptionForCurated(curated),
     examples,
     relatedExpressions: relationPicks.filter((pick) => !pick.href.includes("/lemmas/")),
@@ -293,6 +339,7 @@ export async function buildEntityPageFromLemmaCurated(
     relatedTexts: [],
     relatedLessons,
     continueExploring: buildContinueExploring(relationPicks, [], []),
+    textCount: 0,
     practiceStructure: curated.lemma,
     breadcrumb: [
       { label: "Explorer", href: "/explorer" },
@@ -300,6 +347,8 @@ export async function buildEntityPageFromLemmaCurated(
       { label: curated.lemma },
     ],
   };
+
+  return enrichLemmaCuratedPage(base, curated);
 }
 
 export async function buildEntityPageFromConceptCurated(
@@ -314,13 +363,20 @@ export async function buildEntityPageFromConceptCurated(
           translation: curated.exampleTranslation || undefined,
         },
       ]
-    : relationPicks.slice(0, 4).map((item) => ({ russian: item.label }));
+    : relationPicks.slice(0, 4).map((item) => ({
+        russian: item.label,
+        translation: item.translation,
+      }));
 
-  return {
+  const typeLabel = CURATED_TYPE_LABELS.GRAMMAR;
+
+  const base: ExplorerEntityPageData = {
     kind: "concept",
     label: curated.lemma,
     translation: curated.subtitle ?? undefined,
-    metadataLine: buildMetadataLine(CURATED_TYPE_LABELS.GRAMMAR, curated.difficulty as CefrLevel),
+    typeLabel,
+    badges: [],
+    metadataLine: typeLabel,
     description: curated.explanation?.trim() || genericDescriptionForCurated(curated),
     examples,
     relatedExpressions: relationPicks,
@@ -328,6 +384,7 @@ export async function buildEntityPageFromConceptCurated(
     relatedTexts: [],
     relatedLessons: findLemmaRelatedLessons(curated.lemma, []),
     continueExploring: buildContinueExploring(relationPicks, [], []),
+    textCount: 0,
     practiceStructure: curated.lemma,
     breadcrumb: [
       { label: "Explorer", href: "/explorer" },
@@ -335,6 +392,8 @@ export async function buildEntityPageFromConceptCurated(
       { label: curated.lemma },
     ],
   };
+
+  return enrichCuratedPage(base, curated);
 }
 
 export function buildEntityPageFromConceptKnowledge(
@@ -344,6 +403,7 @@ export function buildEntityPageFromConceptKnowledge(
   const relatedGrammar = concept.relatedConcepts.map((item) => ({
     label: item.title,
     href: conceptPath(item.conceptKey),
+    typeBadge: "Grammar",
   }));
 
   const relatedExpressions = concept.phrases.map((phrase) => ({
@@ -352,6 +412,7 @@ export function buildEntityPageFromConceptKnowledge(
       phrase.type === "COLLOCATION"
         ? collocationPath(phrase.label)
         : expressionPath(phrase.label),
+    typeBadge: PHRASE_GROUP_TYPE_LABELS[phrase.type],
   }));
 
   const examples: ExplorerEntityExample[] =
@@ -365,11 +426,13 @@ export function buildEntityPageFromConceptKnowledge(
           russian: lemma.lemma,
         }));
 
-  return {
+  const base: ExplorerEntityPageData = {
     kind: "concept",
     label: concept.concept.title,
     translation: undefined,
-    metadataLine: buildMetadataLine("Grammar"),
+    typeLabel: "Grammar",
+    badges: [],
+    metadataLine: "Grammar",
     description:
       concept.concept.canonicalExplanation?.trim() ||
       genericDescriptionForPhraseType("GRAMMAR"),
@@ -388,8 +451,10 @@ export function buildEntityPageFromConceptKnowledge(
       concept.lemmas.map((lemma) => ({
         label: lemma.lemma,
         href: lemmaPath(lemma.lemma, lemma.partOfSpeech),
+        typeBadge: "Word",
       })),
     ),
+    textCount: new Set(relatedTexts.map((text) => text.textId)).size,
     practiceStructure: concept.concept.title,
     breadcrumb: [
       { label: "Explorer", href: "/explorer" },
@@ -397,4 +462,6 @@ export function buildEntityPageFromConceptKnowledge(
       { label: concept.concept.title },
     ],
   };
+
+  return enrichConceptPage(base);
 }

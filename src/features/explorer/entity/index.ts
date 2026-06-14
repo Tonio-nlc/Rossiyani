@@ -10,3 +10,11 @@ export type { LemmaEntityResolution } from "./resolve-lemma";
 export { labelsEquivalent, resolvePhraseEntity, phraseTypeLabel } from "./resolve-phrase";
 export type { PhraseEntityResolution } from "./resolve-phrase";
 export type { ExplorerEntityExample, ExplorerEntityKind, ExplorerEntityPageData, ExplorerEntityPick, PhraseRouteHint } from "./types";
+export {
+  buildMetadataLine,
+  buildWhyItMatters,
+  frequencyLabelFromCount,
+  frequencyLabelFromScore,
+  registerBadge,
+  splitEditorialParagraphs,
+} from "./types";
