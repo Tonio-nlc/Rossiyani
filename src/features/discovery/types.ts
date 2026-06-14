@@ -10,6 +10,8 @@ export type LearningSignals = {
   recentTopics: string[];
   /** Daily discovery archive — candidate id + calendar date */
   discoveryArchive: Array<{ candidateId: string; dateKey: string }>;
+  /** Most recently opened manual lesson slugs (most recent first). */
+  recentManualLessonSlugs: string[];
   /** @deprecated Use discoveryArchive — kept for cookie backward compatibility */
   featuredHistory: string[];
 };
@@ -23,6 +25,7 @@ export const EMPTY_LEARNING_SIGNALS: LearningSignals = {
   savedPhraseTexts: [],
   recentTopics: [],
   discoveryArchive: [],
+  recentManualLessonSlugs: [],
   featuredHistory: [],
 };
 

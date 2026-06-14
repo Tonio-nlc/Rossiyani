@@ -44,6 +44,7 @@ function parseSignals(raw: string | undefined): LearningSignals {
       savedPhraseTexts: parsed.savedPhraseTexts ?? [],
       recentTopics: parsed.recentTopics ?? [],
       discoveryArchive,
+      recentManualLessonSlugs: parsed.recentManualLessonSlugs ?? [],
       featuredHistory: parsed.featuredHistory ?? discoveryArchive.map((entry) => entry.candidateId),
     };
   } catch {

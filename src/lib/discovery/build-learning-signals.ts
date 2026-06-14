@@ -3,6 +3,7 @@ import { getSavedComposePhrases } from "@/lib/compose/saved-phrases";
 import { getAllReadingProgress } from "@/lib/reader/reading-progress";
 import type { LearningSignals } from "@/features/discovery";
 import { getDiscoveryArchive } from "@/lib/discovery/saved-discoveries";
+import { getRecentManualLessonSlugs } from "@/lib/manual/manual-lesson-history";
 
 const TOPIC_KEYWORDS: Record<string, string[]> = {
   motion: ["ехать", "идти", "ходить", "поехать", "добираться", "приезжать", "ездить"],
@@ -63,6 +64,7 @@ export function buildLearningSignals(): LearningSignals {
     savedPhraseTexts,
     recentTopics,
     discoveryArchive,
+    recentManualLessonSlugs: getRecentManualLessonSlugs(),
     featuredHistory,
   };
 }

@@ -1,15 +1,14 @@
 import { lemmaPath } from "@/components/explorer/explorer-routes";
 import { getDateKey } from "@/features/discovery/discovery-seed";
 import { getTodaysDiscovery } from "@/features/discovery";
-import type { TodaysDiscovery } from "@/features/discovery";
 import { getLearnerContext } from "@/features/discovery/get-learner-context";
 import { prisma } from "@/lib/prisma";
 
-import { pickFeaturedLesson } from "./pick-featured-lesson";
-import type { HomeFeaturedLesson } from "./pick-featured-lesson";
+import { getFeaturedLesson } from "./get-featured-lesson";
 import { pickFeaturedPractice } from "./pick-featured-practice";
 import type { HomeFeaturedPractice } from "./pick-featured-practice";
 
+export type { HomeFeaturedLesson, GetFeaturedLessonInput } from "./get-featured-lesson";
 export type { HomeFeaturedPractice } from "./pick-featured-practice";
 
 export type HomeReviewWord = {
@@ -23,12 +22,10 @@ export type HomeReviewToday = {
   moreCount: number;
 };
 
-export type { HomeFeaturedLesson } from "./pick-featured-lesson";
-
 export type HomeJournalData = {
-  todaysDiscovery: TodaysDiscovery | null;
+  todaysDiscovery: import("@/features/discovery").TodaysDiscovery | null;
   review: HomeReviewToday;
-  featuredLesson: HomeFeaturedLesson | null;
+  featuredLesson: import("./get-featured-lesson").HomeFeaturedLesson;
   featuredPractice: HomeFeaturedPractice;
   reviewHref: string;
 };
@@ -62,11 +59,14 @@ export async function getHomeJournalData(): Promise<HomeJournalData> {
     count: reviewCountForLemma(item.lemma, index),
   }));
 
-  const featuredPractice = await pickFeaturedPractice({
-    todaysDiscovery,
-    signals,
-    reviewLemmas: reviewLemmas.map((item) => item.lemma),
-  });
+  const [featuredLesson, featuredPractice] = await Promise.all([
+    getFeaturedLesson({ todaysDiscovery, signals }),
+    pickFeaturedPractice({
+      todaysDiscovery,
+      signals,
+      reviewLemmas: reviewLemmas.map((item) => item.lemma),
+    }),
+  ]);
 
   return {
     todaysDiscovery,
@@ -74,7 +74,7 @@ export async function getHomeJournalData(): Promise<HomeJournalData> {
       words: reviewWords,
       moreCount: Math.max(0, lemmaPool.length - reviewWords.length),
     },
-    featuredLesson: pickFeaturedLesson(todaysDiscovery),
+    featuredLesson,
     featuredPractice,
     reviewHref: "/explorer/lemmas",
   };

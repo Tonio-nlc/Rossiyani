@@ -8,6 +8,7 @@ import {
 import { getLessonBySlug } from "@/features/manual";
 
 import { ManualMarkdown } from "./manual-markdown";
+import { ManualLessonVisitTracker } from "./manual-lesson-visit-tracker";
 
 type ManualLessonViewProps = {
   lesson: ManualLesson;
@@ -20,6 +21,7 @@ export function ManualLessonView({ lesson }: ManualLessonViewProps) {
 
   return (
     <article className="mx-auto max-w-3xl">
+      <ManualLessonVisitTracker slug={lesson.slug} />
       <header className="space-y-4 border-b border-[var(--border)] pb-8">
         <Link
           href="/manual"
