@@ -1,29 +1,16 @@
 import { getKnowledgeMetrics } from "@/features/admin";
-import { getDailyConnection } from "@/features/home";
-import { getExplorerIndex, getKnowledgeCanvas } from "@/features/explorer";
-import { listTexts } from "@/features/texts";
+import { getExplorerEditorialData } from "@/features/explorer/get-explorer-editorial";
 import { ExplorerHub } from "@/components/explorer";
 
 export default async function ExplorerPage() {
-  const texts = await listTexts();
-  const [metrics, indexTopics, canvas, dailyConnection] = await Promise.all([
+  const [metrics, editorial] = await Promise.all([
     getKnowledgeMetrics().catch(() => null),
-    getExplorerIndex(texts.length),
-    getKnowledgeCanvas(),
-    getDailyConnection(),
+    getExplorerEditorialData(),
   ]);
 
   const isEmpty =
     !metrics ||
     (metrics.graphSize.lemmas === 0 && metrics.graphSize.concepts === 0);
 
-  return (
-    <ExplorerHub
-      indexTopics={indexTopics}
-      canvas={canvas}
-      dailyConnection={dailyConnection}
-      textCount={texts.length}
-      isEmpty={isEmpty}
-    />
-  );
+  return <ExplorerHub editorial={editorial} isEmpty={isEmpty} />;
 }

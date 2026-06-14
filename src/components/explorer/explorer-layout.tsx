@@ -12,7 +12,7 @@ type ExplorerLayoutProps = {
 export function ExplorerLayout({ breadcrumb, title, subtitle, children }: ExplorerLayoutProps) {
   return (
     <div className="space-y-8 pb-16 animate-fade-up">
-      <header className="space-y-4 border-b border-[var(--border)] pb-6">
+      <header className="space-y-4 pb-6">
         <ExplorerBreadcrumb items={breadcrumb} />
         {title ? (
           <div>

@@ -2,10 +2,11 @@ import Link from "next/link";
 
 import { getCaseLegendEntry } from "@/features/grammar/case-legend-data";
 import type { ConceptKnowledge } from "@/types/knowledge-graph";
-
 import { practicePath } from "@/lib/practice/constants";
 
+import { ExplorerDiscoveryGrid } from "./explorer-discovery-grid";
 import { ExplorerLayout } from "./explorer-layout";
+import { endingPath, lemmaPath, textPath, conceptPath } from "./explorer-routes";
 import {
   collocationChip,
   conceptChip,
@@ -15,12 +16,26 @@ import {
   RelatedNavigation,
   textChip,
 } from "./related-navigation";
-import { endingPath, lemmaPath } from "./explorer-routes";
 
 type ConceptDetailViewProps = {
   concept: ConceptKnowledge;
   relatedTexts: Array<{ textId: string; textTitle: string; sentenceRussian: string }>;
 };
+
+function JourneySection({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="space-y-4">
+      <p className="home-section-label">{label}</p>
+      {children}
+    </section>
+  );
+}
 
 function grammaticalQuestion(concept: ConceptKnowledge): string | null {
   const caseNode = concept.cases[0];
@@ -36,167 +51,151 @@ function grammaticalQuestion(concept: ConceptKnowledge): string | null {
 
 export function ConceptDetailView({ concept, relatedTexts }: ConceptDetailViewProps) {
   const question = grammaticalQuestion(concept);
+  const primaryText = relatedTexts[0];
 
   const related = [
-    ...concept.endings.slice(0, 6).map((e) => endingChip(e.ending, e.caseKey)),
-    ...concept.lemmas.slice(0, 6).map((l) => lemmaChip(l.lemma, l.partOfSpeech)),
+    ...concept.relatedConcepts.slice(0, 6).map((c) => conceptChip(c.conceptKey, c.title)),
+    ...concept.lemmas.slice(0, 4).map((l) => lemmaChip(l.lemma, l.partOfSpeech)),
     ...concept.phrases.slice(0, 4).map((p) =>
       p.type === "COLLOCATION" ? collocationChip(p.label) : expressionChip(p.label),
     ),
-    ...concept.relatedConcepts.slice(0, 4).map((c) => conceptChip(c.conceptKey, c.title)),
-    ...relatedTexts.slice(0, 4).map((t) => textChip(t.textId, t.textTitle)),
+    ...concept.endings.slice(0, 4).map((e) => endingChip(e.ending, e.caseKey)),
+    ...relatedTexts.slice(0, 3).map((t) => textChip(t.textId, t.textTitle)),
   ];
 
   return (
     <ExplorerLayout
-      breadcrumb={[{ label: "Concepts", href: "/explorer/concepts" }, { label: concept.concept.title }]}
-      title={concept.concept.title}
-      subtitle={concept.concept.category.replace(/_/g, " ").toLowerCase()}
+      breadcrumb={[{ label: "Explorer", href: "/explorer" }, { label: concept.concept.title }]}
     >
-      <div className="grid min-w-0 gap-[var(--layout-gap)] lg:grid-cols-[minmax(0,1fr)_minmax(240px,320px)]">
-        <div className="min-w-0 space-y-8">
+      <article className="space-y-12 pb-8">
+        <header className="space-y-4">
+          <p className="font-reader text-[clamp(2rem,4vw,2.75rem)] font-semibold leading-tight tracking-tight text-[var(--ink)]">
+            {concept.concept.title}
+          </p>
+          <p className="text-sm text-[var(--ink-muted)]">
+            {concept.concept.hitCount.toLocaleString("fr-FR")} occurrences ·{" "}
+            {concept.stats.lemmaCount} lemmes
+          </p>
+
+          <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium">
+            {primaryText ? (
+              <li>
+                <Link
+                  href={textPath(primaryText.textId)}
+                  className="focus-kb text-[var(--ink)] underline-offset-2 hover:underline"
+                >
+                  See authentic examples →
+                </Link>
+              </li>
+            ) : null}
+            <li>
+              <Link
+                href={practicePath({
+                  structure: concept.concept.title,
+                  mode: "structure",
+                  from: "explorer",
+                })}
+                className="focus-kb text-[var(--ink)] underline-offset-2 hover:underline"
+              >
+                Practice this construction →
+              </Link>
+            </li>
+          </ul>
+        </header>
+
+        <JourneySection label="Meaning">
           {question ? (
-            <section className="surface-elevated rounded-2xl border border-[var(--border)] p-5">
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-violet-bright)]">
-                Question grammaticale
-              </h2>
-              <p className="mt-3 font-reader text-xl text-[var(--foreground)]">{question}</p>
-            </section>
+            <p className="mb-3 font-reader text-lg text-[var(--ink)]">{question}</p>
           ) : null}
-
-          <section className="space-y-3">
-            <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-              Explication
-            </h2>
-            <p className="text-sm leading-relaxed text-[var(--foreground)]">
-              {concept.concept.canonicalExplanation}
-            </p>
-          </section>
-
+          <p className="max-w-2xl text-sm leading-relaxed text-[var(--ink-secondary)]">
+            {concept.concept.canonicalExplanation}
+          </p>
           {concept.concept.frenchComparison ? (
-            <section className="surface-elevated rounded-2xl border border-[var(--border)] p-5">
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-                Français ↔ Russe
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--foreground)]">
-                {concept.concept.frenchComparison}
-              </p>
-            </section>
-          ) : null}
-
-          {concept.endings.length > 0 ? (
-            <section className="space-y-3">
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-                Terminaisons associées
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {concept.endings.map((e) => (
-                  <Link
-                    key={e.id}
-                    href={endingPath(e.ending, e.caseKey)}
-                    className="focus-kb card-hover rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 font-reader text-sm transition hover:border-[var(--accent-violet)]"
-                  >
-                    -{e.ending}
-                    <span className="ml-2 text-xs text-[var(--muted)]">{e.caseKey}</span>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          {concept.lemmas.length > 0 ? (
-            <section className="space-y-3">
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-                Exemples (lemmes)
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {concept.lemmas.slice(0, 12).map((l) => (
-                  <Link
-                    key={l.id}
-                    href={lemmaPath(l.lemma, l.partOfSpeech)}
-                    className="focus-kb card-hover rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 font-reader transition hover:border-[var(--accent-cyan)]"
-                  >
-                    {l.lemma}
-                  </Link>
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          {relatedTexts.length > 0 ? (
-            <section className="space-y-3">
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-                Textes liés
-              </h2>
-              <ul className="space-y-2">
-                {relatedTexts.map((t) => (
-                  <li key={`${t.textId}-${t.sentenceRussian.slice(0, 20)}`}>
-                    <Link
-                      href={`/texts/${t.textId}`}
-                      className="focus-kb card-hover block rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 transition hover:border-[var(--border-strong)]"
-                    >
-                      <p className="text-xs font-medium text-[var(--accent-violet-bright)]">
-                        {t.textTitle}
-                      </p>
-                      <p className="mt-1 font-reader text-sm text-[var(--foreground)]">
-                        {t.sentenceRussian}
-                      </p>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-        </div>
-
-        <aside className="min-w-0 space-y-6">
-          <div className="surface-elevated rounded-2xl border border-[var(--border)] p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-              Statistiques
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[var(--ink-secondary)]">
+              {concept.concept.frenchComparison}
             </p>
-            <dl className="mt-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-[var(--muted)]">Lemmes</dt>
-                <dd>{concept.stats.lemmaCount}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-[var(--muted)]">Terminaisons</dt>
-                <dd>{concept.stats.endingCount}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-[var(--muted)]">Occurrences</dt>
-                <dd>{concept.concept.hitCount}</dd>
-              </div>
-            </dl>
-          </div>
+          ) : null}
+        </JourneySection>
 
-          {concept.cases.map((c) => (
-            <Link
-              key={c.id}
-              href={`/explorer/cases/${c.caseKey}`}
-              className="focus-kb card-hover block rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 transition"
-            >
-              <p className="text-xs text-[var(--muted)]">Cas lié</p>
-              <p className="mt-1 font-medium">{c.titleFr}</p>
-            </Link>
-          ))}
+        {concept.lemmas.length > 0 ? (
+          <JourneySection label="Frequently used">
+            <ExplorerDiscoveryGrid
+              items={concept.lemmas.slice(0, 12).map((lemma) => ({
+                label: lemma.lemma,
+                href: lemmaPath(lemma.lemma, lemma.partOfSpeech),
+              }))}
+            />
+          </JourneySection>
+        ) : null}
 
-          <div className="border-t border-[var(--border)] pt-4">
-            <Link
-              href={practicePath({
-                structure: concept.concept.title,
-                mode: "structure",
-                from: "explorer",
-              })}
-              className="focus-kb text-sm font-medium text-[var(--foreground)] underline-offset-2 hover:underline"
-            >
-              Practice this construction →
-            </Link>
-          </div>
+        {relatedTexts.length > 0 ? (
+          <JourneySection label="Reader">
+            <div className="grid gap-3 lg:grid-cols-2">
+              {relatedTexts.map((text) => (
+                <Link
+                  key={`${text.textId}-${text.sentenceRussian.slice(0, 20)}`}
+                  href={textPath(text.textId)}
+                  className="focus-kb group flex flex-col rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-4 transition hover:border-[var(--ink-muted)]"
+                >
+                  <p className="text-sm font-medium text-[var(--ink)]">{text.textTitle}</p>
+                  <p className="mt-2 flex-1 font-reader text-sm leading-relaxed text-[var(--ink-secondary)]">
+                    {text.sentenceRussian}
+                  </p>
+                  <span className="mt-4 text-sm font-medium text-[var(--ink-muted)] group-hover:text-[var(--color-link)]">
+                    Read examples →
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </JourneySection>
+        ) : null}
 
-          <RelatedNavigation items={related} />
-        </aside>
-      </div>
+        <JourneySection label="Practice">
+          <Link
+            href={practicePath({
+              structure: concept.concept.title,
+              mode: "structure",
+              from: "explorer",
+            })}
+            className="focus-kb group flex flex-col rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-5 transition hover:border-[var(--ink-muted)]"
+          >
+            <p className="font-reader text-lg text-[var(--ink)] group-hover:text-[var(--color-link)]">
+              Write your own sentence
+            </p>
+            <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+              Practice <span className="font-reader">{concept.concept.title}</span> in context.
+            </p>
+            <span className="mt-4 text-sm font-medium text-[var(--ink-muted)] group-hover:text-[var(--color-link)]">
+              Practice this →
+            </span>
+          </Link>
+        </JourneySection>
+
+        {concept.relatedConcepts.length > 0 ? (
+          <JourneySection label="Related concepts">
+            <ExplorerDiscoveryGrid
+              items={concept.relatedConcepts.map((relatedConcept) => ({
+                label: relatedConcept.title,
+                href: conceptPath(relatedConcept.conceptKey),
+              }))}
+            />
+          </JourneySection>
+        ) : null}
+
+        {concept.endings.length > 0 ? (
+          <JourneySection label="Related forms">
+            <ExplorerDiscoveryGrid
+              items={concept.endings.map((ending) => ({
+                label: `-${ending.ending}`,
+                href: endingPath(ending.ending, ending.caseKey),
+                meta: ending.caseKey ?? undefined,
+              }))}
+            />
+          </JourneySection>
+        ) : null}
+
+        <RelatedNavigation items={related} />
+      </article>
     </ExplorerLayout>
   );
 }

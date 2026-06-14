@@ -8,10 +8,10 @@ import { casePath } from "@/components/explorer/explorer-routes";
 export default function CasesBrowsePage() {
   return (
     <CategoryBrowse
-      title="Cas"
-      subtitle="Les six cas russes (+ locatif) — questions, terminaisons typiques et contrastes avec le français."
+      title="Russian cases"
+      subtitle="The six cases (+ locative) — questions, typical endings, and contrasts with French."
       breadcrumbLabel="Cas"
-      featuredTitle="Les cas"
+      featuredTitle="Featured"
       featured={CASE_LEGEND_ENTRIES.map((c) => ({
         label: c.frenchName,
         href: casePath(c.key),

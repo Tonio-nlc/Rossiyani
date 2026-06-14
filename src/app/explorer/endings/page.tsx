@@ -8,10 +8,10 @@ export default async function EndingsBrowsePage() {
 
   return (
     <CategoryBrowse
-      title="Terminaisons"
-      subtitle="Terminaisons réutilisables — l'élément visuel central de la morphologie russe."
+      title="Word endings"
+      subtitle="Reusable endings — the visual heart of Russian morphology."
       breadcrumbLabel="Terminaisons"
-      featuredTitle="Terminaisons les plus fréquentes"
+      featuredTitle="Popular"
       featured={(metrics?.topEndings ?? []).map((e) => ({
         label: `-${e.ending}`,
         href: endingPath(e.ending),

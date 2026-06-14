@@ -37,9 +37,9 @@ export function CategoryBrowse({
           action={{ label: "Importer des textes", href: "/import" }}
         />
       ) : null}
-      <p className="text-sm text-[var(--muted)]">
-        <Link href="/explorer" className="focus-kb text-[var(--accent-violet-bright)] hover:underline">
-          ← Retour à Explorer
+      <p className="text-sm text-[var(--ink-muted)]">
+        <Link href="/explorer" className="focus-kb text-[var(--ink)] underline-offset-2 hover:underline">
+          ← Back to Explorer
         </Link>
       </p>
     </ExplorerLayout>

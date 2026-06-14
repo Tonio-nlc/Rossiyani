@@ -17,25 +17,27 @@ export function BrowseList({ title, items }: BrowseListProps) {
   }
 
   return (
-    <section className="space-y-3">
-      <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-        {title}
-      </h2>
-      <ul className="divide-y divide-[var(--border)] rounded-2xl border border-[var(--border)] bg-[var(--surface)]">
+    <section className="space-y-4">
+      <p className="home-section-label">{title}</p>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
-          <li key={item.href}>
-            <Link
-              href={item.href}
-              className="focus-kb card-hover flex items-center justify-between gap-4 px-4 py-3 transition first:rounded-t-2xl last:rounded-b-2xl hover:bg-[var(--surface-elevated)]"
-            >
-              <span className="font-reader text-[var(--foreground)]">{item.label}</span>
-              {item.meta ? (
-                <span className="shrink-0 text-xs text-[var(--muted)]">{item.meta}</span>
-              ) : null}
-            </Link>
-          </li>
+          <Link
+            key={item.href}
+            href={item.href}
+            className="focus-kb group flex flex-col rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-4 transition hover:border-[var(--ink-muted)]"
+          >
+            <span className="font-reader text-[var(--ink)] group-hover:text-[var(--color-link)]">
+              {item.label}
+            </span>
+            {item.meta ? (
+              <span className="mt-2 line-clamp-2 text-sm text-[var(--ink-muted)]">{item.meta}</span>
+            ) : null}
+            <span className="mt-3 text-sm font-medium text-[var(--ink-muted)] group-hover:text-[var(--color-link)]">
+              Open →
+            </span>
+          </Link>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }

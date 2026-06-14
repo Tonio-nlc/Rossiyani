@@ -3,10 +3,10 @@ import { CategoryBrowse } from "@/components/explorer/category-browse";
 export default function ExpressionsBrowsePage() {
   return (
     <CategoryBrowse
-      title="Expressions"
-      subtitle="Expressions figées et constructions natives — recherchez par label russe ou français."
+      title="Native expressions"
+      subtitle="Fixed phrases and idioms — search by Russian or French label."
       breadcrumbLabel="Expressions"
-      featuredTitle="À découvrir"
+      featuredTitle="Featured"
       featured={[]}
     >
       <p className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] px-5 py-4 text-sm text-[var(--muted)]">

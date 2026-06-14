@@ -8,10 +8,10 @@ export default async function ConceptsBrowsePage() {
 
   return (
     <CategoryBrowse
-      title="Concepts"
-      subtitle="Patterns grammaticaux, cas, constructions — le cœur pédagogique du graphe."
+      title="Grammar patterns"
+      subtitle="Living patterns from your texts — constructions, cases, and how Russian actually works."
       breadcrumbLabel="Concepts"
-      featuredTitle="Concepts les plus fréquents"
+      featuredTitle="Popular"
       featured={(metrics?.topConcepts ?? []).map((c) => ({
         label: c.title,
         href: conceptPath(c.title),
