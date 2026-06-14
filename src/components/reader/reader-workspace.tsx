@@ -12,7 +12,7 @@ import {
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
 import { getTextReadingProgress } from "@/lib/reader/reading-progress";
 import type { PartOfSpeech } from "@/types";
-import type { WordDetailGraph } from "@/types/word-detail-graph";
+import { prefetchWordDetail } from "@/lib/reader/reader-word-detail-store";
 
 import { ReaderAboutText } from "./reader-about-text";
 import { ReaderCompletionCard } from "./reader-completion-card";
@@ -23,6 +23,8 @@ import { mapSentenceWords, ReaderSentence } from "./reader-sentence";
 import { toReaderWordSnapshot } from "./reader-word-utils";
 import { useFocusMode } from "./use-focus-mode";
 import { useReaderTextSearch } from "./use-reader-text-search";
+import { useReaderWordDetailStore } from "./use-reader-word-detail-store";
+import { useReaderWordPrefetch } from "./use-reader-word-prefetch";
 import { useReaderWordLookup } from "./use-reader-word-lookup";
 import { useReaderKeyboard } from "./use-reader-keyboard";
 import { useReadingProgress } from "./use-reading-progress";
@@ -31,20 +33,22 @@ import { useShowSentenceTranslations } from "./use-show-sentence-translations";
 
 type ReaderWorkspaceProps = {
   text: ReaderTextData;
-  wordDetailCache?: Record<string, WordDetailGraph>;
 };
 
 export type { ReaderWorkspaceProps };
 
-export function ReaderWorkspace({
-  text,
-  wordDetailCache = {},
-}: ReaderWorkspaceProps) {
+export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   const [selectedSentenceId, setSelectedSentenceId] = useState<string | null>(
     text.sentences[0]?.id ?? null,
   );
   const [selectedWordSnapshot, setSelectedWordSnapshot] = useState<ReaderWordSnapshot | null>(
     null,
+  );
+  const [visibleSentenceIds, setVisibleSentenceIds] = useState<string[]>(() =>
+    text.sentences[0] ? [text.sentences[0].id] : [],
+  );
+  const visibleSentenceIdsRef = useRef<Set<string>>(
+    new Set(text.sentences[0] ? [text.sentences[0].id] : []),
   );
   const marginRef = useRef<HTMLDivElement>(null);
   const restoredRef = useRef(false);
@@ -86,7 +90,24 @@ export function ReaderWorkspace({
     [textSearch.results],
   );
 
-  const { detail } = useReaderWordLookup(selectedWordSnapshot, wordDetailCache);
+  const { prefetch, revision } = useReaderWordDetailStore();
+
+  const { detail, loading } = useReaderWordLookup({
+    selectedWord: selectedWordSnapshot,
+    cacheRevision: revision,
+  });
+
+  useReaderWordPrefetch({
+    text,
+    visibleSentenceIds,
+    selectedWordId: selectedWordSnapshot?.id ?? null,
+    hoveredWordId: null,
+    prefetch,
+  });
+
+  const handleHoverWord = useCallback((wordId: string) => {
+    prefetchWordDetail(wordId);
+  }, []);
 
   const agreementTarget = useMemo(() => {
     if (!selectedWordSnapshot) {
@@ -105,12 +126,13 @@ export function ReaderWorkspace({
   const marginPanelProps = useMemo(
     () => ({
       detail,
+      loading,
       textIndex,
       agreementTarget,
       showAllTranslations,
       onToggleAllTranslations: setShowAllTranslations,
     }),
-    [detail, textIndex, agreementTarget, showAllTranslations, setShowAllTranslations],
+    [detail, loading, textIndex, agreementTarget, showAllTranslations, setShowAllTranslations],
   );
 
   const structureCount = useMemo(() => {
@@ -193,16 +215,31 @@ export function ReaderWorkspace({
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
+        let changed = false;
+
         for (const entry of entries) {
+          const sentenceId = entry.target.getAttribute("data-sentence-id");
+          if (!sentenceId) {
+            continue;
+          }
+
           if (entry.isIntersecting) {
-            const sentenceId = entry.target.getAttribute("data-sentence-id");
-            if (sentenceId) {
-              recordSentence(sentenceId);
+            if (!visibleSentenceIdsRef.current.has(sentenceId)) {
+              visibleSentenceIdsRef.current.add(sentenceId);
+              changed = true;
             }
+            recordSentence(sentenceId);
+          } else if (visibleSentenceIdsRef.current.has(sentenceId)) {
+            visibleSentenceIdsRef.current.delete(sentenceId);
+            changed = true;
           }
         }
+
+        if (changed) {
+          setVisibleSentenceIds([...visibleSentenceIdsRef.current]);
+        }
       },
-      { threshold: 0.55 },
+      { threshold: 0.2, rootMargin: "120px 0px" },
     );
 
     for (const node of sentenceRefs.current.values()) {
@@ -237,6 +274,7 @@ export function ReaderWorkspace({
           naturalTranslation: sentence.naturalTranslation,
         }),
       );
+      prefetchWordDetail(word.id);
       recordWord(word.id, sentenceId);
       if (window.matchMedia("(max-width: 1023px)").matches) {
         requestAnimationFrame(() => {
@@ -349,6 +387,7 @@ export function ReaderWorkspace({
                       naturalTranslation: sentence.naturalTranslation,
                     })
                   }
+                  onHoverWord={handleHoverWord}
                   marginPanelProps={marginPanelProps}
                   registerRef={(node) => {
                     if (node) {

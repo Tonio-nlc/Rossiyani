@@ -28,8 +28,10 @@ type ReaderSentenceProps = {
   dimmed: boolean;
   onSelectSentence: () => void;
   onSelectWord: (word: SentenceBlockWord) => void;
+  onHoverWord?: (wordId: string) => void;
   marginPanelProps: {
     detail: WordDetailGraph | null;
+    loading?: boolean;
     textIndex: ReaderTextPhraseIndex;
     agreementTarget: string | null;
     showAllTranslations: boolean;
@@ -57,6 +59,7 @@ export const ReaderSentence = memo(function ReaderSentence({
   dimmed,
   onSelectSentence,
   onSelectWord,
+  onHoverWord,
   marginPanelProps,
   registerRef,
   marginRef,
@@ -91,6 +94,7 @@ export const ReaderSentence = memo(function ReaderSentence({
         searchMatchWordIds={searchMatchWordIds}
         searchActiveWordId={searchActiveWordId}
         onSelectWord={onSelectWord}
+        onHoverWord={onHoverWord}
       />
       <SentenceActions
         sentenceRussian={russianText}

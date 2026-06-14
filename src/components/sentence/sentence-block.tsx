@@ -36,6 +36,7 @@ type SentenceBlockProps = {
   searchMatchWordIds?: Set<string>;
   searchActiveWordId?: string | null;
   onSelectWord: (word: SentenceBlockWord) => void;
+  onHoverWord?: (wordId: string) => void;
 };
 
 export const SentenceBlock = memo(function SentenceBlock({
@@ -50,6 +51,7 @@ export const SentenceBlock = memo(function SentenceBlock({
   searchMatchWordIds,
   searchActiveWordId = null,
   onSelectWord,
+  onHoverWord,
 }: SentenceBlockProps) {
   const wordByPosition = new Map(words.map((word) => [word.position, word]));
   const segments = buildSentenceDisplay(
@@ -92,6 +94,9 @@ export const SentenceBlock = memo(function SentenceBlock({
                 searchActive={searchActiveWordId === word.id}
                 hasFullAnalysis={fullAnalysisWordIds.has(word.id)}
                 onClick={() => onSelectWord(word)}
+                onPointerEnter={
+                  onHoverWord ? () => onHoverWord(word.id) : undefined
+                }
               />
             </span>
           );

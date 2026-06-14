@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 
 import { ReaderView } from "@/components/reader/reader-view";
-import { getTextWordDetailCache } from "@/features/reader/get-text-word-detail-cache";
 import { getTextForReader } from "@/features/texts";
 
 import ReaderEmptyPage from "./empty-state";
@@ -20,7 +19,5 @@ export default async function ReaderPage({ params }: PageProps) {
     return <ReaderEmptyPage textTitle={text.title} />;
   }
 
-  const wordDetailCache = await getTextWordDetailCache(text);
-
-  return <ReaderView text={text} wordDetailCache={wordDetailCache} />;
+  return <ReaderView text={text} />;
 }

@@ -16,6 +16,7 @@ type WordTokenProps = {
   searchActive?: boolean;
   hasFullAnalysis?: boolean;
   onClick?: () => void;
+  onPointerEnter?: () => void;
 };
 
 export const WordToken = memo(function WordToken({
@@ -26,12 +27,14 @@ export const WordToken = memo(function WordToken({
   searchActive,
   hasFullAnalysis,
   onClick,
+  onPointerEnter,
 }: WordTokenProps) {
   return (
     <button
       type="button"
       data-word-id={wordId}
       onClick={onClick}
+      onPointerEnter={onPointerEnter}
       className={[
         "focus-kb inline cursor-pointer border-0 bg-transparent p-0 align-baseline font-reader text-inherit transition-opacity duration-150",
         selected
