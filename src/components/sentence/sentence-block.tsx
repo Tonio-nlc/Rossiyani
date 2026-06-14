@@ -6,6 +6,7 @@ import { buildSentenceDisplay } from "@/lib/formatting/build-sentence-display";
 import type { PartOfSpeech } from "@/types";
 
 import { resolveSentenceBlockWord } from "../reader/reader-word-utils";
+import { SentenceTranslationToggle } from "../reader/sentence-translation-toggle";
 import { WordToken } from "../word/word-token";
 import { SentenceNaturalTranslation } from "./sentence-natural-translation";
 
@@ -28,6 +29,7 @@ type SentenceBlockProps = {
   russianText: string;
   naturalTranslation?: string | null;
   showTranslation?: boolean;
+  onToggleTranslation?: () => void;
   words: SentenceBlockWord[];
   fullAnalysisWordIds: Set<string>;
   selectedWordId: string | null;
@@ -40,7 +42,8 @@ export const SentenceBlock = memo(function SentenceBlock({
   sentenceId,
   russianText,
   naturalTranslation,
-  showTranslation = true,
+  showTranslation = false,
+  onToggleTranslation,
   words,
   fullAnalysisWordIds,
   selectedWordId,
@@ -53,6 +56,7 @@ export const SentenceBlock = memo(function SentenceBlock({
     russianText,
     words.map((word) => ({ position: word.position, original: word.original })),
   );
+  const hasTranslation = Boolean(naturalTranslation?.trim());
 
   return (
     <div role="group" aria-label="Phrase">
@@ -93,8 +97,15 @@ export const SentenceBlock = memo(function SentenceBlock({
           );
         })}
       </p>
-      {showTranslation && naturalTranslation ? (
-        <SentenceNaturalTranslation sentenceId={sentenceId} text={naturalTranslation} />
+      {onToggleTranslation ? (
+        <SentenceTranslationToggle
+          expanded={showTranslation}
+          onToggle={onToggleTranslation}
+          hasTranslation={hasTranslation}
+        />
+      ) : null}
+      {showTranslation && hasTranslation ? (
+        <SentenceNaturalTranslation sentenceId={sentenceId} text={naturalTranslation!} />
       ) : null}
     </div>
   );

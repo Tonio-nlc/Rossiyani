@@ -32,6 +32,7 @@ export type AnnotationLesson = {
 export type AnnotationPanelData = {
   displayForm: string;
   lemma: string | null;
+  partOfSpeech: string | null;
   headerProperties: string[];
   usage: string | null;
   grammar: AnnotationGrammarRow[];
@@ -39,6 +40,7 @@ export type AnnotationPanelData = {
     primary: string[];
     secondary: string[];
   } | null;
+  exampleSentence: string | null;
   relations: AnnotationRelation[];
   lessons: AnnotationLesson[];
   explorerHref: string | null;
@@ -290,14 +292,18 @@ export function buildAnnotationPanelData(detail: WordDetailGraph): AnnotationPan
         : null;
 
   const explorerLemma = isDisplayableUiText(occurrence.lemma) ? occurrence.lemma : null;
+  const pos = POS_LABELS_EN[occurrence.partOfSpeech] ?? null;
+  const exampleSentence = detail.examples[0]?.trim() || null;
 
   return {
     displayForm: occurrence.original,
     lemma,
+    partOfSpeech: pos,
     headerProperties,
     usage: buildUsage(detail, semantic.explanation),
     grammar: buildGrammarRows(detail, headerProperties),
     translation: buildTranslation(detail, semantic.primaryMeanings, semantic.extraMeanings),
+    exampleSentence,
     relations: buildRelations(detail),
     lessons: buildLessons(detail),
     explorerHref: explorerLemma

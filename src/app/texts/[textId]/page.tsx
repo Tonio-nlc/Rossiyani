@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { ReaderView } from "@/components/reader/reader-view";
+import { getTodaysDiscovery } from "@/features/discovery";
 import { getTextForReader } from "@/features/texts";
 
 import ReaderEmptyPage from "./empty-state";
@@ -9,7 +10,10 @@ type PageProps = { params: Promise<{ textId: string }> };
 
 export default async function ReaderPage({ params }: PageProps) {
   const { textId } = await params;
-  const text = await getTextForReader(textId);
+  const [text, todaysDiscovery] = await Promise.all([
+    getTextForReader(textId),
+    getTodaysDiscovery().catch(() => null),
+  ]);
 
   if (!text) {
     notFound();
@@ -19,5 +23,5 @@ export default async function ReaderPage({ params }: PageProps) {
     return <ReaderEmptyPage textTitle={text.title} />;
   }
 
-  return <ReaderView text={text} />;
+  return <ReaderView text={text} todaysDiscovery={todaysDiscovery} />;
 }

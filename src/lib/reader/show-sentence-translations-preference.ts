@@ -2,11 +2,11 @@ const STORAGE_KEY = "rossiyani:showSentenceTranslations";
 
 export function getShowSentenceTranslationsPreference(): boolean {
   if (typeof window === "undefined") {
-    return true;
+    return false;
   }
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw === null) {
-    return true;
+    return false;
   }
   return raw === "1";
 }

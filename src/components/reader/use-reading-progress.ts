@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  computeSentencePercent,
   estimateRemainingMinutes,
+  estimateReadingMinutes,
   getTextReadingProgress,
   upsertReadingProgress,
   type TextReadingProgress,
@@ -17,6 +19,7 @@ export function useReadingProgress(text: ReaderTextData) {
     () => text.sentences.reduce((sum, sentence) => sum + sentence.words.length, 0),
     [text],
   );
+  const totalSentences = text.sentences.length;
 
   const [progress, setProgress] = useState<TextReadingProgress | null>(null);
   const lastTickRef = useRef<number>(Date.now());
@@ -79,6 +82,7 @@ export function useReadingProgress(text: ReaderTextData) {
       const next = upsertReadingProgress({
         textId: text.id,
         lastSentenceId: sentenceId,
+        seenSentenceId: sentenceId,
         totalWords,
       });
       setProgress(next);
@@ -94,6 +98,7 @@ export function useReadingProgress(text: ReaderTextData) {
         lastSentenceId: sentenceId,
         lastWordId: wordId,
         seenWordId: wordId,
+        seenSentenceId: sentenceId,
         totalWords,
       });
       setProgress(next);
@@ -101,13 +106,20 @@ export function useReadingProgress(text: ReaderTextData) {
     [flushReadingTime, text.id, totalWords],
   );
 
+  const sentencesSeenCount = progress?.sentencesSeenIds?.length ?? 0;
   const remainingMinutes = estimateRemainingMinutes(progress, totalWords);
+  const estimatedMinutes = estimateReadingMinutes(totalWords);
+  const sentencePercent = computeSentencePercent(sentencesSeenCount, totalSentences);
 
   return {
     progress,
     totalWords,
+    totalSentences,
     wordsSeenCount: progress?.wordsSeenIds.length ?? 0,
+    sentencesSeenCount,
     percent: progress?.percent ?? 0,
+    sentencePercent,
+    estimatedMinutes,
     remainingMinutes,
     recordSentence,
     recordWord,

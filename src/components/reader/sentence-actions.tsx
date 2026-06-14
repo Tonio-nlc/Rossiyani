@@ -47,7 +47,7 @@ export function SentenceActions({
         }}
         className="focus-kb text-[var(--ink-secondary)] hover:text-[var(--ink)]"
       >
-        {saved ? "Saved ✓" : "Save"}
+        {saved ? "✓ Saved" : "Save"}
       </button>
       <Link
         href={practiceHref}

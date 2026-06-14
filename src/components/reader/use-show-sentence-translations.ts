@@ -11,7 +11,7 @@ export function useShowSentenceTranslations(): {
   showTranslations: boolean;
   setShowTranslations: (show: boolean) => void;
 } {
-  const [showTranslations, setShowTranslationsState] = useState(true);
+  const [showTranslations, setShowTranslationsState] = useState(false);
 
   useEffect(() => {
     setShowTranslationsState(getShowSentenceTranslationsPreference());

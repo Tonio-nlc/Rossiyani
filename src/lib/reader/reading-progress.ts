@@ -5,6 +5,7 @@ export type TextReadingProgress = {
   lastSentenceId: string;
   lastWordId: string | null;
   wordsSeenIds: string[];
+  sentencesSeenIds: string[];
   totalWords: number;
   percent: number;
   readingTimeMs: number;
@@ -80,20 +81,26 @@ export function upsertReadingProgress(input: {
   lastSentenceId: string;
   lastWordId?: string | null;
   seenWordId?: string;
+  seenSentenceId?: string;
   totalWords: number;
   readingTimeDeltaMs?: number;
 }): TextReadingProgress {
   const store = loadStore();
   const existing = store[input.textId];
   const wordsSeen = new Set(existing?.wordsSeenIds ?? []);
+  const sentencesSeen = new Set(existing?.sentencesSeenIds ?? []);
 
   if (input.seenWordId) {
     wordsSeen.add(input.seenWordId);
+  }
+  if (input.seenSentenceId) {
+    sentencesSeen.add(input.seenSentenceId);
   }
 
   const totalWords = Math.max(input.totalWords, existing?.totalWords ?? 0);
   const readingTimeMs = (existing?.readingTimeMs ?? 0) + (input.readingTimeDeltaMs ?? 0);
   const wordsSeenIds = [...wordsSeen];
+  const sentencesSeenIds = [...sentencesSeen];
   const percent = computePercent(wordsSeenIds.length, totalWords);
 
   const progress: TextReadingProgress = {
@@ -101,6 +108,7 @@ export function upsertReadingProgress(input: {
     lastSentenceId: input.lastSentenceId,
     lastWordId: input.lastWordId ?? existing?.lastWordId ?? null,
     wordsSeenIds,
+    sentencesSeenIds,
     totalWords,
     percent,
     readingTimeMs,
@@ -110,6 +118,23 @@ export function upsertReadingProgress(input: {
   store[input.textId] = progress;
   saveStore(store);
   return progress;
+}
+
+export function estimateReadingMinutes(totalWords: number): number {
+  if (totalWords <= 0) {
+    return 0;
+  }
+  return Math.max(1, Math.ceil(totalWords / 120));
+}
+
+export function computeSentencePercent(
+  sentencesSeenCount: number,
+  totalSentences: number,
+): number {
+  if (totalSentences <= 0) {
+    return 0;
+  }
+  return Math.min(100, Math.round((sentencesSeenCount / totalSentences) * 100));
 }
 
 export function formatLastReadLabel(isoDate: string): string {

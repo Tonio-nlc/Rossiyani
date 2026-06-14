@@ -2,9 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { EditorialTitle, Hairline, MetadataLine } from "@/components/editorial";
-import { SentenceBlock } from "@/components/sentence/sentence-block";
-import { SentenceActions } from "./sentence-actions";
+import type { TodaysDiscovery } from "@/features/discovery";
 import type { ReaderTextData } from "@/features/texts";
 import { setLastReadTextId } from "@/lib/last-read-text";
 import type { ReaderSearchEntry } from "@/lib/reader/build-reader-search-index";
@@ -12,20 +10,31 @@ import { getTextReadingProgress } from "@/lib/reader/reading-progress";
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
 import type { PartOfSpeech } from "@/types";
 
+import { SentenceBlock } from "@/components/sentence/sentence-block";
+import { ReaderCompletionCard } from "./reader-completion-card";
+import { ReaderHeader } from "./reader-header";
 import { ReaderInTextSearch } from "./reader-in-text-search";
 import { ReaderMarginPanel } from "./reader-margin-panel";
+import { ReaderReadingStatus } from "./reader-reading-status";
+import { buildReaderTargets, ReaderTodaysTarget } from "./reader-todays-target";
+import { SentenceActions } from "./sentence-actions";
 import { toReaderWordSnapshot } from "./reader-word-utils";
+import { useFocusMode } from "./use-focus-mode";
 import { useReaderTextSearch } from "./use-reader-text-search";
 import { useReaderWordAnalysis } from "./use-reader-word-analysis";
 import { useReaderKeyboard } from "./use-reader-keyboard";
 import { useReadingProgress } from "./use-reading-progress";
+import { useSentenceTranslationExpansion } from "./use-sentence-translation-expansion";
 import { useShowSentenceTranslations } from "./use-show-sentence-translations";
 
 type ReaderWorkspaceProps = {
   text: ReaderTextData;
+  todaysDiscovery?: TodaysDiscovery | null;
 };
 
-export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
+export type { ReaderWorkspaceProps };
+
+export function ReaderWorkspace({ text, todaysDiscovery = null }: ReaderWorkspaceProps) {
   const [selectedSentenceId, setSelectedSentenceId] = useState<string | null>(
     text.sentences[0]?.id ?? null,
   );
@@ -34,11 +43,23 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   );
   const marginRef = useRef<HTMLDivElement>(null);
   const restoredRef = useRef(false);
+  const sentenceRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  const { showTranslations, setShowTranslations } = useShowSentenceTranslations();
+  const { showTranslations: showAllTranslations, setShowTranslations: setShowAllTranslations } =
+    useShowSentenceTranslations();
+  const { isExpanded, toggleExpanded } = useSentenceTranslationExpansion();
+  const { focusMode, setFocusMode } = useFocusMode();
 
-  const { percent, wordsSeenCount, totalWords, recordSentence, recordWord } =
-    useReadingProgress(text);
+  const {
+    percent,
+    sentencePercent,
+    wordsSeenCount,
+    totalWords,
+    totalSentences,
+    estimatedMinutes,
+    recordSentence,
+    recordWord,
+  } = useReadingProgress(text);
 
   const scrollToSearchResult = useCallback((result: ReaderSearchEntry) => {
     setSelectedSentenceId(result.sentenceId);
@@ -61,9 +82,41 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   const marginPanelProps = {
     detail,
     loading,
-    showTranslations,
-    onToggleTranslations: setShowTranslations,
+    showAllTranslations,
+    onToggleAllTranslations: setShowAllTranslations,
   };
+
+  const todaysTargets = useMemo(
+    () => buildReaderTargets(text, todaysDiscovery),
+    [text, todaysDiscovery],
+  );
+
+  const structureCount = useMemo(() => {
+    const labels = new Set<string>();
+    for (const sentence of text.sentences) {
+      for (const group of sentence.phraseGroups) {
+        labels.add(group.label);
+      }
+    }
+    return labels.size;
+  }, [text.sentences]);
+
+  const grammarPointCount = useMemo(() => {
+    const cases = new Set<string>();
+    for (const sentence of text.sentences) {
+      for (const word of sentence.words) {
+        if (word.case) {
+          cases.add(word.case);
+        }
+      }
+    }
+    return cases.size;
+  }, [text.sentences]);
+
+  const practiceStructure = useMemo(() => {
+    const firstPhrase = text.sentences[0]?.phraseGroups[0]?.label;
+    return firstPhrase ?? text.sentences[0]?.words[0]?.lemma ?? text.title;
+  }, [text]);
 
   useEffect(() => {
     setLastReadTextId(text.id);
@@ -92,6 +145,28 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     }
   }, [text.id, text.sentences]);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const sentenceId = entry.target.getAttribute("data-sentence-id");
+            if (sentenceId) {
+              recordSentence(sentenceId);
+            }
+          }
+        }
+      },
+      { threshold: 0.55 },
+    );
+
+    for (const node of sentenceRefs.current.values()) {
+      observer.observe(node);
+    }
+
+    return () => observer.disconnect();
+  }, [text.sentences, recordSentence]);
+
   const fullAnalysisWordIdsBySentence = useMemo(() => {
     const map = new Map<string, Set<string>>();
     for (const sentence of text.sentences) {
@@ -112,6 +187,14 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   );
 
   const selectedWordId = selectedWordSnapshot?.id ?? null;
+
+  const currentPhraseIndex = useMemo(() => {
+    if (!selectedSentenceId) {
+      return 1;
+    }
+    const index = text.sentences.findIndex((sentence) => sentence.id === selectedSentenceId);
+    return index >= 0 ? index + 1 : 1;
+  }, [selectedSentenceId, text.sentences]);
 
   const handleSelectSentence = useCallback(
     (sentenceId: string) => {
@@ -179,23 +262,21 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     onCloseSearch: textSearch.closeSearch,
   });
 
-  const metadataItems = [
-    text.level,
-    text.source ?? undefined,
-    `${text.sentences.length} phrases`,
-    totalWords > 0 ? `${percent}% lu` : undefined,
-    totalWords > 0 ? `${wordsSeenCount}/${totalWords} mots` : undefined,
-  ].filter((item): item is string => Boolean(item));
-
   return (
     <div className="reader-fullscreen min-w-0">
-      <header className="max-w-[var(--reading-max)]">
-        <EditorialTitle variant="section">{text.title}</EditorialTitle>
-        <MetadataLine className="mt-3" items={metadataItems} />
-      </header>
+      <ReaderHeader
+        title={text.title}
+        level={text.level}
+        estimatedMinutes={estimatedMinutes}
+        sentenceCount={totalSentences}
+        wordCount={totalWords}
+        percent={percent}
+        focusMode={focusMode}
+        onFocusModeChange={setFocusMode}
+      />
 
       {textSearch.isOpen || textSearch.query.trim().length > 0 ? (
-        <div className="mt-[var(--layout-gap)] max-w-[var(--reading-max)]">
+        <div className="mt-5 max-w-[var(--reading-max)]">
           <ReaderInTextSearch
             query={textSearch.query}
             onQueryChange={textSearch.setQuery}
@@ -210,72 +291,107 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
         </div>
       ) : null}
 
-      <Hairline className="my-[var(--layout-gap)]" />
+      <div className="mt-5 grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(240px,var(--annotation-max))] lg:items-start lg:gap-8">
+        <div className="min-w-0 space-y-5">
+          <ReaderReadingStatus
+            currentPhraseIndex={currentPhraseIndex}
+            totalPhrases={totalSentences}
+            sentencePercent={sentencePercent}
+            wordPercent={percent}
+          />
 
-      <div className="grid min-w-0 gap-[var(--layout-gap)] lg:grid-cols-[minmax(0,1fr)_minmax(240px,var(--annotation-max))] lg:items-start lg:gap-[clamp(1.5rem,3vw,2.5rem)]">
-        <article className="min-w-0 space-y-[var(--layout-gap)]">
-          {text.sentences.map((sentence) => (
-            <div
-              key={sentence.id}
-              onClick={(event) => {
-                const target = event.target as HTMLElement;
-                if (target.closest("button, a")) {
-                  return;
-                }
-                handleSelectSentence(sentence.id);
-              }}
-              className={[
-                "min-w-0 border-l pl-3 transition",
-                selectedSentenceId === sentence.id
-                  ? "border-[var(--ink-muted)]"
-                  : "border-transparent",
-              ].join(" ")}
-            >
-              <SentenceBlock
-                sentenceId={sentence.id}
-                russianText={sentence.russianText}
-                naturalTranslation={sentence.naturalTranslation}
-                showTranslation={showTranslations}
-                words={sentence.words.map((word) => ({
-                  ...word,
-                  partOfSpeech: word.partOfSpeech as PartOfSpeech,
-                  formId: word.formId,
-                }))}
-                fullAnalysisWordIds={fullAnalysisWordIdsBySentence.get(sentence.id) ?? new Set()}
-                selectedWordId={selectedWordId}
-                searchMatchWordIds={searchMatchWordIds}
-                searchActiveWordId={textSearch.activeResult?.wordId ?? null}
-                onSelectWord={(word) =>
-                  handleSelectWord(sentence.id, {
-                    ...word,
-                    sentenceId: sentence.id,
-                    textId: text.id,
-                    literalTranslation: sentence.literalTranslation,
-                    naturalTranslation: sentence.naturalTranslation,
-                  })
-                }
-              />
-              <SentenceActions
-                sentenceRussian={sentence.russianText}
-                textId={text.id}
-                textTitle={text.title}
-                selected={selectedSentenceId === sentence.id}
-              />
-              {selectedWordSnapshot?.sentenceId === sentence.id ? (
+          <ReaderTodaysTarget targets={todaysTargets} discovery={todaysDiscovery} />
+
+          <article className="min-w-0 space-y-6">
+            {text.sentences.map((sentence) => {
+              const isActive = selectedSentenceId === sentence.id;
+              const dimmed = focusMode && !isActive;
+
+              return (
                 <div
-                  ref={marginRef}
-                  className="mt-[var(--layout-gap)] border-t border-[var(--hairline)] pt-[var(--layout-gap)] lg:hidden"
-                  aria-label="Annotations"
+                  key={sentence.id}
+                  ref={(node) => {
+                    if (node) {
+                      sentenceRefs.current.set(sentence.id, node);
+                    } else {
+                      sentenceRefs.current.delete(sentence.id);
+                    }
+                  }}
+                  data-sentence-id={sentence.id}
+                  onClick={(event) => {
+                    const target = event.target as HTMLElement;
+                    if (target.closest("button, a")) {
+                      return;
+                    }
+                    handleSelectSentence(sentence.id);
+                  }}
+                  className={[
+                    "min-w-0 rounded-2xl border-l-2 py-1 pl-4 transition duration-200",
+                    isActive
+                      ? "border-[var(--ink)] bg-[var(--surface)]/40"
+                      : "border-transparent",
+                    dimmed ? "opacity-40" : "opacity-100",
+                    focusMode && isActive ? "opacity-100" : "",
+                  ].join(" ")}
                 >
-                  <ReaderMarginPanel {...marginPanelProps} />
+                  <SentenceBlock
+                    sentenceId={sentence.id}
+                    russianText={sentence.russianText}
+                    naturalTranslation={sentence.naturalTranslation}
+                    showTranslation={isExpanded(sentence.id, showAllTranslations)}
+                    onToggleTranslation={() => toggleExpanded(sentence.id)}
+                    words={sentence.words.map((word) => ({
+                      ...word,
+                      partOfSpeech: word.partOfSpeech as PartOfSpeech,
+                      formId: word.formId,
+                    }))}
+                    fullAnalysisWordIds={
+                      fullAnalysisWordIdsBySentence.get(sentence.id) ?? new Set()
+                    }
+                    selectedWordId={selectedWordId}
+                    searchMatchWordIds={searchMatchWordIds}
+                    searchActiveWordId={textSearch.activeResult?.wordId ?? null}
+                    onSelectWord={(word) =>
+                      handleSelectWord(sentence.id, {
+                        ...word,
+                        sentenceId: sentence.id,
+                        textId: text.id,
+                        literalTranslation: sentence.literalTranslation,
+                        naturalTranslation: sentence.naturalTranslation,
+                      })
+                    }
+                  />
+                  <SentenceActions
+                    sentenceRussian={sentence.russianText}
+                    textId={text.id}
+                    textTitle={text.title}
+                    selected={isActive}
+                  />
+                  {selectedWordSnapshot?.sentenceId === sentence.id ? (
+                    <div
+                      ref={marginRef}
+                      className="mt-5 border-t border-[var(--hairline)] pt-5 lg:hidden"
+                      aria-label="Annotations"
+                    >
+                      <ReaderMarginPanel {...marginPanelProps} />
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-            </div>
-          ))}
-        </article>
+              );
+            })}
+
+            <ReaderCompletionCard
+              wordsReviewed={wordsSeenCount}
+              structureCount={structureCount}
+              grammarPointCount={grammarPointCount}
+              practiceStructure={practiceStructure}
+              primaryConceptKey={null}
+            />
+          </article>
+        </div>
 
         <aside
-          className="hidden min-w-0 lg:sticky lg:block lg:top-[calc(var(--header-height)+var(--layout-gap))] lg:self-start"
+          className="hidden min-w-0 lg:sticky lg:block lg:top-[calc(var(--header-height)+1rem)] lg:self-start"
           aria-label="Annotations"
         >
           <ReaderMarginPanel {...marginPanelProps} />
