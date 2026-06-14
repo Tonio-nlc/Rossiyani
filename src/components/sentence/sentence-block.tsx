@@ -104,8 +104,18 @@ export const SentenceBlock = memo(function SentenceBlock({
           hasTranslation={hasTranslation}
         />
       ) : null}
-      {showTranslation && hasTranslation ? (
-        <SentenceNaturalTranslation sentenceId={sentenceId} text={naturalTranslation!} />
+      {hasTranslation ? (
+        <div
+          className={[
+            "grid transition-[grid-template-rows,opacity] duration-300 ease-out",
+            showTranslation ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+          ].join(" ")}
+          aria-hidden={!showTranslation}
+        >
+          <div className="overflow-hidden">
+            <SentenceNaturalTranslation sentenceId={sentenceId} text={naturalTranslation!} />
+          </div>
+        </div>
       ) : null}
     </div>
   );

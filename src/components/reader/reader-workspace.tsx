@@ -6,11 +6,14 @@ import type { TodaysDiscovery } from "@/features/discovery";
 import type { ReaderTextData } from "@/features/texts";
 import { setLastReadTextId } from "@/lib/last-read-text";
 import type { ReaderSearchEntry } from "@/lib/reader/build-reader-search-index";
-import { getTextReadingProgress } from "@/lib/reader/reading-progress";
+import { buildTextIntroduction } from "@/lib/reader/build-text-introduction";
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
+import { getTextReadingProgress } from "@/lib/reader/reading-progress";
 import type { PartOfSpeech } from "@/types";
 
 import { SentenceBlock } from "@/components/sentence/sentence-block";
+
+import { ReaderAboutText } from "./reader-about-text";
 import { ReaderCompletionCard } from "./reader-completion-card";
 import { ReaderHeader } from "./reader-header";
 import { ReaderInTextSearch } from "./reader-in-text-search";
@@ -89,6 +92,11 @@ export function ReaderWorkspace({ text, todaysDiscovery = null }: ReaderWorkspac
   const todaysTargets = useMemo(
     () => buildReaderTargets(text, todaysDiscovery),
     [text, todaysDiscovery],
+  );
+
+  const textIntroduction = useMemo(
+    () => buildTextIntroduction(text, estimatedMinutes),
+    [text, estimatedMinutes],
   );
 
   const structureCount = useMemo(() => {
@@ -275,6 +283,10 @@ export function ReaderWorkspace({ text, todaysDiscovery = null }: ReaderWorkspac
         onFocusModeChange={setFocusMode}
       />
 
+      <div className="mt-4">
+        <ReaderAboutText introduction={textIntroduction} />
+      </div>
+
       {textSearch.isOpen || textSearch.query.trim().length > 0 ? (
         <div className="mt-5 max-w-[var(--reading-max)]">
           <ReaderInTextSearch
@@ -300,7 +312,11 @@ export function ReaderWorkspace({ text, todaysDiscovery = null }: ReaderWorkspac
             wordPercent={percent}
           />
 
-          <ReaderTodaysTarget targets={todaysTargets} discovery={todaysDiscovery} />
+          <ReaderTodaysTarget
+            targets={todaysTargets}
+            discovery={todaysDiscovery}
+            estimatedMinutes={estimatedMinutes}
+          />
 
           <article className="min-w-0 space-y-6">
             {text.sentences.map((sentence) => {

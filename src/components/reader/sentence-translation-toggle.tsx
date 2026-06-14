@@ -22,9 +22,14 @@ export function SentenceTranslationToggle({
         event.stopPropagation();
         onToggle();
       }}
-      className="focus-kb mt-3 text-sm font-medium text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
+      className="focus-kb mt-3 text-left text-xs text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
     >
       {expanded ? "Hide translation" : "Show translation"}
+      {!expanded ? (
+        <span className="mt-0.5 block text-[10px] text-[var(--ink-muted)]" aria-hidden>
+          ↓
+        </span>
+      ) : null}
     </button>
   );
 }

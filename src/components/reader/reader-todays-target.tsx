@@ -5,10 +5,12 @@ import type { TodaysDiscovery } from "@/features/discovery";
 type ReaderTodaysTargetProps = {
   targets: string[];
   discovery: TodaysDiscovery | null;
+  estimatedMinutes: number;
 };
 
 export function buildReaderTargets(
   text: {
+    level: string;
     sentences: Array<{
       russianText: string;
       words: Array<{ lemma: string; case: string | null }>;
@@ -28,6 +30,10 @@ export function buildReaderTargets(
     seen.add(key);
     targets.push(value.trim());
   };
+
+  if (["A1", "A2", "B1"].includes(text.level)) {
+    add("conversation vocabulary");
+  }
 
   if (discovery) {
     const inText = text.sentences.some((sentence) =>
@@ -68,34 +74,44 @@ export function buildReaderTargets(
   return targets.slice(0, 4);
 }
 
-export function ReaderTodaysTarget({ targets, discovery }: ReaderTodaysTargetProps) {
+export function ReaderTodaysTarget({
+  targets,
+  discovery,
+  estimatedMinutes,
+}: ReaderTodaysTargetProps) {
   if (targets.length === 0) {
     return null;
   }
 
   return (
-    <section className="rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] px-5 py-4">
+    <section className="border-t border-[var(--hairline)] pt-4">
       <p className="home-section-label">Today&apos;s target</p>
-      <p className="mt-3 text-sm text-[var(--ink-secondary)]">Learn:</p>
-      <ul className="mt-2 space-y-1.5">
+      <p className="mt-3 text-xs text-[var(--ink-muted)]">
+        <span aria-hidden>✓ </span>
+        Learn:
+      </p>
+      <ul className="mt-2 space-y-1">
         {targets.map((target) => (
-          <li key={target} className="flex items-center gap-2 font-reader text-base text-[var(--ink)]">
+          <li key={target} className="flex gap-2 text-sm text-[var(--ink-secondary)]">
             <span className="text-[var(--ink-muted)]" aria-hidden>
-              ✓
+              –
             </span>
             {discovery && target === discovery.displayLabel && discovery.explorerHref ? (
               <Link
                 href={discovery.explorerHref}
-                className="focus-kb hover:text-[var(--color-link)]"
+                className="focus-kb break-russian font-reader text-[var(--ink)] underline-offset-2 hover:underline"
               >
                 {target}
               </Link>
             ) : (
-              target
+              <span className="break-russian font-reader text-[var(--ink)]">{target}</span>
             )}
           </li>
         ))}
       </ul>
+      <p className="mt-3 text-xs text-[var(--ink-muted)]">
+        Estimated reading: {Math.max(1, estimatedMinutes)} min
+      </p>
     </section>
   );
 }

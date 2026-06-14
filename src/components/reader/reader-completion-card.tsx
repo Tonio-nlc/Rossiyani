@@ -24,6 +24,10 @@ export function ReaderCompletionCard({
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
+  const explorerHref = primaryConceptKey
+    ? conceptPath(primaryConceptKey)
+    : `/explorer?q=${encodeURIComponent(practiceStructure)}`;
+
   useEffect(() => {
     const node = ref.current;
     if (!node) {
@@ -44,51 +48,60 @@ export function ReaderCompletionCard({
   return (
     <div ref={ref} className="pt-4">
       {visible ? (
-        <section className="rounded-3xl border border-[var(--hairline)] bg-[var(--surface)] p-6 md:p-8">
-          <p className="home-section-label">Reading completed</p>
-          <p className="mt-4 font-reader text-xl text-[var(--ink)]">You reviewed:</p>
-          <ul className="mt-3 space-y-1.5 text-sm text-[var(--ink-secondary)]">
-            <li>{wordsReviewed} words</li>
-            {structureCount > 0 ? (
-              <li>{structureCount} important structures</li>
-            ) : null}
-            {grammarPointCount > 0 ? (
-              <li>{grammarPointCount} grammar points</li>
-            ) : null}
-          </ul>
-          <p className="mt-6 text-sm font-medium text-[var(--ink)]">Continue learning</p>
-          <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium">
+        <section className="border-t border-[var(--hairline)] pt-6">
+          <p className="text-sm text-[var(--ink-secondary)]">
+            <span aria-hidden>✓ </span>
+            Reading completed
+          </p>
+          <p className="mt-4 home-section-label">Today you discovered</p>
+          <ul className="mt-3 space-y-1 text-sm text-[var(--ink-secondary)]">
             <li>
-              <Link
-                href={practicePath({
-                  structure: practiceStructure,
-                  mode: "structure",
-                  from: "reader",
-                })}
-                className="focus-kb text-[var(--ink)] underline-offset-2 hover:underline"
-              >
-                Practice →
-              </Link>
+              {wordsReviewed} new word{wordsReviewed === 1 ? "" : "s"}
             </li>
-            {primaryConceptKey ? (
+            {structureCount > 0 ? (
               <li>
-                <Link
-                  href={conceptPath(primaryConceptKey)}
-                  className="focus-kb text-[var(--ink)] underline-offset-2 hover:underline"
-                >
-                  Explore structure →
-                </Link>
+                {structureCount} important structure{structureCount === 1 ? "" : "s"}
               </li>
             ) : null}
-            <li>
-              <Link
-                href="/library?section=phrases"
-                className="focus-kb text-[var(--ink)] underline-offset-2 hover:underline"
-              >
-                Review saved words →
-              </Link>
-            </li>
+            {grammarPointCount > 0 ? (
+              <li>
+                {grammarPointCount} grammar observation{grammarPointCount === 1 ? "" : "s"}
+              </li>
+            ) : null}
           </ul>
+          <div className="mt-6 border-t border-[var(--hairline)] pt-4">
+            <p className="home-section-label">Continue learning</p>
+            <ul className="mt-3 space-y-2 text-sm">
+              <li>
+                <Link
+                  href={practicePath({
+                    structure: practiceStructure,
+                    mode: "structure",
+                    from: "reader",
+                  })}
+                  className="focus-kb text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
+                >
+                  Practice this topic →
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={explorerHref}
+                  className="focus-kb text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
+                >
+                  Explore these structures →
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/library"
+                  className="focus-kb text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
+                >
+                  Read another text →
+                </Link>
+              </li>
+            </ul>
+          </div>
         </section>
       ) : (
         <div className="h-8" aria-hidden />

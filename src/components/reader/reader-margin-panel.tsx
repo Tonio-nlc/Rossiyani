@@ -7,7 +7,7 @@ import { buildAnnotationPanelData } from "@/lib/reader/build-annotation-panel-da
 import { isReaderWordSaved, saveReaderWord } from "@/lib/reader/saved-words";
 import type { WordDetailGraph } from "@/types/word-detail-graph";
 
-import { ReaderFoundAcross } from "./reader-found-across";
+import { CollapsibleSection, ReaderFoundAcross } from "./reader-found-across";
 
 type ReaderMarginPanelProps = {
   detail: WordDetailGraph | null;
@@ -28,6 +28,23 @@ function PanelSection({
       <p className="home-section-label">{label}</p>
       {children}
     </section>
+  );
+}
+
+function EditorialLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
+    >
+      {children}
+    </Link>
   );
 }
 
@@ -61,7 +78,7 @@ export function ReaderMarginPanel({
         <button
           type="button"
           onClick={() => onToggleAllTranslations(!showAllTranslations)}
-          className="focus-kb text-sm text-[var(--ink-secondary)] underline-offset-2 hover:underline"
+          className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 hover:underline"
         >
           {showAllTranslations ? "Hide all translations" : "Show all translations"}
         </button>
@@ -70,33 +87,18 @@ export function ReaderMarginPanel({
   }
 
   const primaryLesson = panel.lessons[0];
-  const readHref = panel.explorerHref;
 
   return (
-    <div className="space-y-5">
-      <header className="space-y-3 border-b border-[var(--hairline)] pb-4">
+    <div className="space-y-4">
+      <header className="space-y-2">
         <p className="break-russian font-reader text-[clamp(1.75rem,4vw,2rem)] leading-none text-[var(--ink)]">
           {panel.displayForm}
         </p>
         {panel.translation ? (
-          <p className="text-base leading-relaxed text-[var(--ink)]">
+          <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">
             {panel.translation.primary.join(" · ")}
           </p>
         ) : null}
-        <dl className="space-y-1 text-sm text-[var(--ink-secondary)]">
-          {panel.lemma ? (
-            <div className="flex gap-2">
-              <dt className="text-[var(--ink-muted)]">Base form</dt>
-              <dd className="break-russian font-reader text-[var(--ink)]">{panel.lemma}</dd>
-            </div>
-          ) : null}
-          {panel.partOfSpeech ? (
-            <div className="flex gap-2">
-              <dt className="text-[var(--ink-muted)]">Part of speech</dt>
-              <dd>{panel.partOfSpeech}</dd>
-            </div>
-          ) : null}
-        </dl>
       </header>
 
       {panel.usage ? (
@@ -113,52 +115,25 @@ export function ReaderMarginPanel({
         </PanelSection>
       ) : null}
 
-      {panel.relations.length > 0 ? (
-        <PanelSection label="Related forms">
-          <ul className="space-y-2">
-            {panel.relations.map((relation) => (
-              <li key={relation.href}>
-                <Link
-                  href={relation.href}
-                  className="focus-kb break-russian font-reader text-sm text-[var(--ink)] underline-offset-2 hover:text-[var(--color-link)] hover:underline"
-                >
-                  {relation.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </PanelSection>
-      ) : null}
-
       <ReaderFoundAcross
-        lessonHref={primaryLesson ? primaryLesson.href : null}
-        lessonTitle={primaryLesson?.title ?? null}
-        textCount={detail.statistics.seenInTexts}
-        readHref={readHref}
+        explorerHref={panel.explorerHref}
         practiceHref={panel.practiceHref ?? "#"}
+        textCount={detail.statistics.seenInTexts}
+        lessonHref={primaryLesson?.href ?? null}
+        lessonTitle={primaryLesson?.title ?? null}
       />
 
       {(panel.explorerHref || panel.practiceHref) && (
         <PanelSection label="Actions">
-          <ul className="space-y-2 text-sm font-medium">
+          <ul className="flex flex-wrap gap-x-4 gap-y-1">
             {panel.explorerHref ? (
               <li>
-                <Link
-                  href={panel.explorerHref}
-                  className="focus-kb text-[var(--ink)] underline-offset-2 hover:underline"
-                >
-                  Open in Explorer →
-                </Link>
+                <EditorialLink href={panel.explorerHref}>Explore</EditorialLink>
               </li>
             ) : null}
             {panel.practiceHref ? (
               <li>
-                <Link
-                  href={panel.practiceHref}
-                  className="focus-kb text-[var(--ink)] underline-offset-2 hover:underline"
-                >
-                  Practice →
-                </Link>
+                <EditorialLink href={panel.practiceHref}>Practice</EditorialLink>
               </li>
             ) : null}
             <li>
@@ -172,7 +147,7 @@ export function ReaderMarginPanel({
                   });
                   setSaved(true);
                 }}
-                className="focus-kb text-[var(--ink)] underline-offset-2 hover:underline"
+                className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
               >
                 {saved ? "✓ Saved" : "Save"}
               </button>
@@ -181,21 +156,36 @@ export function ReaderMarginPanel({
         </PanelSection>
       )}
 
-      {panel.lessons.length > 1 ? (
-        <PanelSection label="Manual">
+      {panel.relations.length > 0 ? (
+        <CollapsibleSection label="related forms">
           <ul className="space-y-1.5">
-            {panel.lessons.slice(1).map((lesson) => (
-              <li key={lesson.href}>
+            {panel.relations.map((relation) => (
+              <li key={relation.href}>
                 <Link
-                  href={lesson.href}
-                  className="focus-kb text-sm text-[var(--ink)] underline-offset-2 hover:underline"
+                  href={relation.href}
+                  className="focus-kb break-russian font-reader text-sm text-[var(--ink-secondary)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
                 >
-                  {lesson.title}
+                  {relation.label}
                 </Link>
               </li>
             ))}
           </ul>
-        </PanelSection>
+        </CollapsibleSection>
+      ) : null}
+
+      {detail.statistics.occurrenceCount > 0 || detail.statistics.seenInTexts > 0 ? (
+        <CollapsibleSection label="occurrences">
+          <dl className="space-y-1 text-xs text-[var(--ink-secondary)]">
+            <div className="flex justify-between gap-3">
+              <dt className="text-[var(--ink-muted)]">In this text</dt>
+              <dd>{detail.statistics.occurrenceCount}×</dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-[var(--ink-muted)]">Across library</dt>
+              <dd>{detail.statistics.seenInTexts} text{detail.statistics.seenInTexts === 1 ? "" : "s"}</dd>
+            </div>
+          </dl>
+        </CollapsibleSection>
       ) : null}
 
       <button
