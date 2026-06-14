@@ -62,6 +62,7 @@ type PracticeAnalysisViewProps = {
   rewriting: string | null;
   openRewriteId: string | null;
   rewriteResult: RewriteResult | null;
+  rewriteSaved: boolean;
   saved: boolean;
   onSave: () => void;
   onSaveRewrite: (text: string) => void;
@@ -103,6 +104,7 @@ export function PracticeAnalysisView(props: PracticeAnalysisViewProps) {
         rewriting={props.rewriting}
         openRewriteId={props.openRewriteId}
         rewriteResult={props.rewriteResult}
+        rewriteSaved={props.rewriteSaved}
         primaryStructureHref={primaryStructure?.href}
         onSaveRewrite={props.onSaveRewrite}
         onPracticeAgain={props.onPracticeAgain}
@@ -267,6 +269,7 @@ function RewriteSection({
   rewriting,
   openRewriteId,
   rewriteResult,
+  rewriteSaved,
   primaryStructureHref,
   onSaveRewrite,
   onPracticeAgain,
@@ -275,6 +278,7 @@ function RewriteSection({
   rewriting: string | null;
   openRewriteId: string | null;
   rewriteResult: RewriteResult | null;
+  rewriteSaved: boolean;
   primaryStructureHref?: string;
   onSaveRewrite: (text: string) => void;
   onPracticeAgain: (text: string) => void;
@@ -323,6 +327,7 @@ function RewriteSection({
           text={rewriteResult.text}
           explanation={rewriteResult.explanation}
           structureHref={primaryStructureHref}
+          saved={rewriteSaved}
           onCopy={() => void navigator.clipboard.writeText(rewriteResult.text)}
           onSave={() => onSaveRewrite(rewriteResult.text)}
           onPracticeAgain={() => onPracticeAgain(rewriteResult.text)}
@@ -337,6 +342,7 @@ function RewriteResultPanel({
   text,
   explanation,
   structureHref,
+  saved,
   onCopy,
   onSave,
   onPracticeAgain,
@@ -345,6 +351,7 @@ function RewriteResultPanel({
   text: string;
   explanation: string;
   structureHref?: string;
+  saved: boolean;
   onCopy: () => void;
   onSave: () => void;
   onPracticeAgain: () => void;
@@ -372,9 +379,10 @@ function RewriteResultPanel({
           <button
             type="button"
             onClick={onSave}
-            className="focus-kb text-[var(--ink-secondary)] hover:text-[var(--ink)]"
+            disabled={saved}
+            className="focus-kb text-[var(--ink-secondary)] transition hover:text-[var(--ink)] disabled:cursor-default disabled:text-[var(--ink-muted)]"
           >
-            Save
+            {saved ? "✓ Saved" : "Save to Library"}
           </button>
         </li>
         <li>

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { Reference } from "@/components/editorial";
 import { practicePath } from "@/lib/practice/constants";
 import { deleteComposePhrase, getSavedComposePhrases } from "@/lib/compose/saved-phrases";
 
@@ -19,18 +18,15 @@ export function LibraryMyPhrases() {
   }, []);
 
   if (phrases.length === 0) {
-    return (
-      <p className="text-sm text-[var(--ink-muted)]">
-        No saved phrases yet.{" "}
-        <Reference href="/practice">Write in Practice →</Reference>
-      </p>
-    );
+    return null;
   }
 
   return (
-    <ul className="divide-y divide-[var(--hairline)]">
-      {phrases.map((phrase) => (
-        <li key={phrase.id} className="py-5">
+    <div className="border-t border-[var(--hairline)] pt-8">
+      <p className="home-section-label">Saved analyses</p>
+      <ul className="mt-4 divide-y divide-[var(--hairline)]">
+        {phrases.map((phrase) => (
+          <li key={phrase.id} className="py-5">
           <p className="break-russian font-reader text-base text-[var(--ink)]">
             {truncate(phrase.originalSentence)}
           </p>
@@ -91,8 +87,9 @@ export function LibraryMyPhrases() {
               Remove
             </button>
           </div>
-        </li>
-      ))}
-    </ul>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

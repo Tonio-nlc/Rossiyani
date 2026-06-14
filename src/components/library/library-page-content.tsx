@@ -6,6 +6,7 @@ import { Reference } from "@/components/editorial";
 
 import { LibraryMyDiscoveries } from "./library-my-discoveries";
 import { LibraryMyPhrases } from "./library-my-phrases";
+import { LibrarySavedPhrases } from "./library-saved-phrases";
 import { LibrarySavedSentences } from "./library-saved-sentences";
 import { LibrarySectionNav, type LibrarySection } from "./library-section-nav";
 import { LibraryView } from "./library-view";
@@ -60,6 +61,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
     return (
       <div className="space-y-6 pb-16">
         <LibrarySectionNav active="phrases" />
+        <LibrarySavedPhrases />
         <LibraryMyPhrases />
       </div>
     );

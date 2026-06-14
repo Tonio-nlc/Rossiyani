@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { Reference, Section } from "@/components/editorial";
+import { useToast } from "@/components/ui/toast-provider";
 import type { StructureContext } from "@/features/practice/get-structure-context";
+import { isPhraseSaved, rewriteTypeFromPresetId, savePhrase } from "@/features/library";
 import type {
   ComposeAnalysis,
   ComposeRegister,
@@ -36,6 +38,7 @@ function isStructureMode(searchParams: URLSearchParams): boolean {
 
 export function PracticeWorkspace() {
   const searchParams = useSearchParams();
+  const { toast } = useToast();
   const [context, setContext] = useState("");
   const [russianText, setRussianText] = useState("");
   const [referenceSentence, setReferenceSentence] = useState<string | null>(null);
@@ -51,6 +54,7 @@ export function PracticeWorkspace() {
   const [analysis, setAnalysis] = useState<ComposeAnalysis | null>(null);
   const [expandedBlocks, setExpandedBlocks] = useState<Record<string, boolean>>({});
   const [saved, setSaved] = useState(false);
+  const [rewriteSavedLocally, setRewriteSavedLocally] = useState(false);
 
   useEffect(() => {
     const phraseId = searchParams.get("phraseId");
@@ -162,6 +166,7 @@ export function PracticeWorkspace() {
             text: payload.rewritten,
             explanation: payload.explanation,
           });
+          setRewriteSavedLocally(false);
         }
       } finally {
         setRewriting(null);
@@ -196,21 +201,25 @@ export function PracticeWorkspace() {
 
   const handleSaveRewrite = useCallback(
     (rewritten: string) => {
-      if (!analysis) {
+      if (!analysis || !openRewriteId) {
         return;
       }
 
-      saveComposePhrase({
+      savePhrase({
         originalSentence: russianText.trim(),
-        context: context.trim() || undefined,
-        correctedVersion: rewritten,
-        alternatives: analysis.alternatives,
-        structures: analysis.structures,
-        analysis,
+        rewrittenSentence: rewritten,
+        rewriteType: rewriteTypeFromPresetId(openRewriteId),
+        explanation: rewriteResult?.explanation ?? "",
+        structures: analysis.structures.map((structure) => ({
+          label: structure.label,
+          href: structure.href,
+        })),
+        source: "practice",
       });
-      setSaved(true);
+      setRewriteSavedLocally(true);
+      toast("✓ Saved to Library", "success");
     },
-    [analysis, context, russianText],
+    [analysis, openRewriteId, rewriteResult?.explanation, russianText, toast],
   );
 
   const handlePracticeAgain = useCallback((text: string) => {
@@ -219,7 +228,12 @@ export function PracticeWorkspace() {
     setRewriteResult(null);
     setOpenRewriteId(null);
     setSaved(false);
+    setRewriteSavedLocally(false);
   }, []);
+
+  const rewriteSaved =
+    rewriteResult !== null &&
+    (rewriteSavedLocally || isPhraseSaved(russianText.trim(), rewriteResult.text));
 
   if (analysis) {
     return (
@@ -233,6 +247,7 @@ export function PracticeWorkspace() {
         rewriting={rewriting}
         openRewriteId={openRewriteId}
         rewriteResult={rewriteResult}
+        rewriteSaved={rewriteSaved}
         saved={saved}
         onSave={handleSave}
         onSaveRewrite={handleSaveRewrite}
