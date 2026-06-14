@@ -14,4 +14,5 @@ export { EndingDetailView } from "./ending-detail-view";
 export { CaseDetailView } from "./case-detail-view";
 export { PhraseDetailView } from "./phrase-detail-view";
 export { RelatedNavigation } from "./related-navigation";
+export { EntityDetailView } from "./entity-detail-view";
 export * from "./explorer-routes";

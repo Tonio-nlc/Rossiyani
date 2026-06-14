@@ -1,10 +1,12 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { PartOfSpeech } from "@prisma/client";
 
-import { LemmaDetailView } from "@/components/explorer";
-import { getLemmaKnowledge } from "@/features/knowledge";
-
-const POS_FALLBACK: PartOfSpeech[] = ["noun", "verb", "adjective", "adverb", "pronoun", "preposition"];
+import { EntityDetailView, LemmaDetailView } from "@/components/explorer";
+import {
+  buildEntityPageFromLemmaCurated,
+  labelsEquivalent,
+  resolveLemmaEntity,
+} from "@/features/explorer/entity";
 
 type PageProps = {
   params: Promise<{ lemma: string }>;
@@ -14,27 +16,26 @@ type PageProps = {
 export default async function LemmaDetailPage({ params, searchParams }: PageProps) {
   const { lemma } = await params;
   const { pos } = await searchParams;
-  const decoded = decodeURIComponent(lemma);
+  const preferredPos = pos as PartOfSpeech | undefined;
 
-  let knowledge = pos
-    ? await getLemmaKnowledge(decoded, pos as PartOfSpeech)
-    : null;
+  const resolved = await resolveLemmaEntity(lemma, preferredPos);
 
-  if (!knowledge) {
-    for (const p of POS_FALLBACK) {
-      if (pos && p === pos) {
-        continue;
-      }
-      knowledge = await getLemmaKnowledge(decoded, p);
-      if (knowledge) {
-        break;
-      }
-    }
-  }
-
-  if (!knowledge) {
+  if (!resolved) {
     notFound();
   }
 
-  return <LemmaDetailView knowledge={knowledge} />;
+  if (!labelsEquivalent(resolved.requestedLemma, resolved.canonicalLemma)) {
+    redirect(resolved.canonicalPath);
+  }
+
+  if (resolved.knowledge) {
+    return <LemmaDetailView knowledge={resolved.knowledge} />;
+  }
+
+  if (resolved.curated) {
+    const pageData = await buildEntityPageFromLemmaCurated(resolved.curated);
+    return <EntityDetailView data={pageData} />;
+  }
+
+  notFound();
 }

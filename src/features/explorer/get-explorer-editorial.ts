@@ -1,14 +1,9 @@
-import {
-  collocationPath,
-  conceptPath,
-  expressionPath,
-  lemmaPath,
-} from "@/components/explorer/explorer-routes";
 import { getTodaysDiscovery } from "@/features/discovery/get-todays-discovery";
 import { loadCuratedJsonCandidates } from "@/features/discovery/load-candidate-pool";
 import type { FeaturedCandidateRow } from "@/features/discovery/types";
 import type { TodaysDiscovery } from "@/features/discovery/types";
 
+import { curatedCandidateHref } from "./entity/paths";
 import { getKnowledgeCanvas, type KnowledgeCanvasData } from "./get-explorer-data";
 
 export type ExplorerEditorialPick = {
@@ -24,34 +19,10 @@ export type ExplorerEditorialData = {
   grammarSpotlight: KnowledgeCanvasData | null;
 };
 
-function candidateHref(candidate: FeaturedCandidateRow): string {
-  if (candidate.explorerHref) {
-    return candidate.explorerHref;
-  }
-
-  switch (candidate.type) {
-    case "WORD":
-      return lemmaPath(candidate.lemma, candidate.partOfSpeech ?? "noun");
-    case "COLLOCATION":
-      return collocationPath(candidate.lemma);
-    case "GRAMMAR":
-      return conceptPath(candidate.lemma);
-    case "EXPRESSION":
-    case "CONSTRUCTION":
-    case "CONVERSATION":
-    case "NATIVE_PHRASE":
-    case "SLANG":
-    case "REGIONAL":
-      return expressionPath(candidate.lemma);
-    default:
-      return `/explorer?q=${encodeURIComponent(candidate.lemma)}`;
-  }
-}
-
 function toPick(candidate: FeaturedCandidateRow): ExplorerEditorialPick {
   return {
     label: candidate.lemma,
-    href: candidateHref(candidate),
+    href: curatedCandidateHref(candidate),
     subtitle: candidate.subtitle || candidate.explanation?.slice(0, 120) || undefined,
   };
 }

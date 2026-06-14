@@ -1,6 +1,11 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
-import { ConceptDetailView } from "@/components/explorer";
+import { ConceptDetailView, EntityDetailView } from "@/components/explorer";
+import {
+  buildEntityPageFromConceptCurated,
+  labelsEquivalent,
+  resolveConceptEntity,
+} from "@/features/explorer/entity";
 import {
   getConceptKnowledge,
   getLemmaKnowledge,
@@ -39,14 +44,28 @@ async function collectRelatedTexts(concept: NonNullable<Awaited<ReturnType<typeo
 
 export default async function ConceptDetailPage({ params }: PageProps) {
   const { key } = await params;
-  const decoded = decodeURIComponent(key);
-  const concept = await getConceptKnowledge(decoded);
+  const resolved = await resolveConceptEntity(key);
 
-  if (!concept) {
+  if (!resolved) {
     notFound();
   }
 
-  const relatedTexts = await collectRelatedTexts(concept);
+  if (
+    !labelsEquivalent(resolved.requestedKey, resolved.canonicalKey) &&
+    !labelsEquivalent(resolved.requestedKey, resolved.canonicalTitle)
+  ) {
+    redirect(resolved.canonicalPath);
+  }
 
-  return <ConceptDetailView concept={concept} relatedTexts={relatedTexts} />;
+  if (resolved.knowledge) {
+    const relatedTexts = await collectRelatedTexts(resolved.knowledge);
+    return <ConceptDetailView concept={resolved.knowledge} relatedTexts={relatedTexts} />;
+  }
+
+  if (resolved.curated) {
+    const pageData = await buildEntityPageFromConceptCurated(resolved.curated);
+    return <EntityDetailView data={pageData} />;
+  }
+
+  notFound();
 }
