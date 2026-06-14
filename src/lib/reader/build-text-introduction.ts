@@ -33,7 +33,7 @@ export function buildTextIntroduction(
 
   const addFocus = (point: string) => {
     const key = point.trim().toLowerCase();
-    if (!key || seen.has(key) || focusPoints.length >= 4) {
+    if (!key || seen.has(key) || focusPoints.length >= 3) {
       return;
     }
     seen.add(key);

@@ -59,8 +59,8 @@ export const SentenceBlock = memo(function SentenceBlock({
   const hasTranslation = Boolean(naturalTranslation?.trim());
 
   return (
-    <div role="group" aria-label="Phrase">
-      <p className="break-russian font-reader text-[clamp(1.375rem,4vw,1.85rem)] leading-[1.65] text-[var(--ink)] sm:leading-[2.1]">
+    <div role="group" aria-label="Phrase" className="max-w-[70ch]">
+      <p className="break-russian font-reader text-[clamp(1.375rem,4vw,1.85rem)] leading-[1.75] text-[var(--ink)] sm:leading-[2.15]">
         {segments.map((segment, index) => {
           if (segment.type === "punctuation") {
             return (

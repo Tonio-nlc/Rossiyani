@@ -370,6 +370,19 @@ body {
   opacity: 0;
 }
 
+@keyframes reader-panel-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-reader-panel-fade {
+  animation: reader-panel-fade 150ms var(--ease-editorial) forwards;
+}
+
 @keyframes microscope-in {
   from {
     opacity: 0;

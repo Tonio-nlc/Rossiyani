@@ -2,29 +2,28 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { TodaysDiscovery } from "@/features/discovery";
 import type { ReaderTextData } from "@/features/texts";
 import { setLastReadTextId } from "@/lib/last-read-text";
 import type { ReaderSearchEntry } from "@/lib/reader/build-reader-search-index";
 import { buildTextIntroduction } from "@/lib/reader/build-text-introduction";
+import {
+  buildReaderTextPhraseIndex,
+} from "@/lib/reader/build-reader-word-panel-data";
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
 import { getTextReadingProgress } from "@/lib/reader/reading-progress";
 import type { PartOfSpeech } from "@/types";
-
-import { SentenceBlock } from "@/components/sentence/sentence-block";
+import type { WordDetailGraph } from "@/types/word-detail-graph";
 
 import { ReaderAboutText } from "./reader-about-text";
 import { ReaderCompletionCard } from "./reader-completion-card";
 import { ReaderHeader } from "./reader-header";
 import { ReaderInTextSearch } from "./reader-in-text-search";
 import { ReaderMarginPanel } from "./reader-margin-panel";
-import { ReaderReadingStatus } from "./reader-reading-status";
-import { buildReaderTargets, ReaderTodaysTarget } from "./reader-todays-target";
-import { SentenceActions } from "./sentence-actions";
+import { mapSentenceWords, ReaderSentence } from "./reader-sentence";
 import { toReaderWordSnapshot } from "./reader-word-utils";
 import { useFocusMode } from "./use-focus-mode";
 import { useReaderTextSearch } from "./use-reader-text-search";
-import { useReaderWordAnalysis } from "./use-reader-word-analysis";
+import { useReaderWordLookup } from "./use-reader-word-lookup";
 import { useReaderKeyboard } from "./use-reader-keyboard";
 import { useReadingProgress } from "./use-reading-progress";
 import { useSentenceTranslationExpansion } from "./use-sentence-translation-expansion";
@@ -32,12 +31,15 @@ import { useShowSentenceTranslations } from "./use-show-sentence-translations";
 
 type ReaderWorkspaceProps = {
   text: ReaderTextData;
-  todaysDiscovery?: TodaysDiscovery | null;
+  wordDetailCache?: Record<string, WordDetailGraph>;
 };
 
 export type { ReaderWorkspaceProps };
 
-export function ReaderWorkspace({ text, todaysDiscovery = null }: ReaderWorkspaceProps) {
+export function ReaderWorkspace({
+  text,
+  wordDetailCache = {},
+}: ReaderWorkspaceProps) {
   const [selectedSentenceId, setSelectedSentenceId] = useState<string | null>(
     text.sentences[0]?.id ?? null,
   );
@@ -55,14 +57,18 @@ export function ReaderWorkspace({ text, todaysDiscovery = null }: ReaderWorkspac
 
   const {
     percent,
-    sentencePercent,
     wordsSeenCount,
-    totalWords,
     totalSentences,
     estimatedMinutes,
     recordSentence,
     recordWord,
   } = useReadingProgress(text);
+
+  const textIndex = useMemo(() => buildReaderTextPhraseIndex(text), [text]);
+  const textIntroduction = useMemo(
+    () => buildTextIntroduction(text, estimatedMinutes),
+    [text, estimatedMinutes],
+  );
 
   const scrollToSearchResult = useCallback((result: ReaderSearchEntry) => {
     setSelectedSentenceId(result.sentenceId);
@@ -80,51 +86,82 @@ export function ReaderWorkspace({ text, todaysDiscovery = null }: ReaderWorkspac
     [textSearch.results],
   );
 
-  const { detail, loading } = useReaderWordAnalysis(selectedWordSnapshot);
+  const { detail } = useReaderWordLookup(selectedWordSnapshot, wordDetailCache);
 
-  const marginPanelProps = {
-    detail,
-    loading,
-    showAllTranslations,
-    onToggleAllTranslations: setShowAllTranslations,
-  };
+  const agreementTarget = useMemo(() => {
+    if (!selectedWordSnapshot) {
+      return null;
+    }
+    const sentence = text.sentences.find((item) => item.id === selectedWordSnapshot.sentenceId);
+    if (!sentence || selectedWordSnapshot.partOfSpeech !== "adjective") {
+      return null;
+    }
+    const previous = sentence.words.find(
+      (word) => word.position === selectedWordSnapshot.position - 1,
+    );
+    return previous?.original ?? null;
+  }, [selectedWordSnapshot, text.sentences]);
 
-  const todaysTargets = useMemo(
-    () => buildReaderTargets(text, todaysDiscovery),
-    [text, todaysDiscovery],
-  );
-
-  const textIntroduction = useMemo(
-    () => buildTextIntroduction(text, estimatedMinutes),
-    [text, estimatedMinutes],
+  const marginPanelProps = useMemo(
+    () => ({
+      detail,
+      textIndex,
+      agreementTarget,
+      showAllTranslations,
+      onToggleAllTranslations: setShowAllTranslations,
+    }),
+    [detail, textIndex, agreementTarget, showAllTranslations, setShowAllTranslations],
   );
 
   const structureCount = useMemo(() => {
     const labels = new Set<string>();
     for (const sentence of text.sentences) {
       for (const group of sentence.phraseGroups) {
-        labels.add(group.label);
+        if (group.type === "NATIVE_CONSTRUCTION") {
+          labels.add(group.label);
+        }
       }
     }
     return labels.size;
   }, [text.sentences]);
 
-  const grammarPointCount = useMemo(() => {
-    const cases = new Set<string>();
+  const expressionCount = useMemo(() => {
+    const labels = new Set<string>();
     for (const sentence of text.sentences) {
-      for (const word of sentence.words) {
-        if (word.case) {
-          cases.add(word.case);
+      for (const group of sentence.phraseGroups) {
+        if (group.type === "FIXED_EXPRESSION" || group.type === "COLLOCATION") {
+          labels.add(group.label);
         }
       }
     }
-    return cases.size;
+    return labels.size;
   }, [text.sentences]);
 
   const practiceStructure = useMemo(() => {
     const firstPhrase = text.sentences[0]?.phraseGroups[0]?.label;
     return firstPhrase ?? text.sentences[0]?.words[0]?.lemma ?? text.title;
   }, [text]);
+
+  const fullAnalysisWordIdsBySentence = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const sentence of text.sentences) {
+      const set = new Set<string>();
+      for (const word of sentence.words) {
+        if (word.formId) {
+          set.add(word.id);
+        }
+      }
+      map.set(sentence.id, set);
+    }
+    return map;
+  }, [text.sentences]);
+
+  const selectedSentence = useMemo(
+    () => text.sentences.find((sentence) => sentence.id === selectedSentenceId) ?? null,
+    [text.sentences, selectedSentenceId],
+  );
+
+  const selectedWordId = selectedWordSnapshot?.id ?? null;
 
   useEffect(() => {
     setLastReadTextId(text.id);
@@ -174,35 +211,6 @@ export function ReaderWorkspace({ text, todaysDiscovery = null }: ReaderWorkspac
 
     return () => observer.disconnect();
   }, [text.sentences, recordSentence]);
-
-  const fullAnalysisWordIdsBySentence = useMemo(() => {
-    const map = new Map<string, Set<string>>();
-    for (const sentence of text.sentences) {
-      const set = new Set<string>();
-      for (const word of sentence.words) {
-        if (word.formId) {
-          set.add(word.id);
-        }
-      }
-      map.set(sentence.id, set);
-    }
-    return map;
-  }, [text.sentences]);
-
-  const selectedSentence = useMemo(
-    () => text.sentences.find((sentence) => sentence.id === selectedSentenceId) ?? null,
-    [text.sentences, selectedSentenceId],
-  );
-
-  const selectedWordId = selectedWordSnapshot?.id ?? null;
-
-  const currentPhraseIndex = useMemo(() => {
-    if (!selectedSentenceId) {
-      return 1;
-    }
-    const index = text.sentences.findIndex((sentence) => sentence.id === selectedSentenceId);
-    return index >= 0 ? index + 1 : 1;
-  }, [selectedSentenceId, text.sentences]);
 
   const handleSelectSentence = useCallback(
     (sentenceId: string) => {
@@ -277,18 +285,19 @@ export function ReaderWorkspace({ text, todaysDiscovery = null }: ReaderWorkspac
         level={text.level}
         estimatedMinutes={estimatedMinutes}
         sentenceCount={totalSentences}
-        wordCount={totalWords}
         percent={percent}
         focusMode={focusMode}
         onFocusModeChange={setFocusMode}
       />
 
-      <div className="mt-4">
-        <ReaderAboutText introduction={textIntroduction} />
-      </div>
+      {textIntroduction ? (
+        <div className="mt-6">
+          <ReaderAboutText introduction={textIntroduction} />
+        </div>
+      ) : null}
 
       {textSearch.isOpen || textSearch.query.trim().length > 0 ? (
-        <div className="mt-5 max-w-[var(--reading-max)]">
+        <div className="mt-6 max-w-[70ch]">
           <ReaderInTextSearch
             query={textSearch.query}
             onQueryChange={textSearch.setQuery}
@@ -303,103 +312,60 @@ export function ReaderWorkspace({ text, todaysDiscovery = null }: ReaderWorkspac
         </div>
       ) : null}
 
-      <div className="mt-5 grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(240px,var(--annotation-max))] lg:items-start lg:gap-8">
-        <div className="min-w-0 space-y-5">
-          <ReaderReadingStatus
-            currentPhraseIndex={currentPhraseIndex}
-            totalPhrases={totalSentences}
-            sentencePercent={sentencePercent}
-            wordPercent={percent}
-          />
-
-          <ReaderTodaysTarget
-            targets={todaysTargets}
-            discovery={todaysDiscovery}
-            estimatedMinutes={estimatedMinutes}
-          />
-
-          <article className="min-w-0 space-y-6">
+      <div className="mt-8 grid min-w-0 gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(240px,3fr)] lg:items-start lg:gap-12">
+        <div className="min-w-0">
+          <article className="min-w-0 max-w-[70ch] space-y-10">
             {text.sentences.map((sentence) => {
               const isActive = selectedSentenceId === sentence.id;
               const dimmed = focusMode && !isActive;
 
               return (
-                <div
+                <ReaderSentence
                   key={sentence.id}
-                  ref={(node) => {
+                  sentenceId={sentence.id}
+                  russianText={sentence.russianText}
+                  naturalTranslation={sentence.naturalTranslation}
+                  textId={text.id}
+                  textTitle={text.title}
+                  words={mapSentenceWords(sentence.words)}
+                  fullAnalysisWordIds={
+                    fullAnalysisWordIdsBySentence.get(sentence.id) ?? new Set()
+                  }
+                  selectedWordId={selectedWordId}
+                  selectedWordSentenceId={selectedWordSnapshot?.sentenceId ?? null}
+                  searchMatchWordIds={searchMatchWordIds}
+                  searchActiveWordId={textSearch.activeResult?.wordId ?? null}
+                  showTranslation={isExpanded(sentence.id, showAllTranslations)}
+                  onToggleTranslation={() => toggleExpanded(sentence.id)}
+                  isActive={isActive}
+                  dimmed={dimmed}
+                  onSelectSentence={() => handleSelectSentence(sentence.id)}
+                  onSelectWord={(word) =>
+                    handleSelectWord(sentence.id, {
+                      ...word,
+                      sentenceId: sentence.id,
+                      textId: text.id,
+                      literalTranslation: sentence.literalTranslation,
+                      naturalTranslation: sentence.naturalTranslation,
+                    })
+                  }
+                  marginPanelProps={marginPanelProps}
+                  registerRef={(node) => {
                     if (node) {
                       sentenceRefs.current.set(sentence.id, node);
                     } else {
                       sentenceRefs.current.delete(sentence.id);
                     }
                   }}
-                  data-sentence-id={sentence.id}
-                  onClick={(event) => {
-                    const target = event.target as HTMLElement;
-                    if (target.closest("button, a")) {
-                      return;
-                    }
-                    handleSelectSentence(sentence.id);
-                  }}
-                  className={[
-                    "min-w-0 rounded-2xl border-l-2 py-1 pl-4 transition duration-200",
-                    isActive
-                      ? "border-[var(--ink)] bg-[var(--surface)]/40"
-                      : "border-transparent",
-                    dimmed ? "opacity-40" : "opacity-100",
-                    focusMode && isActive ? "opacity-100" : "",
-                  ].join(" ")}
-                >
-                  <SentenceBlock
-                    sentenceId={sentence.id}
-                    russianText={sentence.russianText}
-                    naturalTranslation={sentence.naturalTranslation}
-                    showTranslation={isExpanded(sentence.id, showAllTranslations)}
-                    onToggleTranslation={() => toggleExpanded(sentence.id)}
-                    words={sentence.words.map((word) => ({
-                      ...word,
-                      partOfSpeech: word.partOfSpeech as PartOfSpeech,
-                      formId: word.formId,
-                    }))}
-                    fullAnalysisWordIds={
-                      fullAnalysisWordIdsBySentence.get(sentence.id) ?? new Set()
-                    }
-                    selectedWordId={selectedWordId}
-                    searchMatchWordIds={searchMatchWordIds}
-                    searchActiveWordId={textSearch.activeResult?.wordId ?? null}
-                    onSelectWord={(word) =>
-                      handleSelectWord(sentence.id, {
-                        ...word,
-                        sentenceId: sentence.id,
-                        textId: text.id,
-                        literalTranslation: sentence.literalTranslation,
-                        naturalTranslation: sentence.naturalTranslation,
-                      })
-                    }
-                  />
-                  <SentenceActions
-                    sentenceRussian={sentence.russianText}
-                    textId={text.id}
-                    textTitle={text.title}
-                    selected={isActive}
-                  />
-                  {selectedWordSnapshot?.sentenceId === sentence.id ? (
-                    <div
-                      ref={marginRef}
-                      className="mt-5 border-t border-[var(--hairline)] pt-5 lg:hidden"
-                      aria-label="Annotations"
-                    >
-                      <ReaderMarginPanel {...marginPanelProps} />
-                    </div>
-                  ) : null}
-                </div>
+                  marginRef={marginRef}
+                />
               );
             })}
 
             <ReaderCompletionCard
               wordsReviewed={wordsSeenCount}
               structureCount={structureCount}
-              grammarPointCount={grammarPointCount}
+              expressionCount={expressionCount}
               practiceStructure={practiceStructure}
               primaryConceptKey={null}
             />
@@ -408,7 +374,7 @@ export function ReaderWorkspace({ text, todaysDiscovery = null }: ReaderWorkspac
 
         <aside
           className="hidden min-w-0 lg:sticky lg:block lg:top-[calc(var(--header-height)+1rem)] lg:self-start"
-          aria-label="Annotations"
+          aria-label="Word context"
         >
           <ReaderMarginPanel {...marginPanelProps} />
         </aside>

@@ -3,32 +3,24 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { buildAnnotationPanelData } from "@/lib/reader/build-annotation-panel-data";
+import {
+  buildReaderWordPanelData,
+  collocationHref,
+  type ReaderTextPhraseIndex,
+} from "@/lib/reader/build-reader-word-panel-data";
 import { isReaderWordSaved, saveReaderWord } from "@/lib/reader/saved-words";
 import type { WordDetailGraph } from "@/types/word-detail-graph";
 
-import { CollapsibleSection, ReaderFoundAcross } from "./reader-found-across";
-
 type ReaderMarginPanelProps = {
   detail: WordDetailGraph | null;
-  loading: boolean;
+  textIndex: ReaderTextPhraseIndex;
+  agreementTarget?: string | null;
   showAllTranslations: boolean;
   onToggleAllTranslations: (value: boolean) => void;
 };
 
-function PanelSection({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="space-y-2">
-      <p className="home-section-label">{label}</p>
-      {children}
-    </section>
-  );
+function PanelLabel({ children }: { children: ReactNode }) {
+  return <p className="home-section-label">{children}</p>;
 }
 
 function EditorialLink({
@@ -50,12 +42,17 @@ function EditorialLink({
 
 export function ReaderMarginPanel({
   detail,
-  loading,
+  textIndex,
+  agreementTarget = null,
   showAllTranslations,
   onToggleAllTranslations,
 }: ReaderMarginPanelProps) {
-  const panel = useMemo(() => (detail ? buildAnnotationPanelData(detail) : null), [detail]);
+  const panel = useMemo(
+    () => (detail ? buildReaderWordPanelData(detail, textIndex, agreementTarget) : null),
+    [detail, textIndex, agreementTarget],
+  );
   const [saved, setSaved] = useState(false);
+  const panelKey = detail?.wordId ?? "empty";
 
   useEffect(() => {
     if (!panel || !detail) {
@@ -65,15 +62,11 @@ export function ReaderMarginPanel({
     setSaved(isReaderWordSaved(panel.displayForm, detail.textId));
   }, [panel, detail]);
 
-  if (loading && !detail) {
-    return <p className="text-metadata animate-pulse text-[var(--ink-muted)]">…</p>;
-  }
-
   if (!detail || !panel) {
     return (
       <div className="space-y-4">
         <p className="text-sm leading-relaxed text-[var(--ink-muted)]">
-          Click a word to explore its meaning, forms, and connections.
+          Select a word to see its meaning and grammar.
         </p>
         <button
           type="button"
@@ -86,107 +79,119 @@ export function ReaderMarginPanel({
     );
   }
 
-  const primaryLesson = panel.lessons[0];
-
   return (
-    <div className="space-y-4">
-      <header className="space-y-2">
-        <p className="break-russian font-reader text-[clamp(1.75rem,4vw,2rem)] leading-none text-[var(--ink)]">
+    <div key={panelKey} className="animate-reader-panel-fade space-y-5">
+      <header className="space-y-2 border-b border-[var(--hairline)] pb-4">
+        <p className="break-russian font-reader text-[clamp(1.5rem,3vw,1.875rem)] leading-none text-[var(--ink)]">
           {panel.displayForm}
         </p>
         {panel.translation ? (
-          <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">
-            {panel.translation.primary.join(" · ")}
-          </p>
+          <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">{panel.translation}</p>
+        ) : null}
+        {panel.partOfSpeech ? (
+          <p className="text-xs text-[var(--ink-muted)]">{panel.partOfSpeech}</p>
         ) : null}
       </header>
 
-      {panel.usage ? (
-        <PanelSection label="Why this form?">
-          <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">{panel.usage}</p>
-        </PanelSection>
+      {panel.usedHere.length > 0 || panel.contextNotes.length > 0 ? (
+        <section className="space-y-3">
+          <PanelLabel>Used here</PanelLabel>
+          {panel.usedHere.length > 0 ? (
+            <dl className="space-y-1.5">
+              {panel.usedHere.map((row) => (
+                <div key={row.label} className="flex justify-between gap-3 text-sm">
+                  <dt className="text-[var(--ink-muted)]">{row.label}</dt>
+                  <dd className="text-[var(--ink-secondary)]">{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+          {panel.contextNotes.map((note) => (
+            <p key={note} className="text-sm leading-relaxed text-[var(--ink-secondary)]">
+              {note}
+            </p>
+          ))}
+        </section>
       ) : null}
 
-      {panel.exampleSentence ? (
-        <PanelSection label="Example">
-          <p className="break-russian font-reader text-sm leading-relaxed text-[var(--ink)]">
-            {panel.exampleSentence}
-          </p>
-        </PanelSection>
-      ) : null}
-
-      <ReaderFoundAcross
-        explorerHref={panel.explorerHref}
-        practiceHref={panel.practiceHref ?? "#"}
-        textCount={detail.statistics.seenInTexts}
-        lessonHref={primaryLesson?.href ?? null}
-        lessonTitle={primaryLesson?.title ?? null}
-      />
-
-      {(panel.explorerHref || panel.practiceHref) && (
-        <PanelSection label="Actions">
-          <ul className="flex flex-wrap gap-x-4 gap-y-1">
-            {panel.explorerHref ? (
-              <li>
-                <EditorialLink href={panel.explorerHref}>Explore</EditorialLink>
-              </li>
-            ) : null}
-            {panel.practiceHref ? (
-              <li>
-                <EditorialLink href={panel.practiceHref}>Practice</EditorialLink>
-              </li>
-            ) : null}
-            <li>
-              <button
-                type="button"
-                onClick={() => {
-                  saveReaderWord({
-                    displayForm: panel.displayForm,
-                    lemma: panel.lemma,
-                    textId: detail.textId,
-                  });
-                  setSaved(true);
-                }}
-                className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
-              >
-                {saved ? "✓ Saved" : "Save"}
-              </button>
-            </li>
-          </ul>
-        </PanelSection>
-      )}
-
-      {panel.relations.length > 0 ? (
-        <CollapsibleSection label="related forms">
+      {panel.collocations.length > 0 ? (
+        <section className="space-y-2">
+          <PanelLabel>Collocations</PanelLabel>
           <ul className="space-y-1.5">
-            {panel.relations.map((relation) => (
-              <li key={relation.href}>
+            {panel.collocations.map((label) => (
+              <li key={label}>
                 <Link
-                  href={relation.href}
-                  className="focus-kb break-russian font-reader text-sm text-[var(--ink-secondary)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
+                  href={collocationHref(label)}
+                  className="focus-kb break-russian font-reader text-sm text-[var(--ink)] underline-offset-2 hover:underline"
                 >
-                  {relation.label}
+                  {label}
                 </Link>
               </li>
             ))}
           </ul>
-        </CollapsibleSection>
+        </section>
       ) : null}
 
-      {detail.statistics.occurrenceCount > 0 || detail.statistics.seenInTexts > 0 ? (
-        <CollapsibleSection label="occurrences">
-          <dl className="space-y-1 text-xs text-[var(--ink-secondary)]">
-            <div className="flex justify-between gap-3">
-              <dt className="text-[var(--ink-muted)]">In this text</dt>
-              <dd>{detail.statistics.occurrenceCount}×</dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-[var(--ink-muted)]">Across library</dt>
-              <dd>{detail.statistics.seenInTexts} text{detail.statistics.seenInTexts === 1 ? "" : "s"}</dd>
-            </div>
-          </dl>
-        </CollapsibleSection>
+      {panel.example ? (
+        <section className="space-y-2">
+          <PanelLabel>Example</PanelLabel>
+          <p className="break-russian font-reader text-sm leading-relaxed text-[var(--ink-secondary)]">
+            {panel.example}
+          </p>
+        </section>
       ) : null}
+
+      {panel.foundIn.length > 0 ? (
+        <section className="space-y-2 border-t border-[var(--hairline)] pt-4">
+          <PanelLabel>Found in Rossiyani</PanelLabel>
+          <ul className="space-y-2">
+            {panel.foundIn.map((item) => (
+              <li key={item.label}>
+                <Link
+                  href={item.href}
+                  className="focus-kb group block transition hover:text-[var(--color-link)]"
+                >
+                  <span className="text-sm text-[var(--ink)]">{item.label}</span>
+                  <span className="mt-0.5 block text-xs text-[var(--ink-muted)] group-hover:text-[var(--ink-secondary)]">
+                    {item.detail}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <section className="space-y-2 border-t border-[var(--hairline)] pt-4">
+        <ul className="flex flex-wrap gap-x-4 gap-y-1">
+          {panel.explorerHref ? (
+            <li>
+              <EditorialLink href={panel.explorerHref}>Explore</EditorialLink>
+            </li>
+          ) : null}
+          {panel.practiceHref ? (
+            <li>
+              <EditorialLink href={panel.practiceHref}>Practice</EditorialLink>
+            </li>
+          ) : null}
+          <li>
+            <button
+              type="button"
+              onClick={() => {
+                saveReaderWord({
+                  displayForm: panel.displayForm,
+                  lemma: panel.lemma,
+                  textId: detail.textId,
+                });
+                setSaved(true);
+              }}
+              className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
+            >
+              {saved ? "✓ Saved" : "Save"}
+            </button>
+          </li>
+        </ul>
+      </section>
 
       <button
         type="button"
