@@ -25,11 +25,11 @@ export function DiscoveryActions({ discovery }: DiscoveryActionsProps) {
   }, [discovery]);
 
   return (
-    <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium">
+    <ul className="mt-5 flex flex-wrap gap-6 text-sm font-medium tracking-wide">
       <li>
         <Link
           href={discovery.explorerHref}
-          className="focus-kb text-[var(--ink)] transition hover:text-[var(--color-link)]"
+          className="focus-kb text-[var(--ink)] underline-offset-4 transition hover:text-[var(--color-link)]"
         >
           Explore →
         </Link>
@@ -37,7 +37,7 @@ export function DiscoveryActions({ discovery }: DiscoveryActionsProps) {
       <li>
         <Link
           href={discovery.practiceHref}
-          className="focus-kb text-[var(--ink)] transition hover:text-[var(--color-link)]"
+          className="focus-kb text-[var(--ink)] underline-offset-4 transition hover:text-[var(--color-link)]"
         >
           Practice →
         </Link>
@@ -45,7 +45,7 @@ export function DiscoveryActions({ discovery }: DiscoveryActionsProps) {
       <li>
         <Link
           href={discovery.readExamplesHref}
-          className="focus-kb text-[var(--ink)] transition hover:text-[var(--color-link)]"
+          className="focus-kb text-[var(--ink)] underline-offset-4 transition hover:text-[var(--color-link)]"
         >
           Read examples →
         </Link>
@@ -57,7 +57,7 @@ export function DiscoveryActions({ discovery }: DiscoveryActionsProps) {
             saveDiscovery(discovery);
             setSaved(true);
           }}
-          className="focus-kb text-[var(--ink-secondary)] transition hover:text-[var(--ink)]"
+          className="focus-kb text-[var(--ink)] underline-offset-4 transition hover:text-[var(--color-link)]"
         >
           {saved ? "Saved ✓" : "Save →"}
         </button>
