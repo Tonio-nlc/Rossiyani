@@ -11,7 +11,10 @@ type HomeTodaysDiscoveryProps = {
 
 function HeroIllustration() {
   return (
-    <div className="hidden min-w-0 lg:flex lg:items-center lg:justify-start" aria-hidden>
+    <div
+      className="hidden min-w-0 lg:flex lg:items-center lg:justify-start lg:-translate-x-[140px]"
+      aria-hidden
+    >
       <Image
         src="/illustrations/hero_image.png"
         alt=""
