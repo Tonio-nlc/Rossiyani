@@ -11,15 +11,15 @@ type HomeTodaysDiscoveryProps = {
 
 function HeroIllustration() {
   return (
-    <div className="hidden min-w-0 lg:flex lg:items-center lg:justify-center" aria-hidden>
+    <div className="hidden min-w-0 lg:flex lg:items-center lg:justify-start" aria-hidden>
       <Image
         src="/illustrations/hero_image.png"
         alt=""
         width={2338}
         height={1474}
         priority
-        className="h-auto w-full max-w-[560px] object-contain"
-        sizes="(min-width: 1024px) 560px, 0px"
+        className="h-auto w-full max-w-[620px] object-contain"
+        sizes="(min-width: 1024px) 620px, 0px"
       />
     </div>
   );
@@ -27,8 +27,8 @@ function HeroIllustration() {
 
 function HeroContainer({ children }: { children: React.ReactNode }) {
   return (
-    <section className="pb-16 pt-[var(--space-4)] lg:mx-auto lg:max-w-[1280px] lg:px-16">
-      <div className="lg:grid lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-[72px]">
+    <section className="pb-16 pt-[var(--space-4)]">
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-10">
         {children}
       </div>
     </section>
