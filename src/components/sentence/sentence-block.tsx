@@ -3,6 +3,7 @@
 import { memo } from "react";
 
 import { buildSentenceDisplay } from "@/lib/formatting/build-sentence-display";
+import type { WordHighlightKind } from "@/lib/reader/build-interactive-words";
 import type { PartOfSpeech } from "@/types";
 
 import { resolveSentenceBlockWord } from "../reader/reader-word-utils";
@@ -31,12 +32,14 @@ type SentenceBlockProps = {
   showTranslation?: boolean;
   onToggleTranslation?: () => void;
   words: SentenceBlockWord[];
-  fullAnalysisWordIds: Set<string>;
+  interactiveWordKinds: Map<string, WordHighlightKind>;
   selectedWordId: string | null;
+  hoveredWordId?: string | null;
   searchMatchWordIds?: Set<string>;
   searchActiveWordId?: string | null;
   onSelectWord: (word: SentenceBlockWord) => void;
-  onHoverWord?: (wordId: string) => void;
+  onHoverWord?: (word: SentenceBlockWord) => void;
+  onHoverWordLeave?: () => void;
 };
 
 export const SentenceBlock = memo(function SentenceBlock({
@@ -46,12 +49,14 @@ export const SentenceBlock = memo(function SentenceBlock({
   showTranslation = false,
   onToggleTranslation,
   words,
-  fullAnalysisWordIds,
+  interactiveWordKinds,
   selectedWordId,
+  hoveredWordId = null,
   searchMatchWordIds,
   searchActiveWordId = null,
   onSelectWord,
   onHoverWord,
+  onHoverWordLeave,
 }: SentenceBlockProps) {
   const wordByPosition = new Map(words.map((word) => [word.position, word]));
   const segments = buildSentenceDisplay(
@@ -62,7 +67,7 @@ export const SentenceBlock = memo(function SentenceBlock({
 
   return (
     <div role="group" aria-label="Phrase" className="max-w-[70ch]">
-      <p className="break-russian font-reader text-[clamp(1.375rem,4vw,1.85rem)] leading-[1.75] text-[var(--ink)] sm:leading-[2.15]">
+      <p className="break-russian font-reader text-[clamp(1.375rem,4vw,1.85rem)] leading-[1.55] text-[var(--ink)] sm:leading-[1.65]">
         {segments.map((segment, index) => {
           if (segment.type === "punctuation") {
             return (
@@ -74,6 +79,8 @@ export const SentenceBlock = memo(function SentenceBlock({
 
           const word = resolveSentenceBlockWord(sentenceId, segment, wordByPosition);
           const isOrphan = !wordByPosition.has(segment.position);
+          const highlightKind = interactiveWordKinds.get(word.id) ?? null;
+          const interactive = highlightKind !== null;
 
           return (
             <span
@@ -90,13 +97,16 @@ export const SentenceBlock = memo(function SentenceBlock({
                 partOfSpeech={word.partOfSpeech}
                 grammaticalCase={word.case}
                 selected={selectedWordId === word.id}
+                hovered={hoveredWordId === word.id}
                 searchMatch={searchMatchWordIds?.has(word.id)}
                 searchActive={searchActiveWordId === word.id}
-                hasFullAnalysis={fullAnalysisWordIds.has(word.id)}
+                interactive={interactive}
+                highlightKind={highlightKind}
                 onClick={() => onSelectWord(word)}
                 onPointerEnter={
-                  onHoverWord ? () => onHoverWord(word.id) : undefined
+                  interactive && onHoverWord ? () => onHoverWord(word) : undefined
                 }
+                onPointerLeave={interactive ? onHoverWordLeave : undefined}
               />
             </span>
           );
@@ -112,13 +122,17 @@ export const SentenceBlock = memo(function SentenceBlock({
       {hasTranslation ? (
         <div
           className={[
-            "grid transition-[grid-template-rows,opacity] duration-300 ease-out",
-            showTranslation ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+            "grid transition-[grid-template-rows] duration-300 ease-out",
+            showTranslation ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
           ].join(" ")}
           aria-hidden={!showTranslation}
         >
           <div className="overflow-hidden">
-            <SentenceNaturalTranslation sentenceId={sentenceId} text={naturalTranslation!} />
+            <SentenceNaturalTranslation
+              sentenceId={sentenceId}
+              text={naturalTranslation!}
+              visible={showTranslation}
+            />
           </div>
         </div>
       ) : null}

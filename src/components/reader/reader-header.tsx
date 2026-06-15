@@ -8,6 +8,7 @@ type ReaderHeaderProps = {
   level: string;
   estimatedMinutes: number;
   sentenceCount: number;
+  currentSentenceIndex: number;
   percent: number;
   focusMode: boolean;
   onFocusModeChange: (enabled: boolean) => void;
@@ -18,6 +19,7 @@ export function ReaderHeader({
   level,
   estimatedMinutes,
   sentenceCount,
+  currentSentenceIndex,
   percent,
   focusMode,
   onFocusModeChange,
@@ -28,10 +30,15 @@ export function ReaderHeader({
     `${sentenceCount} ${sentenceCount === 1 ? "sentence" : "sentences"}`,
   ];
 
+  const sentenceLabel =
+    sentenceCount > 0
+      ? `Sentence ${Math.min(currentSentenceIndex + 1, sentenceCount)} / ${sentenceCount}`
+      : null;
+
   return (
-    <header className="space-y-4">
+    <header className="space-y-3">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0 space-y-3">
+        <div className="min-w-0 space-y-2">
           <h1 className="font-reader text-[clamp(1.75rem,4vw,2.25rem)] font-semibold leading-tight tracking-tight text-[var(--ink)]">
             {title}
           </h1>
@@ -46,7 +53,14 @@ export function ReaderHeader({
         </button>
       </div>
 
-      <ProgressBar value={percent} className="h-1" aria-label="Reading progress" />
+      <div className="flex items-center gap-4">
+        <ProgressBar value={percent} className="h-px flex-1" aria-label="Reading progress" />
+        {sentenceLabel ? (
+          <p className="shrink-0 text-[10px] tracking-wide text-[var(--ink-muted)]">
+            {sentenceLabel}
+          </p>
+        ) : null}
+      </div>
     </header>
   );
 }

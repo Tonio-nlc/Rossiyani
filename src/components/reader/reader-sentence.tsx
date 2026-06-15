@@ -3,10 +3,11 @@
 import { memo } from "react";
 
 import { SentenceBlock, type SentenceBlockWord } from "@/components/sentence/sentence-block";
+import type { WordHighlightKind } from "@/lib/reader/build-interactive-words";
+import type { InteractiveWordEntry } from "@/lib/reader/build-interactive-words";
 import type { PartOfSpeech } from "@/types";
 
 import { ReaderMarginPanel } from "./reader-margin-panel";
-import { SentenceActions } from "./sentence-actions";
 import type { ReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel-data";
 import type { WordDetailGraph } from "@/types/word-detail-graph";
 
@@ -14,28 +15,32 @@ type ReaderSentenceProps = {
   sentenceId: string;
   russianText: string;
   naturalTranslation: string;
-  textId: string;
-  textTitle: string;
   words: SentenceBlockWord[];
-  fullAnalysisWordIds: Set<string>;
+  interactiveWordKinds: Map<string, WordHighlightKind>;
   selectedWordId: string | null;
+  hoveredWordId: string | null;
   selectedWordSentenceId: string | null;
   searchMatchWordIds: Set<string>;
   searchActiveWordId: string | null;
   showTranslation: boolean;
   onToggleTranslation: () => void;
-  isActive: boolean;
   dimmed: boolean;
   onSelectSentence: () => void;
   onSelectWord: (word: SentenceBlockWord) => void;
-  onHoverWord?: (wordId: string) => void;
+  onHoverWord?: (word: SentenceBlockWord) => void;
+  onHoverWordLeave?: () => void;
   marginPanelProps: {
     detail: WordDetailGraph | null;
     loading?: boolean;
     textIndex: ReaderTextPhraseIndex;
+    textWords: InteractiveWordEntry[];
+    activeWordId: string | null;
     agreementTarget: string | null;
     showAllTranslations: boolean;
     onToggleAllTranslations: (value: boolean) => void;
+    onHoverWord: (entry: InteractiveWordEntry) => void;
+    onSelectWord: (entry: InteractiveWordEntry) => void;
+    onHoverWordLeave: () => void;
   };
   registerRef: (node: HTMLDivElement | null) => void;
   marginRef: React.RefObject<HTMLDivElement | null>;
@@ -45,21 +50,20 @@ export const ReaderSentence = memo(function ReaderSentence({
   sentenceId,
   russianText,
   naturalTranslation,
-  textId,
-  textTitle,
   words,
-  fullAnalysisWordIds,
+  interactiveWordKinds,
   selectedWordId,
+  hoveredWordId,
   selectedWordSentenceId,
   searchMatchWordIds,
   searchActiveWordId,
   showTranslation,
   onToggleTranslation,
-  isActive,
   dimmed,
   onSelectSentence,
   onSelectWord,
   onHoverWord,
+  onHoverWordLeave,
   marginPanelProps,
   registerRef,
   marginRef,
@@ -78,7 +82,7 @@ export const ReaderSentence = memo(function ReaderSentence({
         onSelectSentence();
       }}
       className={[
-        "min-w-0 py-3 transition-opacity duration-150",
+        "min-w-0 py-1.5 transition-opacity duration-150",
         dimmed ? "opacity-35" : "opacity-100",
       ].join(" ")}
     >
@@ -89,23 +93,19 @@ export const ReaderSentence = memo(function ReaderSentence({
         showTranslation={showTranslation}
         onToggleTranslation={onToggleTranslation}
         words={words}
-        fullAnalysisWordIds={fullAnalysisWordIds}
+        interactiveWordKinds={interactiveWordKinds}
         selectedWordId={selectedWordId}
+        hoveredWordId={hoveredWordId}
         searchMatchWordIds={searchMatchWordIds}
         searchActiveWordId={searchActiveWordId}
         onSelectWord={onSelectWord}
         onHoverWord={onHoverWord}
-      />
-      <SentenceActions
-        sentenceRussian={russianText}
-        textId={textId}
-        textTitle={textTitle}
-        selected={isActive}
+        onHoverWordLeave={onHoverWordLeave}
       />
       {showMobilePanel ? (
         <div
           ref={marginRef}
-          className="mt-6 border-t border-[var(--hairline)] pt-6 lg:hidden"
+          className="mt-4 border-t border-[var(--hairline)] pt-4 lg:hidden"
           aria-label="Word context"
         >
           <ReaderMarginPanel {...marginPanelProps} />

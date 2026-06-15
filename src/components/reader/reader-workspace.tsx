@@ -5,10 +5,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReaderTextData } from "@/features/texts";
 import { setLastReadTextId } from "@/lib/last-read-text";
 import type { ReaderSearchEntry } from "@/lib/reader/build-reader-search-index";
-import { buildTextIntroduction } from "@/lib/reader/build-text-introduction";
 import {
-  buildReaderTextPhraseIndex,
-} from "@/lib/reader/build-reader-word-panel-data";
+  buildInteractiveWordsBySentence,
+  buildTextWordIndex,
+  type InteractiveWordEntry,
+} from "@/lib/reader/build-interactive-words";
+import { buildTextIntroduction } from "@/lib/reader/build-text-introduction";
+import { buildReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel-data";
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
 import { getTextReadingProgress } from "@/lib/reader/reading-progress";
 import type { PartOfSpeech } from "@/types";
@@ -37,6 +40,11 @@ type ReaderWorkspaceProps = {
 
 export type { ReaderWorkspaceProps };
 
+function findWordInText(text: ReaderTextData, wordId: string, sentenceId: string) {
+  const sentence = text.sentences.find((item) => item.id === sentenceId);
+  return sentence?.words.find((word) => word.id === wordId) ?? null;
+}
+
 export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   const [selectedSentenceId, setSelectedSentenceId] = useState<string | null>(
     text.sentences[0]?.id ?? null,
@@ -44,6 +52,8 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   const [selectedWordSnapshot, setSelectedWordSnapshot] = useState<ReaderWordSnapshot | null>(
     null,
   );
+  const [hoveredWordSnapshot, setHoveredWordSnapshot] = useState<ReaderWordSnapshot | null>(null);
+  const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
   const [visibleSentenceIds, setVisibleSentenceIds] = useState<string[]>(() =>
     text.sentences[0] ? [text.sentences[0].id] : [],
   );
@@ -66,8 +76,14 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     estimatedMinutes,
     recordSentence,
     recordWord,
+    progress,
   } = useReadingProgress(text);
 
+  const interactiveBySentence = useMemo(() => buildInteractiveWordsBySentence(text), [text]);
+  const textWords = useMemo(
+    () => buildTextWordIndex(text, interactiveBySentence),
+    [text, interactiveBySentence],
+  );
   const textIndex = useMemo(() => buildReaderTextPhraseIndex(text), [text]);
   const textIntroduction = useMemo(
     () => buildTextIntroduction(text, estimatedMinutes),
@@ -92,54 +108,142 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
 
   const { prefetch, revision } = useReaderWordDetailStore();
 
+  const displayWordSnapshot = hoveredWordSnapshot ?? selectedWordSnapshot;
+  const hoveredWordId = hoveredWordSnapshot?.id ?? null;
+  const selectedWordId = selectedWordSnapshot?.id ?? null;
+  const activeWordId = displayWordSnapshot?.id ?? null;
+
   const { detail, loading } = useReaderWordLookup({
-    selectedWord: selectedWordSnapshot,
+    selectedWord: displayWordSnapshot,
     cacheRevision: revision,
   });
 
   useReaderWordPrefetch({
     text,
     visibleSentenceIds,
-    selectedWordId: selectedWordSnapshot?.id ?? null,
-    hoveredWordId: null,
+    selectedWordId,
+    hoveredWordId,
     prefetch,
   });
 
-  const handleHoverWord = useCallback((wordId: string) => {
-    prefetchWordDetail(wordId);
+  const buildSnapshot = useCallback(
+    (sentenceId: string, wordId: string): ReaderWordSnapshot | null => {
+      const sentence = text.sentences.find((item) => item.id === sentenceId);
+      const word = findWordInText(text, wordId, sentenceId);
+      if (!sentence || !word) {
+        return null;
+      }
+      return toReaderWordSnapshot({
+        ...word,
+        partOfSpeech: word.partOfSpeech as PartOfSpeech,
+        sentenceId,
+        textId: text.id,
+        literalTranslation: sentence.literalTranslation,
+        naturalTranslation: sentence.naturalTranslation,
+        gender: word.gender,
+        number: word.number,
+        tense: word.tense,
+        aspect: word.aspect,
+      });
+    },
+    [text],
+  );
+
+  const handleHoverWordEntry = useCallback(
+    (entry: InteractiveWordEntry) => {
+      const snapshot = buildSnapshot(entry.sentenceId, entry.id);
+      if (!snapshot) {
+        return;
+      }
+      setHoveredWordSnapshot(snapshot);
+      prefetchWordDetail(entry.id);
+    },
+    [buildSnapshot],
+  );
+
+  const handleHoverWordLeave = useCallback(() => {
+    setHoveredWordSnapshot(null);
   }, []);
 
+  const handleHoverWord = useCallback(
+    (word: { id: string; sentenceId?: string } & Record<string, unknown>) => {
+      const sentenceId = "sentenceId" in word && word.sentenceId ? String(word.sentenceId) : selectedSentenceId;
+      if (!sentenceId) {
+        return;
+      }
+      const snapshot = buildSnapshot(sentenceId, word.id);
+      if (!snapshot) {
+        return;
+      }
+      setHoveredWordSnapshot(snapshot);
+      prefetchWordDetail(word.id);
+    },
+    [buildSnapshot, selectedSentenceId],
+  );
+
   const agreementTarget = useMemo(() => {
-    if (!selectedWordSnapshot) {
+    if (!displayWordSnapshot) {
       return null;
     }
-    const sentence = text.sentences.find((item) => item.id === selectedWordSnapshot.sentenceId);
-    if (!sentence || selectedWordSnapshot.partOfSpeech !== "adjective") {
+    const sentence = text.sentences.find((item) => item.id === displayWordSnapshot.sentenceId);
+    if (!sentence || displayWordSnapshot.partOfSpeech !== "adjective") {
       return null;
     }
     const previous = sentence.words.find(
-      (word) => word.position === selectedWordSnapshot.position - 1,
+      (word) => word.position === displayWordSnapshot.position - 1,
     );
     return previous?.original ?? null;
-  }, [selectedWordSnapshot, text.sentences]);
+  }, [displayWordSnapshot, text.sentences]);
 
   const marginPanelProps = useMemo(
     () => ({
       detail,
       loading,
       textIndex,
+      textWords,
+      activeWordId,
       agreementTarget,
       showAllTranslations,
       onToggleAllTranslations: setShowAllTranslations,
+      onHoverWord: handleHoverWordEntry,
+      onSelectWord: (entry: InteractiveWordEntry) => {
+        const snapshot = buildSnapshot(entry.sentenceId, entry.id);
+        if (!snapshot) {
+          return;
+        }
+        setSelectedSentenceId(entry.sentenceId);
+        setSelectedWordSnapshot(snapshot);
+        setHoveredWordSnapshot(null);
+        prefetchWordDetail(entry.id);
+        recordWord(entry.id, entry.sentenceId);
+      },
+      onHoverWordLeave: handleHoverWordLeave,
     }),
-    [detail, loading, textIndex, agreementTarget, showAllTranslations, setShowAllTranslations],
+    [
+      detail,
+      loading,
+      textIndex,
+      textWords,
+      activeWordId,
+      agreementTarget,
+      showAllTranslations,
+      setShowAllTranslations,
+      handleHoverWordEntry,
+      handleHoverWordLeave,
+      buildSnapshot,
+      recordWord,
+    ],
   );
 
-  const structureCount = useMemo(() => {
+  const constructionCount = useMemo(() => {
     const labels = new Set<string>();
     for (const sentence of text.sentences) {
       for (const group of sentence.phraseGroups) {
-        if (group.type === "NATIVE_CONSTRUCTION") {
+        if (
+          group.type === "NATIVE_CONSTRUCTION" ||
+          group.type === "FIXED_EXPRESSION" ||
+          group.type === "COLLOCATION"
+        ) {
           labels.add(group.label);
         }
       }
@@ -147,43 +251,32 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     return labels.size;
   }, [text.sentences]);
 
-  const expressionCount = useMemo(() => {
-    const labels = new Set<string>();
+  const grammarObservationCount = useMemo(() => {
+    const seenIds = new Set(progress?.wordsSeenIds ?? []);
+    let count = 0;
     for (const sentence of text.sentences) {
-      for (const group of sentence.phraseGroups) {
-        if (group.type === "FIXED_EXPRESSION" || group.type === "COLLOCATION") {
-          labels.add(group.label);
+      const interactive = interactiveBySentence.get(sentence.id);
+      if (!interactive) {
+        continue;
+      }
+      for (const [wordId, kind] of interactive) {
+        if (kind === "grammar" && seenIds.has(wordId)) {
+          count += 1;
         }
       }
     }
-    return labels.size;
-  }, [text.sentences]);
+    return count;
+  }, [interactiveBySentence, progress?.wordsSeenIds, text.sentences]);
 
   const practiceStructure = useMemo(() => {
     const firstPhrase = text.sentences[0]?.phraseGroups[0]?.label;
     return firstPhrase ?? text.sentences[0]?.words[0]?.lemma ?? text.title;
   }, [text]);
 
-  const fullAnalysisWordIdsBySentence = useMemo(() => {
-    const map = new Map<string, Set<string>>();
-    for (const sentence of text.sentences) {
-      const set = new Set<string>();
-      for (const word of sentence.words) {
-        if (word.formId) {
-          set.add(word.id);
-        }
-      }
-      map.set(sentence.id, set);
-    }
-    return map;
-  }, [text.sentences]);
-
   const selectedSentence = useMemo(
     () => text.sentences.find((sentence) => sentence.id === selectedSentenceId) ?? null,
     [text.sentences, selectedSentenceId],
   );
-
-  const selectedWordId = selectedWordSnapshot?.id ?? null;
 
   useEffect(() => {
     setLastReadTextId(text.id);
@@ -216,6 +309,8 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     const observer = new IntersectionObserver(
       (entries) => {
         let changed = false;
+        let topMostIndex = -1;
+        let topMostRatio = 0;
 
         for (const entry of entries) {
           const sentenceId = entry.target.getAttribute("data-sentence-id");
@@ -229,17 +324,27 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
               changed = true;
             }
             recordSentence(sentenceId);
+
+            const index = text.sentences.findIndex((sentence) => sentence.id === sentenceId);
+            if (index >= 0 && entry.intersectionRatio >= topMostRatio) {
+              topMostRatio = entry.intersectionRatio;
+              topMostIndex = index;
+            }
           } else if (visibleSentenceIdsRef.current.has(sentenceId)) {
             visibleSentenceIdsRef.current.delete(sentenceId);
             changed = true;
           }
         }
 
+        if (topMostRatio > 0) {
+          setCurrentSentenceIndex(topMostIndex);
+        }
+
         if (changed) {
           setVisibleSentenceIds([...visibleSentenceIdsRef.current]);
         }
       },
-      { threshold: 0.2, rootMargin: "120px 0px" },
+      { threshold: [0.2, 0.5, 0.75], rootMargin: "120px 0px" },
     );
 
     for (const node of sentenceRefs.current.values()) {
@@ -253,6 +358,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     (sentenceId: string) => {
       setSelectedSentenceId(sentenceId);
       setSelectedWordSnapshot(null);
+      setHoveredWordSnapshot(null);
       recordSentence(sentenceId);
     },
     [recordSentence],
@@ -274,6 +380,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
           naturalTranslation: sentence.naturalTranslation,
         }),
       );
+      setHoveredWordSnapshot(null);
       prefetchWordDetail(word.id);
       recordWord(word.id, sentenceId);
       if (window.matchMedia("(max-width: 1023px)").matches) {
@@ -310,7 +417,10 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
       }
     },
     onSelectSentence: handleSelectSentence,
-    onClearWord: () => setSelectedWordSnapshot(null),
+    onClearWord: () => {
+      setSelectedWordSnapshot(null);
+      setHoveredWordSnapshot(null);
+    },
     onOpenSearch: textSearch.focusSearch,
     searchOpen: textSearch.isOpen,
     onCloseSearch: textSearch.closeSearch,
@@ -323,19 +433,14 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
         level={text.level}
         estimatedMinutes={estimatedMinutes}
         sentenceCount={totalSentences}
+        currentSentenceIndex={currentSentenceIndex}
         percent={percent}
         focusMode={focusMode}
         onFocusModeChange={setFocusMode}
       />
 
-      {textIntroduction ? (
-        <div className="mt-6">
-          <ReaderAboutText introduction={textIntroduction} />
-        </div>
-      ) : null}
-
       {textSearch.isOpen || textSearch.query.trim().length > 0 ? (
-        <div className="mt-6 max-w-[70ch]">
+        <div className="mt-5 max-w-[70ch]">
           <ReaderInTextSearch
             query={textSearch.query}
             onQueryChange={textSearch.setQuery}
@@ -350,12 +455,11 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
         </div>
       ) : null}
 
-      <div className="mt-8 grid min-w-0 gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(240px,3fr)] lg:items-start lg:gap-12">
+      <div className="mt-6 grid min-w-0 gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(240px,3fr)] lg:items-start lg:gap-10">
         <div className="min-w-0">
-          <article className="min-w-0 max-w-[70ch] space-y-10">
+          <article className="min-w-0 max-w-[70ch] space-y-8">
             {text.sentences.map((sentence) => {
-              const isActive = selectedSentenceId === sentence.id;
-              const dimmed = focusMode && !isActive;
+              const dimmed = focusMode && selectedSentenceId !== sentence.id;
 
               return (
                 <ReaderSentence
@@ -363,19 +467,17 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
                   sentenceId={sentence.id}
                   russianText={sentence.russianText}
                   naturalTranslation={sentence.naturalTranslation}
-                  textId={text.id}
-                  textTitle={text.title}
                   words={mapSentenceWords(sentence.words)}
-                  fullAnalysisWordIds={
-                    fullAnalysisWordIdsBySentence.get(sentence.id) ?? new Set()
+                  interactiveWordKinds={
+                    interactiveBySentence.get(sentence.id) ?? new Map()
                   }
                   selectedWordId={selectedWordId}
+                  hoveredWordId={hoveredWordId}
                   selectedWordSentenceId={selectedWordSnapshot?.sentenceId ?? null}
                   searchMatchWordIds={searchMatchWordIds}
                   searchActiveWordId={textSearch.activeResult?.wordId ?? null}
                   showTranslation={isExpanded(sentence.id, showAllTranslations)}
                   onToggleTranslation={() => toggleExpanded(sentence.id)}
-                  isActive={isActive}
                   dimmed={dimmed}
                   onSelectSentence={() => handleSelectSentence(sentence.id)}
                   onSelectWord={(word) =>
@@ -387,7 +489,10 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
                       naturalTranslation: sentence.naturalTranslation,
                     })
                   }
-                  onHoverWord={handleHoverWord}
+                  onHoverWord={(word) =>
+                    handleHoverWord({ ...word, sentenceId: sentence.id })
+                  }
+                  onHoverWordLeave={handleHoverWordLeave}
                   marginPanelProps={marginPanelProps}
                   registerRef={(node) => {
                     if (node) {
@@ -402,12 +507,16 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
             })}
 
             <ReaderCompletionCard
-              wordsReviewed={wordsSeenCount}
-              structureCount={structureCount}
-              expressionCount={expressionCount}
+              newWordsCount={wordsSeenCount}
+              constructionCount={constructionCount}
+              grammarObservationCount={grammarObservationCount}
               practiceStructure={practiceStructure}
               primaryConceptKey={null}
             />
+
+            {textIntroduction ? (
+              <ReaderAboutText introduction={textIntroduction} defaultCollapsed />
+            ) : null}
           </article>
         </div>
 

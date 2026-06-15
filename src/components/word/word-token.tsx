@@ -2,6 +2,7 @@
 
 import { memo } from "react";
 
+import type { WordHighlightKind } from "@/lib/reader/build-interactive-words";
 import type { PartOfSpeech } from "@/types";
 
 type WordTokenProps = {
@@ -12,40 +13,63 @@ type WordTokenProps = {
   partOfSpeech: PartOfSpeech;
   grammaticalCase?: string | null;
   selected?: boolean;
+  hovered?: boolean;
   searchMatch?: boolean;
   searchActive?: boolean;
-  hasFullAnalysis?: boolean;
+  interactive?: boolean;
+  highlightKind?: WordHighlightKind | null;
   onClick?: () => void;
   onPointerEnter?: () => void;
+  onPointerLeave?: () => void;
+};
+
+const HIGHLIGHT_CLASS: Record<WordHighlightKind, string> = {
+  verb: "reader-word-verb",
+  construction: "reader-word-construction",
+  grammar: "reader-word-grammar",
+  noun: "reader-word-noun",
 };
 
 export const WordToken = memo(function WordToken({
   wordId,
   stressMarked,
   selected,
+  hovered,
   searchMatch,
   searchActive,
-  hasFullAnalysis,
+  interactive = false,
+  highlightKind = null,
   onClick,
   onPointerEnter,
+  onPointerLeave,
 }: WordTokenProps) {
+  if (!interactive) {
+    return (
+      <span data-word-id={wordId} className="font-reader text-inherit">
+        {stressMarked}
+      </span>
+    );
+  }
+
   return (
     <button
       type="button"
       data-word-id={wordId}
       onClick={onClick}
       onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
       className={[
-        "focus-kb inline cursor-pointer border-0 bg-transparent p-0 align-baseline font-reader text-inherit transition-opacity duration-150",
+        "reader-word-interactive focus-kb inline cursor-pointer border-0 bg-transparent p-0 align-baseline font-reader text-inherit",
+        "transition-[background-color,text-decoration-color] duration-150",
+        highlightKind ? HIGHLIGHT_CLASS[highlightKind] : "",
         selected
-          ? "underline decoration-[var(--color-grammar)] decoration-2 underline-offset-[6px]"
+          ? "reader-word-selected"
           : searchActive
-            ? "underline decoration-[var(--color-culture)] decoration-2 underline-offset-[6px]"
+            ? "reader-word-search-active"
             : searchMatch
-              ? "underline decoration-[var(--hairline-strong)] decoration-1 underline-offset-[5px]"
-              : hasFullAnalysis
-                ? "underline decoration-dotted decoration-[var(--hairline-strong)] underline-offset-[5px]"
-                : "hover:opacity-70",
+              ? "reader-word-search-match"
+              : "",
+        hovered && !selected ? "reader-word-hover" : "",
       ].join(" ")}
     >
       {stressMarked}

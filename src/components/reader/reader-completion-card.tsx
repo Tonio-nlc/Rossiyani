@@ -6,17 +6,17 @@ import { conceptPath } from "@/components/explorer/explorer-routes";
 import { practicePath } from "@/lib/practice/constants";
 
 type ReaderCompletionCardProps = {
-  wordsReviewed: number;
-  structureCount: number;
-  expressionCount: number;
+  newWordsCount: number;
+  constructionCount: number;
+  grammarObservationCount: number;
   practiceStructure: string;
   primaryConceptKey: string | null;
 };
 
 export function ReaderCompletionCard({
-  wordsReviewed,
-  structureCount,
-  expressionCount,
+  newWordsCount,
+  constructionCount,
+  grammarObservationCount,
   practiceStructure,
   primaryConceptKey,
 }: ReaderCompletionCardProps) {
@@ -25,31 +25,34 @@ export function ReaderCompletionCard({
     : `/explorer?q=${encodeURIComponent(practiceStructure)}`;
 
   return (
-    <section className="max-w-[70ch] space-y-4 border-t border-[var(--hairline)] pt-8">
+    <section className="max-w-[70ch] space-y-5 border-t border-[var(--hairline)] pt-8">
       <p className="text-sm text-[var(--ink-secondary)]">
         <span aria-hidden>✓ </span>
         Reading completed
       </p>
+
       <div>
         <p className="home-section-label">Today you discovered</p>
         <ul className="mt-2 space-y-1 text-sm text-[var(--ink-secondary)]">
           <li>
-            {wordsReviewed} word{wordsReviewed === 1 ? "" : "s"}
+            {newWordsCount} new word{newWordsCount === 1 ? "" : "s"}
           </li>
-          {structureCount > 0 ? (
+          {constructionCount > 0 ? (
             <li>
-              {structureCount} structure{structureCount === 1 ? "" : "s"}
+              {constructionCount} useful construction{constructionCount === 1 ? "" : "s"}
             </li>
           ) : null}
-          {expressionCount > 0 ? (
+          {grammarObservationCount > 0 ? (
             <li>
-              {expressionCount} expression{expressionCount === 1 ? "" : "s"}
+              {grammarObservationCount} grammar observation
+              {grammarObservationCount === 1 ? "" : "s"}
             </li>
           ) : null}
         </ul>
       </div>
+
       <div>
-        <p className="text-xs text-[var(--ink-muted)]">Continue</p>
+        <p className="text-xs text-[var(--ink-muted)]">Continue learning</p>
         <ul className="mt-2 space-y-1.5 text-sm">
           <li>
             <Link
@@ -68,7 +71,7 @@ export function ReaderCompletionCard({
               href={explorerHref}
               className="focus-kb text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
             >
-              Explore →
+              Explore similar texts →
             </Link>
           </li>
           <li>
