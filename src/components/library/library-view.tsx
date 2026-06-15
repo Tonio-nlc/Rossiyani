@@ -21,11 +21,12 @@ const REMOVE_ANIMATION_MS = 280;
 
 type LibraryViewProps = {
   initialTexts: TextListItem[];
+  showPageHeader?: boolean;
 };
 
 type DialogTarget = TextListItem | null;
 
-export function LibraryView({ initialTexts }: LibraryViewProps) {
+export function LibraryView({ initialTexts, showPageHeader = true }: LibraryViewProps) {
   const { toast } = useToast();
   const [texts, setTexts] = useState(initialTexts);
   const [search, setSearch] = useState("");
@@ -108,8 +109,10 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
   }, [deleteTarget, toast]);
 
   return (
-    <div className="space-y-6 pb-16">
-      <LibraryHeader textCount={texts.length} sentenceCount={totalSentences} />
+    <div className={showPageHeader ? "space-y-6 pb-16" : "space-y-6"}>
+      {showPageHeader ? (
+        <LibraryHeader textCount={texts.length} sentenceCount={totalSentences} />
+      ) : null}
       <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
       <LibraryFilters
         level={level}

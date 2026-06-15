@@ -35,7 +35,10 @@ export function ImportSources({
 }: ImportSourcesProps) {
   return (
     <div className="space-y-8">
-      <div className="surface-elevated rounded-3xl border border-[var(--border)] p-5 sm:p-7">
+      <div
+        id="import-paste"
+        className="scroll-mt-24 rounded-2xl border border-[var(--hairline)] px-5 py-6 sm:px-7 sm:py-7"
+      >
         <ImportPastePanel
           text={pastedText}
           title={pasteTitle}
@@ -51,12 +54,14 @@ export function ImportSources({
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="h-px flex-1 bg-[var(--border)]" />
-        <span className="text-xs uppercase tracking-wider text-[var(--muted)]">ou</span>
-        <div className="h-px flex-1 bg-[var(--border)]" />
+        <div className="h-px flex-1 bg-[var(--hairline)]" />
+        <span className="text-xs uppercase tracking-wider text-[var(--ink-muted)]">or</span>
+        <div className="h-px flex-1 bg-[var(--hairline)]" />
       </div>
 
-      <ImportFilePanel disabled={disabled} onFiles={onFiles} />
+      <div id="import-file" className="scroll-mt-24">
+        <ImportFilePanel disabled={disabled} onFiles={onFiles} />
+      </div>
 
       <ImportFolderPanel disabled={disabled} onFiles={onFiles} />
     </div>

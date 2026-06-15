@@ -61,6 +61,19 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
     setHistory(loadImportHistory());
   }, []);
 
+  useEffect(() => {
+    const hash = window.location.hash.replace("#", "");
+    if (!hash) {
+      return;
+    }
+    requestAnimationFrame(() => {
+      document.getElementById(`import-${hash}`)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }, []);
+
   const getAuthHeaders = useCallback((): Record<string, string> => {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     const secret = sessionStorage.getItem(ADMIN_SECRET_KEY);
@@ -577,13 +590,15 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
         </section>
       ) : null}
 
-      <ImportHistoryPanel
-        localHistory={history}
-        serverJobs={serverJobs}
-        onRetry={handleRetry}
-        onResumeJob={(id) => void handleResumeJob(id)}
-        onViewReport={report ? () => window.scrollTo({ top: 0, behavior: "smooth" }) : undefined}
-      />
+      <div id="import-history" className="scroll-mt-24">
+        <ImportHistoryPanel
+          localHistory={history}
+          serverJobs={serverJobs}
+          onRetry={handleRetry}
+          onResumeJob={(id) => void handleResumeJob(id)}
+          onViewReport={report ? () => window.scrollTo({ top: 0, behavior: "smooth" }) : undefined}
+        />
+      </div>
     </div>
   );
 }
