@@ -8,7 +8,7 @@ type ImportFilePanelProps = {
 };
 
 export const IMPORT_FILE_ACCEPT =
-  ".txt,.md,text/plain,text/markdown,application/octet-stream,text/*";
+  ".txt,.md,.pdf,text/plain,text/markdown,application/pdf,application/octet-stream,text/*";
 
 export function ImportFilePanel({ disabled, onFiles }: ImportFilePanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -67,7 +67,7 @@ export function ImportFilePanel({ disabled, onFiles }: ImportFilePanelProps) {
           }}
         />
 
-        <p className="text-sm text-[var(--muted)]">Glisser-déposer ou choisir un fichier texte</p>
+        <p className="text-sm text-[var(--muted)]">Glisser-déposer ou choisir un fichier</p>
         <label
           htmlFor="import-file-picker"
           className={[
@@ -78,7 +78,7 @@ export function ImportFilePanel({ disabled, onFiles }: ImportFilePanelProps) {
           Choisir un fichier
         </label>
         <p className="mt-3 text-[11px] text-[var(--muted)]">
-          .txt · .md · text/plain · tout fichier texte lisible
+          .txt · .md · .pdf · text/plain
         </p>
       </div>
     </section>

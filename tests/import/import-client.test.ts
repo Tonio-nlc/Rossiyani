@@ -52,6 +52,7 @@ describe("import-client helpers", () => {
 
   it("derives title from file name", () => {
     expect(titleFromFileName("mon_texte-russe.txt")).toBe("mon texte russe");
+    expect(titleFromFileName("article.pdf")).toBe("article");
   });
 
   it("detects CEFR level from file name", () => {

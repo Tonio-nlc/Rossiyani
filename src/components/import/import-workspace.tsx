@@ -19,12 +19,16 @@ import {
   loadImportHistory,
   readImportFiles,
   saveImportHistoryEntry,
+  type ImportFileProgressCallback,
   type ImportHistoryEntry,
   type ImportQueueItem,
   type ImportSessionReport,
   type PendingImportFile,
 } from "@/lib/import-client";
 import { formatImportFailure } from "@/lib/import-error-format";
+import type { ImportParsePhase } from "@/services/import/parsers";
+
+import { ImportExtractionProgress } from "./import-extraction-progress";
 
 import { ImportFilePreview } from "./import-file-preview";
 import { ImportHistoryPanel } from "./import-history-panel";
@@ -47,6 +51,12 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
   const [pasteSource, setPasteSource] = useState("");
   const [staged, setStaged] = useState<PendingImportFile[]>([]);
   const [staging, setStaging] = useState(false);
+  const [extractionProgress, setExtractionProgress] = useState<{
+    fileName: string;
+    phase: ImportParsePhase;
+    fileIndex: number;
+    totalFiles: number;
+  } | null>(null);
   const [queue, setQueue] = useState<ImportQueueItem[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [report, setReport] = useState<ImportSessionReport | null>(null);
@@ -313,17 +323,26 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
   const handleFilesSelected = useCallback(
     async (files: File[]) => {
       setStaging(true);
+      setExtractionProgress(null);
       try {
-        const { accepted, failedRead } = await readImportFiles(files, defaultLevel);
+        const onProgress: ImportFileProgressCallback = (fileName, phase, fileIndex, totalFiles) => {
+          setExtractionProgress({ fileName, phase, fileIndex, totalFiles });
+        };
+
+        const { accepted, failedRead } = await readImportFiles(files, defaultLevel, onProgress);
         if (accepted.length === 0) {
+          const firstFailure = failedRead[0];
           toast(
-            failedRead.length > 0 ? "Impossible de lire le(s) fichier(s)" : "Aucun fichier sélectionné",
+            firstFailure?.error ??
+              (failedRead.length > 0 ? "Impossible de lire le(s) fichier(s)" : "Aucun fichier sélectionné"),
             "error",
           );
           return;
         }
         if (failedRead.length > 0) {
-          toast(`${failedRead.length} fichier(s) illisible(s)`, "error");
+          for (const failure of failedRead) {
+            toast(`${failure.fileName} : ${failure.error}`, "error");
+          }
         }
         setStaged((prev) => {
           const existingNames = new Set(prev.map((p) => p.fileName));
@@ -338,6 +357,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
         });
       } finally {
         setStaging(false);
+        setExtractionProgress(null);
       }
     },
     [defaultLevel, toast],
@@ -520,6 +540,15 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
           Voir la bibliothèque →
         </Link>
       </div>
+
+      {extractionProgress ? (
+        <ImportExtractionProgress
+          fileName={extractionProgress.fileName}
+          phase={extractionProgress.phase}
+          fileIndex={extractionProgress.fileIndex}
+          totalFiles={extractionProgress.totalFiles}
+        />
+      ) : null}
 
       {staged.length > 0 ? (
         <ImportFilePreview

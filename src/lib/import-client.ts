@@ -1,6 +1,8 @@
 import type { ImportSegmentStats } from "@/domain/pipeline";
 import { segmentSentences } from "@/services/parser/segment-sentences";
 import type { ImportRussianTextResult } from "@/services/import/types";
+import type { ImportParsePhase, ImportSourceType } from "@/services/import/parsers";
+import { isPdfImportError, readImportSource } from "@/services/import/parsers";
 import type { CefrLevel } from "@/types/domain";
 import type { KnowledgeMetricsSnapshot } from "@/types/import-pipeline";
 
@@ -17,7 +19,25 @@ export type PendingImportFile = {
   estimatedSentences: number;
   fileSizeBytes: number;
   detectedLevel: CefrLevel | null;
+  sourceType?: ImportSourceType;
+  summary?: string;
+  focusPoints?: string[];
+  category?: string | null;
+  estimatedReadingMinutes?: number;
 };
+
+export type ImportFileReadFailure = {
+  fileName: string;
+  error: string;
+  reason?: string;
+};
+
+export type ImportFileProgressCallback = (
+  fileName: string,
+  phase: ImportParsePhase,
+  fileIndex: number,
+  totalFiles: number,
+) => void;
 
 export type ImportQueueItemStatus =
   | "pending"
@@ -174,37 +194,74 @@ export function formatFileSize(bytes: number): string {
 }
 
 export function titleFromFileName(fileName: string): string {
-  return fileName.replace(/\.(txt|md)$/i, "").replace(/[-_]/g, " ");
+  return fileName.replace(/\.(txt|md|pdf)$/i, "").replace(/[-_]/g, " ");
 }
 
-export async function readImportFile(file: File, level: CefrLevel): Promise<PendingImportFile> {
-  const rawText = await file.text();
-  const detectedLevel = detectLevelFromFileName(file.name);
+function isPdfFile(file: File): boolean {
+  return /\.pdf$/i.test(file.name) || file.type === "application/pdf";
+}
+
+export async function readImportFile(
+  file: File,
+  level: CefrLevel,
+  onProgress?: (phase: ImportParsePhase) => void,
+): Promise<PendingImportFile> {
+  const document = await readImportSource({
+    fileName: file.name,
+    level,
+    mimeType: file.type,
+    rawText: isPdfFile(file) ? undefined : await file.text(),
+    arrayBuffer: isPdfFile(file) ? await file.arrayBuffer() : undefined,
+    onProgress,
+  });
+
   return {
     id: crypto.randomUUID(),
     fileName: file.name,
-    title: titleFromFileName(file.name),
-    source: "",
-    rawText: rawText.trim(),
-    level: detectedLevel ?? level,
-    estimatedSentences: segmentSentences(rawText).length,
+    title: document.title,
+    source: document.source,
+    rawText: document.rawText,
+    level: document.metadata.detectedLevel ?? level,
+    estimatedSentences: document.metadata.estimatedSentences,
     fileSizeBytes: file.size,
-    detectedLevel,
+    detectedLevel: document.metadata.detectedLevel,
+    sourceType: document.sourceType,
+    summary: document.metadata.summary,
+    focusPoints: document.metadata.focusPoints,
+    category: document.metadata.category,
+    estimatedReadingMinutes: document.metadata.estimatedReadingMinutes,
   };
 }
 
 export async function readImportFiles(
   files: File[],
   level: CefrLevel,
-): Promise<{ accepted: PendingImportFile[]; failedRead: string[] }> {
+  onProgress?: ImportFileProgressCallback,
+): Promise<{ accepted: PendingImportFile[]; failedRead: ImportFileReadFailure[] }> {
   const accepted: PendingImportFile[] = [];
-  const failedRead: string[] = [];
+  const failedRead: ImportFileReadFailure[] = [];
 
-  for (const file of files) {
+  for (let index = 0; index < files.length; index += 1) {
+    const file = files[index]!;
     try {
-      accepted.push(await readImportFile(file, level));
-    } catch {
-      failedRead.push(file.name);
+      accepted.push(
+        await readImportFile(file, level, (phase) =>
+          onProgress?.(file.name, phase, index + 1, files.length),
+        ),
+      );
+    } catch (error) {
+      if (isPdfImportError(error)) {
+        failedRead.push({
+          fileName: file.name,
+          error: error.userMessage,
+          reason: error.reason,
+        });
+      } else {
+        failedRead.push({
+          fileName: file.name,
+          error: "Impossible de lire ce fichier.",
+        });
+      }
     }
   }
 

@@ -27,6 +27,7 @@
     "@prisma/client": "^6.9.0",
     "gray-matter": "^4.0.3",
     "next": "^15.3.3",
+    "pdfjs-dist": "^6.0.227",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-markdown": "^10.1.0",

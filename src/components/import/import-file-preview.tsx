@@ -85,11 +85,42 @@ export function ImportFilePreview({
                   </div>
                   <div>
                     <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Niveau détecté</dt>
-                    <dd className="mt-0.5 font-medium">
-                      {file.detectedLevel ?? "—"}
-                    </dd>
+                    <dd className="mt-0.5 font-medium">{file.detectedLevel ?? "—"}</dd>
                   </div>
+                  {file.estimatedReadingMinutes ? (
+                    <div>
+                      <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">
+                        Lecture estimée
+                      </dt>
+                      <dd className="mt-0.5 font-medium">{file.estimatedReadingMinutes} min</dd>
+                    </div>
+                  ) : null}
                 </dl>
+
+                {file.sourceType === "pdf" && (file.summary || file.category || file.focusPoints?.length) ? (
+                  <div className="space-y-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm">
+                    {file.category ? (
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--accent-violet-bright)]">
+                        {file.category}
+                      </p>
+                    ) : null}
+                    {file.summary ? (
+                      <p className="leading-relaxed text-[var(--muted)]">{file.summary}</p>
+                    ) : null}
+                    {file.focusPoints && file.focusPoints.length > 0 ? (
+                      <ul className="flex flex-wrap gap-2">
+                        {file.focusPoints.map((point) => (
+                          <li
+                            key={point}
+                            className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-[11px] text-[var(--muted)]"
+                          >
+                            {point}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
               {files.length > 1 ? (
                 <button

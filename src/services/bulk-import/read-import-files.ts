@@ -1,9 +1,16 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
+import {
+  extractPdfTextFromBufferNode,
+  normalizeImportDocument,
+  parseMd,
+  parseTxt,
+  PdfImportError,
+} from "@/services/import/parsers";
 import type { CefrLevel } from "@/types/domain";
 
-const TEXT_EXTENSIONS = new Set([".txt", ".md", ".text"]);
+const TEXT_EXTENSIONS = new Set([".txt", ".md", ".text", ".pdf"]);
 
 export type ImportFileDescriptor = {
   fileName: string;
@@ -18,6 +25,64 @@ export type ReadImportFolderOptions = {
   /** Derive title from filename when true (default). */
   titleFromFilename?: boolean;
 };
+
+async function readImportFileFromDisk(
+  entry: string,
+  fullPath: string,
+  options: ReadImportFolderOptions,
+): Promise<ImportFileDescriptor | null> {
+  const ext = path.extname(entry).toLowerCase();
+
+  if (ext === ".pdf") {
+    try {
+      const buffer = await readFile(fullPath);
+      const extraction = await extractPdfTextFromBufferNode(buffer);
+      const { text } = normalizeImportDocument(extraction.pages.join("\n\n"), {
+        sourceType: "pdf",
+        fileName: entry,
+        pdfPages: extraction.pages,
+      });
+      if (!text.trim()) {
+        return null;
+      }
+      return {
+        fileName: entry,
+        filePath: fullPath,
+        title:
+          options.titleFromFilename !== false
+            ? path.basename(entry, ext).replace(/[-_]/g, " ")
+            : entry,
+        rawText: text,
+      };
+    } catch (error) {
+      if (error instanceof PdfImportError) {
+        console.warn(`Skipping PDF ${entry}: ${error.reason}`);
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  const rawText = await readFile(fullPath, "utf8");
+  if (!rawText.trim()) {
+    return null;
+  }
+
+  const document =
+    ext === ".md" || ext === ".markdown"
+      ? parseMd(rawText, entry)
+      : parseTxt(rawText, entry);
+
+  return {
+    fileName: entry,
+    filePath: fullPath,
+    title:
+      options.titleFromFilename !== false
+        ? document.title
+        : entry,
+    rawText: document.rawText,
+  };
+}
 
 /**
  * Reads all text files from a folder (non-recursive by default).
@@ -49,22 +114,10 @@ export async function readImportFolder(
       continue;
     }
 
-    const rawText = await readFile(fullPath, "utf8");
-    if (!rawText.trim()) {
-      continue;
+    const descriptor = await readImportFileFromDisk(entry, fullPath, options);
+    if (descriptor) {
+      files.push(descriptor);
     }
-
-    const title =
-      options.titleFromFilename !== false
-        ? path.basename(entry, ext).replace(/[-_]/g, " ")
-        : entry;
-
-    files.push({
-      fileName: entry,
-      filePath: fullPath,
-      title,
-      rawText,
-    });
   }
 
   return files.sort((a, b) => a.fileName.localeCompare(b.fileName, "fr"));
