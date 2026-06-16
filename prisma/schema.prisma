@@ -105,6 +105,13 @@ enum ImportJobItemStatus {
   SKIPPED_DUPLICATE
 }
 
+enum SentenceAnalysisState {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
 model Text {
   id          String     @id @default(cuid())
   title       String
@@ -131,6 +138,7 @@ model Sentence {
   difficultyScore    Int
   needsReview        Boolean                    @default(false)
   reviewMessage      String?
+  analysisState      SentenceAnalysisState      @default(READY)
   /// Full pipeline output JSON (SentenceAnalysisOutput) — source of truth for rehydration.
   analysisJson       String?
   /// Syntax tree / dependency analysis produced at import.
@@ -146,6 +154,7 @@ model Sentence {
   @@index([textId])
   @@index([difficultyScore])
   @@index([register])
+  @@index([analysisState])
 }
 
 model Word {

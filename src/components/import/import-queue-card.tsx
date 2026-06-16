@@ -17,60 +17,58 @@ const STATUS_LABELS: Record<ImportQueueItem["status"], string> = {
 };
 
 export function ImportQueueCard({ item }: ImportQueueCardProps) {
-  const isActive = item.status === "processing";
+  const isActive = item.status === "processing" || item.enrichmentPending;
   const wordCount = item.result?.wordCount ?? countWords(item.rawText);
+  const phraseCount = item.estimatedSentences;
+  const readyPhrases =
+    item.enrichmentPending && item.sentencesReady === 0
+      ? phraseCount
+      : Math.max(item.sentencesReady, item.sentencesProcessed);
+  const phraseLabel = `${readyPhrases} / ${phraseCount} phrase${phraseCount === 1 ? "" : "s"}`;
+  const wordLabel = `${wordCount} mot${wordCount === 1 ? "" : "s"}`;
 
   return (
     <article
       className={[
-        "surface-elevated rounded-2xl border p-5 transition-all duration-300",
-        isActive ? "border-[var(--accent-violet)]/40 shadow-[var(--shadow-glow)]" : "border-[var(--border)]",
+        "rounded-xl border px-5 py-4 transition-all duration-300",
+        isActive ? "border-[var(--ink-muted)]/30" : "border-[var(--hairline)]",
       ].join(" ")}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <h3 className="font-reader text-lg font-semibold text-[var(--foreground)]">{item.title}</h3>
-          <p className="mt-0.5 truncate text-xs text-[var(--muted)]">
-            {item.source ? `${item.source} · ` : ""}
-            {item.fileName}
-          </p>
-          <p className="mt-1 text-xs text-[var(--muted)]">{STATUS_LABELS[item.status]}</p>
-        </div>
-        {item.etaSeconds !== null && isActive ? (
-          <p className="shrink-0 text-xs text-[var(--accent-cyan)]">
-            ~{item.etaSeconds} s restantes
-          </p>
+      <div className="space-y-1">
+        <h3 className="font-reader text-lg text-[var(--ink)]">{item.title}</h3>
+        {item.source ? (
+          <p className="truncate text-xs text-[var(--ink-muted)]">{item.source}</p>
         ) : null}
+        <p className="text-xs text-[var(--ink-secondary)]">{STATUS_LABELS[item.status]}</p>
       </div>
 
-      <div className="mt-4">
-        <ProgressBar value={item.progress} />
-        <p className="mt-2 text-sm text-[var(--muted)]">
-          {item.sentencesProcessed} / {item.estimatedSentences} phrases
+      {isActive ? (
+        <div className="mt-4 space-y-2">
+          <ProgressBar value={item.progress} />
+          <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm text-[var(--ink-secondary)]">
+            <span>
+              {phraseLabel} · {wordLabel}
+            </span>
+            {item.enrichmentPending ? (
+              <span className="text-xs text-[var(--ink-muted)]">Analyse en cours…</span>
+            ) : null}
+          </div>
+          {item.etaSeconds !== null && isActive && !item.enrichmentPending ? (
+            <p className="text-xs text-[var(--ink-muted)]">~{item.etaSeconds} s restantes</p>
+          ) : item.enrichmentPending && item.etaSeconds !== null ? (
+            <p className="text-xs text-[var(--ink-muted)]">~{item.etaSeconds} s restantes</p>
+          ) : null}
+        </div>
+      ) : item.status === "completed" ? (
+        <p className="mt-4 text-sm text-[var(--ink-secondary)]">
+          {phraseLabel} · {wordLabel}
         </p>
-      </div>
-
-      <dl className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
-        <div>
-          <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Mots</dt>
-          <dd className="mt-0.5 font-semibold">{wordCount}</dd>
-        </div>
-        <div>
-          <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Hits cache</dt>
-          <dd className="mt-0.5 font-semibold text-[var(--accent-cyan-bright)]">{item.knowledgeHits}</dd>
-        </div>
-        <div>
-          <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Appels IA</dt>
-          <dd className="mt-0.5 font-semibold">{item.aiCalls}</dd>
-        </div>
-      </dl>
+      ) : null}
 
       {item.errorDetails ? (
         <ImportErrorDetails details={item.errorDetails} />
       ) : item.error ? (
-        <p className="mt-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-          {item.error}
-        </p>
+        <p className="mt-3 text-xs text-[var(--ink-secondary)]">{item.error}</p>
       ) : null}
     </article>
   );

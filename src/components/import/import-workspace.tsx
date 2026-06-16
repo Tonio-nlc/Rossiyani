@@ -13,7 +13,7 @@ import {
   buildSessionReport,
   countWords,
   createPendingFromPaste,
-  estimateImportSeconds,
+  fetchTextEnrichmentStatus,
   hasImportText,
   isImportTitleValid,
   loadImportHistory,
@@ -65,10 +65,14 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
   const [processing, setProcessing] = useState(false);
   const [retryFiles, setRetryFiles] = useState<Map<string, PendingImportFile>>(new Map());
   const metricsBeforeRef = useRef<KnowledgeMetricsSnapshot | null>(null);
-  const progressTimerRef = useRef<number | null>(null);
+  const enrichmentPollRef = useRef<number | null>(null);
 
   useEffect(() => {
-    setHistory(loadImportHistory());
+    return () => {
+      if (enrichmentPollRef.current) {
+        window.clearInterval(enrichmentPollRef.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -122,46 +126,74 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
     setQueue((prev) => prev.map((item) => (item.id === id ? { ...item, ...patch } : item)));
   }, []);
 
-  const startProgressSimulation = useCallback(
-    (item: ImportQueueItem) => {
-      if (progressTimerRef.current) {
-        window.clearInterval(progressTimerRef.current);
-      }
+  useEffect(() => {
+    setHistory(loadImportHistory());
+  }, []);
 
-      const totalSeconds = estimateImportSeconds(item.estimatedSentences);
-      const started = Date.now();
-
-      progressTimerRef.current = window.setInterval(() => {
-        const elapsed = (Date.now() - started) / 1000;
-        const ratio = Math.min(elapsed / totalSeconds, 0.92);
-        const sentencesProcessed = Math.min(
-          item.estimatedSentences,
-          Math.round(item.estimatedSentences * ratio),
-        );
-        const eta = Math.max(0, Math.round(totalSeconds - elapsed));
-
-        updateItem(item.id, {
-          progress: Math.round(ratio * 100),
-          sentencesProcessed,
-          etaSeconds: eta,
-        });
-      }, 400);
-    },
-    [updateItem],
-  );
-
-  const stopProgressSimulation = useCallback(() => {
-    if (progressTimerRef.current) {
-      window.clearInterval(progressTimerRef.current);
-      progressTimerRef.current = null;
+  const stopEnrichmentPolling = useCallback(() => {
+    if (enrichmentPollRef.current) {
+      window.clearInterval(enrichmentPollRef.current);
+      enrichmentPollRef.current = null;
     }
   }, []);
+
+  const startEnrichmentPolling = useCallback(
+    (itemId: string, textId: string) => {
+      stopEnrichmentPolling();
+
+      void fetchTextEnrichmentStatus(textId).then((status) => {
+        if (!status) {
+          return;
+        }
+        updateItem(itemId, {
+          progress: status.total > 0 ? Math.round((status.ready / status.total) * 100) : 20,
+          sentencesProcessed: status.ready,
+          sentencesReady: status.ready,
+          etaSeconds: status.estimatedSecondsRemaining,
+          enrichmentPending: !status.complete,
+        });
+      });
+
+      enrichmentPollRef.current = window.setInterval(() => {
+        void fetchTextEnrichmentStatus(textId).then((status) => {
+          if (!status) {
+            return;
+          }
+
+          updateItem(itemId, {
+            progress: status.total > 0 ? Math.round((status.ready / status.total) * 100) : 0,
+            sentencesProcessed: status.ready,
+            sentencesReady: status.ready,
+            etaSeconds: status.estimatedSecondsRemaining,
+            enrichmentPending: !status.complete,
+            ...(status.complete
+              ? {
+                  status: "completed" as const,
+                  etaSeconds: null,
+                  enrichmentPending: false,
+                }
+              : {}),
+          });
+
+          if (status.complete) {
+            stopEnrichmentPolling();
+          }
+        });
+      }, 1200);
+    },
+    [stopEnrichmentPolling, updateItem],
+  );
 
   const importOne = useCallback(
     async (item: ImportQueueItem): Promise<ImportQueueItem> => {
       setActiveId(item.id);
-      updateItem(item.id, { status: "processing", progress: 0, sentencesProcessed: 0 });
-      startProgressSimulation(item);
+      updateItem(item.id, {
+        status: "processing",
+        progress: 8,
+        sentencesProcessed: 0,
+        sentencesReady: 0,
+        enrichmentPending: false,
+      });
 
       try {
         const res = await fetch("/api/admin/texts/import", {
@@ -176,8 +208,6 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
         });
 
         const data = (await res.json()) as ImportRussianTextResult & { error?: string };
-
-        stopProgressSimulation();
 
         if (!res.ok) {
           const errorMessage = data.error ?? "Import échoué";
@@ -238,18 +268,26 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
           return skipped;
         }
 
+        const enrichmentPending = data.enrichmentPending ?? false;
         const completed: ImportQueueItem = {
           ...item,
-          status: "completed",
-          progress: 100,
+          status: enrichmentPending ? "processing" : "completed",
+          progress: enrichmentPending ? 25 : 100,
           sentencesProcessed: data.sentenceCount,
-          knowledgeHits: data.metrics?.knowledgeHits ?? 0,
-          aiCalls: data.metrics?.aiCalls ?? 0,
-          etaSeconds: null,
+          sentencesReady: 0,
+          knowledgeHits: 0,
+          aiCalls: 0,
+          etaSeconds: enrichmentPending ? Math.max(2, Math.ceil(data.sentenceCount * 0.75)) : null,
+          enrichmentPending,
           textId: data.textId,
           result: data,
         };
         updateItem(item.id, completed);
+
+        if (enrichmentPending && data.textId) {
+          startEnrichmentPolling(item.id, data.textId);
+        }
+
         saveImportHistoryEntry({
           id: item.id,
           fileName: item.fileName,
@@ -259,14 +297,11 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
           textId: data.textId,
           sentenceCount: data.sentenceCount,
           wordCount: data.wordCount,
-          knowledgeHits: data.metrics?.knowledgeHits,
-          aiCalls: data.metrics?.aiCalls,
           completedAt: new Date().toISOString(),
         });
         toast(`« ${item.title} » ajouté à la bibliothèque`, "success");
         return completed;
       } catch {
-        stopProgressSimulation();
         const errorMessage = "Erreur réseau";
         const errorDetails = formatImportFailure(
           {
@@ -292,7 +327,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
         setActiveId(null);
       }
     },
-    [getAuthHeaders, startProgressSimulation, stopProgressSimulation, toast, updateItem],
+    [getAuthHeaders, startEnrichmentPolling, toast, updateItem],
   );
 
   const processQueue = useCallback(
@@ -424,6 +459,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
       status: "pending",
       progress: 0,
       sentencesProcessed: 0,
+      sentencesReady: 0,
       knowledgeHits: 0,
       aiCalls: 0,
       etaSeconds: null,
@@ -453,6 +489,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
       status: "pending",
       progress: 0,
       sentencesProcessed: 0,
+      sentencesReady: 0,
       knowledgeHits: 0,
       aiCalls: 0,
       etaSeconds: null,
@@ -470,7 +507,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
     setQueue([item]);
 
     const results = await processQueue([item]);
-    const imported = results.find((r) => r.status === "completed" && r.textId);
+    const imported = results.find((r) => r.textId);
     if (imported?.textId) {
       router.push(`/texts/${imported.textId}`);
     }
@@ -488,6 +525,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
         status: "pending",
         progress: 0,
         sentencesProcessed: 0,
+        sentencesReady: 0,
         knowledgeHits: 0,
         aiCalls: 0,
         etaSeconds: null,

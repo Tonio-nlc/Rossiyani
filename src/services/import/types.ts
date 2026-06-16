@@ -18,6 +18,7 @@ export type ImportRussianTextResult = {
   sentencesNeedingReview: number;
   warnings: string[];
   skippedDuplicate?: boolean;
+  enrichmentPending?: boolean;
   metrics?: ImportRunMetrics;
   qualityReport?: import("@/services/import-quality").ImportTextQualityReport;
   segmentStats?: import("@/domain/pipeline").ImportSegmentStats;

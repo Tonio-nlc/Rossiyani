@@ -21,6 +21,7 @@ function makeText(): ReaderTextData {
         naturalTranslation: "J'aime la pomme.",
         difficultyScore: 0,
         needsReview: false,
+        analysisState: "READY",
         phraseGroups: [],
         words: [
           {

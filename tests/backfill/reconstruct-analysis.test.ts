@@ -17,6 +17,7 @@ describe("reconstructAnalysisFromSentence", () => {
       register: "neutral",
       difficultyScore: 2,
       needsReview: false,
+      analysisState: "READY",
       reviewMessage: null,
       analysisJson: null,
       syntaxAnalysisJson: null,

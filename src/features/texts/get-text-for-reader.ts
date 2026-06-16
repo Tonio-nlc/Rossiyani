@@ -13,6 +13,7 @@ export type ReaderTextData = {
     naturalTranslation: string;
     difficultyScore: number;
     needsReview: boolean;
+    analysisState: "PENDING" | "PROCESSING" | "READY" | "FAILED";
     words: Array<{
       id: string;
       position: number;
@@ -74,6 +75,7 @@ export async function getTextForReader(textId: string): Promise<ReaderTextData |
       naturalTranslation: s.naturalTranslation,
       difficultyScore: s.difficultyScore,
       needsReview: s.needsReview,
+      analysisState: s.analysisState,
       words: s.words.map((w) => ({
         id: w.id,
         position: w.position,

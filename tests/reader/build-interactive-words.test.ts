@@ -20,6 +20,7 @@ const sampleText: ReaderTextData = {
       naturalTranslation: "He sits quietly.",
       difficultyScore: 1,
       needsReview: false,
+      analysisState: "READY",
       words: [
         {
           id: "w1",

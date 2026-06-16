@@ -50,14 +50,41 @@ export type ImportQueueItem = PendingImportFile & {
   status: ImportQueueItemStatus;
   progress: number;
   sentencesProcessed: number;
+  sentencesReady: number;
   knowledgeHits: number;
   aiCalls: number;
   etaSeconds: number | null;
+  enrichmentPending?: boolean;
   textId?: string;
   error?: string;
   errorDetails?: import("@/lib/import-error-format").ImportFailureDetails;
   result?: ImportRussianTextResult;
 };
+
+export type TextEnrichmentStatusResponse = {
+  textId: string;
+  total: number;
+  ready: number;
+  pending: number;
+  processing: number;
+  failed: number;
+  complete: boolean;
+  estimatedSecondsRemaining: number | null;
+};
+
+export async function fetchTextEnrichmentStatus(
+  textId: string,
+): Promise<TextEnrichmentStatusResponse | null> {
+  try {
+    const response = await fetch(`/api/texts/${textId}/enrichment-status`);
+    if (!response.ok) {
+      return null;
+    }
+    return (await response.json()) as TextEnrichmentStatusResponse;
+  } catch {
+    return null;
+  }
+}
 
 export type ImportHistoryEntry = {
   id: string;

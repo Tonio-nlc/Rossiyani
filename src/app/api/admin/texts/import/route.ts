@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { z } from "zod";
 
-import { importRussianTextFeature } from "@/features/import";
+import { enrichTextImport, runTextImportPipelineFast } from "@/pipeline";
 import {
   buildImportDiagnostic,
   formatPipelineAuditReport,
@@ -13,6 +13,7 @@ import {
   logImportPhase,
   logZodValidationError,
 } from "@/lib/diagnostics";
+import { getAIProviderFromEnv } from "@/services/ai";
 
 const importBodySchema = z.object({
   title: z.string().min(1),
@@ -54,11 +55,55 @@ export async function POST(request: Request) {
       rawTextLength: parsed.data.rawText.length,
     });
 
-    const result = await importRussianTextFeature(parsed.data);
+    const fast = await runTextImportPipelineFast(parsed.data);
 
-    logImportPhase("POST /api/admin/texts/import success", { textId: result.textId });
+    if (fast.skippedDuplicate) {
+      return NextResponse.json(
+        {
+          textId: fast.textId,
+          sentenceCount: 0,
+          wordCount: 0,
+          phraseGroupCount: 0,
+          sentencesNeedingReview: 0,
+          warnings: fast.warnings,
+          skippedDuplicate: true,
+        },
+        { status: 201 },
+      );
+    }
 
-    return NextResponse.json(result, { status: 201 });
+    if (fast.enrichmentPending) {
+      const input = parsed.data;
+      after(async () => {
+        try {
+          const provider = getAIProviderFromEnv();
+          await enrichTextImport(input, fast.textId, fast.segments, provider, undefined, fast.qualityReport);
+          logImportPhase("background enrichment complete", { textId: fast.textId });
+        } catch (error) {
+          logImportError("background enrichment", error, { textId: fast.textId });
+        }
+      });
+    }
+
+    const responseBody = {
+      textId: fast.textId,
+      sentenceCount: fast.sentenceCount,
+      wordCount: fast.wordCount,
+      phraseGroupCount: 0,
+      sentencesNeedingReview: fast.sentenceCount,
+      warnings: fast.warnings,
+      skippedDuplicate: false,
+      enrichmentPending: fast.enrichmentPending,
+    };
+
+    logImportPhase("POST /api/admin/texts/import fast complete", {
+      textId: fast.textId,
+      enrichmentPending: fast.enrichmentPending,
+    });
+
+    return NextResponse.json(responseBody, {
+      status: fast.enrichmentPending ? 202 : 201,
+    });
   } catch (error) {
     const phase = "POST /api/admin/texts/import";
     logImportError(phase, error);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { ReaderTextData } from "@/features/texts";
@@ -23,6 +24,7 @@ import { ReaderHeader } from "./reader-header";
 import { ReaderInTextSearch } from "./reader-in-text-search";
 import { ReaderMarginPanel } from "./reader-margin-panel";
 import { mapSentenceWords, ReaderSentence } from "./reader-sentence";
+import { isSentenceAnalyzing, ReaderSentenceAnalyzing } from "./reader-sentence-analyzing";
 import { toReaderWordSnapshot } from "./reader-word-utils";
 import { useFocusMode } from "./use-focus-mode";
 import { useReaderTextSearch } from "./use-reader-text-search";
@@ -46,6 +48,7 @@ function findWordInText(text: ReaderTextData, wordId: string, sentenceId: string
 }
 
 export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
+  const router = useRouter();
   const [selectedSentenceId, setSelectedSentenceId] = useState<string | null>(
     text.sentences[0]?.id ?? null,
   );
@@ -68,6 +71,26 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     useShowSentenceTranslations();
   const { isExpanded, toggleExpanded } = useSentenceTranslationExpansion();
   const { focusMode, setFocusMode } = useFocusMode();
+
+  const hasPendingAnalysis = useMemo(
+    () =>
+      text.sentences.some((sentence) =>
+        isSentenceAnalyzing(sentence.analysisState, sentence.words.length),
+      ),
+    [text.sentences],
+  );
+
+  useEffect(() => {
+    if (!hasPendingAnalysis) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      router.refresh();
+    }, 2500);
+
+    return () => window.clearInterval(timer);
+  }, [hasPendingAnalysis, router]);
 
   const {
     percent,
@@ -460,6 +483,34 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
           <article className="min-w-0 max-w-[70ch] space-y-8">
             {text.sentences.map((sentence) => {
               const dimmed = focusMode && selectedSentenceId !== sentence.id;
+              const analyzing = isSentenceAnalyzing(
+                sentence.analysisState,
+                sentence.words.length,
+              );
+
+              if (analyzing) {
+                return (
+                  <div
+                    key={sentence.id}
+                    ref={(node) => {
+                      if (node) {
+                        sentenceRefs.current.set(sentence.id, node);
+                      } else {
+                        sentenceRefs.current.delete(sentence.id);
+                      }
+                    }}
+                    data-sentence-id={sentence.id}
+                    className={dimmed ? "opacity-35 transition-opacity duration-150" : undefined}
+                  >
+                    <ReaderSentenceAnalyzing
+                      russianText={sentence.russianText}
+                      naturalTranslation={sentence.naturalTranslation}
+                      showTranslation={isExpanded(sentence.id, showAllTranslations)}
+                      onToggleTranslation={() => toggleExpanded(sentence.id)}
+                    />
+                  </div>
+                );
+              }
 
               return (
                 <ReaderSentence

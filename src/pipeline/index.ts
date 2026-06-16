@@ -1,2 +1,9 @@
-export { runTextImportPipeline } from "./pipeline-orchestrator";
+export {
+  enrichTextImport,
+  getTextEnrichmentStatus,
+  runTextImportPipeline,
+  runTextImportPipelineFast,
+  type FastImportResult,
+  type TextEnrichmentStatus,
+} from "./pipeline-orchestrator";
 export * from "./stages";
