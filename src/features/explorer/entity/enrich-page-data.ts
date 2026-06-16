@@ -52,8 +52,8 @@ export function enrichPhraseKnowledgePage(
     knowledge.canonicalExplanation?.trim() || page.description;
   const heroSummary = firstSentence(description);
 
-  const relatedWithReasons = page.relatedExpressions.map((pick) =>
-    enrichPickWithReason(pick, "Similar meaning"),
+  const relatedWithReasons = page.relatedConcepts.map((pick) =>
+    enrichPickWithReason(pick, pick.reason ?? "Related concept"),
   );
   const grammarWithReasons = page.relatedGrammar.map((pick) =>
     enrichPickWithReason(pick, "Grammar neighbour"),
@@ -71,7 +71,7 @@ export function enrichPhraseKnowledgePage(
         ? `Appears in ${knowledge.seenInTexts} text${knowledge.seenInTexts > 1 ? "s" : ""} across your library.`
         : undefined,
     textCount: knowledge.seenInTexts,
-    relatedExpressions: relatedWithReasons.map((pick) => ({
+    relatedConcepts: relatedWithReasons.map((pick) => ({
       ...pick,
       typeBadge: pick.meta,
     })),
@@ -95,10 +95,10 @@ export function enrichCuratedPage(
     ? curated.topics.filter((topic): topic is string => typeof topic === "string")
     : [];
 
-  const relatedWithReasons = page.relatedExpressions.map((pick) =>
+  const relatedWithReasons = page.relatedConcepts.map((pick) =>
     enrichPickWithReason(
       pick,
-      pick.meta ? "Commonly learned together" : "Similar meaning",
+      pick.reason ?? (pick.meta ? "Commonly learned together" : "Related concept"),
     ),
   );
 
@@ -115,7 +115,7 @@ export function enrichCuratedPage(
     usageNotes:
       topics.length > 0 ? `Often appears in: ${topics.join(", ")}.` : undefined,
     textCount: page.textCount,
-    relatedExpressions: relatedWithReasons.map((pick) => ({
+    relatedConcepts: relatedWithReasons.map((pick) => ({
       ...pick,
       translation: pick.translation ?? pick.meta,
       typeBadge: pick.typeBadge ?? pick.meta,
@@ -146,7 +146,9 @@ export function enrichConceptPage(page: ExplorerEntityPageData): ExplorerEntityP
       enrichPickWithReason(pick, "Grammar neighbour"),
     ),
     continueExploring: prioritizeRecommendations(
-      page.relatedExpressions.map((pick) => enrichPickWithReason(pick, "Similar meaning")),
+      page.relatedConcepts.map((pick) =>
+        enrichPickWithReason(pick, pick.reason ?? "Related concept"),
+      ),
       page.relatedGrammar.map((pick) => enrichPickWithReason(pick, "Grammar neighbour")),
       page.continueExploring,
     ),

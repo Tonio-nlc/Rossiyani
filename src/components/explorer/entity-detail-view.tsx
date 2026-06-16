@@ -171,40 +171,31 @@ function ExampleCards({
   );
 }
 
-function RelatedExpressionCards({ items }: { items: ExplorerEntityPick[] }) {
+function RelatedConceptCards({ items }: { items: ExplorerEntityPick[] }) {
   if (items.length === 0) {
     return null;
   }
 
   return (
     <section className="space-y-5">
-      <SectionLabel>Related expressions</SectionLabel>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <SectionLabel>Related concepts</SectionLabel>
+      <ul className="space-y-3">
         {items.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="focus-kb group flex h-full flex-col rounded-3xl border border-[var(--hairline)] bg-[var(--surface)] p-5 transition duration-200 hover:-translate-y-0.5 hover:border-[var(--ink-muted)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
-          >
-            {item.typeBadge ? (
-              <span className="mb-3 inline-flex w-fit rounded-full border border-[var(--hairline)] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[var(--ink-muted)]">
-                {item.typeBadge}
+          <li key={item.href}>
+            <Link
+              href={item.href}
+              className="focus-kb group inline-flex flex-col"
+            >
+              <span className="break-russian font-reader text-lg text-[var(--ink)] group-hover:text-[var(--color-link)]">
+                {item.label}
               </span>
-            ) : null}
-            <p className="break-russian font-reader text-lg text-[var(--ink)] group-hover:text-[var(--color-link)]">
-              {item.label}
-            </p>
-            {item.translation ? (
-              <p className="mt-2 line-clamp-2 text-sm text-[var(--ink-secondary)]">
-                {item.translation}
-              </p>
-            ) : null}
-            <span className="mt-auto pt-5 text-sm font-medium text-[var(--ink-muted)] group-hover:text-[var(--color-link)]">
-              Open →
-            </span>
-          </Link>
+              {item.translation ? (
+                <span className="mt-1 text-sm text-[var(--ink-secondary)]">{item.translation}</span>
+              ) : null}
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }
@@ -454,7 +445,7 @@ export function EntityDetailView({ data }: EntityDetailViewProps) {
 
         <ExampleCards examples={data.examples} />
 
-        <RelatedExpressionCards items={data.relatedExpressions} />
+        <RelatedConceptCards items={data.relatedConcepts} />
 
         <RelatedGrammarCards items={data.relatedGrammar} />
 

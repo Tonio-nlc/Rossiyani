@@ -16,6 +16,7 @@ import {
 } from "@/lib/normalization/russian-key";
 import { prisma } from "@/lib/prisma";
 import type { SentenceAnalysisOutput } from "@/services/ai/schemas";
+import { isPhraseExplorerEligible } from "@/features/explorer/entity/explorer-eligibility";
 
 type EnsureConceptInput = {
   conceptKey: string;
@@ -64,6 +65,10 @@ export async function resolveConceptsFromAnalysis(
   linked += await resolvePrepositionPatterns(analysis);
 
   for (const group of analysis.phraseGroups) {
+    if (!isPhraseExplorerEligible(group.label, group.type)) {
+      continue;
+    }
+
     const phraseKey = phraseLookupKey(group.label);
     const phraseRow = await prisma.knowledgePhrase.findUnique({ where: { labelKey: phraseKey } });
     if (!phraseRow) {

@@ -7,6 +7,7 @@ import {
   findCuratedCandidateExact,
   findCuratedCandidateFuzzy,
 } from "./curated-lookup";
+import { isConceptExplorerEligibleOrCurated } from "./explorer-eligibility";
 import { findConceptRowFuzzy } from "./fuzzy-match";
 import { curatedCandidateHref } from "./paths";
 
@@ -28,6 +29,18 @@ export async function resolveConceptEntity(
   }
 
   let knowledge = await getConceptKnowledge(requestedKey);
+  const curatedExact = findCuratedCandidateExact(requestedKey);
+  if (
+    knowledge &&
+    !isConceptExplorerEligibleOrCurated(
+      knowledge.concept.conceptKey,
+      knowledge.concept.title,
+      knowledge.concept.category,
+      Boolean(curatedExact),
+    )
+  ) {
+    knowledge = null;
+  }
   if (knowledge) {
     return {
       requestedKey,
@@ -42,6 +55,18 @@ export async function resolveConceptEntity(
   const fuzzyRow = await findConceptRowFuzzy(requestedKey);
   if (fuzzyRow) {
     knowledge = await getConceptKnowledge(fuzzyRow.conceptKey);
+    const curatedFuzzy = findCuratedCandidateExact(fuzzyRow.conceptKey);
+    if (
+      knowledge &&
+      !isConceptExplorerEligibleOrCurated(
+        knowledge.concept.conceptKey,
+        knowledge.concept.title,
+        knowledge.concept.category,
+        Boolean(curatedFuzzy),
+      )
+    ) {
+      knowledge = null;
+    }
     if (knowledge) {
       return {
         requestedKey,

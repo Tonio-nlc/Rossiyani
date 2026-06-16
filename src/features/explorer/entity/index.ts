@@ -9,6 +9,12 @@ export { resolveLemmaEntity } from "./resolve-lemma";
 export type { LemmaEntityResolution } from "./resolve-lemma";
 export { labelsEquivalent, resolvePhraseEntity, phraseTypeLabel } from "./resolve-phrase";
 export type { PhraseEntityResolution } from "./resolve-phrase";
+export {
+  isConceptExplorerEligible,
+  isLemmaExplorerEligible,
+  isPhraseExplorerEligible,
+  explorerHrefForPhrase,
+} from "./explorer-eligibility";
 export type { ExplorerEntityExample, ExplorerEntityKind, ExplorerEntityPageData, ExplorerEntityPick, PhraseRouteHint } from "./types";
 export {
   buildMetadataLine,

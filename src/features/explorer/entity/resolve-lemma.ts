@@ -8,6 +8,7 @@ import {
   findCuratedCandidateExact,
   findCuratedCandidateFuzzy,
 } from "./curated-lookup";
+import { isLemmaExplorerEligible } from "./explorer-eligibility";
 import { findLemmaRowFuzzy } from "./fuzzy-match";
 import { curatedCandidateHref, partOfSpeechFallback } from "./paths";
 import type { FeaturedCandidateRow } from "@/features/discovery/types";
@@ -64,7 +65,7 @@ export async function resolveLemmaEntity(
   }
 
   const loaded = await loadLemmaKnowledge(requestedLemma, preferredPos);
-  if (loaded) {
+  if (loaded && isLemmaExplorerEligible(loaded.knowledge.lemma)) {
     return {
       requestedLemma,
       canonicalLemma: loaded.knowledge.lemma,
@@ -78,7 +79,7 @@ export async function resolveLemmaEntity(
   const fuzzyRow = await findLemmaRowFuzzy(requestedLemma);
   if (fuzzyRow) {
     const fuzzyLoaded = await loadLemmaKnowledge(fuzzyRow.lemma, fuzzyRow.partOfSpeech);
-    if (fuzzyLoaded) {
+    if (fuzzyLoaded && isLemmaExplorerEligible(fuzzyLoaded.knowledge.lemma)) {
       return {
         requestedLemma,
         canonicalLemma: fuzzyLoaded.knowledge.lemma,

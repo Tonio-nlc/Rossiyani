@@ -1,5 +1,3 @@
-import type { CefrLevel } from "@prisma/client";
-
 import {
   collocationPath,
   conceptPath,
@@ -21,6 +19,10 @@ import {
   enrichPhraseKnowledgePage,
 } from "./enrich-page-data";
 import {
+  isConceptExplorerEligible,
+  isPhraseExplorerEligible,
+} from "./explorer-eligibility";
+import {
   curatedCandidateHref,
   CURATED_TYPE_LABELS,
   genericDescriptionForCurated,
@@ -40,38 +42,6 @@ import type {
   PhraseRouteHint,
 } from "./types";
 
-async function fetchRelatedPhrasePicks(
-  label: string,
-  conceptIds: string[],
-): Promise<ExplorerEntityPick[]> {
-  if (conceptIds.length === 0) {
-    return [];
-  }
-
-  const phrases = await prisma.knowledgePhrase.findMany({
-    where: {
-      conceptLinks: { some: { conceptId: { in: conceptIds } } },
-      NOT: { labelKey: phraseLookupKey(label) },
-    },
-    orderBy: { occurrenceCount: "desc" },
-    take: 8,
-    select: { label: true, type: true },
-  });
-
-  return phrases.map((phrase) => {
-    const curated = findCuratedCandidateExact(phrase.label);
-    return {
-      label: phrase.label,
-      href:
-        phrase.type === "COLLOCATION"
-          ? collocationPath(phrase.label)
-          : expressionPath(phrase.label),
-      typeBadge: PHRASE_GROUP_TYPE_LABELS[phrase.type],
-      translation: curated?.subtitle ?? undefined,
-    };
-  });
-}
-
 function curatedRelations(candidate: FeaturedCandidateRow): string[] {
   if (!Array.isArray(candidate.relations)) {
     return [];
@@ -79,7 +49,14 @@ function curatedRelations(candidate: FeaturedCandidateRow): string[] {
   return candidate.relations.filter((item): item is string => typeof item === "string");
 }
 
-async function resolveRelationPicks(relations: string[]): Promise<ExplorerEntityPick[]> {
+function phraseHref(label: string, type: string): string | null {
+  if (!isPhraseExplorerEligible(label, type)) {
+    return null;
+  }
+  return type === "COLLOCATION" ? collocationPath(label) : expressionPath(label);
+}
+
+async function resolveConceptRelationPicks(relations: string[]): Promise<ExplorerEntityPick[]> {
   const picks: ExplorerEntityPick[] = [];
   const seen = new Set<string>();
 
@@ -89,15 +66,64 @@ async function resolveRelationPicks(relations: string[]): Promise<ExplorerEntity
       continue;
     }
 
+    const curated = findCuratedByRelation(relation) ?? findCuratedCandidateExact(relation);
+    if (curated) {
+      const href = curatedCandidateHref(curated);
+      if (seen.has(href)) {
+        continue;
+      }
+      seen.add(key);
+      seen.add(href);
+      picks.push({
+        label: curated.lemma,
+        href,
+        typeBadge:
+          curated.type === "GRAMMAR" || curated.type === "CONSTRUCTION"
+            ? "Concept"
+            : CURATED_TYPE_LABELS[curated.type],
+        translation: curated.subtitle ?? undefined,
+      });
+      continue;
+    }
+
+    const concept = await prisma.knowledgeConcept.findFirst({
+      where: {
+        OR: [
+          { conceptKey: { equals: relation, mode: "insensitive" } },
+          { title: { equals: relation, mode: "insensitive" } },
+        ],
+      },
+      select: { conceptKey: true, title: true, category: true },
+    });
+    if (concept && isConceptExplorerEligible(concept.conceptKey, concept.title, concept.category)) {
+      const href = conceptPath(concept.conceptKey);
+      if (seen.has(href)) {
+        continue;
+      }
+      seen.add(key);
+      seen.add(href);
+      picks.push({
+        label: concept.title,
+        href,
+        typeBadge: "Concept",
+      });
+      continue;
+    }
+
     const lemma = await prisma.knowledgeLemma.findFirst({
       where: { lemma: { equals: relation, mode: "insensitive" } },
       select: { lemma: true, partOfSpeech: true },
     });
     if (lemma) {
+      const href = lemmaPath(lemma.lemma, lemma.partOfSpeech);
+      if (seen.has(href)) {
+        continue;
+      }
       seen.add(key);
+      seen.add(href);
       picks.push({
         label: lemma.lemma,
-        href: lemmaPath(lemma.lemma, lemma.partOfSpeech),
+        href,
         typeBadge: "Word",
       });
       continue;
@@ -108,33 +134,91 @@ async function resolveRelationPicks(relations: string[]): Promise<ExplorerEntity
       select: { label: true, type: true },
     });
     if (phrase) {
+      const href = phraseHref(phrase.label, phrase.type);
+      if (!href || seen.has(href)) {
+        continue;
+      }
       seen.add(key);
-      const curated = findCuratedCandidateExact(phrase.label);
+      seen.add(href);
       picks.push({
         label: phrase.label,
-        href:
-          phrase.type === "COLLOCATION"
-            ? collocationPath(phrase.label)
-            : expressionPath(phrase.label),
+        href,
         typeBadge: PHRASE_GROUP_TYPE_LABELS[phrase.type],
-        translation: curated?.subtitle ?? undefined,
-      });
-      continue;
-    }
-
-    const curated = findCuratedByRelation(relation);
-    if (curated) {
-      seen.add(key);
-      picks.push({
-        label: curated.lemma,
-        href: curatedCandidateHref(curated),
-        typeBadge: CURATED_TYPE_LABELS[curated.type],
-        translation: curated.subtitle ?? undefined,
       });
     }
   }
 
   return picks;
+}
+
+async function fetchRelatedConceptPicks(
+  conceptIds: string[],
+  curatedRelations: string[],
+  excludeLabel?: string,
+): Promise<ExplorerEntityPick[]> {
+  const picks: ExplorerEntityPick[] = [];
+  const seen = new Set<string>();
+
+  const add = (pick: ExplorerEntityPick) => {
+    if (seen.has(pick.href)) {
+      return;
+    }
+    if (excludeLabel && phraseLookupKey(pick.label) === phraseLookupKey(excludeLabel)) {
+      return;
+    }
+    seen.add(pick.href);
+    picks.push(pick);
+  };
+
+  for (const pick of await resolveConceptRelationPicks(curatedRelations)) {
+    add(pick);
+  }
+
+  if (conceptIds.length > 0) {
+    const relations = await prisma.knowledgeConceptRelation.findMany({
+      where: { fromConceptId: { in: conceptIds } },
+      include: { toConcept: true },
+      take: 12,
+    });
+
+    for (const relation of relations) {
+      const concept = relation.toConcept;
+      if (
+        !isConceptExplorerEligible(concept.conceptKey, concept.title, concept.category)
+      ) {
+        continue;
+      }
+      add({
+        label: concept.title,
+        href: conceptPath(concept.conceptKey),
+        typeBadge: "Concept",
+      });
+    }
+
+    const linkedPhrases = await prisma.knowledgePhrase.findMany({
+      where: {
+        conceptLinks: { some: { conceptId: { in: conceptIds } } },
+        ...(excludeLabel ? { NOT: { labelKey: phraseLookupKey(excludeLabel) } } : {}),
+      },
+      orderBy: { occurrenceCount: "desc" },
+      take: 8,
+      select: { label: true, type: true },
+    });
+
+    for (const phrase of linkedPhrases) {
+      const href = phraseHref(phrase.label, phrase.type);
+      if (!href) {
+        continue;
+      }
+      add({
+        label: phrase.label,
+        href,
+        typeBadge: PHRASE_GROUP_TYPE_LABELS[phrase.type],
+      });
+    }
+  }
+
+  return picks.slice(0, 8);
 }
 
 function dedupePicks(items: ExplorerEntityPick[]): ExplorerEntityPick[] {
@@ -149,12 +233,12 @@ function dedupePicks(items: ExplorerEntityPick[]): ExplorerEntityPick[] {
 }
 
 function buildContinueExploring(
-  relatedExpressions: ExplorerEntityPick[],
+  relatedConcepts: ExplorerEntityPick[],
   relatedGrammar: ExplorerEntityPick[],
   relationPicks: ExplorerEntityPick[],
 ): ExplorerEntityPick[] {
   const merged = dedupePicks([
-    ...relatedExpressions.map((pick) => ({ ...pick, reason: pick.reason ?? "Similar meaning" })),
+    ...relatedConcepts.map((pick) => ({ ...pick, reason: pick.reason ?? "Related concept" })),
     ...relationPicks.map((pick) => ({
       ...pick,
       reason: pick.reason ?? "Commonly learned together",
@@ -197,18 +281,22 @@ export async function buildEntityPageFromPhraseKnowledge(
   routeHint: PhraseRouteHint,
 ): Promise<ExplorerEntityPageData> {
   const conceptIds = knowledge.concepts.map((concept) => concept.id);
-  const relatedExpressions = await fetchRelatedPhrasePicks(knowledge.label, conceptIds);
+  const curated = findCuratedCandidateExact(knowledge.label);
+  const relatedConcepts = await fetchRelatedConceptPicks(
+    conceptIds,
+    curated ? curatedRelations(curated) : [],
+    knowledge.label,
+  );
   const relatedGrammar = knowledge.concepts.map((concept) => ({
     label: concept.title,
     href: conceptPath(concept.conceptKey),
     typeBadge: "Grammar",
   }));
-  const relationPicks = await resolveRelationPicks([]);
 
   const examples: ExplorerEntityExample[] =
     knowledge.exampleSentences.length > 0
       ? knowledge.exampleSentences.map((sentence) => ({ russian: sentence }))
-      : relatedExpressions.slice(0, 4).map((item) => ({
+      : relatedConcepts.slice(0, 4).map((item) => ({
           russian: item.label,
           translation: item.translation,
         }));
@@ -229,18 +317,18 @@ export async function buildEntityPageFromPhraseKnowledge(
   const base: ExplorerEntityPageData = {
     kind: phraseKind(routeHint),
     label: knowledge.label,
-    translation: undefined,
+    translation: curated?.subtitle ?? undefined,
     typeLabel,
     badges: [],
     metadataLine: typeLabel,
     description:
       knowledge.canonicalExplanation?.trim() || genericDescriptionForPhraseType(knowledge.type),
     examples,
-    relatedExpressions,
+    relatedConcepts,
     relatedGrammar,
     relatedTexts,
     relatedLessons,
-    continueExploring: buildContinueExploring(relatedExpressions, relatedGrammar, relationPicks),
+    continueExploring: buildContinueExploring(relatedConcepts, relatedGrammar, []),
     textCount: knowledge.seenInTexts,
     practiceStructure: knowledge.label,
     breadcrumb: breadcrumbForPhrase(routeHint, knowledge.label),
@@ -253,16 +341,12 @@ export async function buildEntityPageFromCuratedPhrase(
   curated: FeaturedCandidateRow,
   routeHint: PhraseRouteHint,
 ): Promise<ExplorerEntityPageData> {
-  const relationPicks = await resolveRelationPicks(curatedRelations(curated));
+  const relationPicks = await resolveConceptRelationPicks(curatedRelations(curated));
+  const relatedConcepts = relationPicks;
   const relatedGrammar =
     curated.type === "GRAMMAR"
       ? [{ label: curated.lemma, href: conceptPath(curated.lemma), typeBadge: "Grammar" }]
       : [];
-
-  const relatedExpressions = relationPicks.filter(
-    (pick) => pick.href.includes("/expressions/") || pick.href.includes("/collocations/"),
-  );
-  const relatedWords = relationPicks.filter((pick) => pick.href.includes("/lemmas/"));
 
   const examples: ExplorerEntityExample[] = curated.exampleRussian
     ? [
@@ -288,15 +372,11 @@ export async function buildEntityPageFromCuratedPhrase(
     metadataLine: typeLabel,
     description: curated.explanation?.trim() || genericDescriptionForCurated(curated),
     examples,
-    relatedExpressions: dedupePicks([...relatedExpressions, ...relatedWords]).slice(0, 8),
+    relatedConcepts,
     relatedGrammar,
     relatedTexts: [],
     relatedLessons,
-    continueExploring: buildContinueExploring(
-      relatedExpressions,
-      relatedGrammar,
-      relationPicks,
-    ),
+    continueExploring: buildContinueExploring(relatedConcepts, relatedGrammar, []),
     textCount: 0,
     practiceStructure: curated.lemma,
     breadcrumb: breadcrumbForPhrase(routeHint, curated.lemma),
@@ -308,7 +388,7 @@ export async function buildEntityPageFromCuratedPhrase(
 export async function buildEntityPageFromLemmaCurated(
   curated: FeaturedCandidateRow,
 ): Promise<ExplorerEntityPageData> {
-  const relationPicks = await resolveRelationPicks(curatedRelations(curated));
+  const relationPicks = await resolveConceptRelationPicks(curatedRelations(curated));
 
   const examples: ExplorerEntityExample[] = curated.exampleRussian
     ? [
@@ -334,7 +414,7 @@ export async function buildEntityPageFromLemmaCurated(
     metadataLine: typeLabel,
     description: curated.explanation?.trim() || genericDescriptionForCurated(curated),
     examples,
-    relatedExpressions: relationPicks.filter((pick) => !pick.href.includes("/lemmas/")),
+    relatedConcepts: relationPicks,
     relatedGrammar: [],
     relatedTexts: [],
     relatedLessons,
@@ -354,7 +434,7 @@ export async function buildEntityPageFromLemmaCurated(
 export async function buildEntityPageFromConceptCurated(
   curated: FeaturedCandidateRow,
 ): Promise<ExplorerEntityPageData> {
-  const relationPicks = await resolveRelationPicks(curatedRelations(curated));
+  const relationPicks = await resolveConceptRelationPicks(curatedRelations(curated));
 
   const examples: ExplorerEntityExample[] = curated.exampleRussian
     ? [
@@ -379,7 +459,7 @@ export async function buildEntityPageFromConceptCurated(
     metadataLine: typeLabel,
     description: curated.explanation?.trim() || genericDescriptionForCurated(curated),
     examples,
-    relatedExpressions: relationPicks,
+    relatedConcepts: relationPicks,
     relatedGrammar: [],
     relatedTexts: [],
     relatedLessons: findLemmaRelatedLessons(curated.lemma, []),
@@ -406,14 +486,26 @@ export function buildEntityPageFromConceptKnowledge(
     typeBadge: "Grammar",
   }));
 
-  const relatedExpressions = concept.phrases.map((phrase) => ({
-    label: phrase.label,
-    href:
-      phrase.type === "COLLOCATION"
-        ? collocationPath(phrase.label)
-        : expressionPath(phrase.label),
-    typeBadge: PHRASE_GROUP_TYPE_LABELS[phrase.type],
-  }));
+  const relatedConcepts = dedupePicks([
+    ...concept.phrases.flatMap((phrase) => {
+      const href = phraseHref(phrase.label, phrase.type);
+      if (!href) {
+        return [];
+      }
+      return [
+        {
+          label: phrase.label,
+          href,
+          typeBadge: PHRASE_GROUP_TYPE_LABELS[phrase.type],
+        },
+      ];
+    }),
+    ...concept.lemmas.map((lemma) => ({
+      label: lemma.lemma,
+      href: lemmaPath(lemma.lemma, lemma.partOfSpeech),
+      typeBadge: "Word",
+    })),
+  ]);
 
   const examples: ExplorerEntityExample[] =
     relatedTexts.length > 0
@@ -437,7 +529,7 @@ export function buildEntityPageFromConceptKnowledge(
       concept.concept.canonicalExplanation?.trim() ||
       genericDescriptionForPhraseType("GRAMMAR"),
     examples,
-    relatedExpressions,
+    relatedConcepts,
     relatedGrammar,
     relatedTexts: relatedTexts.map((text) => ({
       russian: text.sentenceRussian,
@@ -446,7 +538,7 @@ export function buildEntityPageFromConceptKnowledge(
     })),
     relatedLessons: findLemmaRelatedLessons(concept.concept.title, concept.relatedConcepts),
     continueExploring: buildContinueExploring(
-      relatedExpressions,
+      relatedConcepts,
       relatedGrammar,
       concept.lemmas.map((lemma) => ({
         label: lemma.lemma,

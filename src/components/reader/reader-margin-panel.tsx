@@ -167,16 +167,26 @@ export function ReaderMarginPanel({
         <section className="space-y-2">
           <PanelLabel>Related words</PanelLabel>
           <ul className="space-y-1.5">
-            {panel.collocations.map((label) => (
-              <li key={label}>
-                <Link
-                  href={collocationHref(label)}
-                  className="focus-kb break-russian font-reader text-sm text-[var(--ink)] underline-offset-2 hover:underline"
-                >
-                  {label}
-                </Link>
-              </li>
-            ))}
+                {panel.collocations.map((label) => {
+                  const href = collocationHref(label);
+                  if (!href) {
+                    return (
+                      <li key={label} className="break-russian font-reader text-sm text-[var(--ink-secondary)]">
+                        {label}
+                      </li>
+                    );
+                  }
+                  return (
+                    <li key={label}>
+                      <Link
+                        href={href}
+                        className="focus-kb break-russian font-reader text-sm text-[var(--ink)] underline-offset-2 hover:underline"
+                      >
+                        {label}
+                      </Link>
+                    </li>
+                  );
+                })}
           </ul>
         </section>
       ) : null}

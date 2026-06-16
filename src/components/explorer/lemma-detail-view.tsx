@@ -2,6 +2,10 @@ import Link from "next/link";
 
 import type { LemmaKnowledge } from "@/types/knowledge-graph";
 import {
+  isConceptExplorerEligible,
+  isPhraseExplorerEligible,
+} from "@/features/explorer/entity/explorer-eligibility";
+import {
   buildFrequencyVisual,
   formatFormMorphLabel,
   formatPosLabelFr,
@@ -74,8 +78,15 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
     }
   }
 
-  const collocations = knowledge.phrases.filter((phrase) => phrase.type === "COLLOCATION");
-  const expressions = knowledge.phrases.filter((phrase) => phrase.type !== "COLLOCATION");
+  const collocations = knowledge.phrases.filter(
+    (phrase) => phrase.type === "COLLOCATION" && isPhraseExplorerEligible(phrase.label, phrase.type),
+  );
+  const relatedConceptPhrases = knowledge.phrases.filter(
+    (phrase) => phrase.type !== "COLLOCATION" && isPhraseExplorerEligible(phrase.label, phrase.type),
+  );
+  const eligibleConcepts = allConcepts.filter((concept) =>
+    isConceptExplorerEligible(concept.conceptKey, concept.title, concept.category),
+  );
   const familyTitle =
     knowledge.partOfSpeech === "verb" ? "Related verbs" : "Related words";
   const primaryLesson = knowledge.relatedLessons[0];
@@ -104,8 +115,8 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
   const relatedItems = [
     ...knowledge.familyLemmas.slice(0, 4).map((item) => lemmaChip(item.lemma, item.partOfSpeech)),
     ...collocations.slice(0, 3).map((phrase) => collocationChip(phrase.label)),
-    ...expressions.slice(0, 3).map((phrase) => expressionChip(phrase.label)),
-    ...allConcepts.slice(0, 4).map((concept) => conceptChip(concept.conceptKey, concept.title)),
+    ...relatedConceptPhrases.slice(0, 3).map((phrase) => expressionChip(phrase.label)),
+    ...eligibleConcepts.slice(0, 4).map((concept) => conceptChip(concept.conceptKey, concept.title)),
     ...knowledge.relatedLessons.slice(0, 2).map((lesson) => lessonChip(lesson.slug, lesson.title)),
     ...knowledge.textsWithStats.slice(0, 2).map((text) => textChip(text.textId, text.textTitle)),
   ];
@@ -307,25 +318,20 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
           </Link>
         </JourneySection>
 
-        {expressions.length > 0 ? (
-          <JourneySection label="Related expressions">
-            <ExplorerDiscoveryGrid
-              items={expressions.map((phrase) => ({
-                label: phrase.label,
-                href: expressionPath(phrase.label),
-                meta: `${phrase.occurrenceCount}×`,
-              }))}
-            />
-          </JourneySection>
-        ) : null}
-
-        {allConcepts.length > 0 ? (
+        {(eligibleConcepts.length > 0 || relatedConceptPhrases.length > 0) ? (
           <JourneySection label="Related concepts">
             <ExplorerDiscoveryGrid
-              items={allConcepts.map((concept) => ({
-                label: concept.title,
-                href: conceptPath(concept.conceptKey),
-              }))}
+              items={[
+                ...relatedConceptPhrases.map((phrase) => ({
+                  label: phrase.label,
+                  href: expressionPath(phrase.label),
+                  meta: `${phrase.occurrenceCount}×`,
+                })),
+                ...eligibleConcepts.map((concept) => ({
+                  label: concept.title,
+                  href: conceptPath(concept.conceptKey),
+                })),
+              ]}
             />
           </JourneySection>
         ) : null}

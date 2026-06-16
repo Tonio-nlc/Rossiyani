@@ -8,6 +8,7 @@ import {
   findCuratedCandidateExact,
   findCuratedCandidateFuzzy,
 } from "./curated-lookup";
+import { isPhraseExplorerEligibleOrCurated } from "./explorer-eligibility";
 import { findPhraseRowFuzzy } from "./fuzzy-match";
 import { curatedCandidateHref, phraseRouteForType } from "./paths";
 import type { PhraseRouteHint, ResolvedPhraseEntity } from "./types";
@@ -46,6 +47,13 @@ export async function resolvePhraseEntity(
   const routeKind = routeHintFromRoute(options?.routeKind);
 
   let knowledge = await getPhraseKnowledge(requestedLabel);
+  const curatedExact = findCuratedCandidateExact(requestedLabel);
+  if (
+    knowledge &&
+    !isPhraseExplorerEligibleOrCurated(knowledge.label, knowledge.type, Boolean(curatedExact))
+  ) {
+    knowledge = null;
+  }
   if (knowledge) {
     return {
       requestedLabel,
@@ -60,6 +68,13 @@ export async function resolvePhraseEntity(
   const fuzzyRow = await findPhraseRowFuzzy(requestedLabel);
   if (fuzzyRow) {
     knowledge = await getPhraseKnowledge(fuzzyRow.label);
+    const curatedFuzzy = findCuratedCandidateExact(fuzzyRow.label);
+    if (
+      knowledge &&
+      !isPhraseExplorerEligibleOrCurated(knowledge.label, knowledge.type, Boolean(curatedFuzzy))
+    ) {
+      knowledge = null;
+    }
     if (knowledge) {
       return {
         requestedLabel,

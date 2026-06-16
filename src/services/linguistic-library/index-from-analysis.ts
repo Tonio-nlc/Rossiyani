@@ -7,6 +7,7 @@ import {
 import { prisma } from "@/lib/prisma";
 import type { SentenceAnalysisOutput } from "@/services/ai/schemas";
 import type { IndexAnalysisResult } from "@/types/linguistic-library";
+import { isPhraseExplorerEligible } from "@/features/explorer/entity/explorer-eligibility";
 
 /**
  * Indexes a validated SentenceAnalysisOutput into the LinguisticLibrary.
@@ -130,6 +131,10 @@ export async function indexFromAnalysis(
   }
 
   for (const group of analysis.phraseGroups) {
+    if (!isPhraseExplorerEligible(group.label, group.type)) {
+      continue;
+    }
+
     const labelKey = phraseLookupKey(group.label);
     const existing = await prisma.knowledgePhrase.findUnique({
       where: { labelKey },

@@ -1,4 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import {
+  isConceptExplorerEligible,
+  isPhraseExplorerEligible,
+} from "@/features/explorer/entity/explorer-eligibility";
 
 export type KnowledgeSearchResult = {
   lemmas: Array<{ id: string; lemma: string; partOfSpeech: string; occurrenceCount: number }>;
@@ -78,8 +82,10 @@ export async function searchKnowledge(
       case: f.case,
     })),
     endings,
-    concepts,
-    phrases,
+    concepts: concepts.filter((concept) =>
+      isConceptExplorerEligible(concept.conceptKey, concept.title, concept.category),
+    ),
+    phrases: phrases.filter((phrase) => isPhraseExplorerEligible(phrase.label, phrase.type)),
     texts: texts.map((t) => ({
       id: t.id,
       title: t.title,

@@ -12,6 +12,11 @@ import type { PhraseGroupType } from "@/types/domain";
 import type { WordDetailGraph } from "@/types/word-detail-graph";
 
 import { buildLinguisticExplanation } from "./build-linguistic-explanation";
+import {
+  explorerHrefForPhrase,
+  isConceptExplorerEligible,
+  isPhraseExplorerEligible,
+} from "@/features/explorer/entity/explorer-eligibility";
 
 export type ReaderWordPanelRow = {
   label: string;
@@ -122,9 +127,12 @@ function buildCollocations(
   const seen = new Set<string>();
   const collocations: string[] = [];
 
-  const add = (label: string) => {
+  const add = (label: string, type = "COLLOCATION") => {
     const key = label.trim().toLowerCase();
     if (!isDisplayableUiText(label) || seen.has(key)) {
+      return;
+    }
+    if (!isPhraseExplorerEligible(label, type)) {
       return;
     }
     seen.add(key);
@@ -133,16 +141,16 @@ function buildCollocations(
 
   for (const phrase of detail.lemmaKnowledge?.phrases ?? []) {
     if (phrase.type === "COLLOCATION") {
-      add(phrase.label);
+      add(phrase.label, phrase.type);
     }
   }
 
   if (detail.phraseOccurrence?.type === "COLLOCATION") {
-    add(detail.phraseOccurrence.label);
+    add(detail.phraseOccurrence.label, detail.phraseOccurrence.type);
   }
 
   for (const label of textIndex?.collocationsByLemma.get(detail.occurrence.lemma) ?? []) {
-    add(label);
+    add(label, "COLLOCATION");
   }
 
   return collocations.slice(0, 6);
@@ -164,20 +172,39 @@ function buildFoundInLinks(detail: WordDetailGraph): ReaderFoundInLink[] {
   }
 
   const expressions = (detail.lemmaKnowledge?.phrases ?? []).filter(
-    (phrase) => phrase.type !== "COLLOCATION",
+    (phrase) =>
+      phrase.type !== "COLLOCATION" && isPhraseExplorerEligible(phrase.label, phrase.type),
   );
   if (expressions.length > 0) {
-    links.push({
-      label: "Expressions",
-      detail: `${expressions.length} related expression${expressions.length === 1 ? "" : "s"}`,
-      href: expressionPath(expressions[0]!.label),
-    });
-  } else if (detail.phraseOccurrence && detail.phraseOccurrence.type !== "COLLOCATION") {
-    links.push({
-      label: "Expressions",
-      detail: detail.phraseOccurrence.label,
-      href: expressionPath(detail.phraseOccurrence.label),
-    });
+    const href = explorerHrefForPhrase(
+      expressions[0]!.label,
+      expressions[0]!.type,
+      expressionPath(expressions[0]!.label),
+    );
+    if (href) {
+      links.push({
+        label: "Concepts",
+        detail: `${expressions.length} related concept${expressions.length === 1 ? "" : "s"}`,
+        href,
+      });
+    }
+  } else if (
+    detail.phraseOccurrence &&
+    detail.phraseOccurrence.type !== "COLLOCATION" &&
+    isPhraseExplorerEligible(detail.phraseOccurrence.label, detail.phraseOccurrence.type)
+  ) {
+    const href = explorerHrefForPhrase(
+      detail.phraseOccurrence.label,
+      detail.phraseOccurrence.type,
+      expressionPath(detail.phraseOccurrence.label),
+    );
+    if (href) {
+      links.push({
+        label: "Concepts",
+        detail: detail.phraseOccurrence.label,
+        href,
+      });
+    }
   }
 
   const concept =
@@ -185,7 +212,10 @@ function buildFoundInLinks(detail: WordDetailGraph): ReaderFoundInLink[] {
     detail.lemmaKnowledge?.concepts[0] ??
     detail.lemmaKnowledge?.relatedConcepts[0];
   const lesson = detail.lemmaKnowledge?.relatedLessons[0];
-  if (concept) {
+  if (
+    concept &&
+    isConceptExplorerEligible(concept.conceptKey, concept.title, concept.category ?? "SEMANTIC")
+  ) {
     links.push({
       label: "Grammar",
       detail: concept.title,
@@ -277,8 +307,8 @@ export function buildReaderWordPanelData(
   };
 }
 
-export function collocationHref(label: string): string {
-  return collocationPath(label);
+export function collocationHref(label: string): string | null {
+  return explorerHrefForPhrase(label, "COLLOCATION", collocationPath(label));
 }
 
 export type { PhraseGroupType };

@@ -42,7 +42,7 @@ export type ExplorerEntityPageData = {
   usageNotes?: string;
   commonMistakes?: string;
   examples: ExplorerEntityExample[];
-  relatedExpressions: ExplorerEntityPick[];
+  relatedConcepts: ExplorerEntityPick[];
   relatedGrammar: ExplorerEntityPick[];
   relatedTexts: ExplorerEntityExample[];
   relatedLessons: ExplorerEntityLesson[];
