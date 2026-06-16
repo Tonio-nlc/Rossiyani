@@ -81,20 +81,16 @@ type ManualLevelGridProps = {
   counts: Record<ManualLevel, number>;
 };
 
+const browseCardClass =
+  "focus-kb group block rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] px-5 py-4 transition duration-200 hover:border-[var(--ink-muted)] hover:shadow-[0_2px_14px_rgba(0,0,0,0.05)]";
+
 export function ManualLevelGrid({ counts }: ManualLevelGridProps) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {(Object.keys(MANUAL_LEVEL_LABELS) as ManualLevel[]).map((level) => (
-        <Link
-          key={level}
-          href={`/manual/niveau/${level}`}
-          prefetch
-          className="focus-kb btn-interactive rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 hover:border-[var(--border-strong)] hover:bg-[var(--surface-elevated)]"
-        >
-          <p className="font-reader text-lg font-semibold text-[var(--foreground)]">
-            {MANUAL_LEVEL_LABELS[level]}
-          </p>
-          <p className="mt-1 text-sm text-[var(--muted)]">
+        <Link key={level} href={`/manual/niveau/${level}`} prefetch className={browseCardClass}>
+          <p className="font-reader text-lg text-[var(--ink)]">{MANUAL_LEVEL_LABELS[level]}</p>
+          <p className="mt-2 text-sm text-[var(--ink-muted)]">
             {counts[level]} leçon{counts[level] > 1 ? "s" : ""}
           </p>
         </Link>
@@ -114,25 +110,25 @@ export function ManualCategoryGrid({ counts }: ManualCategoryGridProps) {
 
   if (visible.length === 0) {
     return (
-      <p className="text-sm text-[var(--muted)]">
-        Les premières leçons arrivent bientôt — consulte la feuille de route ci-dessus.
+      <p className="text-sm text-[var(--ink-muted)]">
+        Les premières leçons arrivent bientôt.
       </p>
     );
   }
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {visible.map((category) => (
         <Link
           key={category}
           href={`/manual/theme/${category}`}
           prefetch
-          className="focus-kb btn-interactive rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 hover:border-[var(--border-strong)] hover:bg-[var(--surface-elevated)]"
+          className={browseCardClass}
         >
-          <p className="font-reader text-lg font-semibold text-[var(--foreground)]">
+          <p className="font-reader text-lg text-[var(--ink)]">
             {MANUAL_CATEGORY_LABELS[category]}
           </p>
-          <p className="mt-1 text-sm text-[var(--muted)]">
+          <p className="mt-2 text-sm text-[var(--ink-muted)]">
             {counts[category]} leçon{counts[category] > 1 ? "s" : ""}
           </p>
         </Link>
