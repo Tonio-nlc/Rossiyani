@@ -16,6 +16,7 @@ import { COMPOSE_REGISTERS, COMPOSE_THEMES } from "@/lib/compose/types";
 import { saveComposePhrase, getComposePhraseById } from "@/lib/compose/saved-phrases";
 import { PRACTICE_SUGGESTIONS } from "@/lib/practice/constants";
 
+import { ContextTranslationEntryCard } from "@/components/practice/context-translation-entry-card";
 import { PracticeAnalysisView } from "./practice-analysis-view";
 
 type RewriteResult = {
@@ -272,6 +273,8 @@ export function PracticeWorkspace() {
           Practice is where you transform thoughts into natural Russian.
         </p>
       </Section>
+
+      <ContextTranslationEntryCard />
 
       {structureMode && structureContext ? (
         <StructureHeader context={structureContext} referenceSentence={referenceSentence} />

@@ -16,3 +16,9 @@ export function practicePath(params: Record<string, string | undefined>): string
   const query = search.toString();
   return query ? `/practice?${query}` : "/practice";
 }
+
+export function contextTranslationPath(lessonId?: string): string {
+  return lessonId
+    ? `/practice/context-translation?lesson=${encodeURIComponent(lessonId)}`
+    : "/practice/context-translation";
+}

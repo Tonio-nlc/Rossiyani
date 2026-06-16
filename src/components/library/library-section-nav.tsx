@@ -10,7 +10,7 @@ type LibrarySectionNavProps = {
 
 const SECTIONS: Array<{ id: LibrarySection; label: string; href: string }> = [
   { id: "texts", label: "Texts", href: "/library" },
-  { id: "lessons", label: "Lessons", href: "/manual" },
+  { id: "lessons", label: "Lessons", href: "/library?section=lessons" },
   { id: "saved", label: "Saved", href: "/library?section=saved" },
   { id: "phrases", label: "My phrases", href: "/library?section=phrases" },
   { id: "discoveries", label: "My discoveries", href: "/library?section=discoveries" },

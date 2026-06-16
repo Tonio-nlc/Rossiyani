@@ -5,6 +5,7 @@ import { useMemo } from "react";
 
 import { Reference } from "@/components/editorial";
 
+import { LibraryContextTranslationLessons } from "./library-context-translation-lessons";
 import { LibraryImportCard } from "./library-import-card";
 import { LibraryMyDiscoveries } from "./library-my-discoveries";
 import { LibraryMyPhrases } from "./library-my-phrases";
@@ -37,8 +38,12 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "lessons") {
     return (
-      <div className="space-y-6 pb-16">
+      <div className="space-y-8 pb-16">
         <LibrarySectionNav active="lessons" />
+        <div className="space-y-3">
+          <h2 className="text-sm font-medium text-[var(--ink)]">Context translation</h2>
+          <LibraryContextTranslationLessons />
+        </div>
         <p className="text-sm text-[var(--ink-muted)]">
           Grammar lessons live in the Manual.{" "}
           <Reference href="/manual">Open Manual →</Reference>
