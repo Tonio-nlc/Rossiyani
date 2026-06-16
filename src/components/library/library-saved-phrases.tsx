@@ -36,11 +36,12 @@ export function LibrarySavedPhrases() {
       <div>
         <p className="home-section-label">Saved phrases</p>
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-[var(--ink-secondary)]">
-          Save interesting rewrites from Practice to build your personal Russian library.
+          Save phrases from Practice or Context Translation to build your personal Russian library.
         </p>
-        <Reference href="/practice" className="mt-4 inline-block">
-          Go to Practice →
-        </Reference>
+        <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+          <Reference href="/practice">Go to Practice →</Reference>
+          <Reference href="/practice/context-translation">Context Translation →</Reference>
+        </div>
       </div>
     );
   }

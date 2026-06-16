@@ -342,6 +342,54 @@ body {
   opacity: 0;
 }
 
+@keyframes fade-up-subtle {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up-subtle {
+  animation: fade-up-subtle 0.2s var(--ease-editorial) forwards;
+  opacity: 0;
+}
+
+@keyframes analyzing-dots {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+.analyzing-dot {
+  animation: analyzing-dots 1.2s ease-in-out infinite;
+}
+
+.analyzing-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.analyzing-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.analyzing-dot:nth-child(4) {
+  animation-delay: 0.45s;
+}
+
+.analyzing-dot:nth-child(5) {
+  animation-delay: 0.6s;
+}
+
+
 @keyframes fade-out {
   from {
     opacity: 1;

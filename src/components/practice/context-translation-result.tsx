@@ -3,15 +3,26 @@
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 
+import {
+  isContextTranslationPhraseSaved,
+  saveContextTranslationPhrase,
+} from "@/lib/context-translation/save-actions";
+import {
+  isCulturalNoteSaved,
+  isGrammarConceptSaved,
+  saveCulturalNote,
+  saveGrammarConcept,
+} from "@/lib/context-translation/saved-items";
 import type {
   ContextTranslationAnalysis,
+  ContextTranslationAlternative,
   ContextTranslationFollowUpMessage,
+  ContextTranslationGrammarConcept,
 } from "@/lib/context-translation/types";
 
 type SectionKey =
   | "best"
   | "think"
-  | "naturalness"
   | "errors"
   | "alternatives"
   | "cultural"
@@ -22,10 +33,10 @@ type ContextTranslationResultProps = {
   analysis: ContextTranslationAnalysis;
   visibleSections: number;
   enrichmentLoading: boolean;
-  saved: boolean;
+  savedLesson: boolean;
   followUpMessages: ContextTranslationFollowUpMessage[];
   followUpLoading: boolean;
-  onSave: () => void;
+  onSaveLesson: () => void;
   onStartOver: () => void;
   onFollowUp: (question: string) => Promise<void>;
 };
@@ -33,9 +44,6 @@ type ContextTranslationResultProps = {
 function useSectionOrder(analysis: ContextTranslationAnalysis, enrichmentLoading: boolean) {
   return useMemo(() => {
     const order: SectionKey[] = ["best", "think"];
-    if (analysis.naturalness) {
-      order.push("naturalness");
-    }
     if (analysis.corrections.length > 0) {
       order.push("errors");
     }
@@ -59,13 +67,25 @@ function isSectionVisible(key: SectionKey, order: SectionKey[], visibleSections:
   return visibleSections > index;
 }
 
+function naturalnessLabel(score: number): string {
+  if (score >= 85) {
+    return "Sounds completely natural";
+  }
+  if (score >= 60) {
+    return "Understandable but stiff";
+  }
+  return "Non-native phrasing";
+}
+
 function LessonSection({
   visible,
   label,
+  action,
   children,
 }: {
   visible: boolean;
   label: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   if (!visible) {
@@ -73,10 +93,38 @@ function LessonSection({
   }
 
   return (
-    <section className="animate-fade-up space-y-4 border-t border-[var(--hairline)] pt-8 first:border-t-0 first:pt-0">
-      <p className="home-section-label">{label}</p>
+    <section className="animate-fade-up-subtle space-y-3 border-t border-[var(--hairline)] pt-6 first:border-t-0 first:pt-0">
+      <div className="flex items-baseline justify-between gap-4">
+        <p className="home-section-label">{label}</p>
+        {action}
+      </div>
       {children}
     </section>
+  );
+}
+
+function InlineAction({
+  label,
+  activeLabel,
+  active,
+  onClick,
+  disabled,
+}: {
+  label: string;
+  activeLabel: string;
+  active: boolean;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled || active}
+      className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline disabled:opacity-50"
+    >
+      {active ? activeLabel : label}
+    </button>
   );
 }
 
@@ -94,23 +142,12 @@ function CopyButton({ text }: { text: string }) {
   }, [text]);
 
   return (
-    <button
-      type="button"
+    <InlineAction
+      label="Copy"
+      activeLabel="Copied ✓"
+      active={copied}
       onClick={() => void copy()}
-      className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
-    >
-      {copied ? "Copied" : "Copy"}
-    </button>
-  );
-}
-
-function NaturalnessBar({ score }: { score: number }) {
-  const filled = Math.round(score / 10);
-  return (
-    <div className="flex items-center gap-3 font-mono text-sm tracking-wider text-[var(--ink-secondary)]">
-      <span aria-hidden>{Array.from({ length: 10 }, (_, index) => (index < filled ? "█" : "░")).join("")}</span>
-      <span className="font-sans text-xs text-[var(--ink-muted)]">{score}%</span>
-    </div>
+    />
   );
 }
 
@@ -123,6 +160,104 @@ const REGISTER_LABELS: Record<string, string> = {
 };
 
 const REGISTER_ORDER = ["neutral", "informal", "spoken", "literary", "formal"];
+
+function SavePhraseButton({
+  sourceSentence,
+  russianPhrase,
+  register,
+  nuance,
+}: {
+  sourceSentence: string;
+  russianPhrase: string;
+  register?: ContextTranslationAlternative["register"];
+  nuance?: string;
+}) {
+  const [saved, setSaved] = useState(() =>
+    isContextTranslationPhraseSaved(sourceSentence, russianPhrase),
+  );
+
+  return (
+    <InlineAction
+      label="Save"
+      activeLabel="Saved ✓"
+      active={saved}
+      onClick={() => {
+        saveContextTranslationPhrase({
+          sourceSentence,
+          russianPhrase,
+          register,
+          nuance,
+        });
+        setSaved(true);
+      }}
+    />
+  );
+}
+
+function SaveNoteButton({ note, sourceSentence }: { note: string; sourceSentence: string }) {
+  const [saved, setSaved] = useState(() => isCulturalNoteSaved(note, sourceSentence));
+
+  return (
+    <InlineAction
+      label="Save note"
+      activeLabel="Saved ✓"
+      active={saved}
+      onClick={() => {
+        saveCulturalNote(note, sourceSentence);
+        setSaved(true);
+      }}
+    />
+  );
+}
+
+function GrammarConceptRow({
+  concept,
+  sourceSentence,
+}: {
+  concept: ContextTranslationGrammarConcept;
+  sourceSentence: string;
+}) {
+  const [saved, setSaved] = useState(() =>
+    isGrammarConceptSaved(concept.label, sourceSentence),
+  );
+
+  if (!concept.href) {
+    return null;
+  }
+
+  return (
+    <li className="flex items-center justify-between gap-4 py-2.5">
+      <div className="min-w-0 flex-1">
+        <Link
+          href={concept.href}
+          className="focus-kb text-sm text-[var(--ink)] underline-offset-2 hover:text-[var(--color-link)] hover:underline"
+        >
+          {concept.label}
+        </Link>
+        {concept.countLabel ? (
+          <p className="mt-0.5 text-xs text-[var(--ink-muted)]">{concept.countLabel}</p>
+        ) : null}
+      </div>
+      <div className="flex shrink-0 items-center gap-3">
+        <Link
+          href={concept.href}
+          className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
+        >
+          Open Explorer
+        </Link>
+        <InlineAction
+          label="Save concept"
+          activeLabel="Saved ✓"
+          active={saved}
+          onClick={() => {
+            saveGrammarConcept(concept.label, concept.href, sourceSentence);
+            setSaved(true);
+          }}
+        />
+      </div>
+    </li>
+  );
+}
 
 function FollowUpPanel({
   visible,
@@ -142,11 +277,11 @@ function FollowUpPanel({
   }
 
   return (
-    <section className="animate-fade-up space-y-4 border-t border-[var(--hairline)] pt-8">
+    <section className="animate-fade-up-subtle space-y-3 border-t border-[var(--hairline)] pt-6">
       <p className="home-section-label">Ask a follow-up question</p>
 
       {messages.length > 0 ? (
-        <ul className="space-y-4">
+        <ul className="space-y-3">
           {messages.map((message, index) => (
             <li
               key={`${message.role}-${index}`}
@@ -164,7 +299,7 @@ function FollowUpPanel({
       ) : null}
 
       <form
-        className="space-y-3"
+        className="space-y-2"
         onSubmit={(event) => {
           event.preventDefault();
           const trimmed = question.trim();
@@ -199,15 +334,19 @@ export function ContextTranslationResult({
   analysis,
   visibleSections,
   enrichmentLoading,
-  saved,
+  savedLesson,
   followUpMessages,
   followUpLoading,
-  onSave,
+  onSaveLesson,
   onStartOver,
   onFollowUp,
 }: ContextTranslationResultProps) {
   const sectionOrder = useSectionOrder(analysis, enrichmentLoading);
   const { thinkLikeNative } = analysis;
+  const [phraseSaved, setPhraseSaved] = useState(() =>
+    isContextTranslationPhraseSaved(analysis.sourceText, analysis.bestTranslation),
+  );
+
   const alternativesByRegister = REGISTER_ORDER.map((register) => ({
     register,
     items: analysis.alternatives.filter((alt) => alt.register === register),
@@ -215,9 +354,22 @@ export function ContextTranslationResult({
 
   const show = (key: SectionKey) => isSectionVisible(key, sectionOrder, visibleSections);
 
+  const handleSavePhrase = useCallback(() => {
+    saveContextTranslationPhrase({
+      sourceSentence: analysis.sourceText,
+      russianPhrase: analysis.bestTranslation,
+      nuance: thinkLikeNative.conceptualShift,
+    });
+    setPhraseSaved(true);
+  }, [analysis.bestTranslation, analysis.sourceText, thinkLikeNative.conceptualShift]);
+
+  const handleSaveLesson = useCallback(() => {
+    onSaveLesson();
+  }, [onSaveLesson]);
+
   return (
-    <article className="mx-auto max-w-2xl space-y-0 pb-16">
-      <header className="mb-10 space-y-4">
+    <article className="mx-auto max-w-2xl space-y-0 pb-12">
+      <header className="mb-7 space-y-3">
         <Link
           href="/practice"
           className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
@@ -230,16 +382,56 @@ export function ContextTranslationResult({
         <p className="text-sm text-[var(--ink-secondary)]">{analysis.sourceText}</p>
       </header>
 
-      <LessonSection visible={show("best")} label="Best native translation">
-        <p className="break-russian font-reader text-[clamp(1.75rem,4vw,2.5rem)] leading-tight text-[var(--ink)]">
-          {analysis.bestTranslation}
-        </p>
-        <CopyButton text={analysis.bestTranslation} />
-      </LessonSection>
+      {show("best") ? (
+        <section className="animate-fade-up-subtle space-y-3 border-t border-[var(--hairline)] pt-6">
+          <p className="home-section-label">Best native translation</p>
+          <p className="break-russian font-reader text-[clamp(1.75rem,4vw,2.35rem)] leading-tight text-[var(--ink)]">
+            {analysis.bestTranslation}
+          </p>
+
+          {analysis.naturalness ? (
+            <div className="space-y-2">
+              <p className="text-sm text-[var(--ink-secondary)]">
+                {analysis.naturalness.score >= 85 ? "✓ " : ""}
+                {naturalnessLabel(analysis.naturalness.score)}
+              </p>
+              {analysis.naturalness.score < 85 ? (
+                <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">
+                  {analysis.naturalness.explanation}
+                </p>
+              ) : null}
+              {analysis.naturalness.preferredExpression ? (
+                <p className="break-russian font-reader text-base text-[var(--ink)]">
+                  {analysis.naturalness.preferredExpression}
+                </p>
+              ) : null}
+            </div>
+          ) : (
+            <p className="text-sm text-[var(--ink-secondary)]">Native formulation</p>
+          )}
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1">
+            <CopyButton text={analysis.bestTranslation} />
+            <InlineAction
+              label="Save phrase"
+              activeLabel="Saved ✓"
+              active={phraseSaved}
+              onClick={handleSavePhrase}
+            />
+            <InlineAction
+              label="Save lesson"
+              activeLabel="Saved to Library ✓"
+              active={savedLesson}
+              disabled={enrichmentLoading}
+              onClick={handleSaveLesson}
+            />
+          </div>
+        </section>
+      ) : null}
 
       <LessonSection visible={show("think")} label="Think like a native">
-        <div className="space-y-6 text-sm leading-relaxed">
-          <div className="space-y-2">
+        <div className="space-y-4 text-sm leading-relaxed">
+          <div className="space-y-1.5">
             <p className="text-xs text-[var(--ink-muted)]">
               {thinkLikeNative.sourceLanguageLabel} thought
             </p>
@@ -252,16 +444,16 @@ export function ContextTranslationResult({
             ↓
           </p>
 
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <p className="text-xs text-[var(--ink-muted)]">Mental image</p>
             <p className="text-[var(--ink-secondary)]">
               &ldquo;{thinkLikeNative.mentalImage}&rdquo;
             </p>
           </div>
 
-          <div className="border-t border-[var(--hairline)] pt-6" />
+          <div className="border-t border-[var(--hairline)] pt-4" />
 
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <p className="text-xs text-[var(--ink-muted)]">Native Russian thought</p>
             <p className="text-[var(--ink-secondary)]">
               &ldquo;{thinkLikeNative.nativeThought}&rdquo;
@@ -276,34 +468,17 @@ export function ContextTranslationResult({
             {thinkLikeNative.nativeFormulation}
           </p>
 
-          <p className="border-t border-[var(--hairline)] pt-4 text-[var(--ink-secondary)]">
+          <p className="border-t border-[var(--hairline)] pt-3 text-[var(--ink-secondary)]">
             {thinkLikeNative.conceptualShift}
           </p>
         </div>
       </LessonSection>
 
-      {analysis.naturalness ? (
-        <LessonSection visible={show("naturalness")} label="Naturalness">
-          <NaturalnessBar score={analysis.naturalness.score} />
-          <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">
-            {analysis.naturalness.explanation}
-          </p>
-          {analysis.naturalness.preferredExpression ? (
-            <div className="space-y-1 pt-2">
-              <p className="text-xs text-[var(--ink-muted)]">Preferred expression</p>
-              <p className="break-russian font-reader text-lg text-[var(--ink)]">
-                {analysis.naturalness.preferredExpression}
-              </p>
-            </div>
-          ) : null}
-        </LessonSection>
-      ) : null}
-
       {analysis.corrections.length > 0 ? (
         <LessonSection visible={show("errors")} label="Error analysis">
-          <ul className="space-y-8">
+          <ul className="space-y-6">
             {analysis.corrections.map((item) => (
-              <li key={`${item.userText}-${item.correction}`} className="space-y-3">
+              <li key={`${item.userText}-${item.correction}`} className="space-y-2.5">
                 <p className="break-russian font-reader text-lg text-[var(--ink)]">{item.userText}</p>
                 <dl className="space-y-2 text-sm">
                   <div>
@@ -332,44 +507,60 @@ export function ContextTranslationResult({
       ) : null}
 
       <LessonSection visible={show("alternatives")} label="Alternative expressions">
-          {enrichmentLoading && analysis.alternatives.length === 0 ? (
-            <p className="text-sm text-[var(--ink-muted)]">Finding alternatives…</p>
-          ) : alternativesByRegister.length > 0 ? (
-            <ul className="space-y-6">
-              {alternativesByRegister.map((group, groupIndex) => (
-                <li key={group.register}>
-                  {groupIndex > 0 ? (
-                    <div className="mb-6 border-t border-[var(--hairline)]" aria-hidden />
-                  ) : null}
-                  <p className="text-xs text-[var(--ink-muted)]">
-                    {REGISTER_LABELS[group.register] ?? group.register}
-                  </p>
-                  <ul className="mt-3 space-y-5">
-                    {group.items.map((alt) => (
-                      <li key={`${alt.register}-${alt.text}`} className="space-y-1">
-                        <p className="break-russian font-reader text-lg text-[var(--ink)]">{alt.text}</p>
+        {enrichmentLoading && analysis.alternatives.length === 0 ? (
+          <p className="text-sm text-[var(--ink-muted)]">Finding alternatives…</p>
+        ) : alternativesByRegister.length > 0 ? (
+          <ul className="space-y-5">
+            {alternativesByRegister.map((group, groupIndex) => (
+              <li key={group.register}>
+                {groupIndex > 0 ? (
+                  <div className="mb-5 border-t border-[var(--hairline)]" aria-hidden />
+                ) : null}
+                <p className="text-xs text-[var(--ink-muted)]">
+                  {REGISTER_LABELS[group.register] ?? group.register}
+                </p>
+                <ul className="mt-2.5 space-y-4">
+                  {group.items.map((alt) => (
+                    <li
+                      key={`${alt.register}-${alt.text}`}
+                      className="flex items-start justify-between gap-4"
+                    >
+                      <div className="min-w-0 space-y-1">
+                        <p className="break-russian font-reader text-lg text-[var(--ink)]">
+                          {alt.text}
+                        </p>
                         <p className="text-sm text-[var(--ink-secondary)]">{alt.nuance}</p>
                         <p className="text-xs text-[var(--ink-muted)]">
                           {alt.frequency} · {alt.whenToUse}
                         </p>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          ) : null}
+                      </div>
+                      <SavePhraseButton
+                        sourceSentence={analysis.sourceText}
+                        russianPhrase={alt.text}
+                        register={alt.register}
+                        nuance={alt.nuance}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </LessonSection>
 
       {analysis.culturalNotes.length > 0 ? (
         <LessonSection visible={show("cultural")} label="Cultural notes">
-          <ul className="space-y-2 text-sm leading-relaxed text-[var(--ink-secondary)]">
+          <ul className="space-y-3 text-sm leading-relaxed text-[var(--ink-secondary)]">
             {analysis.culturalNotes.map((note) => (
-              <li key={note} className="flex gap-2">
-                <span className="text-[var(--ink-muted)]" aria-hidden>
-                  •
+              <li key={note} className="flex items-start justify-between gap-4">
+                <span className="flex gap-2">
+                  <span className="text-[var(--ink-muted)]" aria-hidden>
+                    •
+                  </span>
+                  <span>{note}</span>
                 </span>
-                <span>{note}</span>
+                <SaveNoteButton note={note} sourceSentence={analysis.sourceText} />
               </li>
             ))}
           </ul>
@@ -380,23 +571,11 @@ export function ContextTranslationResult({
         <LessonSection visible={show("grammar")} label="Grammar & language concepts">
           <ul className="divide-y divide-[var(--hairline)]">
             {analysis.grammarConcepts.map((concept) => (
-              <li key={concept.label}>
-                {concept.href ? (
-                  <Link
-                    href={concept.href}
-                    className="focus-kb group flex items-baseline justify-between gap-4 py-3"
-                  >
-                    <span className="text-sm text-[var(--ink)] group-hover:text-[var(--color-link)]">
-                      {concept.label}
-                    </span>
-                    {concept.countLabel ? (
-                      <span className="shrink-0 text-xs text-[var(--ink-muted)]">
-                        {concept.countLabel}
-                      </span>
-                    ) : null}
-                  </Link>
-                ) : null}
-              </li>
+              <GrammarConceptRow
+                key={concept.label}
+                concept={concept}
+                sourceSentence={analysis.sourceText}
+              />
             ))}
           </ul>
         </LessonSection>
@@ -413,15 +592,7 @@ export function ContextTranslationResult({
         onSubmit={onFollowUp}
       />
 
-      <footer className="mt-12 flex flex-wrap items-center gap-4 border-t border-[var(--hairline)] pt-8">
-        <button
-          type="button"
-          onClick={onSave}
-          disabled={saved || enrichmentLoading}
-          className="focus-kb text-sm text-[var(--ink-muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline disabled:opacity-50"
-        >
-          {saved ? "✓ Lesson saved" : "Save lesson"}
-        </button>
+      <footer className="mt-8 border-t border-[var(--hairline)] pt-6">
         <button
           type="button"
           onClick={onStartOver}

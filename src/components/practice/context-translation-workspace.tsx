@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { Section } from "@/components/editorial";
 import { useToast } from "@/components/ui/toast-provider";
 import type {
   ContextTranslationAnalysis,
@@ -19,14 +18,20 @@ import {
 
 import { ContextTranslationResult } from "./context-translation-result";
 
-const EXAMPLE_INPUTS = ["On est foutu.", "We're running late.", "Мы сломаны."];
+const EXAMPLE_INPUTS = [
+  "On est foutu.",
+  "I'm exhausted.",
+  "Мы сломаны.",
+  "Ça vaut le coup.",
+  "Take it easy.",
+];
 
 const PROGRESS_STEPS: Array<{ phase: ContextTranslationProgressPhase; label: string }> = [
   { phase: "bestTranslation", label: "Best translation" },
   { phase: "thinkLikeNative", label: "Think like a native" },
-  { phase: "grammar", label: "Analyzing grammar…" },
-  { phase: "alternatives", label: "Finding alternatives…" },
-  { phase: "culturalNotes", label: "Adding cultural notes…" },
+  { phase: "grammar", label: "Analyzing grammar" },
+  { phase: "alternatives", label: "Finding alternatives" },
+  { phase: "culturalNotes", label: "Adding cultural notes" },
 ];
 
 function createPartialAnalysis(
@@ -60,6 +65,16 @@ function createPartialAnalysis(
   };
 }
 
+function AnalyzingDots() {
+  return (
+    <span className="inline-flex gap-0.5" aria-hidden>
+      {Array.from({ length: 5 }, (_, index) => (
+        <span key={index} className="analyzing-dot inline-block h-1 w-1 rounded-full bg-current" />
+      ))}
+    </span>
+  );
+}
+
 type ContextTranslationWorkspaceProps = {
   initialLessonId?: string | null;
 };
@@ -77,7 +92,7 @@ export function ContextTranslationWorkspace({
   const [progressPhase, setProgressPhase] = useState<ContextTranslationProgressPhase | null>(
     null,
   );
-  const [saved, setSaved] = useState(false);
+  const [savedLesson, setSavedLesson] = useState(false);
   const [visibleSections, setVisibleSections] = useState(0);
   const [followUpMessages, setFollowUpMessages] = useState<ContextTranslationFollowUpMessage[]>(
     [],
@@ -92,7 +107,7 @@ export function ContextTranslationWorkspace({
     if (lesson) {
       setSourceText(lesson.originalSentence);
       setAnalysis(lesson.analysis);
-      setSaved(true);
+      setSavedLesson(true);
       setVisibleSections(12);
     }
   }, [initialLessonId]);
@@ -127,7 +142,7 @@ export function ContextTranslationWorkspace({
       timers.push(
         window.setTimeout(() => {
           setVisibleSections(index);
-        }, index * 100),
+        }, index * 180),
       );
     }
     return () => timers.forEach((timer) => window.clearTimeout(timer));
@@ -135,14 +150,14 @@ export function ContextTranslationWorkspace({
 
   const submit = useCallback(async () => {
     const trimmed = sourceText.trim();
-    if (!trimmed) {
+    if (!trimmed || loading) {
       return;
     }
 
     setLoading(true);
     setEnrichmentLoading(true);
     setAnalysis(null);
-    setSaved(false);
+    setSavedLesson(false);
     setFollowUpMessages([]);
     setProgressPhase("bestTranslation");
     setVisibleSections(0);
@@ -228,21 +243,20 @@ export function ContextTranslationWorkspace({
       setLoading(false);
       setEnrichmentLoading(false);
     }
-  }, [sourceText, toast]);
+  }, [sourceText, loading, toast]);
 
-  const handleSave = useCallback(() => {
+  const handleSaveLesson = useCallback(() => {
     if (!analysis) {
       return;
     }
     saveContextTranslationLesson(analysis);
-    setSaved(true);
-    toast("✓ Lesson saved", "success");
-  }, [analysis, toast]);
+    setSavedLesson(true);
+  }, [analysis]);
 
   const handleStartOver = useCallback(() => {
     setAnalysis(null);
     setSourceText("");
-    setSaved(false);
+    setSavedLesson(false);
     setFollowUpMessages([]);
     setProgressPhase(null);
     setVisibleSections(0);
@@ -296,76 +310,108 @@ export function ContextTranslationWorkspace({
         analysis={analysis}
         visibleSections={visibleSections}
         enrichmentLoading={enrichmentLoading}
-        saved={saved}
+        savedLesson={savedLesson}
         followUpMessages={followUpMessages}
         followUpLoading={followUpLoading}
-        onSave={handleSave}
+        onSaveLesson={handleSaveLesson}
         onStartOver={handleStartOver}
         onFollowUp={handleFollowUp}
       />
     );
   }
 
+  const showPlaceholder = sourceText.length === 0;
+
   return (
-    <div className="space-y-10">
-      <header className="space-y-3">
+    <div className="space-y-8">
+      <header className="space-y-2">
         <Link
           href="/practice"
           className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
         >
           ← Practice
         </Link>
-        <Section eyebrow="Context Translation" title="Think like a native speaker.">
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--ink-secondary)]">
-            Write a sentence in any language. Rossiyani explains how a native would think,
-            phrase it, and why alternatives differ.
-          </p>
-        </Section>
+        <p className="home-section-label">Context Translation</p>
+        <h1 className="font-reader text-[clamp(1.5rem,3.5vw,2rem)] leading-tight text-[var(--ink)]">
+          Think like a native speaker
+        </h1>
+        <p className="max-w-xl text-sm leading-relaxed text-[var(--ink-secondary)]">
+          Write a sentence in French, English or Russian. Rossiyani explains how a native actually
+          thinks.
+        </p>
       </header>
 
       <form
-        className="mx-auto max-w-2xl space-y-6"
+        className="mx-auto max-w-2xl space-y-5"
         onSubmit={(event) => {
           event.preventDefault();
           void submit();
         }}
       >
-        <textarea
-          value={sourceText}
-          onChange={(event) => setSourceText(event.target.value)}
-          rows={5}
-          disabled={loading}
-          placeholder={"Write a sentence...\n\nExamples\n\nOn est foutu.\nWe're running late.\nМы сломаны."}
-          className="focus-kb break-russian w-full resize-y border border-[var(--hairline)] bg-transparent px-4 py-5 text-center font-reader text-[clamp(1.125rem,3vw,1.5rem)] leading-relaxed text-[var(--ink)] outline-none placeholder:text-[var(--ink-muted)] disabled:opacity-60"
-        />
-
-        <div className="flex flex-wrap justify-center gap-2">
-          {EXAMPLE_INPUTS.map((example) => (
-            <button
-              key={example}
-              type="button"
-              disabled={loading}
-              onClick={() => setSourceText(example)}
-              className="focus-kb border border-[var(--hairline)] px-3 py-1.5 text-sm text-[var(--ink-secondary)] transition hover:border-[var(--ink-muted)] hover:text-[var(--ink)] disabled:opacity-50"
+        <div className="relative">
+          {showPlaceholder ? (
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 px-5 py-4 text-left font-reader text-[clamp(1rem,2.5vw,1.125rem)] leading-relaxed text-[var(--ink-muted)]"
+              aria-hidden
             >
-              {example}
-            </button>
-          ))}
+              <p>Translate this idea...</p>
+              <p className="mt-4 text-xs uppercase tracking-[0.14em]">Examples</p>
+              <ul className="mt-2 space-y-1 text-sm">
+                <li>• On est foutu.</li>
+                <li>• Ça vaut le coup.</li>
+                <li>• I&apos;m exhausted.</li>
+                <li>• Мы сломаны.</li>
+              </ul>
+              <p className="mt-4 text-sm">
+                Rossiyani explains how natives naturally express it.
+              </p>
+            </div>
+          ) : null}
+
+          <textarea
+            value={sourceText}
+            onChange={(event) => setSourceText(event.target.value)}
+            rows={4}
+            className="focus-kb break-russian min-h-[9rem] w-full resize-y rounded-xl border border-[var(--hairline)] bg-[var(--surface)] px-5 py-4 font-reader text-[clamp(1rem,2.5vw,1.125rem)] leading-relaxed text-[var(--ink)] outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-transparent hover:border-[var(--ink-muted)]/40 focus:border-[var(--ink-muted)] focus:shadow-[0_0_0_1px_var(--ink-muted)]"
+          />
         </div>
 
-        <div className="text-center">
+        <div className="flex justify-center">
           <button
             type="submit"
-            disabled={loading || !sourceText.trim()}
-            className="focus-kb text-sm font-medium text-[var(--ink)] underline-offset-4 hover:underline disabled:opacity-40"
+            disabled={!sourceText.trim()}
+            className="focus-kb inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--ink)] px-6 text-sm font-medium text-[var(--surface)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Translate &amp; Explain →
+            {loading ? (
+              <>
+                Analyzing...
+                <AnalyzingDots />
+              </>
+            ) : (
+              "Translate & Explain →"
+            )}
           </button>
+        </div>
+
+        <div className="space-y-3 pt-1">
+          <p className="text-center text-xs text-[var(--ink-muted)]">Try:</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {EXAMPLE_INPUTS.map((example) => (
+              <button
+                key={example}
+                type="button"
+                onClick={() => setSourceText(example)}
+                className="focus-kb rounded-full border border-[var(--hairline)] bg-[var(--surface)] px-3.5 py-1.5 text-sm text-[var(--ink-secondary)] transition hover:border-[var(--ink-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--ink)]"
+              >
+                {example}
+              </button>
+            ))}
+          </div>
         </div>
       </form>
 
       {loading && progressPhase ? (
-        <div className="mx-auto max-w-md space-y-2 border-t border-[var(--hairline)] pt-6">
+        <div className="mx-auto max-w-md space-y-1.5 border-t border-[var(--hairline)] pt-5">
           {PROGRESS_STEPS.map((step) => {
             const stepIndex = PROGRESS_STEPS.findIndex((item) => item.phase === step.phase);
             const currentIndex = PROGRESS_STEPS.findIndex((item) => item.phase === progressPhase);
@@ -375,17 +421,17 @@ export function ContextTranslationWorkspace({
               <p
                 key={step.phase}
                 className={[
-                  "text-sm transition-colors",
+                  "text-sm transition-colors duration-200",
                   isDone
                     ? "text-[var(--ink-secondary)]"
                     : isCurrent
                       ? "text-[var(--ink)]"
-                      : "text-[var(--ink-muted)]/50",
+                      : "text-[var(--ink-muted)]/45",
                 ].join(" ")}
               >
-                {isDone ? "✓ " : isCurrent ? "… " : "  "}
-                {step.label.replace("…", "")}
-                {isCurrent && step.label.includes("…") ? "…" : ""}
+                {isDone ? "✓ " : isCurrent ? "↓ " : "  "}
+                {step.label}
+                {isCurrent ? "…" : ""}
               </p>
             );
           })}

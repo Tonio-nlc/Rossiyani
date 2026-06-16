@@ -13,7 +13,7 @@ export type SavedPhrase = {
   explanation: string;
   structures: SavedPhraseStructure[];
   createdAt: string;
-  source: "practice";
+  source: "practice" | "context-translation";
 };
 
 export type SavePhraseInput = Omit<SavedPhrase, "id" | "createdAt">;
