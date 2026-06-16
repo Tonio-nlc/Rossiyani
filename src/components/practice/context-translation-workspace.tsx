@@ -320,11 +320,9 @@ export function ContextTranslationWorkspace({
     );
   }
 
-  const showPlaceholder = sourceText.length === 0;
-
   return (
-    <div className="space-y-8">
-      <header className="space-y-2">
+    <div className="space-y-6">
+      <header className="space-y-1.5">
         <Link
           href="/practice"
           className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
@@ -336,74 +334,51 @@ export function ContextTranslationWorkspace({
           Think like a native speaker
         </h1>
         <p className="max-w-xl text-sm leading-relaxed text-[var(--ink-secondary)]">
-          Write a sentence in French, English or Russian. Rossiyani explains how a native actually
-          thinks.
+          Write a sentence in French, English or Russian.
         </p>
       </header>
 
       <form
-        className="mx-auto max-w-2xl space-y-5"
+        className="mx-auto max-w-2xl space-y-3.5"
         onSubmit={(event) => {
           event.preventDefault();
           void submit();
         }}
       >
-        <div className="relative">
-          {showPlaceholder ? (
-            <div
-              className="pointer-events-none absolute inset-x-0 top-0 px-5 py-4 text-left font-reader text-[clamp(1rem,2.5vw,1.125rem)] leading-relaxed text-[var(--ink-muted)]"
-              aria-hidden
-            >
-              <p>Translate this idea...</p>
-              <p className="mt-4 text-xs uppercase tracking-[0.14em]">Examples</p>
-              <ul className="mt-2 space-y-1 text-sm">
-                <li>• On est foutu.</li>
-                <li>• Ça vaut le coup.</li>
-                <li>• I&apos;m exhausted.</li>
-                <li>• Мы сломаны.</li>
-              </ul>
-              <p className="mt-4 text-sm">
-                Rossiyani explains how natives naturally express it.
-              </p>
-            </div>
-          ) : null}
+        <textarea
+          value={sourceText}
+          onChange={(event) => setSourceText(event.target.value)}
+          rows={3}
+          placeholder={"Translate an idea, not words...\n\nExample:\nOn est foutu."}
+          className="focus-kb break-russian min-h-[140px] w-full resize-y rounded-xl border border-[var(--hairline)] bg-[var(--surface)] px-5 py-3.5 font-reader text-[clamp(1rem,2.5vw,1.125rem)] leading-relaxed text-[var(--ink)] outline-none transition-[border-color,box-shadow] duration-200 placeholder:font-reader placeholder:text-[0.9375rem] placeholder:leading-relaxed placeholder:text-[var(--ink-muted)]/70 hover:border-[var(--ink-muted)]/35 focus:border-[var(--ink-muted)] focus:shadow-[0_1px_3px_rgba(0,0,0,0.06),0_0_0_1px_var(--ink-muted)] focus:outline-none"
+        />
 
-          <textarea
-            value={sourceText}
-            onChange={(event) => setSourceText(event.target.value)}
-            rows={4}
-            className="focus-kb break-russian min-h-[9rem] w-full resize-y rounded-xl border border-[var(--hairline)] bg-[var(--surface)] px-5 py-4 font-reader text-[clamp(1rem,2.5vw,1.125rem)] leading-relaxed text-[var(--ink)] outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-transparent hover:border-[var(--ink-muted)]/40 focus:border-[var(--ink-muted)] focus:shadow-[0_0_0_1px_var(--ink-muted)]"
-          />
-        </div>
+        <button
+          type="submit"
+          disabled={!sourceText.trim()}
+          className="focus-kb inline-flex w-fit min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--ink)] px-6 py-2.5 font-sans text-sm font-medium text-[var(--surface)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {loading ? (
+            <>
+              Analyzing...
+              <AnalyzingDots />
+            </>
+          ) : (
+            "Translate & Explain →"
+          )}
+        </button>
 
-        <div className="flex justify-center">
-          <button
-            type="submit"
-            disabled={!sourceText.trim()}
-            className="focus-kb inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--ink)] px-6 text-sm font-medium text-[var(--surface)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {loading ? (
-              <>
-                Analyzing...
-                <AnalyzingDots />
-              </>
-            ) : (
-              "Translate & Explain →"
-            )}
-          </button>
-        </div>
-
-        <div className="space-y-3 pt-1">
-          <p className="text-center text-xs text-[var(--ink-muted)]">Try:</p>
-          <div className="flex flex-wrap justify-center gap-2">
+        <div className="space-y-2.5 pt-1">
+          <p className="text-xs text-[var(--ink-muted)]">Popular examples</p>
+          <div className="flex flex-wrap gap-2">
             {EXAMPLE_INPUTS.map((example) => (
               <button
                 key={example}
                 type="button"
                 onClick={() => setSourceText(example)}
-                className="focus-kb rounded-full border border-[var(--hairline)] bg-[var(--surface)] px-3.5 py-1.5 text-sm text-[var(--ink-secondary)] transition hover:border-[var(--ink-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--ink)]"
+                className="focus-kb rounded-full border border-[var(--hairline)] bg-[var(--surface)] px-3.5 py-1.5 font-reader text-sm text-[var(--ink-secondary)] transition hover:border-[var(--ink-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--ink)]"
               >
-                {example}
+                ○ {example}
               </button>
             ))}
           </div>
@@ -411,7 +386,7 @@ export function ContextTranslationWorkspace({
       </form>
 
       {loading && progressPhase ? (
-        <div className="mx-auto max-w-md space-y-1.5 border-t border-[var(--hairline)] pt-5">
+        <div className="mx-auto max-w-md space-y-1.5 border-t border-[var(--hairline)] pt-4">
           {PROGRESS_STEPS.map((step) => {
             const stepIndex = PROGRESS_STEPS.findIndex((item) => item.phase === step.phase);
             const currentIndex = PROGRESS_STEPS.findIndex((item) => item.phase === progressPhase);
