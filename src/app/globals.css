@@ -159,44 +159,75 @@ body {
 
 /* Dashboard — magazine home, not SaaS report */
 .home-magazine {
-  max-width: 42rem;
+  width: 100%;
+  max-width: min(100%, 56rem);
   min-width: 0;
 }
 
 .home-magazine-hero {
-  padding-top: clamp(2rem, 6vw, 4rem);
-  padding-bottom: clamp(4rem, 12vw, 7rem);
+  padding-top: clamp(1.25rem, 3vw, 2rem);
+  padding-bottom: clamp(2rem, 5vw, 3rem);
+}
+
+.home-magazine-hero-grid {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .home-magazine-hero-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  }
+}
+
+.home-magazine-hero-art {
+  display: none;
+  min-width: 0;
+  justify-self: end;
+}
+
+@media (min-width: 1024px) {
+  .home-magazine-hero-art {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    max-width: 100%;
+  }
 }
 
 .home-magazine-hero-title {
-  font-size: clamp(2.75rem, 9vw, 4.75rem);
-  line-height: 1.02;
+  font-size: clamp(2.25rem, 6vw, 3.75rem);
+  line-height: 1.04;
   letter-spacing: -0.02em;
 }
 
-.home-magazine-hero-progress {
-  font-size: clamp(2.5rem, 6vw, 3.75rem);
-  line-height: 1;
-  letter-spacing: -0.03em;
+.home-magazine-hero-subtitle {
+  font-family: var(--font-editorial);
+  font-size: clamp(0.9375rem, 1.5vw, 1.0625rem);
+  line-height: 1.55;
 }
 
-.home-magazine-cta {
-  display: inline-block;
+.home-magazine-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.875rem 1.75rem;
   font-size: 0.9375rem;
   font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--ink);
-  border-bottom: 1px solid var(--ink);
-  padding-bottom: 0.125rem;
+  letter-spacing: 0.01em;
   transition: opacity 0.2s var(--ease-editorial);
 }
 
-.home-magazine-cta:hover {
-  opacity: 0.65;
+.home-magazine-primary-btn:hover {
+  opacity: 0.88;
 }
 
 .home-magazine-section {
-  padding-block: clamp(3rem, 8vw, 5rem);
+  padding-block: clamp(1.75rem, 4vw, 2.5rem);
   border-top: 1px solid var(--hairline);
 }
 
@@ -206,13 +237,25 @@ body {
 
 .home-magazine-lede {
   font-family: var(--font-editorial);
-  font-size: clamp(1rem, 2vw, 1.125rem);
+  font-size: clamp(0.9375rem, 1.5vw, 1.0625rem);
   line-height: 1.65;
 }
 
 .home-magazine-rationale {
   font-family: var(--font-editorial);
   font-style: italic;
+}
+
+.home-magazine-card {
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.375rem;
+  box-shadow: 0 1px 0 rgba(31, 31, 29, 0.04);
+}
+
+.home-magazine-card-featured {
+  padding: 1.5rem 1.625rem;
 }
 
 /* Russian text — prevent horizontal overflow */
