@@ -2,88 +2,73 @@
 
 import Link from "next/link";
 
-import { conceptPath } from "@/components/explorer/explorer-routes";
-import { practicePath } from "@/lib/practice/constants";
+import type {
+  ReadingSessionContinueAction,
+  ReadingSessionDiscovery,
+} from "@/lib/reader/build-reading-session-summary";
 
 type ReaderCompletionCardProps = {
-  newWordsCount: number;
-  constructionCount: number;
-  grammarObservationCount: number;
-  practiceStructure: string;
-  primaryConceptKey: string | null;
+  textTitle: string;
+  discoveries: ReadingSessionDiscovery[];
+  continueActions: ReadingSessionContinueAction[];
 };
 
 export function ReaderCompletionCard({
-  newWordsCount,
-  constructionCount,
-  grammarObservationCount,
-  practiceStructure,
-  primaryConceptKey,
+  textTitle,
+  discoveries,
+  continueActions,
 }: ReaderCompletionCardProps) {
-  const explorerHref = primaryConceptKey
-    ? conceptPath(primaryConceptKey)
-    : `/explorer?q=${encodeURIComponent(practiceStructure)}`;
-
   return (
-    <section className="max-w-[70ch] space-y-5 border-t border-[var(--hairline)] pt-8">
+    <section className="max-w-[70ch] space-y-6 border-t border-[var(--hairline)] pt-8">
       <p className="text-sm text-[var(--ink-secondary)]">
         <span aria-hidden>✓ </span>
-        Reading completed
+        Lecture terminée · {textTitle}
       </p>
 
       <div>
-        <p className="home-section-label">Today you discovered</p>
-        <ul className="mt-2 space-y-1 text-sm text-[var(--ink-secondary)]">
-          <li>
-            {newWordsCount} new word{newWordsCount === 1 ? "" : "s"}
-          </li>
-          {constructionCount > 0 ? (
-            <li>
-              {constructionCount} useful construction{constructionCount === 1 ? "" : "s"}
-            </li>
-          ) : null}
-          {grammarObservationCount > 0 ? (
-            <li>
-              {grammarObservationCount} grammar observation
-              {grammarObservationCount === 1 ? "" : "s"}
-            </li>
-          ) : null}
-        </ul>
+        <p className="home-section-label">Aujourd&apos;hui tu as découvert</p>
+        {discoveries.length > 0 ? (
+          <ul className="mt-3 space-y-2 text-sm text-[var(--ink-secondary)]">
+            {discoveries.map((item) => (
+              <li key={item.label} className="flex flex-col gap-0.5">
+                <span className="break-russian font-reader text-[var(--ink)]">{item.label}</span>
+                {item.detail ? (
+                  <span className="text-xs leading-relaxed text-[var(--ink-muted)]">
+                    {item.detail}
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm leading-relaxed text-[var(--ink-muted)]">
+            Cliquez sur les mots surlignés pendant la lecture pour alimenter cette session.
+          </p>
+        )}
       </div>
 
-      <div>
-        <p className="text-xs text-[var(--ink-muted)]">Continue learning</p>
-        <ul className="mt-2 space-y-1.5 text-sm">
-          <li>
-            <Link
-              href={practicePath({
-                structure: practiceStructure,
-                mode: "structure",
-                from: "reader",
-              })}
-              className="focus-kb text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
-            >
-              Practice →
-            </Link>
-          </li>
-          <li>
-            <Link
-              href={explorerHref}
-              className="focus-kb text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
-            >
-              Explore similar texts →
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/library"
-              className="focus-kb text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
-            >
-              Read another text →
-            </Link>
-          </li>
-        </ul>
-      </div>
+      {continueActions.length > 0 ? (
+        <div>
+          <p className="home-section-label">Continuer</p>
+          <ul className="mt-3 space-y-3">
+            {continueActions.map((action) => (
+              <li key={action.href}>
+                <Link
+                  href={action.href}
+                  className="focus-kb group block transition hover:text-[var(--color-link)]"
+                >
+                  <span className="text-sm text-[var(--ink)] group-hover:text-[var(--color-link)]">
+                    {action.label} →
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-relaxed text-[var(--ink-muted)]">
+                    {action.rationale}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </section>
   );
 }

@@ -618,6 +618,16 @@ body {
   min-width: 0;
 }
 
+.reader-word-sheet {
+  overscroll-behavior: contain;
+}
+
+@media (min-width: 1024px) {
+  .reader-word-sheet-backdrop {
+    pointer-events: none;
+  }
+}
+
 .mobile-nav-safe {
   padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
 }

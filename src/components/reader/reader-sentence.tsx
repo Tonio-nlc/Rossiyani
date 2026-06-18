@@ -4,12 +4,7 @@ import { memo } from "react";
 
 import { SentenceBlock, type SentenceBlockWord } from "@/components/sentence/sentence-block";
 import type { WordHighlightKind } from "@/lib/reader/build-interactive-words";
-import type { InteractiveWordEntry } from "@/lib/reader/build-interactive-words";
 import type { PartOfSpeech } from "@/types";
-
-import { ReaderMarginPanel } from "./reader-margin-panel";
-import type { ReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel-data";
-import type { WordDetailGraph } from "@/types/word-detail-graph";
 
 type ReaderSentenceProps = {
   sentenceId: string;
@@ -19,7 +14,6 @@ type ReaderSentenceProps = {
   interactiveWordKinds: Map<string, WordHighlightKind>;
   selectedWordId: string | null;
   hoveredWordId: string | null;
-  selectedWordSentenceId: string | null;
   searchMatchWordIds: Set<string>;
   searchActiveWordId: string | null;
   showTranslation: boolean;
@@ -29,21 +23,7 @@ type ReaderSentenceProps = {
   onSelectWord: (word: SentenceBlockWord) => void;
   onHoverWord?: (word: SentenceBlockWord) => void;
   onHoverWordLeave?: () => void;
-  marginPanelProps: {
-    detail: WordDetailGraph | null;
-    loading?: boolean;
-    textIndex: ReaderTextPhraseIndex;
-    textWords: InteractiveWordEntry[];
-    activeWordId: string | null;
-    agreementTarget: string | null;
-    showAllTranslations: boolean;
-    onToggleAllTranslations: (value: boolean) => void;
-    onHoverWord: (entry: InteractiveWordEntry) => void;
-    onSelectWord: (entry: InteractiveWordEntry) => void;
-    onHoverWordLeave: () => void;
-  };
   registerRef: (node: HTMLDivElement | null) => void;
-  marginRef: React.RefObject<HTMLDivElement | null>;
 };
 
 export const ReaderSentence = memo(function ReaderSentence({
@@ -54,7 +34,6 @@ export const ReaderSentence = memo(function ReaderSentence({
   interactiveWordKinds,
   selectedWordId,
   hoveredWordId,
-  selectedWordSentenceId,
   searchMatchWordIds,
   searchActiveWordId,
   showTranslation,
@@ -64,12 +43,8 @@ export const ReaderSentence = memo(function ReaderSentence({
   onSelectWord,
   onHoverWord,
   onHoverWordLeave,
-  marginPanelProps,
   registerRef,
-  marginRef,
 }: ReaderSentenceProps) {
-  const showMobilePanel = selectedWordSentenceId === sentenceId;
-
   return (
     <div
       ref={registerRef}
@@ -102,15 +77,6 @@ export const ReaderSentence = memo(function ReaderSentence({
         onHoverWord={onHoverWord}
         onHoverWordLeave={onHoverWordLeave}
       />
-      {showMobilePanel ? (
-        <div
-          ref={marginRef}
-          className="mt-4 border-t border-[var(--hairline)] pt-4 lg:hidden"
-          aria-label="Word context"
-        >
-          <ReaderMarginPanel {...marginPanelProps} />
-        </div>
-      ) : null}
     </div>
   );
 });
