@@ -6,11 +6,14 @@ import { useEffect, useMemo, useState } from "react";
 import { estimateReadingMinutes } from "@/components/library/library-utils";
 import type { TextListItem } from "@/features/texts";
 import { displayableTextSource, isDisplayableLibraryText } from "@/lib/home/displayable-text";
+import { continueReadingRationale } from "@/lib/home/session-rationale";
 import {
   formatLastReadLabel,
   getMostRecentReadingTextId,
   getTextReadingProgress,
 } from "@/lib/reader/reading-progress";
+
+import { HomeSessionCard } from "./home-session-card";
 
 type HomeContinueReadingCardProps = {
   texts: TextListItem[];
@@ -29,6 +32,7 @@ export function HomeContinueReadingCard({ texts }: HomeContinueReadingCardProps)
     return displayable.find((item) => item.id === recentId) ?? displayable[0];
   }, [texts]);
 
+  const [rationale, setRationale] = useState<string | null>(null);
   const [meta, setMeta] = useState<string | null>(null);
 
   useEffect(() => {
@@ -40,46 +44,54 @@ export function HomeContinueReadingCard({ texts }: HomeContinueReadingCardProps)
     const minutes = estimateReadingMinutes(text.sentenceCount);
 
     if (!progress || progress.wordsSeenIds.length === 0) {
-      setMeta(`${text.level} · ${minutes} min · Not started`);
+      setRationale(continueReadingRationale(text.title, null, null));
+      setMeta(`${text.level} · ${minutes} min · Pas encore commencé`);
       return;
     }
 
+    const lastRead = formatLastReadLabel(progress.lastReadAt);
+    setRationale(continueReadingRationale(text.title, lastRead, progress.percent));
     setMeta(
-      `${progress.percent}% · ${text.level} · Last opened ${formatLastReadLabel(progress.lastReadAt).toLowerCase()}`,
+      `${progress.percent} % · ${text.level} · Dernière ouverture ${lastRead.toLowerCase()}`,
     );
   }, [text]);
 
   if (!text) {
     return (
-      <div className="border border-[var(--hairline)] px-4 py-4">
-        <p className="home-section-label">Continue reading</p>
-        <p className="mt-2 text-sm text-[var(--ink-muted)]">No text in your library yet.</p>
-        <Link href="/import" className="focus-kb mt-2 inline-block text-sm text-[var(--ink-secondary)]">
-          Import a text →
+      <HomeSessionCard
+        label="Reprendre la lecture"
+        rationale="Ajoutez un texte à votre bibliothèque pour commencer une session."
+      >
+        <p className="text-sm text-[var(--ink-muted)]">Aucun texte disponible pour l&apos;instant.</p>
+        <Link
+          href="/import"
+          className="focus-kb mt-3 inline-block text-sm text-[var(--ink-secondary)] hover:text-[var(--ink)]"
+        >
+          Importer un texte →
         </Link>
-      </div>
+      </HomeSessionCard>
     );
   }
 
   const author = displayableTextSource(text.source);
+  const displayRationale =
+    rationale ?? continueReadingRationale(text.title, null, null);
 
   return (
-    <Link
+    <HomeSessionCard
+      label="Reprendre la lecture"
+      rationale={displayRationale}
       href={`/texts/${text.id}`}
-      prefetch
-      className="focus-kb group block border border-[var(--hairline)] px-4 py-4 transition hover:border-[var(--hairline-strong)]"
+      cta="Reprendre la lecture →"
+      primary
     >
-      <p className="home-section-label">Continue reading</p>
-      <h3 className="mt-2 font-reader text-lg leading-snug text-[var(--ink)] group-hover:text-[var(--color-link)]">
+      <h2 className="font-reader text-[clamp(1.25rem,2.5vw,1.5rem)] leading-snug text-[var(--ink)]">
         {text.title}
-      </h3>
+      </h2>
       {author ? (
         <p className="mt-1 line-clamp-1 text-sm text-[var(--ink-secondary)]">{author}</p>
       ) : null}
       {meta ? <p className="mt-2 text-metadata text-[var(--ink-muted)]">{meta}</p> : null}
-      <p className="mt-2 text-sm text-[var(--ink-secondary)] group-hover:text-[var(--color-link)]">
-        Continue reading →
-      </p>
-    </Link>
+    </HomeSessionCard>
   );
 }

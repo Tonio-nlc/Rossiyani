@@ -1,6 +1,9 @@
 import Link from "next/link";
 
 import type { HomeReviewToday } from "@/features/home";
+import { reviewTodayRationale } from "@/lib/home/session-rationale";
+
+import { HomeSessionCard } from "./home-session-card";
 
 type HomeReviewSectionProps = {
   review: HomeReviewToday;
@@ -8,12 +11,13 @@ type HomeReviewSectionProps = {
 };
 
 export function HomeReviewSection({ review, reviewHref }: HomeReviewSectionProps) {
-  return (
-    <section>
-      <p className="home-section-label">To review today</p>
+  const seedLemma = review.words[0]?.label;
+  const rationale = reviewTodayRationale(seedLemma);
 
+  return (
+    <HomeSessionCard label="Révision du jour" rationale={rationale}>
       {review.words.length > 0 ? (
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
           {review.words.map((word) => (
             <Link
               key={word.href}
@@ -28,7 +32,7 @@ export function HomeReviewSection({ review, reviewHref }: HomeReviewSectionProps
           ))}
         </div>
       ) : (
-        <p className="mt-4 text-sm text-[var(--ink-muted)]">No words queued yet.</p>
+        <p className="text-sm text-[var(--ink-muted)]">Aucun mot en attente pour l&apos;instant.</p>
       )}
 
       {review.moreCount > 0 ? (
@@ -36,18 +40,18 @@ export function HomeReviewSection({ review, reviewHref }: HomeReviewSectionProps
           href={reviewHref}
           className="focus-kb mt-3 inline-block text-sm text-[var(--ink-secondary)] hover:text-[var(--ink)]"
         >
-          +{review.moreCount} more
+          +{review.moreCount} de plus
         </Link>
       ) : null}
 
       <div className="mt-5">
         <Link
           href={reviewHref}
-          className="focus-kb inline-flex items-center justify-center bg-[var(--ink)] px-6 py-3 text-sm font-medium text-[var(--paper)] transition hover:opacity-90"
+          className="focus-kb inline-flex items-center justify-center border border-[var(--ink)] px-5 py-2.5 text-sm font-medium text-[var(--ink)] transition hover:bg-[var(--ink)] hover:text-[var(--paper)]"
         >
-          Review today&apos;s words →
+          Réviser les mots du jour →
         </Link>
       </div>
-    </section>
+    </HomeSessionCard>
   );
 }

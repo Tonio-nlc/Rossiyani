@@ -5,8 +5,8 @@ import { getHomeJournalData } from "@/features/home";
 import { listTexts } from "@/features/texts";
 
 export const metadata: Metadata = {
-  title: "Rossiyani",
-  description: "A calm, editorial Russian language journal.",
+  title: "Dashboard · Rossiyani",
+  description: "Votre fil de session — lecture, exploration et pratique.",
 };
 
 export default async function HomePage() {
