@@ -157,6 +157,64 @@ body {
   color: var(--ink-muted);
 }
 
+/* Dashboard — magazine home, not SaaS report */
+.home-magazine {
+  max-width: 42rem;
+  min-width: 0;
+}
+
+.home-magazine-hero {
+  padding-top: clamp(2rem, 6vw, 4rem);
+  padding-bottom: clamp(4rem, 12vw, 7rem);
+}
+
+.home-magazine-hero-title {
+  font-size: clamp(2.75rem, 9vw, 4.75rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.home-magazine-hero-progress {
+  font-size: clamp(2.5rem, 6vw, 3.75rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.home-magazine-cta {
+  display: inline-block;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 0.125rem;
+  transition: opacity 0.2s var(--ease-editorial);
+}
+
+.home-magazine-cta:hover {
+  opacity: 0.65;
+}
+
+.home-magazine-section {
+  padding-block: clamp(3rem, 8vw, 5rem);
+  border-top: 1px solid var(--hairline);
+}
+
+.home-magazine-section-last {
+  padding-bottom: 0;
+}
+
+.home-magazine-lede {
+  font-family: var(--font-editorial);
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  line-height: 1.65;
+}
+
+.home-magazine-rationale {
+  font-family: var(--font-editorial);
+  font-style: italic;
+}
+
 /* Russian text — prevent horizontal overflow */
 .break-russian {
   overflow-wrap: anywhere;
