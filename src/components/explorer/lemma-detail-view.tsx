@@ -12,6 +12,10 @@ import {
   isDisplayableEnding,
   renderFrequencyStars,
 } from "@/lib/explorer/lemma-display";
+import {
+  tutorSimpleExplanationFromLemma,
+  tutorWhyFromLemma,
+} from "@/lib/explorer/tutor-copy";
 import { practicePath } from "@/lib/practice/constants";
 
 import { EndingBadge } from "@/components/analysis/ending-badge";
@@ -27,33 +31,28 @@ import {
   textPath,
 } from "./explorer-routes";
 import {
+  ExplorerTutorAction,
+  ExplorerTutorAdvanced,
+  ExplorerTutorAdvancedSection,
+  ExplorerTutorExample,
+  ExplorerTutorExplanation,
+  ExplorerTutorMetaLine,
+  ExplorerTutorTitle,
+  ExplorerTutorWhy,
+} from "./explorer-tutor-sections";
+import { RelatedNavigation } from "./related-navigation";
+import {
   collocationChip,
   conceptChip,
   expressionChip,
   lemmaChip,
   lessonChip,
-  RelatedNavigation,
   textChip,
 } from "./related-navigation";
 
 type LemmaDetailViewProps = {
   knowledge: LemmaKnowledge;
 };
-
-function JourneySection({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="space-y-4">
-      <p className="home-section-label">{label}</p>
-      {children}
-    </section>
-  );
-}
 
 function formRowHref(form: LemmaKnowledge["forms"][number]): string {
   if (isDisplayableEnding(form.ending)) {
@@ -87,9 +86,9 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
   const eligibleConcepts = allConcepts.filter((concept) =>
     isConceptExplorerEligible(concept.conceptKey, concept.title, concept.category),
   );
-  const familyTitle =
-    knowledge.partOfSpeech === "verb" ? "Related verbs" : "Related words";
+  const familyTitle = knowledge.partOfSpeech === "verb" ? "Verbes associés" : "Mots associés";
   const primaryLesson = knowledge.relatedLessons[0];
+  const primaryExample = knowledge.examples[0];
   const primaryText = knowledge.textsWithStats[0];
   const readExamplesHref = primaryText
     ? textPath(primaryText.textId)
@@ -121,289 +120,220 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
     ...knowledge.textsWithStats.slice(0, 2).map((text) => textChip(text.textId, text.textTitle)),
   ];
 
+  const secondaryActions = [
+    readExamplesHref ? { label: "Lire des exemples", href: readExamplesHref } : null,
+    primaryLesson
+      ? { label: "Ouvrir la leçon", href: `/manual/lecons/${primaryLesson.slug}` }
+      : null,
+  ].filter(Boolean) as Array<{ label: string; href: string }>;
+
   return (
     <ExplorerLayout
       breadcrumb={[{ label: "Explorer", href: "/explorer" }, { label: knowledge.lemma }]}
     >
-      <article className="space-y-12 pb-8">
-        <header className="space-y-4">
-          <p className="break-russian font-reader text-[clamp(2.25rem,5vw,3.5rem)] font-semibold leading-[1.02] tracking-tight text-[var(--ink)]">
-            {knowledge.stressMarked ?? knowledge.lemma}
-          </p>
-          <p className="text-sm text-[var(--ink-muted)]">
-            {posLabel} · {knowledge.occurrenceCount.toLocaleString("fr-FR")} occurrences ·{" "}
-            {knowledge.seenInTexts} texte{knowledge.seenInTexts > 1 ? "s" : ""}
-          </p>
-          {frequency ? (
-            <p className="text-sm text-amber-500" aria-label={frequency.label}>
-              <span className="tracking-wider">{renderFrequencyStars(frequency.filledStars)}</span>
-              <span className="ml-2 text-[var(--ink-muted)]">{frequency.label}</span>
-            </p>
-          ) : null}
+      <article className="space-y-10 pb-12">
+        <ExplorerTutorTitle
+          label={knowledge.stressMarked ?? knowledge.lemma}
+          translation={knowledge.primaryTranslation}
+        />
 
-          {(knowledge.primaryTranslation || knowledge.simpleExplanation) && (
-            <div className="max-w-2xl space-y-2 pt-2">
-              <p className="home-section-label">Meaning</p>
-              {knowledge.primaryTranslation ? (
-                <p className="font-reader text-xl text-[var(--ink)]">
-                  {knowledge.primaryTranslation}
-                </p>
-              ) : null}
-              {knowledge.simpleExplanation ? (
-                <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">
-                  {knowledge.simpleExplanation}
-                </p>
-              ) : null}
-              {knowledge.secondaryTranslations.length > 0 ? (
-                <p className="text-sm text-[var(--ink-secondary)]">
-                  Also: {knowledge.secondaryTranslations.join(" · ")}
-                </p>
-              ) : null}
-            </div>
-          )}
+        <ExplorerTutorWhy text={tutorWhyFromLemma(knowledge)} />
 
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-sm font-medium">
-            {readExamplesHref ? (
-              <li>
-                <Link
-                  href={readExamplesHref}
-                  className="focus-kb text-[var(--ink)] underline-offset-2 hover:underline"
-                >
-                  Read examples →
-                </Link>
-              </li>
-            ) : null}
-            <li>
-              <Link
-                href={practicePath({
-                  structure: knowledge.lemma,
-                  mode: "structure",
-                  from: "explorer",
-                })}
-                className="focus-kb text-[var(--ink)] underline-offset-2 hover:underline"
-              >
-                Practice this →
-              </Link>
-            </li>
-            {primaryLesson ? (
-              <li>
-                <Link
-                  href={`/manual/lecons/${primaryLesson.slug}`}
-                  className="focus-kb text-[var(--ink)] underline-offset-2 hover:underline"
-                >
-                  Open lesson →
-                </Link>
-              </li>
-            ) : null}
-          </ul>
-        </header>
-
-        {knowledge.examples.length > 0 ? (
-          <JourneySection label="How Russians actually use it">
-            <ul className="grid gap-3 lg:grid-cols-2">
-              {knowledge.examples.map((example) => (
-                <li
-                  key={example.id}
-                  className="rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-4"
-                >
-                  <p className="break-russian font-reader text-sm leading-relaxed text-[var(--ink)]">
-                    {example.sentenceRussian}
-                  </p>
-                  {example.naturalTranslation ? (
-                    <p className="mt-2 text-sm leading-relaxed text-[var(--ink-secondary)]">
-                      {example.naturalTranslation}
-                    </p>
-                  ) : null}
-                  {example.textId && example.textTitle ? (
-                    <Link
-                      href={textPath(example.textId)}
-                      className="focus-kb mt-3 inline-block text-xs font-medium text-[var(--ink-muted)] hover:text-[var(--color-link)]"
-                    >
-                      {example.textTitle} →
-                    </Link>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          </JourneySection>
+        {primaryExample ? (
+          <ExplorerTutorExample
+            russian={primaryExample.sentenceRussian}
+            translation={primaryExample.naturalTranslation}
+            sourceHref={primaryExample.textId ? textPath(primaryExample.textId) : null}
+            sourceLabel={primaryExample.textTitle ?? null}
+          />
+        ) : primaryText ? (
+          <ExplorerTutorExample
+            russian={primaryText.sentenceRussian}
+            sourceHref={textPath(primaryText.textId)}
+            sourceLabel={primaryText.textTitle}
+          />
         ) : null}
 
-        {knowledge.familyLemmas.length > 0 ? (
-          <JourneySection label={familyTitle}>
-            <ExplorerDiscoveryGrid
-              items={knowledge.familyLemmas.map((item) => ({
-                label: item.lemma,
-                href: lemmaPath(item.lemma, item.partOfSpeech),
-              }))}
-            />
-          </JourneySection>
-        ) : null}
+        <ExplorerTutorExplanation text={tutorSimpleExplanationFromLemma(knowledge)} />
 
-        {collocations.length > 0 ? (
-          <JourneySection label="Common constructions">
-            <ExplorerDiscoveryGrid
-              items={collocations.map((phrase) => ({
-                label: phrase.label,
-                href: collocationPath(phrase.label),
-                meta: `${phrase.occurrenceCount}× in your texts`,
-              }))}
-            />
-          </JourneySection>
-        ) : null}
-
-        {knowledge.relatedLessons.length > 0 ? (
-          <JourneySection label="Manual">
-            {knowledge.relatedLessons.map((lesson) => (
-              <Link
-                key={lesson.slug}
-                href={`/manual/lecons/${lesson.slug}`}
-                className="focus-kb group flex flex-col rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-5 transition hover:border-[var(--ink-muted)]"
-              >
-                <p className="text-sm text-[var(--ink-muted)]">Lesson</p>
-                <p className="mt-1 font-reader text-lg text-[var(--ink)] group-hover:text-[var(--color-link)]">
-                  {lesson.title}
-                </p>
-                <span className="mt-3 text-sm font-medium text-[var(--ink-muted)] group-hover:text-[var(--color-link)]">
-                  Open lesson →
-                </span>
-              </Link>
-            ))}
-          </JourneySection>
-        ) : null}
-
-        {knowledge.textsWithStats.length > 0 ? (
-          <JourneySection label="Reader">
-            <p className="text-sm text-[var(--ink-secondary)]">
-              Found in {knowledge.textsWithStats.length} text
-              {knowledge.textsWithStats.length > 1 ? "s" : ""}
-            </p>
-            <div className="grid gap-3 lg:grid-cols-2">
-              {knowledge.textsWithStats.map((text) => (
-                <Link
-                  key={text.textId}
-                  href={textPath(text.textId)}
-                  className="focus-kb group flex h-full flex-col rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-4 transition hover:border-[var(--ink-muted)]"
-                >
-                  <p className="text-sm font-medium text-[var(--ink)]">{text.textTitle}</p>
-                  <p className="mt-2 flex-1 font-reader text-sm leading-relaxed text-[var(--ink-secondary)]">
-                    {text.sentenceRussian}
-                  </p>
-                  <span className="mt-4 text-sm font-medium text-[var(--ink-muted)] group-hover:text-[var(--color-link)]">
-                    Read examples →
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </JourneySection>
-        ) : null}
-
-        <JourneySection label="Practice">
-          <Link
-            href={practicePath({
+        <ExplorerTutorAction
+          primary={{
+            label: "Pratiquer ce mot",
+            href: practicePath({
               structure: knowledge.lemma,
               mode: "structure",
               from: "explorer",
-            })}
-            className="focus-kb group flex flex-col rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-5 transition hover:border-[var(--ink-muted)]"
-          >
-            <p className="font-reader text-lg text-[var(--ink)] group-hover:text-[var(--color-link)]">
-              Write your own sentence
-            </p>
-            <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-              Use <span className="font-reader">{knowledge.lemma}</span> in context and get feedback.
-            </p>
-            <span className="mt-4 text-sm font-medium text-[var(--ink-muted)] group-hover:text-[var(--color-link)]">
-              Practice this →
-            </span>
-          </Link>
-        </JourneySection>
+            }),
+            description: `Utilisez ${knowledge.lemma} dans une phrase que vous pourriez dire.`,
+          }}
+          secondary={secondaryActions}
+        />
 
-        {(eligibleConcepts.length > 0 || relatedConceptPhrases.length > 0) ? (
-          <JourneySection label="Related concepts">
-            <ExplorerDiscoveryGrid
-              items={[
-                ...relatedConceptPhrases.map((phrase) => ({
+        <ExplorerTutorAdvanced>
+          <ExplorerTutorAdvancedSection label="Profil">
+            <ExplorerTutorMetaLine>
+              {posLabel} · {knowledge.occurrenceCount.toLocaleString("fr-FR")} occurrences ·{" "}
+              {knowledge.seenInTexts} texte{knowledge.seenInTexts > 1 ? "s" : ""}
+            </ExplorerTutorMetaLine>
+            {frequency ? (
+              <p className="text-sm text-amber-500" aria-label={frequency.label}>
+                <span className="tracking-wider">{renderFrequencyStars(frequency.filledStars)}</span>
+                <span className="ml-2 text-[var(--ink-muted)]">{frequency.label}</span>
+              </p>
+            ) : null}
+          </ExplorerTutorAdvancedSection>
+
+          {knowledge.examples.length > 1 ? (
+            <ExplorerTutorAdvancedSection label="Autres exemples">
+              <ul className="grid gap-3 lg:grid-cols-2">
+                {knowledge.examples.slice(1).map((example) => (
+                  <li
+                    key={example.id}
+                    className="rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-4"
+                  >
+                    <p className="break-russian font-reader text-sm leading-relaxed text-[var(--ink)]">
+                      {example.sentenceRussian}
+                    </p>
+                    {example.naturalTranslation ? (
+                      <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                        {example.naturalTranslation}
+                      </p>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </ExplorerTutorAdvancedSection>
+          ) : null}
+
+          {knowledge.familyLemmas.length > 0 ? (
+            <ExplorerTutorAdvancedSection label={familyTitle}>
+              <ExplorerDiscoveryGrid
+                items={knowledge.familyLemmas.map((item) => ({
+                  label: item.lemma,
+                  href: lemmaPath(item.lemma, item.partOfSpeech),
+                }))}
+              />
+            </ExplorerTutorAdvancedSection>
+          ) : null}
+
+          {collocations.length > 0 ? (
+            <ExplorerTutorAdvancedSection label="Constructions fréquentes">
+              <ExplorerDiscoveryGrid
+                items={collocations.map((phrase) => ({
                   label: phrase.label,
-                  href: expressionPath(phrase.label),
-                  meta: `${phrase.occurrenceCount}×`,
-                })),
-                ...eligibleConcepts.map((concept) => ({
-                  label: concept.title,
-                  href: conceptPath(concept.conceptKey),
-                })),
-              ]}
-            />
-          </JourneySection>
-        ) : null}
+                  href: collocationPath(phrase.label),
+                  meta: `${phrase.occurrenceCount}× dans vos textes`,
+                }))}
+              />
+            </ExplorerTutorAdvancedSection>
+          ) : null}
 
-        {morphRows.length > 1 ? (
-          <JourneySection label="Grammar notes">
-            <dl className="grid gap-3 sm:grid-cols-2">
-              {morphRows.map((row) => (
-                <div
-                  key={row.label}
-                  className="rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] px-4 py-3"
-                >
-                  <dt className="text-xs text-[var(--ink-muted)]">{row.label}</dt>
-                  <dd className="mt-1 font-reader text-lg text-[var(--ink)]">
-                    {"href" in row && row.href ? (
-                      <Link href={row.href} className="focus-kb hover:text-[var(--color-link)]">
-                        {row.value}
-                      </Link>
-                    ) : (
-                      row.value
-                    )}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </JourneySection>
-        ) : null}
+          {(eligibleConcepts.length > 0 || relatedConceptPhrases.length > 0) ? (
+            <ExplorerTutorAdvancedSection label="Concepts liés">
+              <ExplorerDiscoveryGrid
+                items={[
+                  ...relatedConceptPhrases.map((phrase) => ({
+                    label: phrase.label,
+                    href: expressionPath(phrase.label),
+                    meta: `${phrase.occurrenceCount}×`,
+                  })),
+                  ...eligibleConcepts.map((concept) => ({
+                    label: concept.title,
+                    href: conceptPath(concept.conceptKey),
+                  })),
+                ]}
+              />
+            </ExplorerTutorAdvancedSection>
+          ) : null}
 
-        {knowledge.forms.length > 0 ? (
-          <JourneySection label="Forms encountered">
-            <div className="overflow-x-auto rounded-2xl border border-[var(--hairline)]">
-              <table className="w-full min-w-[520px] text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--hairline)] bg-[var(--surface)] text-left text-xs text-[var(--ink-muted)]">
-                    <th className="px-4 py-3">Forme</th>
-                    <th className="px-4 py-3">Cas / Temps</th>
-                    <th className="px-4 py-3 text-right">Occurrences</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {knowledge.forms.map((form) => {
-                    const morphLabel = formatFormMorphLabel(form, knowledge.partOfSpeech);
-                    return (
-                      <tr key={form.id} className="border-b border-[var(--hairline)] last:border-0">
-                        <td className="px-4 py-0">
-                          <Link
-                            href={formRowHref(form)}
-                            className="focus-kb flex items-center gap-2 py-3 font-reader font-medium transition hover:text-[var(--color-link)]"
-                          >
-                            {form.original}
-                            {isDisplayableEnding(form.ending) ? (
-                              <EndingBadge
-                                endingText={`-${form.ending}`}
-                                grammaticalCase={form.case}
-                              />
-                            ) : null}
-                          </Link>
-                        </td>
-                        <td className="px-4 py-3 text-[var(--ink-muted)]">{morphLabel ?? ""}</td>
-                        <td className="px-4 py-3 text-right text-[var(--ink-muted)]">
-                          {form.occurrenceCount.toLocaleString("fr-FR")}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </JourneySection>
-        ) : null}
+          {morphRows.length > 1 ? (
+            <ExplorerTutorAdvancedSection label="Notes grammaticales">
+              <dl className="grid gap-3 sm:grid-cols-2">
+                {morphRows.map((row) => (
+                  <div
+                    key={row.label}
+                    className="rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] px-4 py-3"
+                  >
+                    <dt className="text-xs text-[var(--ink-muted)]">{row.label}</dt>
+                    <dd className="mt-1 font-reader text-lg text-[var(--ink)]">
+                      {"href" in row && row.href ? (
+                        <Link href={row.href} className="focus-kb hover:text-[var(--color-link)]">
+                          {row.value}
+                        </Link>
+                      ) : (
+                        row.value
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </ExplorerTutorAdvancedSection>
+          ) : null}
 
-        <RelatedNavigation items={relatedItems} />
+          {knowledge.forms.length > 0 ? (
+            <ExplorerTutorAdvancedSection label="Formes rencontrées">
+              <div className="overflow-x-auto rounded-2xl border border-[var(--hairline)]">
+                <table className="w-full min-w-[520px] text-sm">
+                  <thead>
+                    <tr className="border-b border-[var(--hairline)] bg-[var(--surface)] text-left text-xs text-[var(--ink-muted)]">
+                      <th className="px-4 py-3">Forme</th>
+                      <th className="px-4 py-3">Cas / Temps</th>
+                      <th className="px-4 py-3 text-right">Occurrences</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {knowledge.forms.map((form) => {
+                      const morphLabel = formatFormMorphLabel(form, knowledge.partOfSpeech);
+                      return (
+                        <tr key={form.id} className="border-b border-[var(--hairline)] last:border-0">
+                          <td className="px-4 py-0">
+                            <Link
+                              href={formRowHref(form)}
+                              className="focus-kb flex items-center gap-2 py-3 font-reader font-medium transition hover:text-[var(--color-link)]"
+                            >
+                              {form.original}
+                              {isDisplayableEnding(form.ending) ? (
+                                <EndingBadge
+                                  endingText={`-${form.ending}`}
+                                  grammaticalCase={form.case}
+                                />
+                              ) : null}
+                            </Link>
+                          </td>
+                          <td className="px-4 py-3 text-[var(--ink-muted)]">{morphLabel ?? ""}</td>
+                          <td className="px-4 py-3 text-right text-[var(--ink-muted)]">
+                            {form.occurrenceCount.toLocaleString("fr-FR")}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </ExplorerTutorAdvancedSection>
+          ) : null}
+
+          {knowledge.textsWithStats.length > 0 ? (
+            <ExplorerTutorAdvancedSection label="Dans vos textes">
+              <div className="grid gap-3 lg:grid-cols-2">
+                {knowledge.textsWithStats.map((text) => (
+                  <Link
+                    key={text.textId}
+                    href={textPath(text.textId)}
+                    className="focus-kb rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-4 transition hover:border-[var(--ink-muted)]"
+                  >
+                    <p className="text-sm font-medium text-[var(--ink)]">{text.textTitle}</p>
+                    <p className="mt-2 font-reader text-sm leading-relaxed text-[var(--ink-secondary)]">
+                      {text.sentenceRussian}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </ExplorerTutorAdvancedSection>
+          ) : null}
+
+          <RelatedNavigation items={relatedItems} />
+        </ExplorerTutorAdvanced>
       </article>
     </ExplorerLayout>
   );

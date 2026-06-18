@@ -15,4 +15,12 @@ export { CaseDetailView } from "./case-detail-view";
 export { PhraseDetailView } from "./phrase-detail-view";
 export { RelatedNavigation } from "./related-navigation";
 export { EntityDetailView } from "./entity-detail-view";
+export {
+  ExplorerTutorAction,
+  ExplorerTutorAdvanced,
+  ExplorerTutorExample,
+  ExplorerTutorExplanation,
+  ExplorerTutorTitle,
+  ExplorerTutorWhy,
+} from "./explorer-tutor-sections";
 export * from "./explorer-routes";

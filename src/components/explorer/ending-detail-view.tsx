@@ -3,10 +3,21 @@ import Link from "next/link";
 import { EndingBadge } from "@/components/analysis/ending-badge";
 import { getCaseLegendEntry } from "@/features/grammar/case-legend-data";
 import type { CaseKey } from "@/features/grammar";
+import { tutorWhyFromEnding } from "@/lib/explorer/tutor-copy";
 import { pickCanonicalExplanation } from "@/services/knowledge-graph/graph-mappers";
 import type { EndingGraph } from "@/types/knowledge-graph";
 
 import { ExplorerLayout } from "./explorer-layout";
+import {
+  ExplorerTutorAction,
+  ExplorerTutorAdvanced,
+  ExplorerTutorAdvancedSection,
+  ExplorerTutorExample,
+  ExplorerTutorExplanation,
+  ExplorerTutorMetaLine,
+  ExplorerTutorTitle,
+  ExplorerTutorWhy,
+} from "./explorer-tutor-sections";
 import {
   caseChip,
   conceptChip,
@@ -23,11 +34,12 @@ export function EndingDetailView({ graph }: EndingDetailViewProps) {
   const { ending, forms, lemmas, concepts, occurrences } = graph;
   const legend = getCaseLegendEntry(ending.caseKey as CaseKey);
   const explanation = pickCanonicalExplanation(ending.canonicalExplanation, ending.explanationFr);
+  const endingLabel = `-${ending.ending}`;
 
   const exampleSentences = [
     ...new Set(
       occurrences
-        .map((o) => o.sentenceRussian)
+        .map((occurrence) => occurrence.sentenceRussian)
         .filter(Boolean)
         .slice(0, 8),
     ),
@@ -35,129 +47,126 @@ export function EndingDetailView({ graph }: EndingDetailViewProps) {
 
   const formLemmaMap = new Map<string, string>();
   for (const form of forms) {
-    const match = lemmas.find((l) => form.original.startsWith(l.lemma) || form.original.includes(l.lemma));
+    const match = lemmas.find(
+      (lemma) => form.original.startsWith(lemma.lemma) || form.original.includes(lemma.lemma),
+    );
     if (match) {
       formLemmaMap.set(form.id, match.lemma);
     }
   }
 
+  const primaryLemma = lemmas[0];
   const related = [
-    ...concepts.map((c) => conceptChip(c.conceptKey, c.title)),
+    ...concepts.map((concept) => conceptChip(concept.conceptKey, concept.title)),
     ...(legend ? [caseChip(ending.caseKey, legend.frenchName)] : []),
-    ...lemmas.slice(0, 6).map((l) => lemmaChip(l.lemma, l.partOfSpeech)),
+    ...lemmas.slice(0, 6).map((lemma) => lemmaChip(lemma.lemma, lemma.partOfSpeech)),
   ];
 
   return (
     <ExplorerLayout
       breadcrumb={[
         { label: "Terminaisons", href: "/explorer/endings" },
-        { label: `-${ending.ending}` },
+        { label: endingLabel },
       ]}
-      title=""
-      subtitle={legend ? `${legend.frenchName} · ${legend.question}` : ending.caseKey}
     >
-      <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="animate-fade-up">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-            Terminaison
-          </p>
-          <div className="mt-3">
-            <EndingBadge
-              endingText={`-${ending.ending}`}
-              grammaticalCase={ending.caseKey}
-              size="hero"
-            />
-          </div>
-        </div>
-        <p className="text-sm text-[var(--muted)]">
-          {ending.hitCount.toLocaleString("fr-FR")} occurrences dans le graphe
-        </p>
-      </div>
+      <article className="space-y-10 pb-12">
+        <header className="space-y-3">
+          <EndingBadge
+            endingText={endingLabel}
+            grammaticalCase={ending.caseKey}
+            size="hero"
+          />
+          <ExplorerTutorTitle
+            label={endingLabel}
+            translation={legend ? `${legend.frenchName} · ${legend.question}` : ending.caseKey}
+          />
+        </header>
 
-      <div className="grid min-w-0 gap-[var(--layout-gap)] lg:grid-cols-[minmax(0,1fr)_minmax(240px,320px)]">
-        <div className="min-w-0 space-y-8">
-          {explanation ? (
-            <section className="space-y-3">
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-                Explication
-              </h2>
-              <p className="text-sm leading-relaxed">{explanation}</p>
-            </section>
-          ) : null}
+        <ExplorerTutorWhy
+          text={tutorWhyFromEnding(endingLabel, legend?.question ?? null)}
+        />
 
-          {legend ? (
-            <section className="surface-elevated rounded-2xl border border-[var(--border)] p-5">
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-                Français ↔ Russe
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed">{legend.frenchContrast}</p>
-            </section>
-          ) : null}
+        {exampleSentences[0] ? (
+          <ExplorerTutorExample russian={exampleSentences[0]} />
+        ) : legend?.examples[0] ? (
+          <ExplorerTutorExample russian={legend.examples[0]} />
+        ) : null}
 
-          <section className="space-y-3">
-            <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-              Mots avec cette terminaison ({forms.length})
-            </h2>
+        <ExplorerTutorExplanation
+          text={[explanation, legend?.frenchContrast].filter(Boolean).join("\n\n")}
+        />
+
+        <ExplorerTutorAction
+          primary={{
+            label: primaryLemma ? `Explorer ${primaryLemma.lemma}` : "Voir le cas associé",
+            href: primaryLemma
+              ? lemmaPath(primaryLemma.lemma, primaryLemma.partOfSpeech)
+              : `/explorer/cases/${encodeURIComponent(ending.caseKey)}`,
+            description: "Passez du motif grammatical au mot concret dans vos textes.",
+          }}
+        />
+
+        <ExplorerTutorAdvanced>
+          <ExplorerTutorAdvancedSection label="Statistiques">
+            <ExplorerTutorMetaLine>
+              {ending.hitCount.toLocaleString("fr-FR")} occurrences · {forms.length} formes ·{" "}
+              {lemmas.length} lemmes
+            </ExplorerTutorMetaLine>
+          </ExplorerTutorAdvancedSection>
+
+          <ExplorerTutorAdvancedSection label="Mots avec cette terminaison">
             <div className="flex flex-wrap gap-2">
-              {forms.map((f) => {
-                const lemma = formLemmaMap.get(f.id);
-                const inner = (
-                  <span className="font-reader">{f.original}</span>
-                );
+              {forms.map((form) => {
+                const lemma = formLemmaMap.get(form.id);
+                const inner = <span className="font-reader">{form.original}</span>;
                 return lemma ? (
                   <Link
-                    key={f.id}
+                    key={form.id}
                     href={lemmaPath(lemma, "noun")}
-                    className="focus-kb card-hover rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 transition"
+                    className="focus-kb rounded-lg border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 transition hover:border-[var(--ink-muted)]"
                   >
                     {inner}
                   </Link>
                 ) : (
                   <span
-                    key={f.id}
-                    className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 font-reader"
+                    key={form.id}
+                    className="rounded-lg border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 font-reader"
                   >
-                    {f.original}
+                    {form.original}
                   </span>
                 );
               })}
             </div>
-          </section>
+          </ExplorerTutorAdvancedSection>
 
-          {exampleSentences.length > 0 ? (
-            <section className="space-y-3">
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-                Exemples
-              </h2>
+          {exampleSentences.length > 1 ? (
+            <ExplorerTutorAdvancedSection label="Autres exemples">
               <ul className="space-y-2">
-                {exampleSentences.map((s) => (
+                {exampleSentences.slice(1).map((sentence) => (
                   <li
-                    key={s}
-                    className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 font-reader text-sm"
+                    key={sentence}
+                    className="rounded-xl border border-[var(--hairline)] bg-[var(--surface)] px-4 py-3 font-reader text-sm"
                   >
-                    {s}
+                    {sentence}
                   </li>
                 ))}
               </ul>
-            </section>
+            </ExplorerTutorAdvancedSection>
           ) : null}
-        </div>
 
-        <aside className="min-w-0 space-y-6">
           <Link
             href={`/explorer/cases/${encodeURIComponent(ending.caseKey)}`}
-            className="focus-kb card-hover block rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-5 transition"
+            className="focus-kb block rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-5 transition hover:border-[var(--ink-muted)]"
           >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-              Cas associé
+            <p className="text-sm text-[var(--ink-muted)]">Cas associé</p>
+            <p className="mt-1 font-medium text-[var(--ink)]">
+              {legend?.frenchName ?? ending.caseKey}
             </p>
-            <p className="mt-2 font-medium">{legend?.frenchName ?? ending.caseKey}</p>
-            {legend ? <p className="mt-1 text-xs text-[var(--muted)]">{legend.question}</p> : null}
           </Link>
 
           <RelatedNavigation items={related} />
-        </aside>
-      </div>
+        </ExplorerTutorAdvanced>
+      </article>
     </ExplorerLayout>
   );
 }

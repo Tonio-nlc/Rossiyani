@@ -2,8 +2,19 @@ import Link from "next/link";
 
 import { CASE_LEGEND_ENTRIES } from "@/features/grammar/case-legend-data";
 import type { CaseGraph } from "@/types/knowledge-graph";
+import { tutorWhyFromCase } from "@/lib/explorer/tutor-copy";
 
 import { ExplorerLayout } from "./explorer-layout";
+import {
+  ExplorerTutorAction,
+  ExplorerTutorAdvanced,
+  ExplorerTutorAdvancedSection,
+  ExplorerTutorExample,
+  ExplorerTutorExplanation,
+  ExplorerTutorMetaLine,
+  ExplorerTutorTitle,
+  ExplorerTutorWhy,
+} from "./explorer-tutor-sections";
 import {
   conceptChip,
   endingChip,
@@ -17,110 +28,107 @@ type CaseDetailViewProps = {
 };
 
 export function CaseDetailView({ graph }: CaseDetailViewProps) {
-  const legend = CASE_LEGEND_ENTRIES.find((e) => e.key === graph.caseNode.caseKey);
+  const legend = CASE_LEGEND_ENTRIES.find((entry) => entry.key === graph.caseNode.caseKey);
+  const primaryLemma = graph.lemmas[0];
+  const exampleRussian = legend?.examples[0] ?? null;
+  const explanation =
+    graph.caseNode.canonicalExplanation ?? legend?.frenchContrast ?? "";
 
   const related = [
     ...(graph.caseNode.concept
       ? [conceptChip(graph.caseNode.concept.conceptKey, graph.caseNode.concept.title)]
       : []),
-    ...graph.endings.slice(0, 8).map((e) => endingChip(e.ending, e.caseKey)),
-    ...graph.lemmas.slice(0, 6).map((l) => lemmaChip(l.lemma, l.partOfSpeech)),
+    ...graph.endings.slice(0, 8).map((ending) => endingChip(ending.ending, ending.caseKey)),
+    ...graph.lemmas.slice(0, 6).map((lemma) => lemmaChip(lemma.lemma, lemma.partOfSpeech)),
   ];
 
   return (
     <ExplorerLayout
       breadcrumb={[{ label: "Cas", href: "/explorer/cases" }, { label: graph.caseNode.titleFr }]}
-      title={graph.caseNode.titleFr}
-      subtitle={legend?.question ?? graph.caseNode.caseKey}
     >
-      <div className="grid min-w-0 gap-[var(--layout-gap)] lg:grid-cols-[minmax(0,1fr)_minmax(240px,320px)]">
-        <div className="min-w-0 space-y-8">
-          {(graph.caseNode.canonicalExplanation || legend?.frenchContrast) && (
-            <section className="space-y-3">
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-                Explication
-              </h2>
-              <p className="text-sm leading-relaxed">
-                {graph.caseNode.canonicalExplanation ?? legend?.frenchContrast}
-              </p>
-            </section>
-          )}
+      <article className="space-y-10 pb-12">
+        <ExplorerTutorTitle
+          label={graph.caseNode.titleFr}
+          translation={legend?.question ?? graph.caseNode.caseKey}
+        />
 
-          {legend ? (
-            <section className="surface-elevated rounded-2xl border border-[var(--border)] p-5">
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-                Français ↔ Russe
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed">{legend.frenchContrast}</p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {legend.examples.map((ex) => (
+        <ExplorerTutorWhy
+          text={tutorWhyFromCase(graph.caseNode.titleFr, legend?.frenchContrast ?? null)}
+        />
+
+        {exampleRussian ? (
+          <ExplorerTutorExample russian={exampleRussian} />
+        ) : null}
+
+        <ExplorerTutorExplanation text={explanation} />
+
+        <ExplorerTutorAction
+          primary={{
+            label: primaryLemma ? `Explorer ${primaryLemma.lemma}` : "Explorer un lemme",
+            href: primaryLemma
+              ? lemmaPath(primaryLemma.lemma, primaryLemma.partOfSpeech)
+              : `/explorer/cases/${encodeURIComponent(graph.caseNode.caseKey)}`,
+            description: primaryLemma
+              ? `Voir comment le ${graph.caseNode.titleFr.toLowerCase()} apparaît sur un mot concret.`
+              : "Parcourez les lemmes associés à ce cas.",
+          }}
+        />
+
+        <ExplorerTutorAdvanced>
+          <ExplorerTutorAdvancedSection label="Statistiques">
+            <ExplorerTutorMetaLine>
+              {graph.stats.endingCount} terminaisons · {graph.stats.formCount} formes ·{" "}
+              {graph.stats.occurrenceCount.toLocaleString("fr-FR")} occurrences
+            </ExplorerTutorMetaLine>
+          </ExplorerTutorAdvancedSection>
+
+          {legend && legend.examples.length > 1 ? (
+            <ExplorerTutorAdvancedSection label="Autres exemples">
+              <div className="flex flex-wrap gap-2">
+                {legend.examples.slice(1).map((example) => (
                   <span
-                    key={ex}
-                    className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1 font-reader text-sm"
+                    key={example}
+                    className="rounded-lg border border-[var(--hairline)] bg-[var(--surface)] px-3 py-1.5 font-reader text-sm"
                   >
-                    {ex}
+                    {example}
                   </span>
                 ))}
               </div>
-            </section>
+            </ExplorerTutorAdvancedSection>
           ) : null}
 
-          <section className="space-y-3">
-            <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-              Terminaisons typiques ({graph.endings.length})
-            </h2>
+          <ExplorerTutorAdvancedSection label="Terminaisons typiques">
             <div className="flex flex-wrap gap-2">
-              {graph.endings.map((e) => (
+              {graph.endings.map((ending) => (
                 <Link
-                  key={e.id}
-                  href={endingPath(e.ending, e.caseKey)}
-                  className="focus-kb card-hover rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 font-reader transition"
+                  key={ending.id}
+                  href={endingPath(ending.ending, ending.caseKey)}
+                  className="focus-kb rounded-lg border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 font-reader transition hover:border-[var(--ink-muted)]"
                 >
-                  -{e.ending}
-                  <span className="ml-2 text-xs text-[var(--muted)]">{e.hitCount}×</span>
+                  -{ending.ending}
+                  <span className="ml-2 text-xs text-[var(--ink-muted)]">{ending.hitCount}×</span>
                 </Link>
               ))}
             </div>
-          </section>
+          </ExplorerTutorAdvancedSection>
 
-          <section className="space-y-3">
-            <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-              Lemmes ({graph.lemmas.length})
-            </h2>
+          <ExplorerTutorAdvancedSection label="Lemmes">
             <div className="flex flex-wrap gap-2">
-              {graph.lemmas.slice(0, 24).map((l) => (
+              {graph.lemmas.slice(0, 24).map((lemma) => (
                 <Link
-                  key={l.id}
-                  href={lemmaPath(l.lemma, l.partOfSpeech)}
-                  className="focus-kb card-hover rounded-lg border border-[var(--border)] px-3 py-1.5 font-reader text-sm transition"
+                  key={lemma.id}
+                  href={lemmaPath(lemma.lemma, lemma.partOfSpeech)}
+                  className="focus-kb rounded-lg border border-[var(--hairline)] px-3 py-1.5 font-reader text-sm transition hover:border-[var(--ink-muted)]"
                 >
-                  {l.lemma}
+                  {lemma.lemma}
                 </Link>
               ))}
             </div>
-          </section>
-        </div>
+          </ExplorerTutorAdvancedSection>
 
-        <aside className="min-w-0 space-y-6">
-          <div className="surface-elevated rounded-2xl border border-[var(--border)] p-5">
-            <dl className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-[var(--muted)]">Terminaisons</dt>
-                <dd>{graph.stats.endingCount}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-[var(--muted)]">Formes</dt>
-                <dd>{graph.stats.formCount}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-[var(--muted)]">Occurrences</dt>
-                <dd>{graph.stats.occurrenceCount}</dd>
-              </div>
-            </dl>
-          </div>
           <RelatedNavigation items={related} />
-        </aside>
-      </div>
+        </ExplorerTutorAdvanced>
+      </article>
     </ExplorerLayout>
   );
 }
