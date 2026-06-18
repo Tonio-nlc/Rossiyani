@@ -40,7 +40,8 @@ export type Text = {
   id: string;
   title: string;
   level: CefrLevel;
-  source?: string;
+  collectionId: string;
+  categoryIds: string[];
   createdAt: Date;
 };
 

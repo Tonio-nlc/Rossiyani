@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-import { type TextListItem } from "./list-texts";
+import { mapTextListItem, type TextListItem } from "./list-texts";
 import { validateTextTitle } from "./text-title-validation";
 
 export class TextNotFoundError extends Error {
@@ -51,12 +51,5 @@ export async function renameText(textId: string, rawTitle: string): Promise<Text
     return text;
   });
 
-  return {
-    id: updated.id,
-    title: updated.title,
-    level: updated.level,
-    source: updated.source,
-    createdAt: updated.createdAt,
-    sentenceCount: updated._count.sentences,
-  };
+  return mapTextListItem(updated);
 }

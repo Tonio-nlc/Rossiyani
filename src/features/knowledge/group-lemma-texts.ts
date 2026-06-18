@@ -48,3 +48,13 @@ export function mapLemmaExamples(occurrences: GraphOccurrenceSummary[]): LemmaEx
       textTitle: occurrence.textTitle,
     }));
 }
+
+export function attachCollectionIds<T extends { textId: string | null }>(
+  refs: T[],
+  metaByTextId: Map<string, { collectionId: string }>,
+): Array<T & { collectionId?: string }> {
+  return refs.map((ref) => ({
+    ...ref,
+    collectionId: ref.textId ? metaByTextId.get(ref.textId)?.collectionId : undefined,
+  }));
+}

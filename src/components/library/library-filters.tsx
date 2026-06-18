@@ -1,14 +1,19 @@
 import type { ReactNode } from "react";
+
+import { getAllCategories } from "@/content/categories";
+import { getAllCollections } from "@/content/collections";
 import type { CefrLevel } from "@/types";
 
-import type { LibraryTagFilter } from "./library-utils";
-import { LIBRARY_LEVELS, LIBRARY_TAGS } from "./library-utils";
+import type { LibraryCategoryFilter, LibraryCollectionFilter } from "./library-utils";
+import { LIBRARY_LEVELS } from "./library-utils";
 
 type LibraryFiltersProps = {
   level: CefrLevel | "all";
-  tag: LibraryTagFilter;
+  collection: LibraryCollectionFilter;
+  category: LibraryCategoryFilter;
   onLevelChange: (level: CefrLevel | "all") => void;
-  onTagChange: (tag: LibraryTagFilter) => void;
+  onCollectionChange: (collection: LibraryCollectionFilter) => void;
+  onCategoryChange: (category: LibraryCategoryFilter) => void;
 };
 
 function FilterChip({
@@ -39,15 +44,20 @@ function FilterChip({
 
 export function LibraryFilters({
   level,
-  tag,
+  collection,
+  category,
   onLevelChange,
-  onTagChange,
+  onCollectionChange,
+  onCategoryChange,
 }: LibraryFiltersProps) {
-  const hasActiveFilter = level !== "all" || tag !== "all";
+  const hasActiveFilter = level !== "all" || collection !== "all" || category !== "all";
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
+          Niveau
+        </span>
         <FilterChip active={level === "all"} onClick={() => onLevelChange("all")}>
           Tous
         </FilterChip>
@@ -57,12 +67,34 @@ export function LibraryFilters({
           </FilterChip>
         ))}
       </div>
+
       <div className="flex flex-wrap items-center gap-2">
-        <FilterChip active={tag === "all"} onClick={() => onTagChange("all")}>
-          Toutes catégories
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
+          Collections
+        </span>
+        <FilterChip active={collection === "all"} onClick={() => onCollectionChange("all")}>
+          Toutes
         </FilterChip>
-        {LIBRARY_TAGS.map(({ id, label }) => (
-          <FilterChip key={id} active={tag === id} onClick={() => onTagChange(id)}>
+        {getAllCollections().map(({ id, name }) => (
+          <FilterChip
+            key={id}
+            active={collection === id}
+            onClick={() => onCollectionChange(id)}
+          >
+            {name}
+          </FilterChip>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
+          Catégories
+        </span>
+        <FilterChip active={category === "all"} onClick={() => onCategoryChange("all")}>
+          Toutes
+        </FilterChip>
+        {getAllCategories().map(({ id, label }) => (
+          <FilterChip key={id} active={category === id} onClick={() => onCategoryChange(id)}>
             {label}
           </FilterChip>
         ))}
@@ -71,7 +103,8 @@ export function LibraryFilters({
             type="button"
             onClick={() => {
               onLevelChange("all");
-              onTagChange("all");
+              onCollectionChange("all");
+              onCategoryChange("all");
             }}
             className="focus-kb text-xs text-[var(--accent-violet-bright)] hover:underline"
           >

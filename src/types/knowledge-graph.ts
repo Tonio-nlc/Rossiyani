@@ -194,6 +194,7 @@ export type RelatedTextRef = {
   textId: string;
   textTitle: string;
   sentenceRussian: string;
+  collectionId?: string;
 };
 
 export type LemmaTextRef = {
@@ -201,6 +202,7 @@ export type LemmaTextRef = {
   textTitle: string;
   sentenceRussian: string;
   occurrenceCount: number;
+  collectionId?: string;
 };
 
 export type LemmaExampleRef = {
@@ -209,6 +211,7 @@ export type LemmaExampleRef = {
   naturalTranslation: string | null;
   textId: string | null;
   textTitle: string | null;
+  collectionId?: string;
 };
 
 export type LemmaPhraseRef = {

@@ -8,3 +8,4 @@ export { MetadataLine } from "./metadata-line";
 export { PageCanvas } from "./page-canvas";
 export { Reference } from "./reference";
 export { Section } from "./section";
+export { TextEditorialContext } from "./text-editorial-context";

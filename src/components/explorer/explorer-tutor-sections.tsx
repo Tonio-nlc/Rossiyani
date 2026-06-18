@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
 
+import { TextEditorialContext } from "@/components/editorial";
 import { splitEditorialParagraphs } from "@/features/explorer/entity/types";
 
 type ExplorerTutorTitleProps = {
@@ -50,7 +51,10 @@ type ExplorerTutorExampleProps = {
   russian: string;
   translation?: string | null;
   sourceHref?: string | null;
+  /** @deprecated Use sourceTitle + sourceCollectionId */
   sourceLabel?: string | null;
+  sourceTitle?: string | null;
+  sourceCollectionId?: string | null;
   explanation?: string | null;
 };
 
@@ -59,8 +63,12 @@ export function ExplorerTutorExample({
   translation,
   sourceHref,
   sourceLabel,
+  sourceTitle,
+  sourceCollectionId,
   explanation,
 }: ExplorerTutorExampleProps) {
+  const resolvedTitle = sourceTitle ?? sourceLabel;
+  const showEditorialSource = Boolean(resolvedTitle && sourceCollectionId);
   return (
     <section className="space-y-4">
       <p className="home-section-label">Exemple réel</p>
@@ -74,12 +82,22 @@ export function ExplorerTutorExample({
         {explanation ? (
           <p className="mt-2 text-sm leading-relaxed text-[var(--ink-muted)]">{explanation}</p>
         ) : null}
-        {sourceHref && sourceLabel ? (
+        {showEditorialSource ? (
+          <div className="mt-4">
+            <TextEditorialContext
+              eyebrow="Exemple issu de :"
+              title={resolvedTitle!}
+              collectionId={sourceCollectionId!}
+              href={sourceHref}
+              size="sm"
+            />
+          </div>
+        ) : sourceHref && resolvedTitle ? (
           <Link
             href={sourceHref}
             className="focus-kb mt-4 inline-block text-sm font-medium text-[var(--ink-muted)] transition hover:text-[var(--color-link)]"
           >
-            {sourceLabel} →
+            {resolvedTitle} →
           </Link>
         ) : null}
       </blockquote>

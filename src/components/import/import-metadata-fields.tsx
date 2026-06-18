@@ -1,15 +1,22 @@
 "use client";
 
+import { getAllCategories } from "@/content/categories";
+import { getAllCollections, type CollectionId } from "@/content/collections";
+import type { CategoryId } from "@/content/categories";
 import type { CefrLevel } from "@/types/domain";
 
 const LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "Native"];
+const COLLECTIONS = getAllCollections();
+const CATEGORIES = getAllCategories();
 
 type ImportMetadataFieldsProps = {
   title: string;
-  source: string;
+  collectionId: CollectionId;
+  categoryId: CategoryId | "";
   level: CefrLevel;
   onTitleChange: (value: string) => void;
-  onSourceChange: (value: string) => void;
+  onCollectionChange: (collectionId: CollectionId) => void;
+  onCategoryChange: (categoryId: CategoryId | "") => void;
   onLevelChange: (level: CefrLevel) => void;
   disabled?: boolean;
   titleError?: string | null;
@@ -17,12 +24,17 @@ type ImportMetadataFieldsProps = {
   compact?: boolean;
 };
 
+const fieldClass =
+  "focus-kb mt-1.5 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 text-sm text-[var(--foreground)] focus:border-[var(--accent-violet)]/40";
+
 export function ImportMetadataFields({
   title,
-  source,
+  collectionId,
+  categoryId,
   level,
   onTitleChange,
-  onSourceChange,
+  onCollectionChange,
+  onCategoryChange,
   onLevelChange,
   disabled,
   titleError,
@@ -33,10 +45,10 @@ export function ImportMetadataFields({
     <div
       className={[
         "grid gap-4",
-        compact ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 lg:grid-cols-3",
+        compact ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 lg:grid-cols-2",
       ].join(" ")}
     >
-      <div className={compact ? "sm:col-span-2" : "lg:col-span-1"}>
+      <div className={compact ? "sm:col-span-2" : "lg:col-span-2"}>
         <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
           Nom du texte <span className="text-red-300">*</span>
         </label>
@@ -45,7 +57,7 @@ export function ImportMetadataFields({
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
           disabled={disabled}
-          placeholder="Ex. : L'hiver en Russie"
+          placeholder="Ex. : В метро"
           className={[
             "focus-kb mt-1.5 w-full rounded-xl border bg-[var(--surface)] px-3 py-2.5 font-reader text-base text-[var(--foreground)] placeholder:text-[var(--muted)]/60",
             titleError
@@ -62,19 +74,42 @@ export function ImportMetadataFields({
 
       <div>
         <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
-          Source
+          Collection
         </label>
-        <input
-          type="text"
-          value={source}
-          onChange={(e) => onSourceChange(e.target.value)}
+        <select
+          value={collectionId}
+          onChange={(e) => onCollectionChange(e.target.value as CollectionId)}
           disabled={disabled}
-          placeholder="Ex. : Wikipedia, Livre, Article…"
-          className="focus-kb mt-1.5 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)]/60 focus:border-[var(--accent-violet)]/40"
-        />
+          className={fieldClass}
+        >
+          {COLLECTIONS.map((collection) => (
+            <option key={collection.id} value={collection.id}>
+              {collection.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>
+        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
+          Catégorie
+        </label>
+        <select
+          value={categoryId}
+          onChange={(e) => onCategoryChange(e.target.value as CategoryId | "")}
+          disabled={disabled}
+          className={fieldClass}
+        >
+          <option value="">Aucune</option>
+          {CATEGORIES.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className={compact ? "sm:col-span-2" : "lg:col-span-2"}>
         <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
           Niveau CEFR
         </label>
@@ -82,7 +117,7 @@ export function ImportMetadataFields({
           value={level}
           onChange={(e) => onLevelChange(e.target.value as CefrLevel)}
           disabled={disabled}
-          className="focus-kb mt-1.5 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 text-sm text-[var(--foreground)]"
+          className={fieldClass}
         >
           {LEVELS.map((l) => (
             <option key={l} value={l}>

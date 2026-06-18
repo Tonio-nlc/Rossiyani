@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import type { CategoryId } from "@/content/categories";
+import type { CollectionId } from "@/content/collections";
 import {
   analyzePastedText,
   hasImportText,
@@ -15,12 +17,14 @@ import { ImportMetadataFields } from "./import-metadata-fields";
 type ImportPastePanelProps = {
   text: string;
   title: string;
-  source: string;
+  collectionId: CollectionId;
+  categoryId: CategoryId | "";
   level: CefrLevel;
   disabled?: boolean;
   onTextChange: (text: string) => void;
   onTitleChange: (title: string) => void;
-  onSourceChange: (source: string) => void;
+  onCollectionChange: (collectionId: CollectionId) => void;
+  onCategoryChange: (categoryId: CategoryId | "") => void;
   onLevelChange: (level: CefrLevel) => void;
   onAnalyze: () => void;
 };
@@ -28,12 +32,14 @@ type ImportPastePanelProps = {
 export function ImportPastePanel({
   text,
   title,
-  source,
+  collectionId,
+  categoryId,
   level,
   disabled,
   onTextChange,
   onTitleChange,
-  onSourceChange,
+  onCollectionChange,
+  onCategoryChange,
   onLevelChange,
   onAnalyze,
 }: ImportPastePanelProps) {
@@ -79,14 +85,16 @@ export function ImportPastePanel({
 
       <ImportMetadataFields
         title={title}
-        source={source}
+        collectionId={collectionId}
+        categoryId={categoryId}
         level={level}
         onTitleChange={(value) => {
           setTitleTouched(true);
           setTitleError(null);
           onTitleChange(value);
         }}
-        onSourceChange={onSourceChange}
+        onCollectionChange={onCollectionChange}
+        onCategoryChange={onCategoryChange}
         onLevelChange={onLevelChange}
         disabled={disabled}
         titleError={titleError}

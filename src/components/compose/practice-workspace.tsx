@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { Reference, Section } from "@/components/editorial";
+import { Reference, Section, TextEditorialContext } from "@/components/editorial";
 import { useToast } from "@/components/ui/toast-provider";
 import type { StructureContext } from "@/features/practice/get-structure-context";
 import { isPhraseSaved, rewriteTypeFromPresetId, savePhrase } from "@/features/library";
@@ -291,6 +291,8 @@ export function PracticeWorkspace() {
               ? `/texts/${searchParams.get("textId")}`
               : null,
             readerTitle: searchParams.get("textTitle"),
+            readerCollectionId: null,
+            readerCollectionName: null,
             explorerHref: `/explorer?q=${encodeURIComponent(searchParams.get("structure") ?? "")}`,
           }}
           referenceSentence={referenceSentence}
@@ -448,10 +450,20 @@ function StructureHeader({ context, referenceSentence }: StructureHeaderProps) {
         </div>
       ) : null}
 
+      {context.readerHref && context.readerTitle && context.readerCollectionId ? (
+        <TextEditorialContext
+          eyebrow="Basé sur :"
+          title={context.readerTitle}
+          collectionId={context.readerCollectionId}
+          href={context.readerHref}
+          size="sm"
+        />
+      ) : null}
+
       <div className="flex flex-wrap gap-4 text-sm">
         {context.readerHref ? (
           <Reference href={context.readerHref}>
-            {context.readerTitle ? `Open in Reader — ${context.readerTitle}` : "Open in Reader →"}
+            {context.readerTitle ? "Ouvrir dans le Reader →" : "Open in Reader →"}
           </Reference>
         ) : null}
         <Reference href={context.explorerHref}>Open in Explorer →</Reference>

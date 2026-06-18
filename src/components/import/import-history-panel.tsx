@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import type { ImportJobSummary } from "@/features/bulk-import";
+import { getCollectionName } from "@/content/collections";
 import type { ImportHistoryEntry } from "@/lib/import-client";
 
 type ImportHistoryPanelProps = {
@@ -150,6 +151,7 @@ function HistoryRow({
 }
 
 function formatLocalMeta(entry: ImportHistoryEntry): string {
+  const collectionLabel = entry.collectionId ? getCollectionName(entry.collectionId) : null;
   const date = new Date(entry.completedAt).toLocaleDateString("fr-FR", {
     day: "numeric",
     month: "short",
@@ -159,15 +161,15 @@ function formatLocalMeta(entry: ImportHistoryEntry): string {
   });
 
   if (entry.status === "skipped") {
-    return [entry.source, date, "Doublon ignoré"].filter(Boolean).join(" · ");
+    return [collectionLabel, date, "Doublon ignoré"].filter(Boolean).join(" · ");
   }
 
   if (entry.status === "failed") {
-    return [entry.source, date, entry.error ?? "Échec"].filter(Boolean).join(" · ");
+    return [collectionLabel, date, entry.error ?? "Échec"].filter(Boolean).join(" · ");
   }
 
   const parts = [
-    entry.source,
+    collectionLabel,
     date,
     `${entry.sentenceCount ?? 0} phrase${(entry.sentenceCount ?? 0) > 1 ? "s" : ""}`,
     `${entry.wordCount ?? 0} mot${(entry.wordCount ?? 0) > 1 ? "s" : ""}`,

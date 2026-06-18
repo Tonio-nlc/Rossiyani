@@ -3,6 +3,13 @@ import { segmentSentences } from "@/services/parser/segment-sentences";
 import type { ImportRussianTextResult } from "@/services/import/types";
 import type { ImportParsePhase, ImportSourceType } from "@/services/import/parsers";
 import { isPdfImportError, readImportSource } from "@/services/import/parsers";
+import type { CategoryId } from "@/content/categories";
+import { isCategoryId } from "@/content/categories";
+import {
+  DEFAULT_COLLECTION_ID,
+  inferCollectionFromImportHints,
+  type CollectionId,
+} from "@/content/collections";
 import type { CefrLevel } from "@/types/domain";
 import type { KnowledgeMetricsSnapshot } from "@/types/import-pipeline";
 
@@ -13,7 +20,8 @@ export type PendingImportFile = {
   id: string;
   fileName: string;
   title: string;
-  source: string;
+  collectionId: CollectionId;
+  categoryIds: CategoryId[];
   rawText: string;
   level: CefrLevel;
   estimatedSentences: number;
@@ -90,7 +98,7 @@ export type ImportHistoryEntry = {
   id: string;
   fileName: string;
   title: string;
-  source?: string;
+  collectionId?: CollectionId;
   status: "completed" | "failed" | "skipped";
   textId?: string;
   sentenceCount?: number;
@@ -182,14 +190,15 @@ export function titleFromPaste(rawText: string): string {
 export function createPendingFromPaste(
   rawText: string,
   level: CefrLevel,
-  metadata?: { title?: string; source?: string },
+  metadata?: { title?: string; collectionId?: CollectionId; categoryIds?: CategoryId[] },
 ): PendingImportFile {
   const trimmed = rawText.trim();
   return {
     id: crypto.randomUUID(),
     fileName: "texte-collé.txt",
     title: metadata?.title?.trim() || titleFromPaste(trimmed),
-    source: metadata?.source?.trim() ?? "",
+    collectionId: metadata?.collectionId ?? DEFAULT_COLLECTION_ID,
+    categoryIds: metadata?.categoryIds ?? [],
     rawText: trimmed,
     level,
     estimatedSentences: segmentSentences(trimmed).length,
@@ -246,7 +255,14 @@ export async function readImportFile(
     id: crypto.randomUUID(),
     fileName: file.name,
     title: document.title,
-    source: document.source,
+    collectionId: inferCollectionFromImportHints({
+      source: document.source,
+      category: document.metadata.category,
+      fileName: file.name,
+    }),
+    categoryIds: document.metadata.category && isCategoryId(document.metadata.category)
+      ? [document.metadata.category]
+      : [],
     rawText: document.rawText,
     level: document.metadata.detectedLevel ?? level,
     estimatedSentences: document.metadata.estimatedSentences,

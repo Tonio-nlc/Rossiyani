@@ -1,3 +1,4 @@
+import { getCollectionName } from "@/content/collections";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { countWords } from "@/lib/import-client";
 import type { ImportQueueItem } from "@/lib/import-client";
@@ -36,8 +37,10 @@ export function ImportQueueCard({ item }: ImportQueueCardProps) {
     >
       <div className="space-y-1">
         <h3 className="font-reader text-lg text-[var(--ink)]">{item.title}</h3>
-        {item.source ? (
-          <p className="truncate text-xs text-[var(--ink-muted)]">{item.source}</p>
+        {item.collectionId ? (
+          <p className="truncate text-xs text-[var(--ink-muted)]">
+            {getCollectionName(item.collectionId)}
+          </p>
         ) : null}
         <p className="text-xs text-[var(--ink-secondary)]">{STATUS_LABELS[item.status]}</p>
       </div>

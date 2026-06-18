@@ -108,10 +108,14 @@ function ContinueHero({
             {entry.label}
           </h1>
 
-          {entry.detail ? (
+          {entry.collectionName ? (
             <p className="home-magazine-hero-subtitle mt-3 text-[var(--ink-secondary)]">
-              {entry.detail}
+              {entry.collectionName}
             </p>
+          ) : null}
+
+          {entry.detail ? (
+            <p className="mt-2 text-sm text-[var(--ink-muted)]">{entry.detail}</p>
           ) : null}
 
           <p className="home-magazine-lede mt-5 max-w-md text-[var(--ink-muted)]">

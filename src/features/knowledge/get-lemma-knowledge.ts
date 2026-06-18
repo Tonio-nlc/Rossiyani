@@ -3,9 +3,10 @@ import type { PartOfSpeech } from "@prisma/client";
 import { knowledgeGraphService } from "@/services/knowledge-graph";
 import { pickCanonicalExplanation } from "@/services/knowledge-graph/graph-mappers";
 import type { LemmaKnowledge } from "@/types/knowledge-graph";
+import { lookupTextEditorialMeta } from "@/features/texts/lookup-text-editorial-meta";
 
 import { findLemmaRelatedLessons } from "./find-lemma-related-lessons";
-import { groupLemmaTexts, mapLemmaExamples } from "./group-lemma-texts";
+import { attachCollectionIds, groupLemmaTexts, mapLemmaExamples } from "./group-lemma-texts";
 import { mapOccurrencesToRelatedTexts } from "./related-texts";
 import {
   formatDominantAspectFr,
@@ -57,6 +58,19 @@ export async function getLemmaKnowledge(
       }
     : null;
 
+  const textIds = [
+    ...new Set(
+      graph.occurrences.map((occurrence) => occurrence.textId).filter(Boolean) as string[],
+    ),
+  ];
+  const editorialMeta = await lookupTextEditorialMeta(textIds);
+  const examples = attachCollectionIds(mapLemmaExamples(graph.occurrences), editorialMeta);
+  const textsWithStats = attachCollectionIds(groupLemmaTexts(graph.occurrences), editorialMeta);
+  const relatedTexts = attachCollectionIds(
+    mapOccurrencesToRelatedTexts(graph.occurrences),
+    editorialMeta,
+  );
+
   return {
     lemma: graph.lemma.lemma,
     partOfSpeech: graph.lemma.partOfSpeech,
@@ -83,12 +97,12 @@ export async function getLemmaKnowledge(
       type: phrase.type,
       occurrenceCount: phrase.occurrenceCount,
     })),
-    examples: mapLemmaExamples(graph.occurrences),
+    examples,
     familyLemmas,
     exampleSentences: graph.exampleSentences,
     seenInTexts: graph.stats.distinctTexts,
-    relatedTexts: mapOccurrencesToRelatedTexts(graph.occurrences),
-    textsWithStats: groupLemmaTexts(graph.occurrences),
+    relatedTexts,
+    textsWithStats,
     relatedLessons: findLemmaRelatedLessons(graph.lemma.lemma, allConcepts),
   };
 }

@@ -1,4 +1,5 @@
 import type { ReaderTextData } from "@/features/texts";
+import { getCollectionById } from "@/content/collections";
 
 export type TextIntroduction = {
   summary: string;
@@ -77,12 +78,11 @@ export function buildTextIntroduction(
     addFocus("verb forms in context");
   }
 
+  const collection = getCollectionById(text.collectionId);
   const firstTranslation = text.sentences[0]?.naturalTranslation?.trim();
-  let summary = "";
+  let summary = collection.description;
 
-  if (text.source?.trim() && text.source.length > 12 && !text.source.startsWith("http")) {
-    summary = text.source.trim();
-  } else if (firstTranslation) {
+  if (!summary && firstTranslation) {
     summary = firstTranslation.endsWith(".") ? firstTranslation : `${firstTranslation}.`;
   } else if (text.title) {
     summary = `A ${text.level} Russian text — ${text.title}.`;

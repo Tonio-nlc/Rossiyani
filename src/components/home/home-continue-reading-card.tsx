@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { getCollectionName } from "@/content/collections";
 import { estimateReadingMinutes } from "@/components/library/library-utils";
 import type { TextListItem } from "@/features/texts";
-import { displayableTextSource, isDisplayableLibraryText } from "@/lib/home/displayable-text";
+import { isDisplayableLibraryText } from "@/lib/home/displayable-text";
 import { continueReadingRationale } from "@/lib/home/session-rationale";
 import {
   formatLastReadLabel,
@@ -73,7 +74,7 @@ export function HomeContinueReadingCard({ texts }: HomeContinueReadingCardProps)
     );
   }
 
-  const author = displayableTextSource(text.source);
+  const collectionName = getCollectionName(text.collectionId);
   const displayRationale =
     rationale ?? continueReadingRationale(text.title, null, null);
 
@@ -88,8 +89,8 @@ export function HomeContinueReadingCard({ texts }: HomeContinueReadingCardProps)
       <h2 className="font-reader text-[clamp(1.25rem,2.5vw,1.5rem)] leading-snug text-[var(--ink)]">
         {text.title}
       </h2>
-      {author ? (
-        <p className="mt-1 line-clamp-1 text-sm text-[var(--ink-secondary)]">{author}</p>
+      {collectionName ? (
+        <p className="mt-1 line-clamp-1 text-sm text-[var(--ink-secondary)]">{collectionName}</p>
       ) : null}
       {meta ? <p className="mt-2 text-metadata text-[var(--ink-muted)]">{meta}</p> : null}
     </HomeSessionCard>

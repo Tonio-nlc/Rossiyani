@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { getCollectionName } from "@/content/collections";
 import type { ReaderTextData } from "@/features/texts";
 import { setLastReadTextId } from "@/lib/last-read-text";
 import type { ReaderSearchEntry } from "@/lib/reader/build-reader-search-index";
@@ -407,6 +408,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     <div className="reader-fullscreen min-w-0">
       <ReaderHeader
         title={text.title}
+        collectionName={getCollectionName(text.collectionId)}
         level={text.level}
         estimatedMinutes={estimatedMinutes}
         sentenceCount={totalSentences}

@@ -10,7 +10,8 @@ const sampleText: ReaderTextData = {
   id: "t1",
   title: "Test",
   level: "B1",
-  source: null,
+  collectionId: "everyday-russian",
+  categoryIds: [],
   sentences: [
     {
       id: "s1",

@@ -1,4 +1,5 @@
 import { getPhraseKnowledge } from "@/features/knowledge/get-phrase-knowledge";
+import { getTextEditorialMeta } from "@/features/texts/lookup-text-editorial-meta";
 import { prisma } from "@/lib/prisma";
 import {
   collocationPath,
@@ -15,6 +16,8 @@ export type StructureContext = {
   exampleSentence: string | null;
   readerHref: string | null;
   readerTitle: string | null;
+  readerCollectionId: string | null;
+  readerCollectionName: string | null;
   explorerHref: string;
 };
 
@@ -27,6 +30,7 @@ export async function getStructureContext(label: string): Promise<StructureConte
   const phraseKnowledge = await getPhraseKnowledge(trimmed);
   if (phraseKnowledge) {
     const related = phraseKnowledge.relatedTexts[0];
+    const editorial = related?.textId ? await getTextEditorialMeta(related.textId) : null;
     return {
       label: phraseKnowledge.label,
       meaning: phraseKnowledge.concepts[0]?.title ?? null,
@@ -34,6 +38,8 @@ export async function getStructureContext(label: string): Promise<StructureConte
       exampleSentence: phraseKnowledge.exampleSentences[0] ?? null,
       readerHref: related ? textPath(related.textId) : null,
       readerTitle: related?.textTitle ?? null,
+      readerCollectionId: editorial?.collectionId ?? null,
+      readerCollectionName: editorial?.collectionName ?? null,
       explorerHref:
         phraseKnowledge.type === "COLLOCATION"
           ? collocationPath(phraseKnowledge.label)
@@ -62,6 +68,8 @@ export async function getStructureContext(label: string): Promise<StructureConte
       exampleSentence: null,
       readerHref: null,
       readerTitle: null,
+      readerCollectionId: null,
+      readerCollectionName: null,
       explorerHref: lemmaPath(lemma.lemma, lemma.partOfSpeech),
     };
   }
@@ -74,6 +82,8 @@ export async function getStructureContext(label: string): Promise<StructureConte
       exampleSentence: null,
       readerHref: null,
       readerTitle: null,
+      readerCollectionId: null,
+      readerCollectionName: null,
       explorerHref: conceptPath(concept.conceptKey),
     };
   }
@@ -85,6 +95,8 @@ export async function getStructureContext(label: string): Promise<StructureConte
     exampleSentence: null,
     readerHref: null,
     readerTitle: null,
+    readerCollectionId: null,
+    readerCollectionName: null,
     explorerHref: `/explorer?q=${encodeURIComponent(trimmed)}`,
   };
 }

@@ -1,40 +1,33 @@
+import type { CategoryId } from "@/content/categories";
+import {
+  getCategoryLabel,
+  inferCategoryIdsFromText,
+} from "@/content/categories";
+import type { CollectionId } from "@/content/collections";
+import { getAllCollections, getCollectionName } from "@/content/collections";
 import type { CefrLevel } from "@/types";
 import type { TextListItem } from "@/features/texts";
 
-export type LibraryTag =
-  | "articles"
-  | "dialogues"
-  | "contes"
-  | "telegram"
-  | "actualites";
-
-export type LibraryTagFilter = LibraryTag | "all";
+export type LibraryCategoryFilter = CategoryId | "all";
+export type LibraryCollectionFilter = CollectionId | "all";
 
 export const LIBRARY_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "Native"];
 
-export const LIBRARY_TAGS: Array<{ id: LibraryTag; label: string }> = [
-  { id: "articles", label: "Articles" },
-  { id: "dialogues", label: "Dialogues" },
-  { id: "contes", label: "Contes" },
-  { id: "telegram", label: "Telegram" },
-  { id: "actualites", label: "Actualités" },
-];
+export const LIBRARY_COLLECTIONS = getAllCollections();
 
-const TAG_MATCHERS: Record<LibraryTag, RegExp> = {
-  articles: /article|journal|presse|blog|medium/i,
-  dialogues: /dialogue|conversation|chat|échange/i,
-  contes: /conte|fable|nouvelle|story|рассказ/i,
-  telegram: /telegram|tg|канал/i,
-  actualites: /actualit|news|новост|presse/i,
-};
-
-export function detectTextTags(text: TextListItem): LibraryTag[] {
-  const haystack = `${text.title} ${text.source ?? ""}`;
-  return LIBRARY_TAGS.filter(({ id }) => TAG_MATCHERS[id].test(haystack)).map(({ id }) => id);
+export function getTextCategoryIds(text: TextListItem): CategoryId[] {
+  if (text.categoryIds.length > 0) {
+    return text.categoryIds;
+  }
+  return inferCategoryIdsFromText(text.title, text.collectionId);
 }
 
-export function textMatchesTag(text: TextListItem, tag: LibraryTag): boolean {
-  return detectTextTags(text).includes(tag);
+export function textMatchesCategory(text: TextListItem, categoryId: CategoryId): boolean {
+  return getTextCategoryIds(text).includes(categoryId);
+}
+
+export function textMatchesCollection(text: TextListItem, collectionId: CollectionId): boolean {
+  return text.collectionId === collectionId;
 }
 
 export function estimateReadingMinutes(sentenceCount: number): number {
@@ -56,22 +49,42 @@ export function filterLibraryTexts(
   texts: TextListItem[],
   query: string,
   level: CefrLevel | "all",
-  tag: LibraryTagFilter,
+  collection: LibraryCollectionFilter,
+  category: LibraryCategoryFilter,
 ): TextListItem[] {
   const q = query.trim().toLowerCase();
   return texts.filter((text) => {
     if (level !== "all" && text.level !== level) {
       return false;
     }
-    if (tag !== "all" && !textMatchesTag(text, tag)) {
+    if (collection !== "all" && !textMatchesCollection(text, collection)) {
+      return false;
+    }
+    if (category !== "all" && !textMatchesCategory(text, category)) {
       return false;
     }
     if (!q) {
       return true;
     }
     const inTitle = text.title.toLowerCase().includes(q);
-    const inSource = (text.source ?? "").toLowerCase().includes(q);
+    const inCollection = getCollectionName(text.collectionId).toLowerCase().includes(q);
+    const inCategories = getTextCategoryIds(text).some((id) =>
+      getCategoryLabel(id).toLowerCase().includes(q),
+    );
     const inLevel = text.level.toLowerCase().includes(q);
-    return inTitle || inSource || inLevel;
+    return inTitle || inCollection || inCategories || inLevel;
   });
 }
+
+/** @deprecated Use getTextCategoryIds */
+export function detectTextTags(text: TextListItem): CategoryId[] {
+  return getTextCategoryIds(text);
+}
+
+/** @deprecated Use textMatchesCategory */
+export function textMatchesTag(text: TextListItem, tag: CategoryId): boolean {
+  return textMatchesCategory(text, tag);
+}
+
+/** @deprecated Use getAllCategories from @/content/categories */
+export { getAllCategories as LIBRARY_TAGS_SOURCE } from "@/content/categories";

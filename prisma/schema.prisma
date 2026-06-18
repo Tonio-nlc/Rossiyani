@@ -113,13 +113,18 @@ enum SentenceAnalysisState {
 }
 
 model Text {
-  id          String     @id @default(cuid())
-  title       String
-  level       CefrLevel
-  source      String?
-  contentHash String?    @unique
-  createdAt   DateTime   @default(now())
-  sentences   Sentence[]
+  id            String     @id @default(cuid())
+  title         String
+  level         CefrLevel
+  collectionId  String     @default("everyday-russian")
+  categoryIds   String[]   @default([])
+  /// @deprecated Legacy free-text origin — use collectionId. Kept for data migration only.
+  source        String?
+  contentHash   String?    @unique
+  createdAt     DateTime   @default(now())
+  sentences     Sentence[]
+
+  @@index([collectionId])
 }
 
 model Sentence {

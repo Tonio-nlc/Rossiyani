@@ -5,6 +5,7 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 
 type ReaderHeaderProps = {
   title: string;
+  collectionName: string;
   level: string;
   estimatedMinutes: number;
   sentenceCount: number;
@@ -16,6 +17,7 @@ type ReaderHeaderProps = {
 
 export function ReaderHeader({
   title,
+  collectionName,
   level,
   estimatedMinutes,
   sentenceCount,
@@ -42,6 +44,7 @@ export function ReaderHeader({
           <h1 className="font-reader text-[clamp(1.75rem,4vw,2.25rem)] font-semibold leading-tight tracking-tight text-[var(--ink)]">
             {title}
           </h1>
+          <p className="text-sm text-[var(--ink-secondary)]">{collectionName}</p>
           <MetadataLine items={metaItems} />
         </div>
         <button

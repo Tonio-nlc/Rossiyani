@@ -15,7 +15,7 @@ import { LibraryFilters } from "./library-filters";
 import { LibraryGrid } from "./library-grid";
 import { LibraryHeader } from "./library-header";
 import { LibrarySearch } from "./library-search";
-import { filterLibraryTexts, type LibraryTagFilter } from "./library-utils";
+import { filterLibraryTexts, type LibraryCategoryFilter, type LibraryCollectionFilter } from "./library-utils";
 
 const REMOVE_ANIMATION_MS = 280;
 
@@ -31,15 +31,16 @@ export function LibraryView({ initialTexts, showPageHeader = true }: LibraryView
   const [texts, setTexts] = useState(initialTexts);
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState<CefrLevel | "all">("all");
-  const [tag, setTag] = useState<LibraryTagFilter>("all");
+  const [collection, setCollection] = useState<LibraryCollectionFilter>("all");
+  const [category, setCategory] = useState<LibraryCategoryFilter>("all");
   const [renameTarget, setRenameTarget] = useState<DialogTarget>(null);
   const [deleteTarget, setDeleteTarget] = useState<DialogTarget>(null);
   const [busyTextId, setBusyTextId] = useState<string | null>(null);
   const [removingTextId, setRemovingTextId] = useState<string | null>(null);
 
   const filtered = useMemo(
-    () => filterLibraryTexts(texts, search, level, tag),
-    [texts, search, level, tag],
+    () => filterLibraryTexts(texts, search, level, collection, category),
+    [texts, search, level, collection, category],
   );
 
   const totalSentences = texts.reduce((sum, text) => sum + text.sentenceCount, 0);
@@ -116,9 +117,11 @@ export function LibraryView({ initialTexts, showPageHeader = true }: LibraryView
       <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
       <LibraryFilters
         level={level}
-        tag={tag}
+        collection={collection}
+        category={category}
         onLevelChange={setLevel}
-        onTagChange={setTag}
+        onCollectionChange={setCollection}
+        onCategoryChange={setCategory}
       />
       <LibraryGrid
         texts={filtered}

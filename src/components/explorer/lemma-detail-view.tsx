@@ -144,13 +144,15 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
             russian={primaryExample.sentenceRussian}
             translation={primaryExample.naturalTranslation}
             sourceHref={primaryExample.textId ? textPath(primaryExample.textId) : null}
-            sourceLabel={primaryExample.textTitle ?? null}
+            sourceTitle={primaryExample.textTitle ?? null}
+            sourceCollectionId={primaryExample.collectionId ?? null}
           />
         ) : primaryText ? (
           <ExplorerTutorExample
             russian={primaryText.sentenceRussian}
             sourceHref={textPath(primaryText.textId)}
-            sourceLabel={primaryText.textTitle}
+            sourceTitle={primaryText.textTitle}
+            sourceCollectionId={primaryText.collectionId ?? null}
           />
         ) : null}
 

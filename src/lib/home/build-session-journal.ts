@@ -1,5 +1,6 @@
 import type { LearningSignals } from "@/features/discovery";
 import type { HomeJournalData } from "@/features/home";
+import { getCollectionName } from "@/content/collections";
 import type { TextListItem } from "@/features/texts";
 import type { SavedComposePhrase } from "@/lib/compose/types";
 import type { DiscoveryArchiveEntry, SavedDiscovery } from "@/lib/discovery/saved-discoveries";
@@ -18,6 +19,7 @@ import {
 export type SessionJournalEntry = {
   label: string;
   detail?: string;
+  collectionName?: string;
   href?: string;
 };
 
@@ -325,6 +327,7 @@ export function buildSessionJournal(input: BuildSessionJournalInput): SessionJou
     const lastRead = progress ? formatLastReadLabel(progress.lastReadAt) : null;
     continueReading = {
       label: continueText.title,
+      collectionName: getCollectionName(continueText.collectionId),
       href: `/texts/${continueText.id}`,
       detail:
         progress && progress.wordsSeenIds.length > 0

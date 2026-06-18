@@ -1,5 +1,7 @@
 "use client";
 
+import type { CategoryId } from "@/content/categories";
+import type { CollectionId } from "@/content/collections";
 import type { CefrLevel } from "@/types/domain";
 
 import { ImportFilePanel } from "./import-file-panel";
@@ -9,12 +11,14 @@ import { ImportPastePanel } from "./import-paste-panel";
 type ImportSourcesProps = {
   pastedText: string;
   pasteTitle: string;
-  pasteSource: string;
+  pasteCollectionId: CollectionId;
+  pasteCategoryId: CategoryId | "";
   defaultLevel: CefrLevel;
   disabled?: boolean;
   onPastedTextChange: (text: string) => void;
   onPasteTitleChange: (title: string) => void;
-  onPasteSourceChange: (source: string) => void;
+  onPasteCollectionChange: (collectionId: CollectionId) => void;
+  onPasteCategoryChange: (categoryId: CategoryId | "") => void;
   onLevelChange: (level: CefrLevel) => void;
   onPasteAnalyze: () => void;
   onFiles: (files: File[]) => void;
@@ -23,12 +27,14 @@ type ImportSourcesProps = {
 export function ImportSources({
   pastedText,
   pasteTitle,
-  pasteSource,
+  pasteCollectionId,
+  pasteCategoryId,
   defaultLevel,
   disabled,
   onPastedTextChange,
   onPasteTitleChange,
-  onPasteSourceChange,
+  onPasteCollectionChange,
+  onPasteCategoryChange,
   onLevelChange,
   onPasteAnalyze,
   onFiles,
@@ -42,12 +48,14 @@ export function ImportSources({
         <ImportPastePanel
           text={pastedText}
           title={pasteTitle}
-          source={pasteSource}
+          collectionId={pasteCollectionId}
+          categoryId={pasteCategoryId}
           level={defaultLevel}
           disabled={disabled}
           onTextChange={onPastedTextChange}
           onTitleChange={onPasteTitleChange}
-          onSourceChange={onPasteSourceChange}
+          onCollectionChange={onPasteCollectionChange}
+          onCategoryChange={onPasteCategoryChange}
           onLevelChange={onLevelChange}
           onAnalyze={onPasteAnalyze}
         />

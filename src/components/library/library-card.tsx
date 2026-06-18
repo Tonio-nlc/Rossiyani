@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { memo } from "react";
 
+import { getCategoryLabel } from "@/content/categories";
+import { getCollectionName } from "@/content/collections";
 import type { TextListItem } from "@/features/texts";
 
 import { LibraryCardActions } from "./library-card-actions";
 import { LibraryCardProgress } from "./library-card-progress";
 import {
-  detectTextTags,
   estimateReadingMinutes,
   estimateWordCount,
-  LIBRARY_TAGS,
+  getTextCategoryIds,
 } from "./library-utils";
 
 type LibraryCardProps = {
@@ -36,10 +37,11 @@ export const LibraryCard = memo(function LibraryCard({
   onRename,
   onDelete,
 }: LibraryCardProps) {
-  const tags = detectTextTags(text);
+  const tags = getTextCategoryIds(text);
   const minutes = estimateReadingMinutes(text.sentenceCount);
   const wordEstimate = estimateWordCount(text.sentenceCount);
   const levelStyle = LEVEL_COLORS[text.level] ?? LEVEL_COLORS.B1;
+  const collectionName = getCollectionName(text.collectionId);
 
   return (
     <article className="group relative h-full">
@@ -69,25 +71,18 @@ export const LibraryCard = memo(function LibraryCard({
           {text.title}
         </h2>
 
-        {text.source ? (
-          <p className="mt-1.5 text-sm text-[var(--muted)]">{text.source}</p>
-        ) : (
-          <p className="mt-1.5 text-sm italic text-[var(--muted)]/60">Source non renseignée</p>
-        )}
+        <p className="mt-1.5 text-sm text-[var(--muted)]">{collectionName}</p>
 
         {tags.length > 0 ? (
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {tags.map((tagId) => {
-              const label = LIBRARY_TAGS.find((t) => t.id === tagId)?.label ?? tagId;
-              return (
-                <span
-                  key={tagId}
-                  className="rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--muted)]"
-                >
-                  {label}
-                </span>
-              );
-            })}
+            {tags.map((tagId) => (
+              <span
+                key={tagId}
+                className="rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--muted)]"
+              >
+                {getCategoryLabel(tagId)}
+              </span>
+            ))}
           </div>
         ) : null}
 

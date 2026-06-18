@@ -34,6 +34,8 @@ import { ImportFilePreview } from "./import-file-preview";
 import { ImportHistoryPanel } from "./import-history-panel";
 import { ImportQueueCard } from "./import-queue-card";
 import { ImportReportCard } from "./import-report-card";
+import { DEFAULT_COLLECTION_ID, type CollectionId } from "@/content/collections";
+import type { CategoryId } from "@/content/categories";
 import { ImportSources } from "./import-sources";
 
 const ADMIN_SECRET_KEY = "rossiyani_admin_secret";
@@ -48,7 +50,8 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
   const [defaultLevel, setDefaultLevel] = useState<CefrLevel>("B1");
   const [pastedText, setPastedText] = useState("");
   const [pasteTitle, setPasteTitle] = useState("");
-  const [pasteSource, setPasteSource] = useState("");
+  const [pasteCollectionId, setPasteCollectionId] = useState<CollectionId>(DEFAULT_COLLECTION_ID);
+  const [pasteCategoryId, setPasteCategoryId] = useState<CategoryId | "">("");
   const [staged, setStaged] = useState<PendingImportFile[]>([]);
   const [staging, setStaging] = useState(false);
   const [extractionProgress, setExtractionProgress] = useState<{
@@ -202,7 +205,8 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
           body: JSON.stringify({
             title: item.title.trim(),
             level: item.level,
-            source: item.source.trim() || undefined,
+            collectionId: item.collectionId,
+            categoryIds: item.categoryIds,
             rawText: item.rawText,
           }),
         });
@@ -233,7 +237,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
             id: item.id,
             fileName: item.fileName,
             title: item.title,
-            source: item.source.trim() || undefined,
+            collectionId: item.collectionId,
             status: "failed",
             sentenceCount: item.estimatedSentences,
             wordCount: countWords(item.rawText),
@@ -258,7 +262,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
             id: item.id,
             fileName: item.fileName,
             title: item.title,
-            source: item.source.trim() || undefined,
+            collectionId: item.collectionId,
             status: "skipped",
             sentenceCount: data.sentenceCount,
             wordCount: countWords(item.rawText),
@@ -292,7 +296,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
           id: item.id,
           fileName: item.fileName,
           title: item.title,
-          source: item.source.trim() || undefined,
+          collectionId: item.collectionId,
           status: "completed",
           textId: data.textId,
           sentenceCount: data.sentenceCount,
@@ -410,13 +414,28 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
     });
   }, []);
 
-  const handleStagedSourceChange = useCallback((id: string, source: string) => {
-    setStaged((prev) => prev.map((file) => (file.id === id ? { ...file, source } : file)));
+  const handleStagedCollectionChange = useCallback((id: string, collectionId: CollectionId) => {
+    setStaged((prev) => prev.map((file) => (file.id === id ? { ...file, collectionId } : file)));
     setRetryFiles((prev) => {
       const next = new Map(prev);
       const file = next.get(id);
       if (file) {
-        next.set(id, { ...file, source });
+        next.set(id, { ...file, collectionId });
+      }
+      return next;
+    });
+  }, []);
+
+  const handleStagedCategoryChange = useCallback((id: string, categoryId: CategoryId | "") => {
+    const categoryIds = categoryId ? [categoryId] : [];
+    setStaged((prev) =>
+      prev.map((file) => (file.id === id ? { ...file, categoryIds } : file)),
+    );
+    setRetryFiles((prev) => {
+      const next = new Map(prev);
+      const file = next.get(id);
+      if (file) {
+        next.set(id, { ...file, categoryIds });
       }
       return next;
     });
@@ -482,7 +501,8 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
 
     const pending = createPendingFromPaste(pastedText, defaultLevel, {
       title: pasteTitle,
-      source: pasteSource,
+      collectionId: pasteCollectionId,
+      categoryIds: pasteCategoryId ? [pasteCategoryId] : [],
     });
     const item: ImportQueueItem = {
       ...pending,
@@ -497,7 +517,8 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
 
     setPastedText("");
     setPasteTitle("");
-    setPasteSource("");
+    setPasteCollectionId(DEFAULT_COLLECTION_ID);
+    setPasteCategoryId("");
     setReport(null);
     setRetryFiles((prev) => {
       const next = new Map(prev);
@@ -511,7 +532,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
     if (imported?.textId) {
       router.push(`/texts/${imported.textId}`);
     }
-  }, [defaultLevel, pasteSource, pasteTitle, pastedText, processing, processQueue, router, toast]);
+  }, [defaultLevel, pasteCategoryId, pasteCollectionId, pasteTitle, pastedText, processing, processQueue, router, toast]);
 
   const handleRetry = useCallback(
     (entry: ImportHistoryEntry) => {
@@ -568,8 +589,8 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
         </p>
         <h1 className="font-reader text-4xl font-semibold tracking-tight sm:text-5xl">Import</h1>
         <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
-          Créez une entrée dans votre bibliothèque : nommez le texte, indiquez sa source et son
-          niveau, puis importez du russe depuis le presse-papier ou un fichier.
+          Créez une entrée dans votre bibliothèque : nommez le texte, choisissez une collection et
+          un niveau, puis importez du russe depuis le presse-papier ou un fichier.
         </p>
       </header>
 
@@ -593,7 +614,8 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
           files={staged}
           disabled={processing || staging}
           onTitleChange={handleStagedTitleChange}
-          onSourceChange={handleStagedSourceChange}
+          onCollectionChange={handleStagedCollectionChange}
+          onCategoryChange={handleStagedCategoryChange}
           onLevelChange={handleStagedLevelChange}
           onRemove={handleRemoveStaged}
           onImport={() => void handleStartImport()}
@@ -603,12 +625,14 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
         <ImportSources
           pastedText={pastedText}
           pasteTitle={pasteTitle}
-          pasteSource={pasteSource}
+          pasteCollectionId={pasteCollectionId}
+          pasteCategoryId={pasteCategoryId}
           defaultLevel={defaultLevel}
           disabled={processing || staging}
           onPastedTextChange={setPastedText}
           onPasteTitleChange={setPasteTitle}
-          onPasteSourceChange={setPasteSource}
+          onPasteCollectionChange={setPasteCollectionId}
+          onPasteCategoryChange={setPasteCategoryId}
           onLevelChange={setDefaultLevel}
           onPasteAnalyze={() => void handlePasteAnalyze()}
           onFiles={(files) => void handleFilesSelected(files)}

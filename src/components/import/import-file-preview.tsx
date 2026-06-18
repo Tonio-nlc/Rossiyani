@@ -1,5 +1,7 @@
 "use client";
 
+import type { CategoryId } from "@/content/categories";
+import type { CollectionId } from "@/content/collections";
 import { countWords, formatFileSize, isImportTitleValid } from "@/lib/import-client";
 import type { PendingImportFile } from "@/lib/import-client";
 import type { CefrLevel } from "@/types/domain";
@@ -10,7 +12,8 @@ type ImportFilePreviewProps = {
   files: PendingImportFile[];
   disabled?: boolean;
   onTitleChange: (id: string, title: string) => void;
-  onSourceChange: (id: string, source: string) => void;
+  onCollectionChange: (id: string, collectionId: CollectionId) => void;
+  onCategoryChange: (id: string, categoryId: CategoryId | "") => void;
   onLevelChange: (id: string, level: CefrLevel) => void;
   onRemove: (id: string) => void;
   onImport: () => void;
@@ -21,7 +24,8 @@ export function ImportFilePreview({
   files,
   disabled,
   onTitleChange,
-  onSourceChange,
+  onCollectionChange,
+  onCategoryChange,
   onLevelChange,
   onRemove,
   onImport,
@@ -41,7 +45,7 @@ export function ImportFilePreview({
           Créer {files.length > 1 ? "des textes" : "un texte"} dans la bibliothèque
         </h2>
         <p className="mt-1 text-sm text-[var(--muted)]">
-          Vérifiez le nom, la source et le niveau avant l&apos;import.
+          Vérifiez le nom, la collection, la catégorie et le niveau avant l&apos;import.
         </p>
       </div>
 
@@ -55,10 +59,14 @@ export function ImportFilePreview({
               <div className="min-w-0 flex-1 space-y-4">
                 <ImportMetadataFields
                   title={file.title}
-                  source={file.source}
+                  collectionId={file.collectionId}
+                  categoryId={file.categoryIds[0] ?? ""}
                   level={file.level}
                   onTitleChange={(value) => onTitleChange(file.id, value)}
-                  onSourceChange={(value) => onSourceChange(file.id, value)}
+                  onCollectionChange={(value) => onCollectionChange(file.id, value)}
+                  onCategoryChange={(value) =>
+                    onCategoryChange(file.id, value)
+                  }
                   onLevelChange={(level) => onLevelChange(file.id, level)}
                   disabled={disabled}
                   fileNameHint={file.fileName}

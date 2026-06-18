@@ -11,7 +11,8 @@ function makeText(): ReaderTextData {
     id: "text-1",
     title: "Test",
     level: "A1",
-    source: null,
+    collectionId: "everyday-russian",
+    categoryIds: [],
     sentences: [
       {
         id: "s1",

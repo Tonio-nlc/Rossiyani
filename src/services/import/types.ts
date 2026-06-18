@@ -4,6 +4,9 @@ import type { ImportRunMetrics } from "@/types/import-pipeline";
 export type ImportRussianTextInput = {
   title: string;
   level: CefrLevel;
+  collectionId?: string;
+  categoryIds?: string[];
+  /** @deprecated Legacy free-text origin — mapped to collectionId when omitted. */
   source?: string;
   rawText: string;
   /** Pre-computed hash; computed automatically when omitted. */

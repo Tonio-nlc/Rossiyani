@@ -18,6 +18,8 @@ import { getAIProviderFromEnv } from "@/services/ai";
 const importBodySchema = z.object({
   title: z.string().min(1),
   level: z.enum(["A1", "A2", "B1", "B2", "C1", "Native"]),
+  collectionId: z.string().optional(),
+  categoryIds: z.array(z.string()).optional(),
   source: z.string().optional(),
   rawText: z.string().min(1),
 });

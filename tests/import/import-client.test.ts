@@ -31,11 +31,13 @@ describe("import-client helpers", () => {
   it("creates pending import from paste", () => {
     const pending = createPendingFromPaste("Hello world.", "B1", {
       title: "Mon titre",
-      source: "Wikipedia",
+      collectionId: "telegram",
+      categoryIds: ["articles"],
     });
     expect(pending.fileName).toBe("texte-collé.txt");
     expect(pending.title).toBe("Mon titre");
-    expect(pending.source).toBe("Wikipedia");
+    expect(pending.collectionId).toBe("telegram");
+    expect(pending.categoryIds).toEqual(["articles"]);
     expect(pending.level).toBe("B1");
     expect(pending.estimatedSentences).toBeGreaterThan(0);
   });
@@ -72,7 +74,8 @@ describe("import-client helpers", () => {
       id: "1",
       fileName: "test.txt",
       title: "Test",
-      source: "",
+      collectionId: "everyday-russian",
+      categoryIds: [],
       rawText: "Привет",
       level: "A2",
       estimatedSentences: 1,
@@ -134,7 +137,8 @@ describe("import-client helpers", () => {
       id: "2",
       fileName: "song.txt",
       title: "Song",
-      source: "",
+      collectionId: "everyday-russian",
+      categoryIds: [],
       rawText: "Строка 1\nСтрока 2",
       level: "A2",
       estimatedSentences: 2,

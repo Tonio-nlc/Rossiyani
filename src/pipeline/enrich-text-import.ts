@@ -21,6 +21,12 @@ import {
   validateImportTextLexical,
 } from "@/services/import-quality";
 import type { ImportPipelineOptions, ImportRussianTextInput } from "@/services/import/types";
+import { normalizeCategoryIds } from "@/content/categories";
+import {
+  isCollectionId,
+  resolveCollectionIdFromLegacySource,
+  type CollectionId,
+} from "@/content/collections";
 import { createImportRunMetrics } from "@/types/import-pipeline";
 
 import {
@@ -48,6 +54,13 @@ import {
 
 const DEFAULT_SENTENCE_CONCURRENCY = 4;
 const DEFAULT_ANALYSIS_BATCH_SIZE = 12;
+
+function resolveImportCollectionId(input: ImportRussianTextInput): CollectionId {
+  if (input.collectionId && isCollectionId(input.collectionId)) {
+    return input.collectionId;
+  }
+  return resolveCollectionIdFromLegacySource(input.source);
+}
 
 export type FastImportResult = {
   textId: string;
@@ -160,7 +173,8 @@ export async function runTextImportPipelineFast(
     data: {
       title: input.title,
       level: input.level,
-      source: input.source ?? null,
+      collectionId: resolveImportCollectionId(input),
+      categoryIds: normalizeCategoryIds(input.categoryIds),
       contentHash,
     },
   });
