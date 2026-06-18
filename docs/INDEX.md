@@ -21,6 +21,7 @@ product/flows/
 ## 3. Comprendre la technique
 
 ARCHITECTURE.md
+MEDIA_LAYER.md
 SPECIFICATION.md
 UI_SPEC.md
 

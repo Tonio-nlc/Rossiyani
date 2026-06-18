@@ -53,10 +53,16 @@ V1 is **Russian only**. No multilingual abstractions, interfaces, or configurati
 ┌───────────────────────────▼─────────────────────────────┐
 │  Foundation                                             │
 │  src/lib          — prisma client, validation, utils      │
+│  src/media        — media catalog, providers, delivery  │
 │  src/types        — shared TypeScript types               │
 │  prisma/          — schema and migrations                 │
 └─────────────────────────────────────────────────────────┘
 ```
+
+### Media Layer
+
+All product modules resolve media through `src/media/` (`MediaAsset`, catalog ids).
+See `docs/MEDIA_LAYER.md`. Product code must never reference file paths or storage backends directly.
 
 ### Dependency rules
 

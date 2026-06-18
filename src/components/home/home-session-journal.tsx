@@ -1,8 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+
+import { MediaImage } from "@/media";
 
 import type { HomeJournalData } from "@/features/home";
 import type { TextListItem } from "@/features/texts";
@@ -68,11 +69,8 @@ function heroEditorialNote(entry: SessionJournalEntry, why: string[]): string {
 function HeroIllustration() {
   return (
     <div className="home-magazine-hero-art" aria-hidden>
-      <Image
-        src="/illustrations/hero_image.png"
-        alt=""
-        width={2338}
-        height={1474}
+      <MediaImage
+        assetId="dashboard.hero"
         priority
         className="h-auto w-full max-w-full object-contain object-center"
         sizes="(min-width: 1024px) 42vw, 0px"
