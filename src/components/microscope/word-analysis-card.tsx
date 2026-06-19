@@ -28,22 +28,20 @@ type WordAnalysisCardProps = {
 
 function PartialAnalysisNotice() {
   return (
-    <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)]/80 px-3 py-2.5">
-      <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
-        Statut
-      </p>
-      <p className="mt-0.5 text-sm font-medium text-[var(--foreground)]">Analyse estimée</p>
+    <div className="ds-microscope-panel">
+      <p className="ds-microscope-panel-title">Statut</p>
+      <p className="mt-1 text-sm text-[var(--ink)]">Analyse estimée</p>
     </div>
   );
 }
 
 function UnrecognizedWordBadge() {
   return (
-    <div className="rounded-lg border border-amber-500/25 bg-amber-500/5 px-3 py-2">
-      <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-amber-200/90">
-        ⚠ Mot non reconnu
+    <div className="ds-microscope-panel">
+      <p className="text-exception text-[10px] font-semibold uppercase tracking-wide">
+        Mot non reconnu
       </p>
-      <p className="mt-0.5 text-xs leading-snug text-[var(--muted)]">
+      <p className="mt-1 text-xs leading-snug text-[var(--ink-muted)]">
         Ce mot n&apos;existe pas encore dans la bibliothèque linguistique.
       </p>
     </div>
@@ -221,10 +219,7 @@ export function WordAnalysisCard({
   isUnrecognizedWord = false,
 }: WordAnalysisCardProps) {
   return (
-    <article
-      className="animate-microscope-in rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/80 p-3 sm:p-4"
-      aria-label="Analyse du mot"
-    >
+    <article className="animate-microscope-in ds-microscope-panel" aria-label="Analyse du mot">
       <dl className="space-y-3">
         {!analysisComplete ? <PartialAnalysisNotice /> : null}
         {isUnrecognizedWord ? <UnrecognizedWordBadge /> : null}

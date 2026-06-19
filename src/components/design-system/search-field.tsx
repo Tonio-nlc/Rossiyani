@@ -1,9 +1,13 @@
+import type { KeyboardEvent, RefObject } from "react";
+
 type SearchFieldProps = {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   resultCount?: number;
   ariaLabel?: string;
+  inputRef?: RefObject<HTMLInputElement | null>;
+  onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
 };
 
 export function SearchField({
@@ -12,13 +16,17 @@ export function SearchField({
   placeholder = "Rechercher…",
   resultCount,
   ariaLabel = "Rechercher",
+  inputRef,
+  onKeyDown,
 }: SearchFieldProps) {
   return (
     <div className="ds-search-field">
       <input
+        ref={inputRef}
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={onKeyDown}
         placeholder={placeholder}
         aria-label={ariaLabel}
         className="focus-kb ds-search-input"

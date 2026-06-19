@@ -29,18 +29,16 @@ export function WordHoverPreview({ word, anchorRect }: WordHoverPreviewProps) {
       style={{ top, left }}
       role="tooltip"
     >
-      <div className="max-w-[220px] rounded-xl border border-[var(--accent-violet)]/40 bg-[var(--surface-elevated)]/95 px-3 py-2.5 shadow-[var(--shadow-glow)] backdrop-blur-md">
-        <p className="font-reader text-lg font-semibold text-[var(--foreground)]">
-          {word.stressMarked}
-        </p>
-        <p className="mt-0.5 text-xs text-[var(--accent-violet-bright)]">{word.lemma}</p>
+      <div className="max-w-[220px] border border-[var(--hairline)] bg-[var(--paper)] px-3 py-2.5">
+        <p className="font-reader text-lg font-semibold text-[var(--ink)]">{word.stressMarked}</p>
+        <p className="mt-0.5 text-xs text-[var(--color-primary)]">{word.lemma}</p>
         {word.ending ? (
-          <p className="mt-1 text-[10px] uppercase tracking-wide text-[var(--muted)]">
+          <p className="mt-1 text-[10px] uppercase tracking-wide text-[var(--ink-muted)]">
             −{word.ending}
             {word.case ? ` · ${formatCaseLabelFr(word.case)}` : ""}
           </p>
         ) : null}
-        <p className="mt-2 line-clamp-2 text-[11px] leading-snug text-[var(--muted)]">
+        <p className="mt-2 line-clamp-2 text-[11px] leading-snug text-[var(--ink-muted)]">
           {word.explanation}
         </p>
       </div>

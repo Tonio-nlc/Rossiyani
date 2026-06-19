@@ -2,7 +2,6 @@
 
 import { useCallback, useMemo, useState } from "react";
 
-import { EditorialContainer } from "@/components/design-system";
 import { DeleteTextDialog } from "@/components/library/delete-text-dialog";
 import { RenameTextDialog } from "@/components/library/rename-text-dialog";
 import { useToast } from "@/components/ui/toast-provider";
@@ -135,7 +134,7 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
   }, []);
 
   return (
-    <EditorialContainer className="space-y-0 pb-16">
+    <div className="space-y-0 pb-8">
       <LibraryCollectionsRow active={collection} onSelect={handleCollectionSelect} />
 
       {featuredText ? <LibraryFeaturedText text={featuredText} /> : null}
@@ -194,6 +193,6 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
         }}
         onConfirm={handleDeleteConfirm}
       />
-    </EditorialContainer>
+    </div>
   );
 }

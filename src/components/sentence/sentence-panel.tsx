@@ -6,6 +6,7 @@ import {
 } from "@/types";
 
 import type { SentenceDetail } from "@/features/sentences";
+import { WorkspacePanel } from "@/components/knowledge-workspace/workspace-panel";
 
 type SentencePanelProps = {
   sentence: SentenceDetail | null;
@@ -19,7 +20,9 @@ export function SentencePanel({ sentence, loading }: SentencePanelProps) {
   if (!sentence) {
     return (
       <PanelShell title="Analyse de la phrase">
-        <p className="text-sm text-neutral-500">Cliquez sur une phrase pour voir l&apos;analyse.</p>
+        <p className="text-sm text-[var(--ink-muted)]">
+          Cliquez sur une phrase pour voir l&apos;analyse.
+        </p>
       </PanelShell>
     );
   }
@@ -29,7 +32,7 @@ export function SentencePanel({ sentence, loading }: SentencePanelProps) {
 
   return (
     <PanelShell title="Analyse de la phrase">
-      <p className="text-lg font-medium">{sentence.russianText}</p>
+      <p className="font-reader text-lg text-[var(--ink)]">{sentence.russianText}</p>
       <MetaRow label="Registre" value={register} />
       <MetaRow label="Difficulté" value={difficulty} />
       <Section title="Traduction littérale" body={sentence.literalTranslation} />
@@ -38,7 +41,7 @@ export function SentencePanel({ sentence, loading }: SentencePanelProps) {
       <Section title="Ordre des mots" body={sentence.orderExplanation} />
       <Section title="Usage natif" body={sentence.nativeUsageNotes} />
       {sentence.needsReview ? (
-        <p className="rounded border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        <p className="border border-[var(--color-secondary)] px-3 py-2 text-sm text-[var(--color-secondary)]">
           {sentence.reviewMessage ?? "Analyse à réviser."}
         </p>
       ) : null}
@@ -47,29 +50,23 @@ export function SentencePanel({ sentence, loading }: SentencePanelProps) {
 }
 
 function PanelShell({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <aside className="rounded-lg border border-neutral-200 bg-white p-4">
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-500">
-        {title}
-      </h2>
-      <div className="space-y-4">{children}</div>
-    </aside>
-  );
+  return <WorkspacePanel title={title}>{children}</WorkspacePanel>;
 }
 
 function Section({ title, body }: { title: string; body: string }) {
   return (
-    <div>
-      <h3 className="text-xs font-semibold uppercase text-neutral-500">{title}</h3>
-      <p className="mt-1 text-sm leading-relaxed text-neutral-800">{body}</p>
-    </div>
+    <section className="space-y-1">
+      <h3 className="text-eyebrow">{title}</h3>
+      <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">{body}</p>
+    </section>
   );
 }
 
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (
-    <p className="text-sm text-neutral-600">
-      <span className="font-medium text-neutral-500">{label} :</span> {value}
-    </p>
+    <div className="flex justify-between gap-3 text-sm">
+      <span className="text-[var(--ink-muted)]">{label}</span>
+      <span className="text-[var(--ink-secondary)]">{value}</span>
+    </div>
   );
 }

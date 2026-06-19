@@ -40,10 +40,8 @@ export function DeclensionGrid({ detail, onSelectForm, loading }: DeclensionGrid
   return (
     <div className="space-y-2">
       {hoveredForm ? (
-        <div className="microscope-highlight animate-microscope-slide rounded-lg border border-[var(--accent-violet)]/30 bg-[var(--accent-violet)]/5 px-3 py-1.5 text-xs text-[var(--muted)]">
-          <span className="font-reader font-semibold text-[var(--foreground)]">
-            {hoveredForm.original}
-          </span>
+        <div className="microscope-highlight animate-microscope-slide border border-[var(--hairline)] bg-[var(--surface-primary)] px-3 py-1.5 text-xs text-[var(--ink-muted)]">
+          <span className="font-reader font-semibold text-[var(--ink)]">{hoveredForm.original}</span>
           <span className="mx-2 text-[var(--border-strong)]">—</span>
           {hoveredForm.explanation}
         </div>

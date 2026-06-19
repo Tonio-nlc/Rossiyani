@@ -25,7 +25,7 @@ export function ExplorerRecentSection() {
   if (entries.length === 0) {
     return (
       <p className="text-sm leading-relaxed text-[var(--ink-muted)]">
-        Your recently viewed words will appear here as you explore.
+        Vos mots consultés récemment apparaîtront ici au fil de l&apos;exploration.
       </p>
     );
   }

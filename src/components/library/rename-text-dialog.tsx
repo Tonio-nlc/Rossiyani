@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { ConfirmDialog, InputField } from "@/components/design-system";
 import { TEXT_TITLE_MAX_LENGTH } from "@/features/texts";
 
 type RenameTextDialogProps = {
@@ -54,33 +54,28 @@ export function RenameTextDialog({
       onConfirm={handleSubmit}
       description={
         <>
-          <label htmlFor="rename-text-input" className="sr-only">
-            Nouveau titre
-          </label>
-          <input
+          <InputField
             id="rename-text-input"
+            label="Nouveau titre"
             type="text"
             value={title}
             maxLength={TEXT_TITLE_MAX_LENGTH + 10}
             disabled={loading}
-            onChange={(event) => {
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setTitle(event.target.value);
               if (error) {
                 setError(null);
               }
             }}
-            onKeyDown={(event) => {
+            onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
               if (event.key === "Enter") {
                 event.preventDefault();
                 handleSubmit();
               }
             }}
-            className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none ring-[var(--accent-violet)] focus:ring-2 disabled:opacity-50"
+            hint={`${title.trim().length}/${TEXT_TITLE_MAX_LENGTH} caractères`}
           />
-          <p className="text-xs text-[var(--muted)]">
-            {title.trim().length}/{TEXT_TITLE_MAX_LENGTH} caractères
-          </p>
-          {error ? <p className="text-xs text-red-400">{error}</p> : null}
+          {error ? <p className="mt-2 text-xs text-[var(--color-secondary)]">{error}</p> : null}
         </>
       }
     />

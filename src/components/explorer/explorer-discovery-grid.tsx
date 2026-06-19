@@ -1,39 +1,17 @@
-import Link from "next/link";
-
-type DiscoveryItem = {
-  label: string;
-  href: string;
-  meta?: string;
-};
+import type { ExplorerGridItem } from "./explorer-editorial-grid";
+import { ExplorerEditorialGrid } from "./explorer-editorial-grid";
 
 type ExplorerDiscoveryGridProps = {
-  items: DiscoveryItem[];
+  items: Array<{ label: string; href: string; meta?: string; subtitle?: string }>;
 };
 
 export function ExplorerDiscoveryGrid({ items }: ExplorerDiscoveryGridProps) {
-  if (items.length === 0) {
-    return null;
-  }
+  const gridItems: ExplorerGridItem[] = items.map((item) => ({
+    label: item.label,
+    href: item.href,
+    meta: item.meta,
+    subtitle: item.subtitle,
+  }));
 
-  return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((item) => (
-        <Link
-          key={`${item.href}-${item.label}`}
-          href={item.href}
-          className="focus-kb group flex flex-col rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-4 transition hover:border-[var(--ink-muted)]"
-        >
-          <p className="break-russian font-reader text-base text-[var(--ink)] group-hover:text-[var(--color-link)]">
-            {item.label}
-          </p>
-          {item.meta ? (
-            <p className="mt-1 line-clamp-2 text-sm text-[var(--ink-muted)]">{item.meta}</p>
-          ) : null}
-          <span className="mt-3 text-sm font-medium text-[var(--ink-muted)] group-hover:text-[var(--color-link)]">
-            Open →
-          </span>
-        </Link>
-      ))}
-    </div>
-  );
+  return <ExplorerEditorialGrid items={gridItems} />;
 }

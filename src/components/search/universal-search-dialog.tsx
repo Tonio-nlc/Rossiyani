@@ -141,19 +141,20 @@ export function UniversalSearchDialog({ open, onClose }: UniversalSearchDialogPr
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 px-4 pt-[8vh] backdrop-blur-sm sm:pt-[10vh]"
+      className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[8vh] sm:pt-[10vh]"
       onClick={onClose}
       role="presentation"
     >
+      <button type="button" aria-label="Fermer" className="ds-dialog-backdrop absolute inset-0" onClick={onClose} />
       <div
         ref={dialogRef}
-        className="animate-search-in w-full max-w-xl overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] shadow-2xl"
+        className="animate-search-in ds-dialog relative w-full max-w-xl overflow-hidden p-0"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-label="Recherche universelle"
       >
-        <div className="flex items-start gap-2 border-b border-[var(--border)] px-4 py-3">
+        <div className="flex items-start gap-2 border-b border-[var(--hairline)] px-4 py-3">
           <div className="min-w-0 flex-1">
             <input
               ref={inputRef}
@@ -163,9 +164,9 @@ export function UniversalSearchDialog({ open, onClose }: UniversalSearchDialogPr
               onKeyDown={onInputKeyDown}
               placeholder="Lemme, terminaison, concept, collocation, texte…"
               aria-label="Rechercher"
-              className="focus-kb w-full bg-transparent text-base text-[var(--foreground)] placeholder:text-[var(--muted)] outline-none"
+              className="focus-kb ds-search-input w-full bg-transparent text-base outline-none"
             />
-            <p className="mt-1 text-[10px] text-[var(--muted)]">
+            <p className="mt-1 text-[10px] text-[var(--ink-muted)]">
               ↑↓ naviguer · Entrée ouvrir · Échap fermer
             </p>
           </div>
@@ -173,7 +174,7 @@ export function UniversalSearchDialog({ open, onClose }: UniversalSearchDialogPr
             type="button"
             onClick={onClose}
             aria-label="Fermer"
-            className="focus-kb btn-interactive shrink-0 rounded-lg px-2 py-1 text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
+            className="focus-kb shrink-0 text-sm text-[var(--ink-muted)] hover:text-[var(--ink)]"
           >
             ✕
           </button>
@@ -212,10 +213,10 @@ export function UniversalSearchDialog({ open, onClose }: UniversalSearchDialogPr
                             onClick={onClose}
                             onMouseEnter={() => setActiveIndex(index)}
                             className={[
-                              "focus-kb btn-interactive block rounded-lg px-3 py-2",
+                              "focus-kb block px-3 py-2 transition",
                               active
-                                ? "bg-[var(--accent-violet)]/15"
-                                : "hover:bg-[var(--surface)]",
+                                ? "border-l-2 border-[var(--color-primary)] bg-[var(--surface-primary)]"
+                                : "hover:bg-[var(--surface-primary)]",
                             ].join(" ")}
                           >
                             <span className="font-reader font-medium">{item.label}</span>

@@ -7,6 +7,7 @@ type PrimaryButtonProps = {
   children: ReactNode;
   className?: string;
   disabled?: boolean;
+  type?: "button" | "submit";
 };
 
 export function PrimaryButton({
@@ -15,6 +16,7 @@ export function PrimaryButton({
   children,
   className = "",
   disabled,
+  type = "button",
 }: PrimaryButtonProps) {
   const classes = ["ds-primary-btn focus-kb", className].filter(Boolean).join(" ");
 
@@ -27,7 +29,7 @@ export function PrimaryButton({
   }
 
   return (
-    <button type="button" onClick={onClick} disabled={disabled} className={classes}>
+    <button type={type} onClick={onClick} disabled={disabled} className={classes}>
       {children}
     </button>
   );

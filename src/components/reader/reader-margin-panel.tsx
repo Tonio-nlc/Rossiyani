@@ -30,7 +30,7 @@ type ReaderMarginPanelProps = {
 };
 
 function PanelLabel({ children }: { children: ReactNode }) {
-  return <p className="home-section-label">{children}</p>;
+  return <p className="text-eyebrow">{children}</p>;
 }
 
 function EditorialLink({

@@ -3,8 +3,8 @@ import { Suspense } from "react";
 import { PracticeWorkspace } from "@/components/compose/practice-workspace";
 
 export const metadata = {
-  title: "Practice — Rossiyani",
-  description: "Express an idea in Russian and understand how a native would phrase it.",
+  title: "Pratique · Rossiyani",
+  description: "Exprimer une idée en russe et comprendre comment un locuteur natif la formulerait.",
 };
 
 export default function PracticePage() {

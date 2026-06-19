@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { SearchField } from "@/components/design-system";
 import type { KnowledgeSearchResult } from "@/features/search";
 
 import { buildSearchNavItems, groupSearchNavItems } from "./search-result-links";
@@ -82,7 +83,7 @@ export function UniversalSearchPanel({
     el?.scrollIntoView({ block: "nearest" });
   }, [activeIndex]);
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (navItems.length === 0) {
       return;
     }
@@ -100,60 +101,36 @@ export function UniversalSearchPanel({
 
   let flatIndex = -1;
   const hasResults = navItems.length > 0;
+  const hasQuery = query.trim().length > 0;
 
   return (
-    <section
-      id="recherche"
-      className={[
-        "border border-[var(--hairline)] bg-[var(--surface-primary)]",
-        isHero ? "rounded-[var(--radius-md)]" : "rounded-[var(--radius-sm)]",
-      ].join(" ")}
-    >
-      <div
-        className={[
-          "border-b border-[var(--hairline)]",
-          isHero ? "px-5 py-6 sm:px-6 sm:py-8" : "px-4 py-3 sm:px-5",
-        ].join(" ")}
-      >
-        <input
-          ref={inputRef}
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder={placeholder}
-          aria-label="Recherche universelle"
-          className={[
-            "focus-kb w-full bg-transparent text-[var(--ink)] placeholder:text-[var(--ink-muted)] outline-none",
-            isHero ? "font-reader text-xl sm:text-2xl" : "text-base",
-          ].join(" ")}
-        />
-        {!isHero ? (
-          <p className="mt-1.5 text-[10px] text-[var(--ink-muted)]">
-            ↑↓ pour naviguer · Entrée pour ouvrir · / depuis n&apos;importe où
-          </p>
-        ) : null}
-      </div>
+    <section id="recherche" className="editorial-page-section space-y-4 pb-0">
+      <SearchField
+        inputRef={inputRef}
+        value={query}
+        onChange={setQuery}
+        onKeyDown={onKeyDown}
+        placeholder={placeholder}
+        ariaLabel="Recherche universelle"
+        resultCount={hasQuery && !loading && hasResults ? navItems.length : undefined}
+      />
+      {!isHero ? (
+        <p className="text-[10px] text-[var(--ink-muted)]">
+          ↑↓ pour naviguer · Entrée pour ouvrir · / depuis n&apos;importe où
+        </p>
+      ) : null}
 
-      <div
-        ref={listRef}
-        className={[
-          "overflow-y-auto p-3 sm:p-4",
-          isHero ? "max-h-[480px]" : "max-h-[420px]",
-        ].join(" ")}
-      >
+      <div ref={listRef} className={isHero ? "max-h-[480px] overflow-y-auto" : "max-h-[420px] overflow-y-auto"}>
         {loading ? (
-          <p className="px-2 py-4 text-sm text-[var(--muted)]">Recherche…</p>
-        ) : !hasResults && query.trim() ? (
-          <p className="px-2 py-4 text-sm text-[var(--muted)]">Aucun résultat.</p>
+          <p className="py-2 text-sm text-[var(--ink-muted)]">Recherche…</p>
+        ) : !hasResults && hasQuery ? (
+          <p className="py-2 text-sm text-[var(--ink-muted)]">Aucun résultat.</p>
         ) : hasResults ? (
-          <div className="space-y-4">
+          <div className="space-y-4 border-t border-[var(--hairline)] pt-4">
             {[...grouped.entries()].map(([category, items]) => (
               <section key={category}>
-                <h3 className="px-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
-                  {category}
-                </h3>
-                <ul className="mt-1 space-y-0.5">
+                <h3 className="text-eyebrow">{category}</h3>
+                <ul className="mt-2 divide-y divide-[var(--hairline)]">
                   {items.map((item) => {
                     flatIndex += 1;
                     const index = flatIndex;
@@ -164,16 +141,16 @@ export function UniversalSearchPanel({
                           href={item.href}
                           data-search-index={index}
                           className={[
-                            "focus-kb block px-3 py-2 transition",
+                            "focus-kb block py-2.5 transition",
                             active
-                              ? "bg-[var(--surface-secondary)] text-[var(--ink)]"
-                              : "hover:bg-[var(--surface-secondary)]/60",
+                              ? "border-l-2 border-[var(--color-primary)] pl-3"
+                              : "pl-3 hover:bg-[var(--surface-primary)]",
                           ].join(" ")}
                           onMouseEnter={() => setActiveIndex(index)}
                         >
-                          <span className="font-reader font-medium">{item.label}</span>
+                          <span className="font-reader font-medium text-[var(--ink)]">{item.label}</span>
                           {item.sublabel ? (
-                            <span className="ml-2 text-xs text-[var(--muted)]">{item.sublabel}</span>
+                            <span className="ml-2 text-xs text-[var(--ink-muted)]">{item.sublabel}</span>
                           ) : null}
                         </Link>
                       </li>
@@ -184,9 +161,9 @@ export function UniversalSearchPanel({
             ))}
           </div>
         ) : (
-          <p className="px-2 py-4 text-sm leading-relaxed text-[var(--muted)]">
+          <p className="py-2 text-sm leading-relaxed text-[var(--ink-muted)]">
             {isHero
-              ? "Tapez un mot russe, une terminaison, un concept grammatical ou le titre d'un texte — le graphe entier répond en direct."
+              ? "Tapez un mot russe, une terminaison, un concept grammatical ou le titre d'un texte."
               : "Tapez pour explorer lemmes, formes, terminaisons, concepts et collocations."}
           </p>
         )}

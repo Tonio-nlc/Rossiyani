@@ -4,10 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { GhostButton } from "./ghost-button";
+
 const NAV = [
   {
+    href: "/",
+    label: "Accueil",
+    match: (path: string) => path === "/",
+  },
+  {
     href: "/reader",
-    label: "Reader",
+    label: "Lecture",
     match: (path: string) => path === "/reader" || path.startsWith("/texts/"),
   },
   {
@@ -17,22 +24,26 @@ const NAV = [
   },
   {
     href: "/practice",
-    label: "Practice",
+    label: "Pratique",
     match: (path: string) => path === "/practice" || path.startsWith("/practice/"),
   },
   {
     href: "/manual",
-    label: "Manual",
+    label: "Manuel",
     match: (path: string) => path === "/manual" || path.startsWith("/manual/"),
   },
   {
     href: "/library",
-    label: "Library",
+    label: "Bibliothèque",
     match: (path: string) => path === "/library" || path.startsWith("/library/"),
   },
 ] as const;
 
-export function AppTopNav() {
+type TopNavigationProps = {
+  onOpenSearch?: () => void;
+};
+
+export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -49,8 +60,8 @@ export function AppTopNav() {
   }, [mobileOpen]);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-[var(--hairline)] bg-[var(--paper)]">
-      <div className="editorial-shell grid h-[var(--header-height)] grid-cols-[1fr_auto] items-center lg:grid-cols-[1fr_auto_1fr]">
+    <header className="ds-top-nav sticky top-0 z-30 border-b border-[var(--hairline)] bg-[var(--paper)]">
+      <div className="ds-editorial-container grid h-[var(--header-height)] grid-cols-[1fr_auto] items-center lg:grid-cols-[1fr_auto_1fr]">
         <Link
           href="/"
           className="focus-kb font-reader text-lg font-medium tracking-tight text-[var(--ink)]"
@@ -59,8 +70,8 @@ export function AppTopNav() {
         </Link>
 
         <nav
-          aria-label="Main"
-          className="hidden items-center justify-center gap-6 xl:gap-7 lg:flex"
+          aria-label="Navigation principale"
+          className="hidden items-center justify-center gap-5 xl:gap-6 lg:flex"
         >
           {NAV.map((item) => {
             const active = item.match(pathname);
@@ -82,13 +93,23 @@ export function AppTopNav() {
           })}
         </nav>
 
-        <div className="flex items-center justify-end gap-3 lg:min-w-[7.5rem]">
+        <div className="flex items-center justify-end gap-2 lg:min-w-[7.5rem]">
+          {onOpenSearch ? (
+            <button
+              type="button"
+              onClick={onOpenSearch}
+              className="focus-kb hidden text-sm text-[var(--ink-secondary)] transition hover:text-[var(--ink)] lg:inline-flex"
+              aria-label="Rechercher"
+            >
+              Rechercher
+            </button>
+          ) : null}
           <button
             type="button"
             className="focus-kb px-2 py-1 text-lg leading-none text-[var(--ink-secondary)] lg:hidden"
             aria-expanded={mobileOpen}
             aria-controls="mobile-main-nav"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
             onClick={() => setMobileOpen((open) => !open)}
           >
             {mobileOpen ? "✕" : "☰"}
@@ -99,10 +120,10 @@ export function AppTopNav() {
       {mobileOpen ? (
         <nav
           id="mobile-main-nav"
-          aria-label="Main mobile"
+          aria-label="Navigation mobile"
           className="border-t border-[var(--hairline)] lg:hidden"
         >
-          <ul className="editorial-shell flex flex-col gap-1 py-3">
+          <ul className="ds-editorial-container flex flex-col gap-1 py-3">
             {NAV.map((item) => {
               const active = item.match(pathname);
               return (
@@ -122,6 +143,13 @@ export function AppTopNav() {
                 </li>
               );
             })}
+            {onOpenSearch ? (
+              <li>
+                <GhostButton onClick={() => { setMobileOpen(false); onOpenSearch(); }}>
+                  Rechercher
+                </GhostButton>
+              </li>
+            ) : null}
           </ul>
         </nav>
       ) : null}

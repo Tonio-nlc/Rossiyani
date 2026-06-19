@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { EditorialCard, GhostButton } from "@/components/design-system";
 import type { HomeFeaturedLesson } from "@/features/home";
 
 type HomeFeaturedLessonCardProps = {
@@ -8,21 +7,13 @@ type HomeFeaturedLessonCardProps = {
 
 export function HomeFeaturedLessonCard({ lesson }: HomeFeaturedLessonCardProps) {
   return (
-    <Link
+    <EditorialCard
       href={lesson.href}
-      className="focus-kb group flex h-full flex-col border border-[var(--hairline)] px-4 py-4 transition hover:border-[var(--hairline-strong)]"
-    >
-      <p className="home-section-label">Featured lesson</p>
-      <h3 className="mt-2 font-reader text-lg leading-snug text-[var(--ink)] group-hover:text-[var(--color-link)]">
-        {lesson.title}
-      </h3>
-      <p className="mt-1 line-clamp-1 text-sm text-[var(--ink-secondary)]">{lesson.description}</p>
-      <p className="mt-2 text-metadata text-[var(--ink-muted)]">
-        {lesson.levelLabel} · {lesson.readingMinutes} min
-      </p>
-      <p className="mt-auto pt-2 text-sm text-[var(--ink-secondary)] group-hover:text-[var(--color-link)]">
-        Open lesson →
-      </p>
-    </Link>
+      eyebrow="Leçon du jour"
+      title={lesson.title}
+      subtitle={lesson.description}
+      meta={`${lesson.levelLabel} · ${lesson.readingMinutes} min`}
+      footer={<GhostButton href={lesson.href}>Lire la leçon →</GhostButton>}
+    />
   );
 }

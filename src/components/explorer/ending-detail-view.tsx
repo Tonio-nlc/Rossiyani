@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { EditorialCard, GhostButton, Tag } from "@/components/design-system";
 import { EndingBadge } from "@/components/analysis/ending-badge";
 import { getCaseLegendEntry } from "@/features/grammar/case-legend-data";
 import type { CaseKey } from "@/features/grammar";
@@ -118,22 +117,14 @@ export function EndingDetailView({ graph }: EndingDetailViewProps) {
             <div className="flex flex-wrap gap-2">
               {forms.map((form) => {
                 const lemma = formLemmaMap.get(form.id);
-                const inner = <span className="font-reader">{form.original}</span>;
                 return lemma ? (
-                  <Link
-                    key={form.id}
-                    href={lemmaPath(lemma, "noun")}
-                    className="focus-kb rounded-lg border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 transition hover:border-[var(--ink-muted)]"
-                  >
-                    {inner}
-                  </Link>
+                  <GhostButton key={form.id} href={lemmaPath(lemma, "noun")}>
+                    <span className="font-reader">{form.original}</span>
+                  </GhostButton>
                 ) : (
-                  <span
-                    key={form.id}
-                    className="rounded-lg border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 font-reader"
-                  >
-                    {form.original}
-                  </span>
+                  <Tag key={form.id}>
+                    <span className="font-reader">{form.original}</span>
+                  </Tag>
                 );
               })}
             </div>
@@ -143,10 +134,7 @@ export function EndingDetailView({ graph }: EndingDetailViewProps) {
             <ExplorerTutorAdvancedSection label="Autres exemples">
               <ul className="space-y-2">
                 {exampleSentences.slice(1).map((sentence) => (
-                  <li
-                    key={sentence}
-                    className="rounded-xl border border-[var(--hairline)] bg-[var(--surface)] px-4 py-3 font-reader text-sm"
-                  >
+                  <li key={sentence} className="ds-microscope-panel font-reader text-sm text-[var(--ink)]">
                     {sentence}
                   </li>
                 ))}
@@ -154,15 +142,16 @@ export function EndingDetailView({ graph }: EndingDetailViewProps) {
             </ExplorerTutorAdvancedSection>
           ) : null}
 
-          <Link
+          <EditorialCard
             href={`/explorer/cases/${encodeURIComponent(ending.caseKey)}`}
-            className="focus-kb block rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-5 transition hover:border-[var(--ink-muted)]"
-          >
-            <p className="text-sm text-[var(--ink-muted)]">Cas associé</p>
-            <p className="mt-1 font-medium text-[var(--ink)]">
-              {legend?.frenchName ?? ending.caseKey}
-            </p>
-          </Link>
+            title={legend?.frenchName ?? ending.caseKey}
+            eyebrow="Cas associé"
+            footer={
+              <GhostButton href={`/explorer/cases/${encodeURIComponent(ending.caseKey)}`}>
+                Explorer →
+              </GhostButton>
+            }
+          />
 
           <RelatedNavigation items={related} />
         </ExplorerTutorAdvanced>

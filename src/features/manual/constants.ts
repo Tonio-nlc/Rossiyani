@@ -97,10 +97,6 @@ export const MANUAL_RECOMMENDED_BOXES = [
   "Situation :",
   "Pour aller un peu plus loin",
 ] as const;
-
-/** @deprecated Use MANUAL_REQUIRED_BOXES — kept for transitional imports. */
-export const MANUAL_REQUIRED_SECTIONS = MANUAL_REQUIRED_BOXES;
-
 export const MANUAL_CONTENT_ROOT = "content/manual";
 
 /** Editorial anti-patterns — abstract labels without explanation. */

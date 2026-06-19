@@ -1,10 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-import { MediaImage } from "@/media";
-
+import {
+  EditorialCard,
+  GhostButton,
+  PrimaryButton,
+  SectionHeader,
+  Tag,
+} from "@/components/design-system";
+import { LibraryCardProgress } from "@/components/library/library-card-progress";
 import type { HomeJournalData } from "@/features/home";
 import type { TextListItem } from "@/features/texts";
 import { getSavedComposePhrases } from "@/lib/compose/saved-phrases";
@@ -30,6 +35,13 @@ type HomeSessionJournalProps = {
 
 const TODAY_LIMIT = 3;
 const REVIEW_LIMIT = 5;
+
+function textIdFromHref(href?: string): string | null {
+  if (!href?.startsWith("/texts/")) {
+    return null;
+  }
+  return href.slice("/texts/".length).split("/")[0] ?? null;
+}
 
 function todayEntries(
   narrative: SessionJournal,
@@ -66,171 +78,83 @@ function heroEditorialNote(entry: SessionJournalEntry, why: string[]): string {
   return "Reprenez le fil de votre session exactement où vous l'avez laissé.";
 }
 
-function HeroIllustration() {
-  return (
-    <div className="home-magazine-hero-art" aria-hidden>
-      <MediaImage
-        assetId="dashboard.hero"
-        priority
-        className="h-auto w-full max-w-full object-contain object-center"
-        sizes="(min-width: 1024px) 42vw, 0px"
-      />
-    </div>
-  );
-}
-
-function EditorialEyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="home-section-label">{children}</p>;
-}
-
-function PrimaryButton({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link href={href} prefetch className="home-magazine-primary-btn focus-kb">
-      {children}
-    </Link>
-  );
-}
-
-function ContinueHero({
+function ContinueReadingSection({
   entry,
   editorialNote,
 }: {
   entry: SessionJournalEntry;
   editorialNote: string;
 }) {
+  const textId = textIdFromHref(entry.href);
+
   return (
-    <section className="home-magazine-hero">
-      <div className="home-magazine-hero-grid">
-        <div className="home-magazine-hero-copy min-w-0">
-          <EditorialEyebrow>Continuer la lecture</EditorialEyebrow>
-
-          <h1 className="home-magazine-hero-title break-russian mt-5 font-reader text-[var(--ink)]">
-            {entry.label}
-          </h1>
-
-          {entry.collectionName ? (
-            <p className="home-magazine-hero-subtitle mt-3 text-[var(--ink-secondary)]">
-              {entry.collectionName}
-            </p>
-          ) : null}
-
-          {entry.detail ? (
-            <p className="mt-2 text-sm text-[var(--ink-muted)]">{entry.detail}</p>
-          ) : null}
-
-          <p className="home-magazine-lede mt-5 max-w-md text-[var(--ink-muted)]">
-            {editorialNote}
-          </p>
-
-          <div className="mt-8">
+    <section className="editorial-page-section space-y-4" aria-label="Continuer la lecture">
+      <p className="text-eyebrow">Continuer la lecture</p>
+      <EditorialCard
+        href={entry.href ?? "/library"}
+        featured
+        eyebrow={entry.collectionName ?? "Lecture en cours"}
+        title={entry.label}
+        meta={entry.detail}
+        footer={
+          <div className="space-y-4">
+            {textId ? <LibraryCardProgress textId={textId} /> : null}
+            <p className="editorial-intro text-sm">{editorialNote}</p>
             <PrimaryButton href={entry.href ?? "/library"}>Continuer la lecture</PrimaryButton>
           </div>
-        </div>
-
-        <HeroIllustration />
-      </div>
+        }
+      />
     </section>
   );
 }
 
-function ContinueHeroEmpty() {
+function ContinueReadingEmpty() {
   return (
-    <section className="home-magazine-hero">
-      <div className="home-magazine-hero-grid">
-        <div className="home-magazine-hero-copy min-w-0">
-          <EditorialEyebrow>Continuer la lecture</EditorialEyebrow>
-          <p className="home-magazine-hero-title mt-5 font-reader leading-snug text-[var(--ink-secondary)]">
-            Importez un texte pour commencer votre fil de lecture.
-          </p>
-          <p className="home-magazine-lede mt-5 max-w-md text-[var(--ink-muted)]">
-            Rossiyani transforme chaque texte en session de compréhension, exploration et
-            mémorisation.
-          </p>
-          <div className="mt-8">
-            <PrimaryButton href="/import">Importer un texte</PrimaryButton>
-          </div>
-        </div>
-
-        <HeroIllustration />
-      </div>
+    <section className="editorial-page-section space-y-4" aria-label="Continuer la lecture">
+      <SectionHeader
+        eyebrow="Continuer la lecture"
+        title="Commencez votre fil de session"
+        description="Importez un texte pour ouvrir une session de lecture, d'exploration et de mémorisation."
+      />
+      <PrimaryButton href="/import">Importer un texte</PrimaryButton>
     </section>
-  );
-}
-
-function DiscoveryCard({ entry, featured }: { entry: SessionJournalEntry; featured?: boolean }) {
-  const inner = (
-    <>
-      <p
-        className={[
-          "break-russian font-reader leading-snug text-[var(--ink)]",
-          featured ? "text-xl" : "text-lg",
-        ].join(" ")}
-      >
-        {entry.label}
-      </p>
-      {entry.detail ? (
-        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[var(--ink-muted)]">
-          {entry.detail}
-        </p>
-      ) : null}
-    </>
-  );
-
-  if (entry.href) {
-    return (
-      <Link
-        href={entry.href}
-        className={[
-          "home-magazine-card focus-kb group block h-full transition hover:border-[var(--ink-muted)]",
-          featured ? "home-magazine-card-featured" : "",
-        ].join(" ")}
-      >
-        <div className="group-hover:text-[var(--color-link)]">{inner}</div>
-        <span className="mt-4 inline-block text-sm text-[var(--ink-muted)] transition group-hover:text-[var(--color-link)]">
-          Explorer →
-        </span>
-      </Link>
-    );
-  }
-
-  return (
-    <article
-      className={[
-        "home-magazine-card h-full",
-        featured ? "home-magazine-card-featured" : "",
-      ].join(" ")}
-    >
-      {inner}
-    </article>
   );
 }
 
 function TodaySection({ entries }: { entries: SessionJournalEntry[] }) {
   if (entries.length === 0) {
     return (
-      <section className="home-magazine-section">
-        <EditorialEyebrow>Aujourd&apos;hui</EditorialEyebrow>
-        <p className="home-magazine-lede mt-5 max-w-lg text-[var(--ink-secondary)]">
-          Lisez, explorez ou enregistrez un mot — vos découvertes apparaîtront ici.
-        </p>
+      <section className="editorial-page-section">
+        <SectionHeader
+          eyebrow="Aujourd'hui"
+          title="Vos découvertes du jour"
+          description="Lisez, explorez ou enregistrez un mot — vos découvertes apparaîtront ici."
+        />
       </section>
     );
   }
 
-  const [featured, ...rest] = entries;
-
   return (
-    <section className="home-magazine-section">
-      <EditorialEyebrow>Aujourd&apos;hui</EditorialEyebrow>
-
-      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {featured ? (
-          <div className="md:col-span-2 lg:col-span-1">
-            <DiscoveryCard entry={featured} featured />
-          </div>
-        ) : null}
-        {rest.map((entry, index) => (
-          <DiscoveryCard key={`${entry.label}-${entry.href ?? index}`} entry={entry} />
+    <section className="editorial-page-section space-y-4" aria-label="Aujourd'hui">
+      <SectionHeader
+        eyebrow="Aujourd'hui"
+        title="Ce que vous venez d'apprendre"
+        description="Découvertes récentes issues de votre lecture et de votre exploration."
+      />
+      <div className="library-editorial-grid">
+        {entries.map((entry, index) => (
+          <EditorialCard
+            key={`${entry.label}-${entry.href ?? index}`}
+            href={entry.href}
+            featured={index === 0}
+            title={entry.label}
+            meta={entry.detail}
+            footer={
+              entry.href ? (
+                <GhostButton href={entry.href}>Explorer →</GhostButton>
+              ) : undefined
+            }
+          />
         ))}
       </div>
     </section>
@@ -240,44 +164,35 @@ function TodaySection({ entries }: { entries: SessionJournalEntry[] }) {
 function ReviewSection({ entries }: { entries: SessionJournalEntry[] }) {
   const visible = entries.slice(0, REVIEW_LIMIT);
 
-  if (visible.length === 0) {
-    return (
-      <section className="home-magazine-section">
-        <EditorialEyebrow>À revoir</EditorialEyebrow>
-        <p className="home-magazine-lede mt-5 max-w-lg text-[var(--ink-muted)]">
-          Rien en attente pour l&apos;instant.
-        </p>
-      </section>
-    );
-  }
-
   return (
-    <section className="home-magazine-section">
-      <EditorialEyebrow>À revoir</EditorialEyebrow>
-
-      <ul className="mt-5 flex flex-wrap gap-2">
-        {visible.map((entry) => (
-          <li key={`${entry.label}-${entry.href ?? entry.detail ?? ""}`}>
-            {entry.href ? (
-              <Link
-                href={entry.href}
-                className="focus-kb inline-flex items-center rounded-full border border-[var(--hairline)] bg-[var(--surface)] px-4 py-2 font-reader text-sm text-[var(--ink)] transition hover:border-[var(--ink-muted)]"
-              >
-                {entry.label}
-              </Link>
-            ) : (
-              <span className="inline-flex items-center rounded-full border border-[var(--hairline)] bg-[var(--surface)] px-4 py-2 font-reader text-sm text-[var(--ink-secondary)]">
-                {entry.label}
-              </span>
-            )}
-          </li>
-        ))}
-      </ul>
+    <section className="editorial-page-section space-y-4" aria-label="À revoir">
+      <SectionHeader
+        eyebrow="À revoir"
+        title="File de révision"
+        description={
+          visible.length > 0
+            ? "Mots et notions à consolider avant votre prochaine lecture."
+            : "Rien en attente pour l'instant."
+        }
+      />
+      {visible.length > 0 ? (
+        <ul className="flex flex-wrap gap-3">
+          {visible.map((entry) => (
+            <li key={`${entry.label}-${entry.href ?? entry.detail ?? ""}`}>
+              {entry.href ? (
+                <GhostButton href={entry.href}>{entry.label}</GhostButton>
+              ) : (
+                <Tag>{entry.label}</Tag>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </section>
   );
 }
 
-function NextStepSection({
+function RecommendedPracticeSection({
   step,
   rationale,
 }: {
@@ -285,28 +200,26 @@ function NextStepSection({
   rationale: string | null;
 }) {
   return (
-    <section className="home-magazine-section home-magazine-section-last">
-      <EditorialEyebrow>Prochaine étape</EditorialEyebrow>
-
-      <Link
+    <section className="editorial-page-section space-y-4" aria-label="Pratique recommandée">
+      <SectionHeader
+        eyebrow="Pratique recommandée"
+        title="Prochaine étape"
+        description="Une action concrète pour prolonger votre session."
+      />
+      <EditorialCard
         href={step.href ?? "/practice"}
-        className="home-magazine-card home-magazine-card-featured focus-kb group mt-5 block max-w-xl transition hover:border-[var(--ink-muted)]"
-      >
-        <p className="font-reader text-xl leading-snug text-[var(--ink)] transition group-hover:text-[var(--color-link)]">
-          {step.label}
-        </p>
-        {step.detail ? (
-          <p className="mt-2 text-sm text-[var(--ink-muted)]">{step.detail}</p>
-        ) : null}
-        {rationale ? (
-          <p className="home-magazine-rationale mt-4 text-sm leading-relaxed text-[var(--ink-muted)]">
-            {rationale}
-          </p>
-        ) : null}
-        <span className="mt-5 inline-block text-sm font-medium text-[var(--ink)] transition group-hover:text-[var(--color-link)]">
-          Commencer →
-        </span>
-      </Link>
+        featured
+        title={step.label}
+        meta={step.detail}
+        footer={
+          <div className="space-y-4">
+            {rationale ? (
+              <p className="editorial-intro text-sm italic text-[var(--ink-muted)]">{rationale}</p>
+            ) : null}
+            <PrimaryButton href={step.href ?? "/practice"}>Commencer</PrimaryButton>
+          </div>
+        }
+      />
     </section>
   );
 }
@@ -339,11 +252,19 @@ export function HomeSessionJournal({ journal, texts }: HomeSessionJournalProps) 
     : "";
 
   return (
-    <div className="home-magazine pb-12">
+    <div className="pb-8">
+      <header className="editorial-page-section pb-0">
+        <SectionHeader
+          eyebrow="Accueil"
+          title="Votre session"
+          description="Reprenez votre lecture, consolidez ce que vous venez d'apprendre, avancez pas à pas."
+        />
+      </header>
+
       {narrative.continueReading ? (
-        <ContinueHero entry={narrative.continueReading} editorialNote={heroNote} />
+        <ContinueReadingSection entry={narrative.continueReading} editorialNote={heroNote} />
       ) : (
-        <ContinueHeroEmpty />
+        <ContinueReadingEmpty />
       )}
 
       <TodaySection entries={today} />
@@ -351,7 +272,7 @@ export function HomeSessionJournal({ journal, texts }: HomeSessionJournalProps) 
       <ReviewSection entries={narrative.toReview} />
 
       {narrative.nextStep ? (
-        <NextStepSection step={narrative.nextStep} rationale={nextRationale} />
+        <RecommendedPracticeSection step={narrative.nextStep} rationale={nextRationale} />
       ) : null}
     </div>
   );

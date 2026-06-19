@@ -1,10 +1,8 @@
 export { ExplorerHub } from "./explorer-hub";
 export { ExplorerLayout } from "./explorer-layout";
 export { ExplorerBreadcrumb } from "./explorer-breadcrumb";
-export { ExplorerCategoryCard } from "./explorer-category-card";
 export { ExplorerSearchPanel } from "./explorer-search-panel";
-export { ExplorerSearchHero } from "./explorer-search-hero";
-export { ExplorerKnowledgeCanvas } from "./explorer-knowledge-canvas";
+export { ExplorerEditorialGrid, ExplorerEditorialSection } from "./explorer-editorial-grid";
 export { ExplorerRecentSection } from "./explorer-recent-section";
 export { UniversalSearchPanel } from "./universal-search-panel";
 export { BrowseList } from "./browse-list";

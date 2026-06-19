@@ -178,7 +178,7 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
               {knowledge.seenInTexts} texte{knowledge.seenInTexts > 1 ? "s" : ""}
             </ExplorerTutorMetaLine>
             {frequency ? (
-              <p className="text-sm text-amber-500" aria-label={frequency.label}>
+              <p className="text-sm text-[var(--ink-muted)]" aria-label={frequency.label}>
                 <span className="tracking-wider">{renderFrequencyStars(frequency.filledStars)}</span>
                 <span className="ml-2 text-[var(--ink-muted)]">{frequency.label}</span>
               </p>
@@ -191,7 +191,7 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
                 {knowledge.examples.slice(1).map((example) => (
                   <li
                     key={example.id}
-                    className="rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-4"
+                    className="ds-microscope-panel"
                   >
                     <p className="break-russian font-reader text-sm leading-relaxed text-[var(--ink)]">
                       {example.sentenceRussian}
@@ -254,7 +254,7 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
                 {morphRows.map((row) => (
                   <div
                     key={row.label}
-                    className="rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] px-4 py-3"
+                    className="ds-microscope-panel"
                   >
                     <dt className="text-xs text-[var(--ink-muted)]">{row.label}</dt>
                     <dd className="mt-1 font-reader text-lg text-[var(--ink)]">
@@ -274,7 +274,7 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
 
           {knowledge.forms.length > 0 ? (
             <ExplorerTutorAdvancedSection label="Formes rencontrées">
-              <div className="overflow-x-auto rounded-2xl border border-[var(--hairline)]">
+              <div className="overflow-x-auto border border-[var(--hairline)]">
                 <table className="w-full min-w-[520px] text-sm">
                   <thead>
                     <tr className="border-b border-[var(--hairline)] bg-[var(--surface)] text-left text-xs text-[var(--ink-muted)]">
@@ -322,7 +322,7 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
                   <Link
                     key={text.textId}
                     href={textPath(text.textId)}
-                    className="focus-kb rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-4 transition hover:border-[var(--ink-muted)]"
+                    className="focus-kb ds-microscope-panel transition hover:border-[var(--hairline-strong)]"
                   >
                     <p className="text-sm font-medium text-[var(--ink)]">{text.textTitle}</p>
                     <p className="mt-2 font-reader text-sm leading-relaxed text-[var(--ink-secondary)]">

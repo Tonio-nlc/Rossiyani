@@ -1,12 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { PageCanvas } from "@/components/editorial/page-canvas";
+import { EditorialContainer, TopNavigation } from "@/components/design-system";
 import { SyncLearningSignals } from "@/components/discovery/sync-learning-signals";
-import { AppTopNav } from "@/components/layout/app-top-nav";
 import { SearchProvider } from "@/components/layout/search-context";
 
 import { OfflineBanner } from "./offline-banner";
@@ -28,14 +27,11 @@ const NAV_SHORTCUTS = [
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   const router = useRouter();
   const [searchOpen, setSearchOpen] = useState(false);
 
   const openSearch = useCallback(() => setSearchOpen(true), []);
   const closeSearch = useCallback(() => setSearchOpen(false), []);
-
-  const isReader = pathname.startsWith("/texts/");
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -66,11 +62,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <SearchProvider openSearch={openSearch}>
       <div className="min-h-screen min-w-0 overflow-x-clip bg-[var(--paper)] text-[var(--ink)]">
         <OfflineBanner />
-        <AppTopNav />
+        <TopNavigation onOpenSearch={openSearch} />
         <SyncLearningSignals />
-        <main className="min-w-0">
-          <PageCanvas variant={isReader ? "reader" : "default"}>{children}</PageCanvas>
-        </main>
+        <EditorialContainer as="main" className="ds-app-main min-w-0">
+          {children}
+        </EditorialContainer>
         {searchOpen ? <UniversalSearchDialog open={searchOpen} onClose={closeSearch} /> : null}
       </div>
     </SearchProvider>

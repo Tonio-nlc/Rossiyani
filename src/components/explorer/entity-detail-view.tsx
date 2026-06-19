@@ -121,7 +121,7 @@ export function EntityDetailView({ data }: EntityDetailViewProps) {
                 {data.examples.slice(1).map((example, index) => (
                   <li
                     key={`${example.russian}-${index}`}
-                    className="rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-5"
+                    className="ds-microscope-panel"
                   >
                     <p className="break-russian font-reader text-base leading-snug text-[var(--ink)]">
                       {example.russian}
@@ -156,7 +156,7 @@ export function EntityDetailView({ data }: EntityDetailViewProps) {
                   <Link
                     key={`${text.textId ?? text.russian}`}
                     href={text.textId ? textPath(text.textId) : "#"}
-                    className="focus-kb group rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-5 transition hover:border-[var(--ink-muted)]"
+                    className="focus-kb ds-microscope-panel transition hover:border-[var(--hairline-strong)]"
                   >
                     {text.textTitle ? (
                       <p className="text-sm font-medium text-[var(--ink)]">{text.textTitle}</p>
@@ -182,7 +182,7 @@ export function EntityDetailView({ data }: EntityDetailViewProps) {
                   <Link
                     key={lesson.slug}
                     href={`/manual/lecons/${lesson.slug}`}
-                    className="focus-kb rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-5 transition hover:border-[var(--ink-muted)]"
+                    className="focus-kb ds-microscope-panel transition hover:border-[var(--hairline-strong)]"
                   >
                     <p className="font-reader text-lg text-[var(--ink)]">{lesson.title}</p>
                     <p className="mt-1 text-sm text-[var(--ink-muted)]">{lesson.level}</p>

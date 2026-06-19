@@ -5,7 +5,7 @@ import { getHomeJournalData } from "@/features/home";
 import { listTexts } from "@/features/texts";
 
 export const metadata: Metadata = {
-  title: "Dashboard · Rossiyani",
+  title: "Accueil · Rossiyani",
   description: "Votre fil de session — lecture, exploration et pratique.",
 };
 

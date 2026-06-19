@@ -1,11 +1,18 @@
-import Link from "next/link";
-
+import {
+  Divider,
+  EditorialCard,
+  GhostButton,
+  PrimaryButton,
+  SectionHeader,
+  Tag,
+} from "@/components/design-system";
+import { Reference } from "@/components/editorial";
 import {
   MANUAL_CATEGORY_LABELS,
   MANUAL_LEVEL_LABELS,
+  getLessonBySlug,
   type ManualLesson,
 } from "@/features/manual";
-import { getLessonBySlug } from "@/features/manual";
 
 import { ManualMarkdown } from "./manual-markdown";
 import { ManualLessonVisitTracker } from "./manual-lesson-visit-tracker";
@@ -19,101 +26,105 @@ export function ManualLessonView({ lesson }: ManualLessonViewProps) {
     .map((slug) => getLessonBySlug(slug))
     .filter((item): item is ManualLesson => item !== null);
 
-  return (
-    <article className="mx-auto max-w-3xl">
-      <ManualLessonVisitTracker slug={lesson.slug} />
-      <header className="space-y-4 border-b border-[var(--border)] pb-8">
-        <Link
-          href="/manual"
-          className="focus-kb text-xs text-[var(--muted)] transition hover:text-[var(--accent-violet-bright)]"
-        >
-          ← Manuel
-        </Link>
+  const practiceHref = `/practice?context=${encodeURIComponent(lesson.title)}`;
 
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--accent-violet-bright)]">
-            {lesson.level.toUpperCase()}
-          </span>
-          <span className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1 text-[10px] font-medium text-[var(--muted)]">
-            {MANUAL_CATEGORY_LABELS[lesson.category]}
-          </span>
-          <span className="text-xs text-[var(--muted)]">
-            {lesson.estimatedReadingTime} min · difficulté {lesson.difficulty}/5
-          </span>
+  return (
+    <article className="pb-8">
+      <ManualLessonVisitTracker slug={lesson.slug} />
+
+      <header className="editorial-page-section pb-0">
+        <GhostButton href="/manual">← Manuel</GhostButton>
+        <div className="mt-4">
+          <SectionHeader
+            eyebrow="Manuel"
+            title={lesson.title}
+            meta={`${MANUAL_LEVEL_LABELS[lesson.level]} · ${MANUAL_CATEGORY_LABELS[lesson.category]} · ${lesson.estimatedReadingTime} min · difficulté ${lesson.difficulty}/5`}
+          />
         </div>
 
-        <h1 className="font-reader text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
-          {lesson.title}
-        </h1>
-
-        {lesson.keywords.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {lesson.keywords.map((keyword) => (
-              <span
-                key={keyword}
-                className="rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[10px] text-[var(--muted)]"
-              >
-                {keyword}
-              </span>
-            ))}
-          </div>
-        ) : null}
+        <ul className="mt-4 flex flex-wrap gap-2">
+          <li>
+            <Tag>{lesson.level.toUpperCase()}</Tag>
+          </li>
+          <li>
+            <Tag>{MANUAL_CATEGORY_LABELS[lesson.category]}</Tag>
+          </li>
+          <li>
+            <Tag>Difficulté {lesson.difficulty}/5</Tag>
+          </li>
+          {lesson.keywords.map((keyword) => (
+            <li key={keyword}>
+              <Tag>{keyword}</Tag>
+            </li>
+          ))}
+        </ul>
 
         {lesson.prerequisites.length > 0 ? (
-          <p className="text-sm text-[var(--muted)]">
-            Prérequis :{" "}
-            {lesson.prerequisites.map((slug, index) => {
-              const prereq = getLessonBySlug(slug);
-              if (!prereq) {
-                return (
-                  <span key={slug}>
-                    {index > 0 ? ", " : ""}
-                    {slug}
-                  </span>
-                );
-              }
-              return (
-                <span key={slug}>
-                  {index > 0 ? ", " : ""}
-                  <Link
-                    href={`/manual/lecons/${slug}`}
-                    className="text-[var(--accent-violet-bright)] hover:underline"
-                  >
-                    {prereq.title}
-                  </Link>
-                </span>
-              );
-            })}
-          </p>
+          <PracticeMarginPrerequisites lesson={lesson} />
         ) : null}
       </header>
 
-      <div className="mt-10">
+      <section className="editorial-page-section pb-0">
         <ManualMarkdown content={lesson.content} />
-      </div>
+      </section>
 
       {related.length > 0 ? (
-        <footer className="mt-12 border-t border-[var(--border)] pt-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-            Leçons liées
-          </p>
-          <ul className="mt-4 space-y-2">
+        <section className="editorial-page-section pb-0">
+          <p className="text-eyebrow mb-4">Concepts liés</p>
+          <div className="library-editorial-grid">
             {related.map((item) => (
-              <li key={item.slug}>
-                <Link
-                  href={`/manual/lecons/${item.slug}`}
-                  className="focus-kb font-reader text-[var(--accent-violet-bright)] hover:underline"
-                >
-                  {item.title}
-                </Link>
-                <span className="ml-2 text-xs text-[var(--muted)]">
-                  {MANUAL_LEVEL_LABELS[item.level]}
-                </span>
-              </li>
+              <EditorialCard
+                key={item.slug}
+                href={`/manual/lecons/${item.slug}`}
+                eyebrow={MANUAL_LEVEL_LABELS[item.level]}
+                title={item.title}
+                meta={`${item.estimatedReadingTime} min`}
+                footer={
+                  <GhostButton href={`/manual/lecons/${item.slug}`}>Lire →</GhostButton>
+                }
+              />
             ))}
-          </ul>
-        </footer>
+          </div>
+        </section>
       ) : null}
+
+      <section className="editorial-page-section pb-0">
+        <Divider />
+        <div className="mt-6 space-y-4">
+          <p className="text-eyebrow">Pratique</p>
+          <p className="editorial-intro max-w-2xl">
+            Appliquez cette leçon en formulant vos propres phrases en russe.
+          </p>
+          <PrimaryButton href={practiceHref}>Mettre en pratique →</PrimaryButton>
+        </div>
+      </section>
+
+      <footer className="editorial-page-section flex flex-wrap gap-4 border-t border-[var(--hairline)] pt-6">
+        <GhostButton href="/manual">Retour au manuel →</GhostButton>
+        <Reference href={practiceHref}>Ouvrir dans la pratique →</Reference>
+      </footer>
     </article>
+  );
+}
+
+function PracticeMarginPrerequisites({ lesson }: { lesson: ManualLesson }) {
+  return (
+    <aside className="mt-6 border-l-2 border-[var(--hairline)] pl-4 text-sm leading-relaxed text-[var(--ink-muted)]">
+      <p className="text-eyebrow mb-2">Prérequis</p>
+      <ul className="space-y-1">
+        {lesson.prerequisites.map((slug) => {
+          const prereq = getLessonBySlug(slug);
+          return (
+            <li key={slug}>
+              {prereq ? (
+                <Reference href={`/manual/lecons/${slug}`}>{prereq.title}</Reference>
+              ) : (
+                slug
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </aside>
   );
 }

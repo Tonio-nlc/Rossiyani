@@ -1,9 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ChangeEvent } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { Reference, Section, TextEditorialContext } from "@/components/editorial";
+import {
+  GhostButton,
+  InputField,
+  PracticeInput,
+  PracticeMarginNote,
+  PrimaryButton,
+  SectionHeader,
+  Tag,
+} from "@/components/design-system";
+import { Reference, TextEditorialContext } from "@/components/editorial";
 import { useToast } from "@/components/ui/toast-provider";
 import type { StructureContext } from "@/features/practice/get-structure-context";
 import { isPhraseSaved, rewriteTypeFromPresetId, savePhrase } from "@/features/library";
@@ -16,7 +25,6 @@ import { COMPOSE_REGISTERS, COMPOSE_THEMES } from "@/lib/compose/types";
 import { saveComposePhrase, getComposePhraseById } from "@/lib/compose/saved-phrases";
 import { PRACTICE_SUGGESTIONS } from "@/lib/practice/constants";
 
-import { ContextTranslationEntryCard } from "@/components/practice/context-translation-entry-card";
 import { PracticeAnalysisView } from "./practice-analysis-view";
 
 type RewriteResult = {
@@ -24,6 +32,21 @@ type RewriteResult = {
   shortTitle: string;
   text: string;
   explanation: string;
+};
+
+const THEME_LABELS: Record<ComposeTheme, string> = {
+  daily_life: "Vie quotidienne",
+  work: "Travail",
+  travel: "Voyage",
+  literature: "Littérature",
+  conversation: "Conversation",
+  free: "Libre",
+};
+
+const REGISTER_LABELS: Record<ComposeRegister, string> = {
+  casual: "Familier",
+  neutral: "Neutre",
+  formal: "Formel",
 };
 
 function isStructureMode(searchParams: URLSearchParams): boolean {
@@ -218,7 +241,7 @@ export function PracticeWorkspace() {
         source: "practice",
       });
       setRewriteSavedLocally(true);
-      toast("✓ Saved to Library", "success");
+      toast("Enregistré dans la bibliothèque", "success");
     },
     [analysis, openRewriteId, rewriteResult?.explanation, russianText, toast],
   );
@@ -262,215 +285,200 @@ export function PracticeWorkspace() {
 
   return (
     <form
-      className="space-y-8"
+      className="pb-8"
       onSubmit={(event) => {
         event.preventDefault();
         void analyze();
       }}
     >
-      <Section eyebrow="Practice" title="Express an idea in Russian.">
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--ink-secondary)]">
-          Practice is where you transform thoughts into natural Russian.
-        </p>
-      </Section>
-
-      <ContextTranslationEntryCard />
+      <header className="editorial-page-section pb-0">
+        <SectionHeader
+          eyebrow="Pratique"
+          title="Exprimer une idée en russe"
+          description="Transformez une pensée en russe naturel — l'exercice est l'interface."
+        />
+      </header>
 
       {structureMode && structureContext ? (
-        <StructureHeader context={structureContext} referenceSentence={referenceSentence} />
+        <section className="editorial-page-section pb-0">
+          <StructureContextNote
+            context={structureContext}
+            referenceSentence={referenceSentence}
+          />
+        </section>
       ) : null}
 
       {structureMode && !structureContext && searchParams.get("structure") ? (
-        <StructureHeader
-          context={{
-            label: searchParams.get("structure") ?? "",
-            meaning: null,
-            explanation: null,
-            exampleSentence: referenceSentence,
-            readerHref: searchParams.get("textId")
-              ? `/texts/${searchParams.get("textId")}`
-              : null,
-            readerTitle: searchParams.get("textTitle"),
-            readerCollectionId: null,
-            readerCollectionName: null,
-            explorerHref: `/explorer?q=${encodeURIComponent(searchParams.get("structure") ?? "")}`,
-          }}
-          referenceSentence={referenceSentence}
-        />
+        <section className="editorial-page-section pb-0">
+          <StructureContextNote
+            context={{
+              label: searchParams.get("structure") ?? "",
+              meaning: null,
+              explanation: null,
+              exampleSentence: referenceSentence,
+              readerHref: searchParams.get("textId")
+                ? `/texts/${searchParams.get("textId")}`
+                : null,
+              readerTitle: searchParams.get("textTitle"),
+              readerCollectionId: null,
+              readerCollectionName: null,
+              explorerHref: `/explorer?q=${encodeURIComponent(searchParams.get("structure") ?? "")}`,
+            }}
+            referenceSentence={referenceSentence}
+          />
+        </section>
       ) : null}
 
       {!structureMode ? (
-        <div>
-          <label htmlFor="practice-context" className="home-section-label">
-            What do you want to say?
-          </label>
-          <input
+        <section className="editorial-page-section pb-0">
+          <InputField
             id="practice-context"
+            label="Que voulez-vous dire ?"
             type="text"
             value={context}
-            onChange={(event) => setContext(event.target.value)}
-            placeholder="Optional — your idea in any language"
-            className="focus-kb mt-3 w-full border-b border-[var(--hairline)] bg-transparent py-2 font-reader text-base text-[var(--ink)] outline-none placeholder:text-[var(--ink-muted)]"
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setContext(event.target.value)}
+            placeholder="Optionnel — votre idée dans n'importe quelle langue"
           />
-        </div>
+        </section>
       ) : null}
 
       {showSuggestions ? (
-        <div>
-          <p className="home-section-label">Need inspiration?</p>
-          <ul className="mt-3 flex flex-wrap gap-2">
+        <section className="editorial-page-section pb-0">
+          <p className="text-eyebrow mb-3">Besoin d&apos;inspiration ?</p>
+          <ul className="flex flex-wrap gap-2">
             {PRACTICE_SUGGESTIONS.map((suggestion) => (
               <li key={suggestion.label}>
-                <button
-                  type="button"
-                  onClick={() => setContext(suggestion.context)}
-                  className="focus-kb border border-[var(--hairline)] px-3 py-1.5 text-sm text-[var(--ink-secondary)] transition hover:border-[var(--ink-muted)] hover:text-[var(--ink)]"
-                >
-                  {suggestion.label}
-                </button>
+                <Tag onClick={() => setContext(suggestion.context)}>{suggestion.label}</Tag>
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       ) : null}
 
-      <div>
-        <label htmlFor="practice-russian" className="home-section-label">
-          {structureMode ? "Now express your own idea" : "Write naturally in Russian"}
-        </label>
-        <textarea
+      <section className="editorial-page-section">
+        <PracticeInput
           id="practice-russian"
+          label={
+            structureMode ? "Exprimez votre propre idée" : "Écrivez naturellement en russe"
+          }
           value={russianText}
           onChange={(event) => setRussianText(event.target.value)}
-          rows={4}
+          rows={5}
           required
-          className="focus-kb break-russian mt-3 w-full min-w-0 resize-y border border-[var(--hairline)] bg-transparent px-3 py-3 font-reader text-[clamp(1rem,2.5vw,1.125rem)] leading-relaxed text-[var(--ink)] outline-none placeholder:text-[var(--ink-muted)]"
           placeholder="Ваше предложение…"
         />
-      </div>
+      </section>
 
-      <details
-        className="group"
-        open={advancedOpen}
-        onToggle={(event) => setAdvancedOpen(event.currentTarget.open)}
-      >
-        <summary className="focus-kb cursor-pointer text-sm font-medium text-[var(--ink-secondary)]">
-          Advanced
-        </summary>
+      {advancedOpen ? (
+        <section className="editorial-page-section pb-0">
+          <PracticeMarginNote>
+            <div className="grid gap-6 sm:grid-cols-2">
+              <fieldset>
+                <legend className="text-eyebrow mb-2">Thème</legend>
+                <ul className="space-y-1.5">
+                  {COMPOSE_THEMES.map((item) => (
+                    <li key={item.id}>
+                      <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--ink-muted)]">
+                        <input
+                          type="radio"
+                          name="theme"
+                          value={item.id}
+                          checked={theme === item.id}
+                          onChange={() => setTheme(item.id)}
+                        />
+                        {THEME_LABELS[item.id]}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </fieldset>
 
-        <div className="mt-4 grid gap-6 sm:grid-cols-2">
-          <fieldset>
-            <legend className="home-section-label">Theme</legend>
-            <ul className="mt-2 space-y-1">
-              {COMPOSE_THEMES.map((item) => (
-                <li key={item.id}>
-                  <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--ink-secondary)]">
-                    <input
-                      type="radio"
-                      name="theme"
-                      value={item.id}
-                      checked={theme === item.id}
-                      onChange={() => setTheme(item.id)}
-                    />
-                    {item.label}
-                  </label>
-                </li>
-              ))}
-            </ul>
-          </fieldset>
+              <fieldset>
+                <legend className="text-eyebrow mb-2">Registre</legend>
+                <ul className="space-y-1.5">
+                  {COMPOSE_REGISTERS.map((item) => (
+                    <li key={item.id}>
+                      <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--ink-muted)]">
+                        <input
+                          type="radio"
+                          name="register"
+                          value={item.id}
+                          checked={register === item.id}
+                          onChange={() => setRegister(item.id)}
+                        />
+                        {REGISTER_LABELS[item.id]}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </fieldset>
+            </div>
+          </PracticeMarginNote>
+        </section>
+      ) : null}
 
-          <fieldset>
-            <legend className="home-section-label">Register</legend>
-            <ul className="mt-2 space-y-1">
-              {COMPOSE_REGISTERS.map((item) => (
-                <li key={item.id}>
-                  <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--ink-secondary)]">
-                    <input
-                      type="radio"
-                      name="register"
-                      value={item.id}
-                      checked={register === item.id}
-                      onChange={() => setRegister(item.id)}
-                    />
-                    {item.label}
-                  </label>
-                </li>
-              ))}
-            </ul>
-          </fieldset>
+      <footer className="editorial-page-section flex flex-wrap items-center justify-between gap-4 border-t border-[var(--hairline)] pt-6">
+        <div className="flex flex-wrap items-center gap-4">
+          <GhostButton onClick={() => setAdvancedOpen((open) => !open)}>
+            {advancedOpen ? "Masquer les options" : "Options avancées"}
+          </GhostButton>
+          <GhostButton href="/practice/context-translation">
+            Traduction contextualisée →
+          </GhostButton>
         </div>
-      </details>
-
-      <div className="flex justify-end">
-        <button
-          type="submit"
-          disabled={loading || !russianText.trim()}
-          className="focus-kb bg-[var(--ink)] px-6 py-3 text-sm font-medium text-[var(--paper)] transition hover:opacity-90 disabled:opacity-40"
-        >
-          {loading ? "Analyzing…" : "Analyze →"}
-        </button>
-      </div>
+        <PrimaryButton type="submit" disabled={loading || !russianText.trim()}>
+          {loading ? "Analyse…" : "Analyser →"}
+        </PrimaryButton>
+      </footer>
     </form>
   );
 }
 
-type StructureHeaderProps = {
+type StructureContextNoteProps = {
   context: StructureContext;
   referenceSentence: string | null;
 };
 
-function StructureHeader({ context, referenceSentence }: StructureHeaderProps) {
+function StructureContextNote({ context, referenceSentence }: StructureContextNoteProps) {
   const example = context.exampleSentence ?? referenceSentence;
 
   return (
-    <div className="space-y-4 border-b border-[var(--hairline)] pb-6">
-      <p className="home-section-label">Using this structure</p>
-      <p className="break-russian font-reader text-[clamp(1.5rem,3vw,1.75rem)] text-[var(--ink)]">{context.label}</p>
+    <PracticeMarginNote>
+      <p className="text-eyebrow mb-2">Structure à utiliser</p>
+      <p className="break-russian font-reader text-xl text-[var(--ink)]">{context.label}</p>
 
       {context.meaning ? (
-        <div>
-          <p className="home-section-label">Meaning</p>
-          <p className="mt-1 text-sm text-[var(--ink-secondary)]">{context.meaning}</p>
-        </div>
+        <p className="mt-3 text-sm leading-relaxed">{context.meaning}</p>
       ) : null}
 
       {context.explanation ? (
-        <div>
-          <p className="home-section-label">Explanation</p>
-          <p className="mt-1 text-sm leading-relaxed text-[var(--ink-secondary)]">
-            {context.explanation}
-          </p>
-        </div>
+        <p className="mt-2 text-sm leading-relaxed">{context.explanation}</p>
       ) : null}
 
       {example ? (
-        <div>
-          <p className="home-section-label">Authentic example</p>
-          <p className="mt-1 font-reader text-base text-[var(--ink)]">{example}</p>
-        </div>
+        <p className="mt-3 break-russian font-reader text-base text-[var(--ink)]">{example}</p>
       ) : null}
 
       {context.readerHref && context.readerTitle && context.readerCollectionId ? (
-        <TextEditorialContext
-          eyebrow="Basé sur :"
-          title={context.readerTitle}
-          collectionId={context.readerCollectionId}
-          href={context.readerHref}
-          size="sm"
-        />
+        <div className="mt-4">
+          <TextEditorialContext
+            eyebrow="Basé sur :"
+            title={context.readerTitle}
+            collectionId={context.readerCollectionId}
+            href={context.readerHref}
+            size="sm"
+          />
+        </div>
       ) : null}
 
-      <div className="flex flex-wrap gap-4 text-sm">
+      <div className="mt-4 flex flex-wrap gap-4">
         {context.readerHref ? (
           <Reference href={context.readerHref}>
-            {context.readerTitle ? "Ouvrir dans le Reader →" : "Open in Reader →"}
+            {context.readerTitle ? "Ouvrir dans le Reader →" : "Ouvrir dans le Reader →"}
           </Reference>
         ) : null}
-        <Reference href={context.explorerHref}>Open in Explorer →</Reference>
+        <Reference href={context.explorerHref}>Explorer →</Reference>
       </div>
-    </div>
+    </PracticeMarginNote>
   );
 }
-
-/** @deprecated Use PracticeWorkspace */
-export const ComposeWorkspace = PracticeWorkspace;

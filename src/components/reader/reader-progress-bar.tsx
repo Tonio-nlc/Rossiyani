@@ -1,6 +1,6 @@
 "use client";
 
-import { ProgressBar } from "@/components/ui/progress-bar";
+import { ProgressBar } from "@/components/design-system";
 
 type ReaderProgressBarProps = {
   percent: number;

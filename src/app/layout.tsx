@@ -4,7 +4,7 @@ import { EB_Garamond, Hanken_Grotesk } from "next/font/google";
 import { ExplorerPathTracker } from "@/components/explorer/explorer-path-tracker";
 import { AppShell } from "@/components/layout";
 import { OnboardingGate } from "@/components/onboarding";
-import { ToastProvider } from "@/components/ui";
+import { ToastProvider } from "@/components/design-system";
 
 import "./globals.css";
 

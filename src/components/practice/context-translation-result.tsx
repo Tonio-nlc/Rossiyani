@@ -1,7 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+
+import {
+  GhostButton,
+  InputField,
+  PracticeMarginNote,
+  PrimaryButton,
+  SectionHeader,
+} from "@/components/design-system";
 
 import {
   isContextTranslationPhraseSaved,
@@ -69,12 +77,12 @@ function isSectionVisible(key: SectionKey, order: SectionKey[], visibleSections:
 
 function naturalnessLabel(score: number): string {
   if (score >= 85) {
-    return "Sounds completely natural";
+    return "Sonorité parfaitement naturelle";
   }
   if (score >= 60) {
-    return "Understandable but stiff";
+    return "Compréhensible, mais un peu rigide";
   }
-  return "Non-native phrasing";
+  return "Formulation non native";
 }
 
 function LessonSection({
@@ -93,38 +101,13 @@ function LessonSection({
   }
 
   return (
-    <section className="animate-fade-up-subtle space-y-3 border-t border-[var(--hairline)] pt-6 first:border-t-0 first:pt-0">
+    <section className="editorial-page-section animate-fade-up-subtle space-y-3 border-t border-[var(--hairline)] pt-6 pb-0">
       <div className="flex items-baseline justify-between gap-4">
-        <p className="home-section-label">{label}</p>
+        <p className="text-eyebrow">{label}</p>
         {action}
       </div>
       {children}
     </section>
-  );
-}
-
-function InlineAction({
-  label,
-  activeLabel,
-  active,
-  onClick,
-  disabled,
-}: {
-  label: string;
-  activeLabel: string;
-  active: boolean;
-  onClick: () => void;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled || active}
-      className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline disabled:opacity-50"
-    >
-      {active ? activeLabel : label}
-    </button>
   );
 }
 
@@ -142,21 +125,18 @@ function CopyButton({ text }: { text: string }) {
   }, [text]);
 
   return (
-    <InlineAction
-      label="Copy"
-      activeLabel="Copied ✓"
-      active={copied}
-      onClick={() => void copy()}
-    />
+    <GhostButton onClick={() => void copy()} disabled={copied}>
+      {copied ? "Copié" : "Copier"}
+    </GhostButton>
   );
 }
 
 const REGISTER_LABELS: Record<string, string> = {
-  neutral: "Neutral",
-  informal: "Informal",
-  spoken: "Spoken",
-  literary: "Literary",
-  formal: "Formal",
+  neutral: "Neutre",
+  informal: "Informel",
+  spoken: "Parlé",
+  literary: "Littéraire",
+  formal: "Formel",
 };
 
 const REGISTER_ORDER = ["neutral", "informal", "spoken", "literary", "formal"];
@@ -177,10 +157,8 @@ function SavePhraseButton({
   );
 
   return (
-    <InlineAction
-      label="Save"
-      activeLabel="Saved ✓"
-      active={saved}
+    <GhostButton
+      disabled={saved}
       onClick={() => {
         saveContextTranslationPhrase({
           sourceSentence,
@@ -190,7 +168,9 @@ function SavePhraseButton({
         });
         setSaved(true);
       }}
-    />
+    >
+      {saved ? "Enregistré" : "Enregistrer"}
+    </GhostButton>
   );
 }
 
@@ -198,15 +178,15 @@ function SaveNoteButton({ note, sourceSentence }: { note: string; sourceSentence
   const [saved, setSaved] = useState(() => isCulturalNoteSaved(note, sourceSentence));
 
   return (
-    <InlineAction
-      label="Save note"
-      activeLabel="Saved ✓"
-      active={saved}
+    <GhostButton
+      disabled={saved}
       onClick={() => {
         saveCulturalNote(note, sourceSentence);
         setSaved(true);
       }}
-    />
+    >
+      {saved ? "Enregistré" : "Enregistrer"}
+    </GhostButton>
   );
 }
 
@@ -239,21 +219,16 @@ function GrammarConceptRow({
         ) : null}
       </div>
       <div className="flex shrink-0 items-center gap-3">
-        <Link
-          href={concept.href}
-          className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
-        >
-          Open Explorer
-        </Link>
-        <InlineAction
-          label="Save concept"
-          activeLabel="Saved ✓"
-          active={saved}
+        <GhostButton href={concept.href}>Explorer →</GhostButton>
+        <GhostButton
+          disabled={saved}
           onClick={() => {
             saveGrammarConcept(concept.label, concept.href, sourceSentence);
             setSaved(true);
           }}
-        />
+        >
+          {saved ? "Enregistré" : "Enregistrer"}
+        </GhostButton>
       </div>
     </li>
   );
@@ -276,9 +251,19 @@ function FollowUpPanel({
     return null;
   }
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = question.trim();
+    if (!trimmed || loading) {
+      return;
+    }
+    setQuestion("");
+    void onSubmit(trimmed);
+  };
+
   return (
-    <section className="animate-fade-up-subtle space-y-3 border-t border-[var(--hairline)] pt-6">
-      <p className="home-section-label">Ask a follow-up question</p>
+    <section className="editorial-page-section animate-fade-up-subtle space-y-4 border-t border-[var(--hairline)] pt-6 pb-0">
+      <p className="text-eyebrow">Poser une question</p>
 
       {messages.length > 0 ? (
         <ul className="space-y-3">
@@ -287,9 +272,7 @@ function FollowUpPanel({
               key={`${message.role}-${index}`}
               className={[
                 "text-sm leading-relaxed",
-                message.role === "user"
-                  ? "text-[var(--ink)]"
-                  : "text-[var(--ink-secondary)]",
+                message.role === "user" ? "text-[var(--ink)]" : "text-[var(--ink-muted)]",
               ].join(" ")}
             >
               {message.content}
@@ -298,33 +281,17 @@ function FollowUpPanel({
         </ul>
       ) : null}
 
-      <form
-        className="space-y-2"
-        onSubmit={(event) => {
-          event.preventDefault();
-          const trimmed = question.trim();
-          if (!trimmed || loading) {
-            return;
-          }
-          setQuestion("");
-          void onSubmit(trimmed);
-        }}
-      >
-        <input
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <InputField
           type="text"
           value={question}
-          onChange={(event) => setQuestion(event.target.value)}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => setQuestion(event.target.value)}
           disabled={loading}
-          placeholder="Can I say this to my boss?"
-          className="focus-kb w-full border-b border-[var(--hairline)] bg-transparent py-2 text-sm text-[var(--ink)] outline-none placeholder:text-[var(--ink-muted)] disabled:opacity-50"
+          placeholder="Puis-je dire cela à mon patron ?"
         />
-        <button
-          type="submit"
-          disabled={loading || !question.trim()}
-          className="focus-kb text-sm text-[var(--ink-muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline disabled:opacity-40"
-        >
-          {loading ? "Thinking…" : "Ask"}
-        </button>
+        <PrimaryButton type="submit" disabled={loading || !question.trim()}>
+          {loading ? "Réflexion…" : "Demander →"}
+        </PrimaryButton>
       </form>
     </section>
   );
@@ -368,147 +335,121 @@ export function ContextTranslationResult({
   }, [onSaveLesson]);
 
   return (
-    <article className="mx-auto max-w-2xl space-y-0 pb-12">
-      <header className="mb-7 space-y-3">
-        <Link
-          href="/practice"
-          className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
-        >
-          ← Practice
-        </Link>
-        <p className="text-xs uppercase tracking-[0.18em] text-[var(--ink-muted)]">
-          Context Translation
-        </p>
-        <p className="text-sm text-[var(--ink-secondary)]">{analysis.sourceText}</p>
+    <article className="pb-8">
+      <header className="editorial-page-section pb-0">
+        <GhostButton href="/practice">← Pratique</GhostButton>
+        <div className="mt-4">
+          <SectionHeader
+            eyebrow="Traduction contextualisée"
+            title="Résultat"
+            description={analysis.sourceText}
+          />
+        </div>
       </header>
 
       {show("best") ? (
-        <section className="animate-fade-up-subtle space-y-3 border-t border-[var(--hairline)] pt-6">
-          <p className="home-section-label">Best native translation</p>
+        <section className="editorial-page-section animate-fade-up-subtle space-y-4 border-t border-[var(--hairline)] pt-6 pb-0">
+          <p className="text-eyebrow">Meilleure formulation native</p>
           <p className="break-russian font-reader text-[clamp(1.75rem,4vw,2.35rem)] leading-tight text-[var(--ink)]">
             {analysis.bestTranslation}
           </p>
 
           {analysis.naturalness ? (
-            <div className="space-y-2">
-              <p className="text-sm text-[var(--ink-secondary)]">
-                {analysis.naturalness.score >= 85 ? "✓ " : ""}
-                {naturalnessLabel(analysis.naturalness.score)}
-              </p>
+            <PracticeMarginNote>
+              <p className="text-sm">{naturalnessLabel(analysis.naturalness.score)}</p>
               {analysis.naturalness.score < 85 ? (
-                <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">
-                  {analysis.naturalness.explanation}
-                </p>
+                <p className="mt-2 leading-relaxed">{analysis.naturalness.explanation}</p>
               ) : null}
               {analysis.naturalness.preferredExpression ? (
-                <p className="break-russian font-reader text-base text-[var(--ink)]">
+                <p className="mt-3 break-russian font-reader text-base text-[var(--ink)]">
                   {analysis.naturalness.preferredExpression}
                 </p>
               ) : null}
-            </div>
+            </PracticeMarginNote>
           ) : (
-            <p className="text-sm text-[var(--ink-secondary)]">Native formulation</p>
+            <p className="text-sm text-[var(--ink-muted)]">Formulation native</p>
           )}
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
             <CopyButton text={analysis.bestTranslation} />
-            <InlineAction
-              label="Save phrase"
-              activeLabel="Saved ✓"
-              active={phraseSaved}
-              onClick={handleSavePhrase}
-            />
-            <InlineAction
-              label="Save lesson"
-              activeLabel="Saved to Library ✓"
-              active={savedLesson}
-              disabled={enrichmentLoading}
-              onClick={handleSaveLesson}
-            />
+            <GhostButton disabled={phraseSaved} onClick={handleSavePhrase}>
+              {phraseSaved ? "Enregistré" : "Enregistrer la phrase"}
+            </GhostButton>
+            <GhostButton disabled={savedLesson || enrichmentLoading} onClick={handleSaveLesson}>
+              {savedLesson ? "Leçon enregistrée" : "Enregistrer la leçon"}
+            </GhostButton>
           </div>
         </section>
       ) : null}
 
-      <LessonSection visible={show("think")} label="Think like a native">
-        <div className="space-y-4 text-sm leading-relaxed">
-          <div className="space-y-1.5">
-            <p className="text-xs text-[var(--ink-muted)]">
-              {thinkLikeNative.sourceLanguageLabel} thought
+      <LessonSection visible={show("think")} label="Penser comme un natif">
+        <PracticeMarginNote>
+          <div className="space-y-4 text-sm leading-relaxed">
+            <div className="space-y-1.5">
+              <p className="text-xs text-[var(--ink-muted)]">
+                Pensée {thinkLikeNative.sourceLanguageLabel.toLowerCase()}
+              </p>
+              <p className="font-reader text-base text-[var(--ink)]">
+                &ldquo;{thinkLikeNative.sourceThought}&rdquo;
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <p className="text-xs text-[var(--ink-muted)]">Image mentale</p>
+              <p>&ldquo;{thinkLikeNative.mentalImage}&rdquo;</p>
+            </div>
+
+            <div className="border-t border-[var(--hairline)] pt-4">
+              <p className="text-xs text-[var(--ink-muted)]">Pensée russe native</p>
+              <p className="mt-1.5">&ldquo;{thinkLikeNative.nativeThought}&rdquo;</p>
+            </div>
+
+            <p className="break-russian font-reader text-xl text-[var(--ink)]">
+              {thinkLikeNative.nativeFormulation}
             </p>
-            <p className="font-reader text-base text-[var(--ink)]">
-              &ldquo;{thinkLikeNative.sourceThought}&rdquo;
-            </p>
+
+            <p className="border-t border-[var(--hairline)] pt-3">{thinkLikeNative.conceptualShift}</p>
           </div>
-
-          <p className="text-center text-[var(--ink-muted)]" aria-hidden>
-            ↓
-          </p>
-
-          <div className="space-y-1.5">
-            <p className="text-xs text-[var(--ink-muted)]">Mental image</p>
-            <p className="text-[var(--ink-secondary)]">
-              &ldquo;{thinkLikeNative.mentalImage}&rdquo;
-            </p>
-          </div>
-
-          <div className="border-t border-[var(--hairline)] pt-4" />
-
-          <div className="space-y-1.5">
-            <p className="text-xs text-[var(--ink-muted)]">Native Russian thought</p>
-            <p className="text-[var(--ink-secondary)]">
-              &ldquo;{thinkLikeNative.nativeThought}&rdquo;
-            </p>
-          </div>
-
-          <p className="text-center text-[var(--ink-muted)]" aria-hidden>
-            ↓
-          </p>
-
-          <p className="break-russian font-reader text-xl text-[var(--ink)]">
-            {thinkLikeNative.nativeFormulation}
-          </p>
-
-          <p className="border-t border-[var(--hairline)] pt-3 text-[var(--ink-secondary)]">
-            {thinkLikeNative.conceptualShift}
-          </p>
-        </div>
+        </PracticeMarginNote>
       </LessonSection>
 
       {analysis.corrections.length > 0 ? (
-        <LessonSection visible={show("errors")} label="Error analysis">
+        <LessonSection visible={show("errors")} label="Analyse des erreurs">
           <ul className="space-y-6">
             {analysis.corrections.map((item) => (
-              <li key={`${item.userText}-${item.correction}`} className="space-y-2.5">
-                <p className="break-russian font-reader text-lg text-[var(--ink)]">{item.userText}</p>
-                <dl className="space-y-2 text-sm">
-                  <div>
-                    <dt className="text-[var(--ink-muted)]">Problem</dt>
-                    <dd className="mt-0.5 text-[var(--ink-secondary)]">{item.problem}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-[var(--ink-muted)]">What natives understand</dt>
-                    <dd className="mt-0.5 text-[var(--ink-secondary)]">{item.nativeInterpretation}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-[var(--ink-muted)]">Native correction</dt>
-                    <dd className="mt-0.5 break-russian font-reader text-[var(--ink)]">
-                      {item.correction}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[var(--ink-muted)]">Reason</dt>
-                    <dd className="mt-0.5 text-[var(--ink-secondary)]">{item.reason}</dd>
-                  </div>
-                </dl>
+              <li key={`${item.userText}-${item.correction}`}>
+                <PracticeMarginNote>
+                  <p className="break-russian font-reader text-lg text-[var(--ink)]">{item.userText}</p>
+                  <dl className="mt-3 space-y-2 text-sm">
+                    <div>
+                      <dt className="text-xs text-[var(--ink-muted)]">Problème</dt>
+                      <dd className="mt-0.5">{item.problem}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-[var(--ink-muted)]">Ce que comprennent les natifs</dt>
+                      <dd className="mt-0.5">{item.nativeInterpretation}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-[var(--ink-muted)]">Correction native</dt>
+                      <dd className="mt-0.5 break-russian font-reader text-[var(--ink)]">
+                        {item.correction}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-[var(--ink-muted)]">Raison</dt>
+                      <dd className="mt-0.5">{item.reason}</dd>
+                    </div>
+                  </dl>
+                </PracticeMarginNote>
               </li>
             ))}
           </ul>
         </LessonSection>
       ) : null}
 
-      <LessonSection visible={show("alternatives")} label="Alternative expressions">
+      <LessonSection visible={show("alternatives")} label="Expressions alternatives">
         {enrichmentLoading && analysis.alternatives.length === 0 ? (
-          <p className="text-sm text-[var(--ink-muted)]">Finding alternatives…</p>
+          <p className="text-sm text-[var(--ink-muted)]">Recherche d&apos;alternatives…</p>
         ) : alternativesByRegister.length > 0 ? (
           <ul className="space-y-5">
             {alternativesByRegister.map((group, groupIndex) => (
@@ -522,14 +463,14 @@ export function ContextTranslationResult({
                 <ul className="mt-2.5 space-y-4">
                   {group.items.map((alt) => (
                     <li
-                      key={`${alt.register}-${alt.text}`}
+                      key={alt.text}
                       className="flex items-start justify-between gap-4"
                     >
                       <div className="min-w-0 space-y-1">
                         <p className="break-russian font-reader text-lg text-[var(--ink)]">
                           {alt.text}
                         </p>
-                        <p className="text-sm text-[var(--ink-secondary)]">{alt.nuance}</p>
+                        <p className="text-sm text-[var(--ink-muted)]">{alt.nuance}</p>
                         <p className="text-xs text-[var(--ink-muted)]">
                           {alt.frequency} · {alt.whenToUse}
                         </p>
@@ -550,16 +491,11 @@ export function ContextTranslationResult({
       </LessonSection>
 
       {analysis.culturalNotes.length > 0 ? (
-        <LessonSection visible={show("cultural")} label="Cultural notes">
-          <ul className="space-y-3 text-sm leading-relaxed text-[var(--ink-secondary)]">
+        <LessonSection visible={show("cultural")} label="Notes culturelles">
+          <ul className="space-y-3 text-sm leading-relaxed">
             {analysis.culturalNotes.map((note) => (
               <li key={note} className="flex items-start justify-between gap-4">
-                <span className="flex gap-2">
-                  <span className="text-[var(--ink-muted)]" aria-hidden>
-                    •
-                  </span>
-                  <span>{note}</span>
-                </span>
+                <PracticeMarginNote>{note}</PracticeMarginNote>
                 <SaveNoteButton note={note} sourceSentence={analysis.sourceText} />
               </li>
             ))}
@@ -568,7 +504,7 @@ export function ContextTranslationResult({
       ) : null}
 
       {analysis.grammarConcepts.length > 0 ? (
-        <LessonSection visible={show("grammar")} label="Grammar & language concepts">
+        <LessonSection visible={show("grammar")} label="Grammaire et concepts">
           <ul className="divide-y divide-[var(--hairline)]">
             {analysis.grammarConcepts.map((concept) => (
               <GrammarConceptRow
@@ -580,8 +516,8 @@ export function ContextTranslationResult({
           </ul>
         </LessonSection>
       ) : enrichmentLoading ? (
-        <LessonSection visible={show("grammar")} label="Grammar & language concepts">
-          <p className="text-sm text-[var(--ink-muted)]">Analyzing grammar…</p>
+        <LessonSection visible={show("grammar")} label="Grammaire et concepts">
+          <p className="text-sm text-[var(--ink-muted)]">Analyse grammaticale…</p>
         </LessonSection>
       ) : null}
 
@@ -592,14 +528,8 @@ export function ContextTranslationResult({
         onSubmit={onFollowUp}
       />
 
-      <footer className="mt-8 border-t border-[var(--hairline)] pt-6">
-        <button
-          type="button"
-          onClick={onStartOver}
-          className="focus-kb text-sm text-[var(--ink-muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
-        >
-          New sentence →
-        </button>
+      <footer className="editorial-page-section flex justify-end border-t border-[var(--hairline)] pt-6">
+        <PrimaryButton onClick={onStartOver}>Nouvelle phrase →</PrimaryButton>
       </footer>
     </article>
   );

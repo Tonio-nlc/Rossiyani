@@ -3,7 +3,6 @@
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
-import { EditorialContainer } from "@/components/design-system";
 import { Reference } from "@/components/editorial";
 
 import { LibraryContextTranslationLessons } from "./library-context-translation-lessons";
@@ -39,10 +38,10 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "lessons") {
     return (
-      <EditorialContainer className="space-y-8 pb-16">
+      <div className="space-y-8 pb-8">
         <LibraryPageIntro />
         <LibrarySectionNav active="lessons" />
-        <div className="library-page-section space-y-3">
+        <div className="editorial-page-section space-y-3">
           <h2 className="editorial-section-title">Context translation</h2>
           <LibraryContextTranslationLessons />
         </div>
@@ -50,51 +49,49 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
           Grammar lessons live in the Manual.{" "}
           <Reference href="/manual">Open Manual →</Reference>
         </p>
-      </EditorialContainer>
+      </div>
     );
   }
 
   if (section === "saved") {
     return (
-      <EditorialContainer className="space-y-6 pb-16">
+      <div className="space-y-6 pb-8">
         <LibraryPageIntro />
         <LibrarySectionNav active="saved" />
         <LibrarySavedSentences />
-      </EditorialContainer>
+      </div>
     );
   }
 
   if (section === "discoveries") {
     return (
-      <EditorialContainer className="space-y-6 pb-16">
+      <div className="space-y-6 pb-8">
         <LibraryPageIntro />
         <LibrarySectionNav active="discoveries" />
         <LibraryMyDiscoveries />
-      </EditorialContainer>
+      </div>
     );
   }
 
   if (section === "phrases") {
     return (
-      <EditorialContainer className="space-y-6 pb-16">
+      <div className="space-y-6 pb-8">
         <LibraryPageIntro />
         <LibrarySectionNav active="phrases" />
         <LibrarySavedPhrases />
         <LibraryMyPhrases />
-      </EditorialContainer>
+      </div>
     );
   }
 
   return (
-    <div className="pb-16">
-      <EditorialContainer>
-        <LibraryPageIntro
-          textCount={collectionStats.textCount}
-          sentenceCount={collectionStats.sentenceCount}
-        />
-        <LibraryImportCard />
-        <LibrarySectionNav active="texts" />
-      </EditorialContainer>
+    <div className="pb-8">
+      <LibraryPageIntro
+        textCount={collectionStats.textCount}
+        sentenceCount={collectionStats.sentenceCount}
+      />
+      <LibraryImportCard />
+      <LibrarySectionNav active="texts" />
       <LibraryView initialTexts={initialTexts} />
     </div>
   );

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { MANUAL_CATEGORIES, MANUAL_CONTENT_ROOT, MANUAL_CURRICULUM_TARGETS } from "./constants";
+import { MANUAL_CATEGORIES, MANUAL_CONTENT_ROOT } from "./constants";
 import { parseLessonFile } from "./parse-lesson";
 import type { ManualCategory, ManualLevel } from "./constants";
 import type { ManualLesson, ManualLessonSummary } from "./types";
@@ -134,26 +134,6 @@ export function getManualStats(contentRoot?: string): {
     byLevel,
     byCategory,
   };
-}
-
-export function getManualCurriculum(contentRoot?: string): Array<{
-  category: ManualCategory;
-  published: number;
-  target: number;
-  percent: number;
-}> {
-  const stats = getManualStats(contentRoot);
-
-  return MANUAL_CATEGORIES.map((category) => {
-    const published = stats.byCategory[category];
-    const target = MANUAL_CURRICULUM_TARGETS[category];
-    return {
-      category,
-      published,
-      target,
-      percent: Math.min(100, Math.round((published / target) * 100)),
-    };
-  });
 }
 
 /** Test helper — clears in-memory cache. */

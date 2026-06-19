@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { getCollectionName } from "@/content/collections";
+import { ReadingLayout, Sidebar } from "@/components/design-system";
 import type { ReaderTextData } from "@/features/texts";
 import { setLastReadTextId } from "@/lib/last-read-text";
 import type { ReaderSearchEntry } from "@/lib/reader/build-reader-search-index";
@@ -26,7 +27,6 @@ import { ReaderInTextSearch } from "./reader-in-text-search";
 import { ReaderMarginPanel } from "./reader-margin-panel";
 import { mapSentenceWords, ReaderSentence } from "./reader-sentence";
 import { isSentenceAnalyzing, ReaderSentenceAnalyzing } from "./reader-sentence-analyzing";
-import { ReaderWordFloatingSheet } from "./reader-word-floating-sheet";
 import { toReaderWordSnapshot } from "./reader-word-utils";
 import { useFocusMode } from "./use-focus-mode";
 import { useReaderTextSearch } from "./use-reader-text-search";
@@ -404,8 +404,16 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     onCloseSearch: textSearch.closeSearch,
   });
 
+  const microscopePanel =
+    selectedWordSnapshot !== null ? <ReaderMarginPanel {...marginPanelProps} /> : null;
+
+  const closeMicroscope = useCallback(() => {
+    setSelectedWordSnapshot(null);
+    setHoveredWordSnapshot(null);
+  }, []);
+
   return (
-    <div className="reader-fullscreen min-w-0">
+    <div className="reader-fullscreen min-w-0 pb-8">
       <ReaderHeader
         title={text.title}
         collectionName={getCollectionName(text.collectionId)}
@@ -419,7 +427,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
       />
 
       {textSearch.isOpen || textSearch.query.trim().length > 0 ? (
-        <div className="mt-5 max-w-[70ch]">
+        <div className="editorial-page-section pb-0 pt-0">
           <ReaderInTextSearch
             query={textSearch.query}
             onQueryChange={textSearch.setQuery}
@@ -434,8 +442,9 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
         </div>
       ) : null}
 
-      <div className="mt-6 min-w-0">
-        <article className="min-w-0 max-w-[70ch] space-y-8">
+      <ReadingLayout
+        main={
+          <article className="space-y-10">
             {text.sentences.map((sentence) => {
               const dimmed = focusMode && selectedSentenceId !== sentence.id;
               const analyzing = isSentenceAnalyzing(
@@ -508,28 +517,38 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
                 />
               );
             })}
-
+          </article>
+        }
+        sidebar={
+          microscopePanel ? (
+            <Sidebar title="Compréhension" aria-label="Fiche mot">
+              {microscopePanel}
+            </Sidebar>
+          ) : null
+        }
+        footer={
+          <>
             <ReaderCompletionCard
               textTitle={text.title}
               discoveries={readingSessionSummary.discoveries}
               continueActions={readingSessionSummary.continueActions}
             />
-
             {textIntroduction ? (
               <ReaderAboutText introduction={textIntroduction} defaultCollapsed />
             ) : null}
-          </article>
-      </div>
+          </>
+        }
+      />
 
-      <ReaderWordFloatingSheet
+      <Sidebar
+        variant="sheet"
         open={selectedWordSnapshot !== null}
-        onClose={() => {
-          setSelectedWordSnapshot(null);
-          setHoveredWordSnapshot(null);
-        }}
+        onClose={closeMicroscope}
+        title="Compréhension"
+        aria-label="Fiche mot"
       >
-        <ReaderMarginPanel {...marginPanelProps} />
-      </ReaderWordFloatingSheet>
+        {microscopePanel}
+      </Sidebar>
     </div>
   );
 }

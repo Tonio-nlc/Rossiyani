@@ -1,9 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
+import {
+  GhostButton,
+  PracticeInput,
+  PrimaryButton,
+  SectionHeader,
+  Tag,
+} from "@/components/design-system";
 import { useToast } from "@/components/ui/toast-provider";
 import type {
   ContextTranslationAnalysis,
@@ -27,11 +33,11 @@ const EXAMPLE_INPUTS = [
 ];
 
 const PROGRESS_STEPS: Array<{ phase: ContextTranslationProgressPhase; label: string }> = [
-  { phase: "bestTranslation", label: "Best translation" },
-  { phase: "thinkLikeNative", label: "Think like a native" },
-  { phase: "grammar", label: "Analyzing grammar" },
-  { phase: "alternatives", label: "Finding alternatives" },
-  { phase: "culturalNotes", label: "Adding cultural notes" },
+  { phase: "bestTranslation", label: "Meilleure traduction" },
+  { phase: "thinkLikeNative", label: "Penser comme un natif" },
+  { phase: "grammar", label: "Analyse grammaticale" },
+  { phase: "alternatives", label: "Alternatives" },
+  { phase: "culturalNotes", label: "Notes culturelles" },
 ];
 
 function createPartialAnalysis(
@@ -170,7 +176,7 @@ export function ContextTranslationWorkspace({
       });
 
       if (!response.ok || !response.body) {
-        toast("Analysis failed. Try again.", "error");
+        toast("L'analyse a échoué. Réessayez.", "error");
         return;
       }
 
@@ -238,7 +244,7 @@ export function ContextTranslationWorkspace({
         }
       }
     } catch {
-      toast("Analysis failed. Try again.", "error");
+      toast("L'analyse a échoué. Réessayez.", "error");
     } finally {
       setLoading(false);
       setEnrichmentLoading(false);
@@ -288,7 +294,7 @@ export function ContextTranslationWorkspace({
         });
 
         if (!response.ok) {
-          toast("Could not answer follow-up.", "error");
+          toast("Impossible de répondre à la question.", "error");
           return;
         }
 
@@ -321,97 +327,85 @@ export function ContextTranslationWorkspace({
   }
 
   return (
-    <div className="space-y-6">
-      <header className="space-y-1.5">
-        <Link
-          href="/practice"
-          className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
-        >
-          ← Practice
-        </Link>
-        <p className="home-section-label">Context Translation</p>
-        <h1 className="font-reader text-[clamp(1.5rem,3.5vw,2rem)] leading-tight text-[var(--ink)]">
-          Think like a native speaker
-        </h1>
-        <p className="max-w-xl text-sm leading-relaxed text-[var(--ink-secondary)]">
-          Write a sentence in French, English or Russian.
-        </p>
+    <form
+      className="pb-8"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void submit();
+      }}
+    >
+      <header className="editorial-page-section pb-0">
+        <GhostButton href="/practice">← Pratique</GhostButton>
+        <div className="mt-4">
+          <SectionHeader
+            eyebrow="Traduction contextualisée"
+            title="Penser comme un locuteur natif"
+            description="Écrivez une phrase en français, anglais ou russe."
+          />
+        </div>
       </header>
 
-      <form
-        className="mx-auto max-w-2xl space-y-3.5"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void submit();
-        }}
-      >
-        <textarea
+      <section className="editorial-page-section">
+        <PracticeInput
+          compact
           value={sourceText}
           onChange={(event) => setSourceText(event.target.value)}
-          rows={3}
-          placeholder={"Translate an idea, not words...\n\nExample:\nOn est foutu."}
-          className="focus-kb break-russian min-h-[140px] w-full resize-y rounded-xl border border-[var(--hairline)] bg-[var(--surface)] px-5 py-3.5 font-reader text-[clamp(1rem,2.5vw,1.125rem)] leading-relaxed text-[var(--ink)] outline-none transition-[border-color,box-shadow] duration-200 placeholder:font-reader placeholder:text-[0.9375rem] placeholder:leading-relaxed placeholder:text-[var(--ink-muted)]/70 hover:border-[var(--ink-muted)]/35 focus:border-[var(--ink-muted)] focus:shadow-[0_1px_3px_rgba(0,0,0,0.06),0_0_0_1px_var(--ink-muted)] focus:outline-none"
+          rows={4}
+          placeholder={"Traduire une idée, pas des mots…\n\nExemple :\nOn est foutu."}
         />
-
-        <button
-          type="submit"
-          disabled={!sourceText.trim()}
-          className="focus-kb inline-flex w-fit min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--ink)] px-6 py-2.5 font-sans text-sm font-medium text-[var(--surface)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {loading ? (
-            <>
-              Analyzing...
-              <AnalyzingDots />
-            </>
-          ) : (
-            "Translate & Explain →"
-          )}
-        </button>
-
-        <div className="space-y-2.5 pt-1">
-          <p className="text-xs text-[var(--ink-muted)]">Popular examples</p>
-          <div className="flex flex-wrap gap-2">
-            {EXAMPLE_INPUTS.map((example) => (
-              <button
-                key={example}
-                type="button"
-                onClick={() => setSourceText(example)}
-                className="focus-kb rounded-full border border-[var(--hairline)] bg-[var(--surface)] px-3.5 py-1.5 font-reader text-sm text-[var(--ink-secondary)] transition hover:border-[var(--ink-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--ink)]"
-              >
-                ○ {example}
-              </button>
-            ))}
-          </div>
-        </div>
-      </form>
+      </section>
 
       {loading && progressPhase ? (
-        <div className="mx-auto max-w-md space-y-1.5 border-t border-[var(--hairline)] pt-4">
-          {PROGRESS_STEPS.map((step) => {
-            const stepIndex = PROGRESS_STEPS.findIndex((item) => item.phase === step.phase);
-            const currentIndex = PROGRESS_STEPS.findIndex((item) => item.phase === progressPhase);
-            const isDone = currentIndex > stepIndex || progressPhase === "complete";
-            const isCurrent = step.phase === progressPhase;
-            return (
-              <p
-                key={step.phase}
-                className={[
-                  "text-sm transition-colors duration-200",
-                  isDone
-                    ? "text-[var(--ink-secondary)]"
-                    : isCurrent
-                      ? "text-[var(--ink)]"
-                      : "text-[var(--ink-muted)]/45",
-                ].join(" ")}
-              >
-                {isDone ? "✓ " : isCurrent ? "↓ " : "  "}
-                {step.label}
-                {isCurrent ? "…" : ""}
-              </p>
-            );
-          })}
-        </div>
+        <section className="editorial-page-section pb-0">
+          <ul className="space-y-1.5 border-t border-[var(--hairline)] pt-4">
+            {PROGRESS_STEPS.map((step) => {
+              const stepIndex = PROGRESS_STEPS.findIndex((item) => item.phase === step.phase);
+              const currentIndex = PROGRESS_STEPS.findIndex((item) => item.phase === progressPhase);
+              const isDone = currentIndex > stepIndex || progressPhase === "complete";
+              const isCurrent = step.phase === progressPhase;
+              return (
+                <li
+                  key={step.phase}
+                  className={[
+                    "text-sm",
+                    isDone
+                      ? "text-[var(--ink-muted)]"
+                      : isCurrent
+                        ? "text-[var(--ink)]"
+                        : "text-[var(--ink-muted)]/45",
+                  ].join(" ")}
+                >
+                  {step.label}
+                  {isCurrent ? "…" : ""}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
       ) : null}
-    </div>
+
+      <section className="editorial-page-section pb-0">
+        <p className="text-eyebrow mb-3">Exemples</p>
+        <ul className="flex flex-wrap gap-2">
+          {EXAMPLE_INPUTS.map((example) => (
+            <li key={example}>
+              <Tag onClick={() => setSourceText(example)}>{example}</Tag>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <footer className="editorial-page-section flex justify-end border-t border-[var(--hairline)] pt-6">
+        <PrimaryButton type="submit" disabled={!sourceText.trim() || loading}>
+          {loading ? (
+            <>
+              Analyse… <AnalyzingDots />
+            </>
+          ) : (
+            "Traduire et expliquer →"
+          )}
+        </PrimaryButton>
+      </footer>
+    </form>
   );
 }

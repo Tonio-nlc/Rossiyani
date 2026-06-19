@@ -11,7 +11,6 @@ export {
   MANUAL_EDITORIAL_VERSION,
   MANUAL_RECOMMENDED_BOXES,
   MANUAL_REQUIRED_BOXES,
-  MANUAL_REQUIRED_SECTIONS,
   MANUAL_STORYTELLING_PATTERNS,
 } from "./constants";
 export type { ManualCategory, ManualLevel } from "./constants";
@@ -21,7 +20,6 @@ export {
   getLessonBySlug,
   getLessonsByCategory,
   getLessonsByLevel,
-  getManualCurriculum,
   getManualStats,
   listLessonSummaries,
   loadAllLessons,

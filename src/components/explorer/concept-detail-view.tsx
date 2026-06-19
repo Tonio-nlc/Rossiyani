@@ -131,7 +131,7 @@ export function ConceptDetailView({ concept, relatedTexts }: ConceptDetailViewPr
                   <Link
                     key={`${text.textId}-${text.sentenceRussian.slice(0, 20)}`}
                     href={textPath(text.textId)}
-                    className="focus-kb rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-4 transition hover:border-[var(--ink-muted)]"
+                    className="focus-kb ds-microscope-panel transition hover:border-[var(--hairline-strong)]"
                   >
                     <p className="text-sm font-medium text-[var(--ink)]">{text.textTitle}</p>
                     <p className="mt-2 font-reader text-sm leading-relaxed text-[var(--ink-secondary)]">

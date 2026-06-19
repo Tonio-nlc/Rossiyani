@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { SearchField } from "@/components/design-system";
 import {
   KnowledgeChain,
   MarginNote,
@@ -149,31 +150,28 @@ function ExplorerSearchPanelInner({ autoFocus = false }: { autoFocus?: boolean }
   const hasQuery = query.trim().length > 0;
 
   return (
-    <div id="recherche" className="space-y-[var(--space-4)]">
-      <div className="border-y border-[var(--hairline)] py-[var(--space-4)]">
-        <input
-          ref={inputRef}
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && expansionChain[0]?.href) {
-              event.preventDefault();
-              router.push(expansionChain[0].href);
-            }
-          }}
-          placeholder="Chercher un mot, un concept, une expression…"
-          aria-label="Recherche exploratoire"
-          className="focus-kb w-full bg-transparent font-reader text-xl text-[var(--ink)] outline-none placeholder:text-[var(--ink-muted)] sm:text-2xl"
-        />
-      </div>
+    <div id="recherche" className="editorial-page-section space-y-4 pb-0">
+      <SearchField
+        inputRef={inputRef}
+        value={query}
+        onChange={setQuery}
+        placeholder="Chercher un mot, un concept, une expression…"
+        ariaLabel="Recherche exploratoire"
+        resultCount={hasQuery && !loading && navItems.length > 0 ? navItems.length : undefined}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && expansionChain[0]?.href) {
+            event.preventDefault();
+            router.push(expansionChain[0].href);
+          }
+        }}
+      />
 
       {loading ? (
         <p className="text-metadata text-[var(--ink-muted)]">Ouverture des relations…</p>
       ) : null}
 
       {!loading && hasQuery && expansionChain.length > 0 ? (
-        <div className="space-y-[var(--space-3)]">
+        <div className="space-y-4">
           <p className="text-eyebrow">Depuis votre recherche</p>
           <KnowledgeChain items={expansionChain} />
           {conceptGraph?.concept.canonicalExplanation ? (
@@ -182,17 +180,17 @@ function ExplorerSearchPanelInner({ autoFocus = false }: { autoFocus?: boolean }
             </MarginNote>
           ) : null}
           {alternates.length > 0 ? (
-            <ul className="divide-y divide-[var(--hairline)] pt-[var(--space-2)]">
+            <ul className="divide-y divide-[var(--hairline)] border-t border-[var(--hairline)]">
               {alternates.map((item) => (
                 <li key={item.id}>
                   <Link
                     href={item.href}
-                    className="focus-kb group flex items-baseline justify-between gap-4 py-2"
+                    className="focus-kb group flex items-baseline justify-between gap-4 py-3"
                   >
-                    <span className="font-reader text-sm text-[var(--ink)] group-hover:text-[var(--color-link)]">
+                    <span className="font-reader text-sm text-[var(--ink)] group-hover:text-[var(--color-primary)]">
                       {item.label}
                     </span>
-                    <span className="text-metadata text-[var(--ink-muted)]">{item.category} →</span>
+                    <span className="text-metadata text-[var(--ink-muted)]">{item.category}</span>
                   </Link>
                 </li>
               ))}

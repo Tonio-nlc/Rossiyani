@@ -7,7 +7,7 @@ type ChapterProps = {
   wide?: boolean;
 };
 
-/** Editorial reading column — sits inside PageCanvas from AppShell. */
+/** Editorial reading column — sits inside EditorialContainer from AppShell. */
 export function Chapter({ children, className = "", wide = false }: ChapterProps) {
   return (
     <article

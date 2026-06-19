@@ -123,6 +123,3 @@ export const PRACTICE_REWRITE_PRESETS: PracticeRewritePreset[] = [
     instruction: "Express the same idea differently using different syntax or construction.",
   },
 ];
-
-/** @deprecated Use PRACTICE_REWRITE_PRESETS */
-export const COMPOSE_REWRITE_PRESETS = PRACTICE_REWRITE_PRESETS.map((preset) => preset.instruction);
