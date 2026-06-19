@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
+import { EditorialContainer } from "@/components/design-system";
 import { Reference } from "@/components/editorial";
 
 import { LibraryContextTranslationLessons } from "./library-context-translation-lessons";
@@ -38,57 +39,63 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "lessons") {
     return (
-      <div className="space-y-8 pb-16">
+      <EditorialContainer className="space-y-8 pb-16">
+        <LibraryPageIntro />
         <LibrarySectionNav active="lessons" />
-        <div className="space-y-3">
-          <h2 className="text-sm font-medium text-[var(--ink)]">Context translation</h2>
+        <div className="library-page-section space-y-3">
+          <h2 className="editorial-section-title">Context translation</h2>
           <LibraryContextTranslationLessons />
         </div>
-        <p className="text-sm text-[var(--ink-muted)]">
+        <p className="text-metadata">
           Grammar lessons live in the Manual.{" "}
           <Reference href="/manual">Open Manual →</Reference>
         </p>
-      </div>
+      </EditorialContainer>
     );
   }
 
   if (section === "saved") {
     return (
-      <div className="space-y-6 pb-16">
+      <EditorialContainer className="space-y-6 pb-16">
+        <LibraryPageIntro />
         <LibrarySectionNav active="saved" />
         <LibrarySavedSentences />
-      </div>
+      </EditorialContainer>
     );
   }
 
   if (section === "discoveries") {
     return (
-      <div className="space-y-6 pb-16">
+      <EditorialContainer className="space-y-6 pb-16">
+        <LibraryPageIntro />
         <LibrarySectionNav active="discoveries" />
         <LibraryMyDiscoveries />
-      </div>
+      </EditorialContainer>
     );
   }
 
   if (section === "phrases") {
     return (
-      <div className="space-y-6 pb-16">
+      <EditorialContainer className="space-y-6 pb-16">
+        <LibraryPageIntro />
         <LibrarySectionNav active="phrases" />
         <LibrarySavedPhrases />
         <LibraryMyPhrases />
-      </div>
+      </EditorialContainer>
     );
   }
 
   return (
-    <div className="space-y-8 pb-16">
-      <LibraryPageIntro
-        textCount={collectionStats.textCount}
-        sentenceCount={collectionStats.sentenceCount}
-      />
-      <LibraryImportCard />
-      <LibrarySectionNav active="texts" />
-      <LibraryView initialTexts={initialTexts} showPageHeader={false} />
+    <div className="pb-16">
+      <EditorialContainer>
+        <LibraryPageIntro
+          textCount={collectionStats.textCount}
+          sentenceCount={collectionStats.sentenceCount}
+        />
+        <LibraryImportCard />
+        <LibrarySectionNav active="texts" />
+      </EditorialContainer>
+      <LibraryView initialTexts={initialTexts} />
     </div>
   );
 }

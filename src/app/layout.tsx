@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { EB_Garamond, Hanken_Grotesk } from "next/font/google";
 
 import { ExplorerPathTracker } from "@/components/explorer/explorer-path-tracker";
 import { AppShell } from "@/components/layout";
@@ -6,6 +7,18 @@ import { OnboardingGate } from "@/components/onboarding";
 import { ToastProvider } from "@/components/ui";
 
 import "./globals.css";
+
+const fontEditorial = EB_Garamond({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-editorial-next",
+  display: "swap",
+});
+
+const fontUi = Hanken_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-ui-next",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Rossiyani",
@@ -18,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
+    <html lang="fr" className={`${fontEditorial.variable} ${fontUi.variable}`}>
       <body>
         <ToastProvider>
           <ExplorerPathTracker />

@@ -6,26 +6,33 @@
 ────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Paper & surfaces */
-  --paper: #f6f4ef;
+  /* Paper & surfaces — design/design-system.md */
+  --paper: #fbf9f4;
   --surface-primary: #fcfbf8;
   --surface-secondary: #f0ece4;
 
   /* Ink */
-  --ink: #1f1f1d;
+  --ink: #1b1c19;
   --ink-secondary: #66635f;
   --ink-muted: #8a867f;
   --ink-disabled: #b7b2aa;
 
+  /* Brand */
+  --color-primary: #1a2e44;
+  --color-secondary: #8c3a32;
+
   /* Semantic — meaning only, never decoration */
-  --color-link: #5f768d;
+  --color-link: #1a2e44;
   --color-grammar: #74806f;
   --color-culture: #b39255;
-  --color-exception: #8a4c43;
+  --color-exception: #8c3a32;
 
   /* Hairlines */
-  --hairline: rgba(31, 31, 29, 0.1);
-  --hairline-strong: rgba(31, 31, 29, 0.16);
+  --hairline: #dbdad5;
+  --hairline-strong: color-mix(in srgb, #1b1c19 16%, transparent);
+
+  /* Design-system radius */
+  --ds-radius: 4px;
 
   /* Layout rhythm */
   --layout-max: 1400px;
@@ -48,14 +55,14 @@
   --space-7: 96px;
 
   /* Radius — restrained */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
   --radius-pill: 999px;
 
-  /* Typography */
-  --font-editorial: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
-  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  /* Typography — design/design-system.md */
+  --font-editorial: var(--font-editorial-next), "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-ui: var(--font-ui-next), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", monospace;
 
   /* Type scale */
@@ -891,6 +898,217 @@ body.modal-open {
   padding-left: var(--space-2);
   color: var(--ink-secondary);
   font-style: italic;
+}
+
+/* ─── Design system — Library page (design/pages_specifications.md) ─── */
+.ds-editorial-container {
+  max-width: 64rem; /* 1024px */
+  padding-inline: var(--layout-padding-inline);
+}
+
+.ds-section-header {
+  padding-bottom: var(--space-5);
+}
+
+.ds-search-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--ds-radius);
+  background: var(--surface-primary);
+  padding: 0.625rem 1rem;
+  transition: border-color var(--duration-normal) ease;
+}
+
+.ds-search-field:focus-within {
+  border-color: var(--color-primary);
+}
+
+.ds-search-input {
+  min-width: 0;
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: var(--font-ui);
+  font-size: var(--text-body-sm);
+  color: var(--ink);
+  outline: none;
+}
+
+.ds-search-input::placeholder {
+  color: var(--ink-muted);
+}
+
+.ds-search-meta {
+  flex-shrink: 0;
+  font-size: var(--text-meta);
+  color: var(--ink-muted);
+}
+
+.ds-tag {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--hairline);
+  border-radius: var(--ds-radius);
+  background: var(--surface-primary);
+  padding: 0.375rem 0.75rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-meta);
+  font-weight: 500;
+  color: var(--ink-secondary);
+  transition:
+    border-color var(--duration-normal) ease,
+    color var(--duration-normal) ease,
+    background var(--duration-normal) ease;
+}
+
+.ds-tag:hover {
+  border-color: var(--hairline-strong);
+  color: var(--ink);
+}
+
+.ds-tag-active {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--surface-primary));
+  color: var(--color-primary);
+}
+
+.ds-tag-static {
+  cursor: default;
+}
+
+.ds-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ds-radius);
+  background: var(--color-primary);
+  padding: 0.625rem 1.25rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-body-sm);
+  font-weight: 500;
+  color: var(--surface-primary);
+  text-decoration: none;
+  transition: opacity var(--duration-normal) ease;
+}
+
+.ds-primary-btn:hover {
+  opacity: 0.9;
+}
+
+.ds-primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ds-ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-ui);
+  font-size: var(--text-body-sm);
+  color: var(--ink-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--duration-normal) ease;
+}
+
+.ds-ghost-btn:hover {
+  color: var(--ink);
+}
+
+.ds-collection-card {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--hairline);
+  border-radius: var(--ds-radius);
+  background: var(--surface-primary);
+  padding: 1rem 1.125rem;
+  transition:
+    border-color var(--duration-normal) ease,
+    background var(--duration-normal) ease;
+}
+
+.ds-collection-card:hover {
+  border-color: var(--hairline-strong);
+}
+
+.ds-collection-card-active {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 4%, var(--surface-primary));
+}
+
+.ds-editorial-card {
+  border: 1px solid var(--hairline);
+  border-radius: var(--ds-radius);
+  background: var(--surface-primary);
+}
+
+.ds-editorial-card-featured {
+  padding: 0.25rem;
+}
+
+.ds-editorial-card-link {
+  display: block;
+  padding: 1.25rem 1.375rem;
+  text-decoration: none;
+  outline: none;
+}
+
+.ds-editorial-card-featured .ds-editorial-card-link {
+  padding: 1.5rem 1.625rem;
+}
+
+.ds-editorial-card-featured .font-reader {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.ds-editorial-card-link:hover .font-reader {
+  color: var(--color-primary);
+}
+
+.library-editorial-grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 640px) {
+  .library-editorial-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.library-page-section {
+  padding-block: var(--space-5);
+}
+
+.library-page-section + .library-page-section {
+  border-top: 1px solid var(--hairline);
+}
+
+.library-collections-scroll {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(11rem, 1fr);
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  scrollbar-width: thin;
+}
+
+@media (min-width: 768px) {
+  .library-collections-scroll {
+    grid-auto-flow: row;
+    grid-auto-columns: unset;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow-x: visible;
+  }
+}
+
+@media (min-width: 1024px) {
+  .library-collections-scroll {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 /* ─── Reduced motion ─── */

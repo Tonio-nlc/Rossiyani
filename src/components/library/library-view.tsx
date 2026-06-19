@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
+import { EditorialContainer } from "@/components/design-system";
 import { DeleteTextDialog } from "@/components/library/delete-text-dialog";
 import { RenameTextDialog } from "@/components/library/rename-text-dialog";
 import { useToast } from "@/components/ui/toast-provider";
@@ -11,22 +12,40 @@ import { clearLastReadTextIfMatches } from "@/lib/last-read-text";
 import { deleteTextRequest, renameTextRequest } from "@/lib/library/text-library-api";
 import { clearTextReadingProgress } from "@/lib/reader/reading-progress";
 
+import { LibraryCollectionsRow } from "./library-collections-row";
+import { LibraryFeaturedText } from "./library-featured-text";
 import { LibraryFilters } from "./library-filters";
 import { LibraryGrid } from "./library-grid";
-import { LibraryHeader } from "./library-header";
 import { LibrarySearch } from "./library-search";
-import { filterLibraryTexts, type LibraryCategoryFilter, type LibraryCollectionFilter } from "./library-utils";
+import {
+  filterLibraryTexts,
+  type LibraryCategoryFilter,
+  type LibraryCollectionFilter,
+} from "./library-utils";
 
 const REMOVE_ANIMATION_MS = 280;
 
 type LibraryViewProps = {
   initialTexts: TextListItem[];
-  showPageHeader?: boolean;
 };
 
 type DialogTarget = TextListItem | null;
 
-export function LibraryView({ initialTexts, showPageHeader = true }: LibraryViewProps) {
+function hasActiveFilters(
+  search: string,
+  level: CefrLevel | "all",
+  collection: LibraryCollectionFilter,
+  category: LibraryCategoryFilter,
+): boolean {
+  return (
+    search.trim().length > 0 ||
+    level !== "all" ||
+    collection !== "all" ||
+    category !== "all"
+  );
+}
+
+export function LibraryView({ initialTexts }: LibraryViewProps) {
   const { toast } = useToast();
   const [texts, setTexts] = useState(initialTexts);
   const [search, setSearch] = useState("");
@@ -43,7 +62,9 @@ export function LibraryView({ initialTexts, showPageHeader = true }: LibraryView
     [texts, search, level, collection, category],
   );
 
-  const totalSentences = texts.reduce((sum, text) => sum + text.sentenceCount, 0);
+  const filtersActive = hasActiveFilters(search, level, collection, category);
+  const featuredText = !filtersActive && filtered[0] ? filtered[0] : null;
+  const gridTexts = featuredText ? filtered.slice(1) : filtered;
 
   const handleRenameConfirm = useCallback(
     async (title: string) => {
@@ -109,28 +130,46 @@ export function LibraryView({ initialTexts, showPageHeader = true }: LibraryView
     }
   }, [deleteTarget, toast]);
 
+  const handleCollectionSelect = useCallback((value: LibraryCollectionFilter) => {
+    setCollection(value);
+  }, []);
+
   return (
-    <div className={showPageHeader ? "space-y-6 pb-16" : "space-y-6"}>
-      {showPageHeader ? (
-        <LibraryHeader textCount={texts.length} sentenceCount={totalSentences} />
-      ) : null}
+    <EditorialContainer className="space-y-0 pb-16">
+      <LibraryCollectionsRow active={collection} onSelect={handleCollectionSelect} />
+
+      {featuredText ? <LibraryFeaturedText text={featuredText} /> : null}
+
       <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
+
       <LibraryFilters
         level={level}
-        collection={collection}
         category={category}
         onLevelChange={setLevel}
-        onCollectionChange={setCollection}
         onCategoryChange={setCategory}
+        onResetAll={
+          filtersActive
+            ? () => {
+                setSearch("");
+                setLevel("all");
+                setCategory("all");
+                setCollection("all");
+              }
+            : undefined
+        }
       />
-      <LibraryGrid
-        texts={filtered}
-        hasAnyTexts={texts.length > 0}
-        busyTextId={busyTextId}
-        removingTextId={removingTextId}
-        onRename={setRenameTarget}
-        onDelete={setDeleteTarget}
-      />
+
+      <section className="library-page-section">
+        <p className="text-eyebrow mb-4">Catalogue</p>
+        <LibraryGrid
+          texts={gridTexts}
+          hasAnyTexts={texts.length > 0}
+          busyTextId={busyTextId}
+          removingTextId={removingTextId}
+          onRename={setRenameTarget}
+          onDelete={setDeleteTarget}
+        />
+      </section>
 
       <RenameTextDialog
         open={renameTarget !== null}
@@ -155,6 +194,6 @@ export function LibraryView({ initialTexts, showPageHeader = true }: LibraryView
         }}
         onConfirm={handleDeleteConfirm}
       />
-    </div>
+    </EditorialContainer>
   );
 }

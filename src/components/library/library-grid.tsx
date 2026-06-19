@@ -42,13 +42,11 @@ export function LibraryGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-[var(--layout-gap)] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="library-editorial-grid">
       {texts.map((text, index) => (
         <div
           key={text.id}
-          className={[
-            removingTextId === text.id ? "animate-fade-out" : "animate-fade-up",
-          ].join(" ")}
+          className={removingTextId === text.id ? "animate-fade-out" : "animate-fade-up"}
           style={
             removingTextId === text.id
               ? undefined

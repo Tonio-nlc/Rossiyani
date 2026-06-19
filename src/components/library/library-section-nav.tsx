@@ -9,16 +9,19 @@ type LibrarySectionNavProps = {
 };
 
 const SECTIONS: Array<{ id: LibrarySection; label: string; href: string }> = [
-  { id: "texts", label: "Texts", href: "/library" },
-  { id: "lessons", label: "Lessons", href: "/library?section=lessons" },
-  { id: "saved", label: "Saved", href: "/library?section=saved" },
-  { id: "phrases", label: "My phrases", href: "/library?section=phrases" },
-  { id: "discoveries", label: "My discoveries", href: "/library?section=discoveries" },
+  { id: "texts", label: "Textes", href: "/library" },
+  { id: "lessons", label: "Leçons", href: "/library?section=lessons" },
+  { id: "saved", label: "Enregistrés", href: "/library?section=saved" },
+  { id: "phrases", label: "Mes phrases", href: "/library?section=phrases" },
+  { id: "discoveries", label: "Découvertes", href: "/library?section=discoveries" },
 ];
 
 export function LibrarySectionNav({ active }: LibrarySectionNavProps) {
   return (
-    <nav aria-label="Library sections" className="flex flex-wrap gap-x-8 gap-y-2 border-b border-[var(--hairline)] pb-4">
+    <nav
+      aria-label="Sections de la bibliothèque"
+      className="library-page-section flex flex-wrap gap-x-6 gap-y-2"
+    >
       {SECTIONS.map((section) => (
         <Link
           key={section.id}
@@ -27,7 +30,7 @@ export function LibrarySectionNav({ active }: LibrarySectionNavProps) {
           className={[
             "focus-kb text-sm font-medium transition",
             active === section.id
-              ? "text-[var(--ink)]"
+              ? "text-[var(--color-primary)] underline underline-offset-4"
               : "text-[var(--ink-secondary)] hover:text-[var(--ink)]",
           ].join(" ")}
         >
