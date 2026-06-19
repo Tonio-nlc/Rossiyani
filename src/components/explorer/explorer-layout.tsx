@@ -16,7 +16,7 @@ export function ExplorerLayout({ breadcrumb, title, subtitle, children }: Explor
         <ExplorerBreadcrumb items={breadcrumb} />
         {title ? (
           <div>
-            <h1 className="break-russian font-reader text-[clamp(1.75rem,4vw,2.5rem)] font-semibold tracking-tight text-[var(--ink)]">
+            <h1 className="editorial-lead-title break-russian font-semibold tracking-tight">
               {title}
             </h1>
             {subtitle ? (

@@ -83,8 +83,8 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
                 className={[
                   "focus-kb text-sm font-medium transition",
                   active
-                    ? "text-[var(--ink)]"
-                    : "text-[var(--ink-secondary)] hover:text-[var(--ink)]",
+                    ? "text-[var(--color-primary)]"
+                    : "text-[var(--ink-secondary)] hover:text-[var(--color-primary)]",
                 ].join(" ")}
               >
                 {item.label}
@@ -98,7 +98,7 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
             <button
               type="button"
               onClick={onOpenSearch}
-              className="focus-kb hidden text-sm text-[var(--ink-secondary)] transition hover:text-[var(--ink)] lg:inline-flex"
+              className="focus-kb hidden text-sm text-[var(--ink-secondary)] transition hover:text-[var(--color-primary)] lg:inline-flex"
               aria-label="Rechercher"
             >
               Rechercher
@@ -134,8 +134,8 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
                     className={[
                       "focus-kb block py-2.5 text-sm font-medium transition",
                       active
-                        ? "text-[var(--ink)]"
-                        : "text-[var(--ink-secondary)] hover:text-[var(--ink)]",
+                        ? "text-[var(--color-primary)]"
+                        : "text-[var(--ink-secondary)] hover:text-[var(--color-primary)]",
                     ].join(" ")}
                   >
                     {item.label}

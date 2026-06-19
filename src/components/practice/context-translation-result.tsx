@@ -350,7 +350,7 @@ export function ContextTranslationResult({
       {show("best") ? (
         <section className="editorial-page-section animate-fade-up-subtle space-y-4 border-t border-[var(--hairline)] pt-6 pb-0">
           <p className="text-eyebrow">Meilleure formulation native</p>
-          <p className="break-russian font-reader text-[clamp(1.75rem,4vw,2.35rem)] leading-tight text-[var(--ink)]">
+          <p className="editorial-lead-title break-russian leading-tight">
             {analysis.bestTranslation}
           </p>
 

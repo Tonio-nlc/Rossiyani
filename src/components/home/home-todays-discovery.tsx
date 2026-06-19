@@ -27,7 +27,7 @@ export function HomeTodaysDiscovery({ discovery }: HomeTodaysDiscoveryProps) {
         </p>
         <Link
           href="/import"
-          className="focus-kb mt-4 inline-block text-sm text-[var(--ink-secondary)] hover:text-[var(--ink)]"
+          className="focus-kb link-editorial mt-4 inline-block text-sm"
         >
           Importer un texte →
         </Link>
@@ -37,7 +37,7 @@ export function HomeTodaysDiscovery({ discovery }: HomeTodaysDiscoveryProps) {
 
   return (
     <HomeSessionCard label="Découverte du jour" rationale={todaysDiscoveryRationale(discovery)}>
-      <h2 className="break-russian font-reader text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.1] tracking-tight text-[var(--ink)]">
+      <h2 className="editorial-lead-title break-russian text-discovery tracking-tight">
         {discovery.displayLabel}
       </h2>
 

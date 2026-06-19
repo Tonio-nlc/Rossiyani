@@ -14,7 +14,7 @@ type ExplorerTutorTitleProps = {
 export function ExplorerTutorTitle({ label, translation }: ExplorerTutorTitleProps) {
   return (
     <header className="editorial-page-section space-y-2 pb-0">
-      <p className="break-russian font-reader text-[clamp(2rem,5vw,3rem)] font-semibold leading-[1.05] tracking-tight text-[var(--ink)]">
+      <p className="editorial-title break-russian tracking-tight">
         {label}
       </p>
       {translation ? (

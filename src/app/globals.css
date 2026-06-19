@@ -9,23 +9,23 @@
   /* Paper & surfaces — global palette */
   --paper: #fbf9f4;
   --surface-primary: #f5f3ee;
-  --surface-secondary: #f0ece4;
-
-  /* Ink */
-  --ink: #1b1c19;
-  --ink-secondary: #66635f;
-  --ink-muted: #5f6468;
-  --ink-disabled: #b7b2aa;
+  --surface-secondary: #f1ede5;
+  --surface-alt: #f1ede5;
 
   /* Brand */
   --color-primary: #1a2e44;
   --color-secondary: #8c3a32;
+  --ink-eyebrow: color-mix(in srgb, var(--color-primary) 68%, var(--ink-muted));
 
   /* Semantic — meaning only, never decoration */
   --color-link: #1a2e44;
   --color-grammar: #74806f;
   --color-culture: #b39255;
   --color-exception: #8c3a32;
+  --color-discovery: #8c3a32;
+
+  /* Progress — warm clay track, Oxford fill */
+  --progress-track: #e8ddd0;
 
   /* Hairlines */
   --hairline: #dbdad5;
@@ -65,10 +65,11 @@
   --font-ui: var(--font-ui-next), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", monospace;
 
-  /* Type scale */
-  --text-hero: clamp(3rem, 8vw, 6rem);
-  --text-page: clamp(2.5rem, 4vw, 4rem);
-  --text-section: clamp(1.5rem, 3vw, 2rem);
+  /* Type scale — editorial polish: calmer heroes, clearer hierarchy */
+  --text-hero: clamp(2rem, 4vw, 3.5rem);
+  --text-page: clamp(2rem, 3.5vw, 3.5rem);
+  --text-section: clamp(1.375rem, 2.5vw, 2.5rem);
+  --text-lead: clamp(1.5rem, 3vw, 2rem);
   --text-subsection: clamp(1.25rem, 2vw, 1.5rem);
   --text-body: clamp(1rem, 1.5vw, 1.125rem);
   --text-body-sm: clamp(1rem, 1.5vw, 1rem);
@@ -147,12 +148,12 @@ body {
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--ink-muted);
+  color: var(--ink-eyebrow);
 }
 
 .text-metadata {
   font-size: var(--text-caption);
-  color: var(--ink-secondary);
+  color: color-mix(in srgb, var(--color-primary) 52%, var(--ink-muted));
   line-height: 1.5;
 }
 
@@ -161,7 +162,11 @@ body {
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--ink-muted);
+  color: var(--ink-eyebrow);
+}
+
+.text-discovery {
+  color: var(--color-discovery);
 }
 
 /* Russian text — prevent horizontal overflow */
@@ -176,7 +181,7 @@ body {
   font-size: var(--text-page);
   font-weight: 600;
   letter-spacing: -0.02em;
-  line-height: 1.08;
+  line-height: 1.12;
   color: var(--ink);
 }
 
@@ -184,14 +189,23 @@ body {
   font-family: var(--font-editorial);
   font-size: var(--text-hero);
   font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.02;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
   color: var(--ink);
 }
 
 .editorial-section-title {
   font-family: var(--font-editorial);
   font-size: var(--text-section);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.editorial-lead-title {
+  font-family: var(--font-editorial);
+  font-size: var(--text-lead);
   font-weight: 600;
   letter-spacing: -0.015em;
   line-height: 1.15;
@@ -233,17 +247,19 @@ body {
   background: var(--surface-primary);
 }
 
-/* ─── Links — editorial, not startup ─── */
+/* ─── Links — Oxford Blue, underline on interaction ─── */
 .link-editorial {
   color: var(--color-link);
-  text-decoration: underline;
+  text-decoration: none;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
   transition: color var(--duration-fast) ease;
 }
 
-.link-editorial:hover {
-  color: var(--ink);
+.link-editorial:hover,
+.link-editorial:focus-visible {
+  color: var(--color-primary);
+  text-decoration: underline;
 }
 
 /* ─── Buttons — legacy alias maps to design system ─── */
@@ -831,7 +847,7 @@ body.modal-open {
   gap: var(--space-2);
   border: 1px solid var(--hairline);
   border-radius: var(--ds-radius);
-  background: var(--surface-primary);
+  background: var(--paper);
   padding: 0.625rem 1rem;
   transition: border-color var(--duration-normal) ease;
 }
@@ -879,8 +895,8 @@ body.modal-open {
 }
 
 .ds-tag:hover {
-  border-color: var(--hairline-strong);
-  color: var(--ink);
+  border-color: color-mix(in srgb, var(--color-primary) 20%, var(--hairline));
+  color: var(--color-primary);
 }
 
 .ds-tag-active {
@@ -922,14 +938,15 @@ body.modal-open {
   align-items: center;
   font-family: var(--font-ui);
   font-size: var(--text-body-sm);
-  color: var(--ink-secondary);
-  text-decoration: underline;
+  color: var(--color-link);
+  text-decoration: none;
   text-underline-offset: 3px;
   transition: color var(--duration-normal) ease;
 }
 
 .ds-ghost-btn:hover {
-  color: var(--ink);
+  color: var(--color-primary);
+  text-decoration: underline;
 }
 
 .ds-collection-card {
@@ -961,6 +978,7 @@ body.modal-open {
 
 .ds-editorial-card-featured {
   padding: 0.25rem;
+  border-color: color-mix(in srgb, var(--color-discovery) 22%, var(--hairline));
 }
 
 .ds-editorial-card-link {
@@ -980,6 +998,11 @@ body.modal-open {
 
 .ds-editorial-card-link:hover .font-reader {
   color: var(--color-primary);
+}
+
+.ds-editorial-card .font-reader {
+  color: var(--ink);
+  transition: color var(--duration-normal) ease;
 }
 
 .library-editorial-grid {
@@ -1035,7 +1058,7 @@ body.modal-open {
   width: 100%;
   border: 1px solid var(--hairline);
   border-radius: var(--ds-radius);
-  background: var(--surface-primary);
+  background: var(--paper);
   padding: 0.625rem 0.875rem;
   font-family: var(--font-ui);
   font-size: var(--text-body-sm);
@@ -1118,10 +1141,10 @@ a.ds-exercise-card {
 
 /* ─── Design system — progress ─── */
 .ds-progress {
-  height: 4px;
+  height: 5px;
   overflow: hidden;
   border-radius: var(--ds-radius);
-  background: var(--surface-secondary);
+  background: var(--progress-track);
 }
 
 .ds-progress-fill {
@@ -1244,6 +1267,20 @@ a.ds-exercise-card {
 
 .ds-app-main {
   padding-block: var(--space-3) var(--space-6);
+}
+
+/* ─── Top navigation — Oxford Blue active state ─── */
+.ds-top-nav [aria-current="page"] {
+  color: var(--color-primary);
+}
+
+/* ─── Manual — handbook emphasis (color only) ─── */
+article:has(.manual-prose) .editorial-title {
+  color: color-mix(in srgb, var(--color-primary) 82%, var(--ink));
+}
+
+article:has(.manual-prose) .text-eyebrow {
+  color: color-mix(in srgb, var(--color-primary) 75%, var(--ink-muted));
 }
 
 /* ─── Microscope panels — editorial flat surfaces ─── */

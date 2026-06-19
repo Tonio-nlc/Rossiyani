@@ -25,7 +25,7 @@ export function LibraryCardProgress({ textId }: LibraryCardProgressProps) {
 
   return (
     <div className="mt-4 space-y-1.5 border border-[var(--hairline)] bg-[var(--surface-primary)] px-3 py-2.5">
-      <p className="font-mono text-xs tabular-nums text-[var(--foreground)]">
+      <p className="font-mono text-xs tabular-nums text-[var(--color-primary)]">
         {renderProgressBlocks(progress.percent)} {progress.percent} %
       </p>
       <p className="text-xs text-[var(--muted)]">

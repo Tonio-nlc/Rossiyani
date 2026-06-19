@@ -21,7 +21,7 @@ export function HomeSessionCard({
   const shellClass = [
     "block transition",
     primary
-      ? "border border-[var(--ink)] bg-[var(--paper)]"
+      ? "border border-[var(--color-primary)] bg-[var(--paper)]"
       : "border border-[var(--hairline)] hover:border-[var(--hairline-strong)]",
     href ? "focus-kb group" : "",
   ].join(" ");
@@ -36,7 +36,7 @@ export function HomeSessionCard({
           className={[
             "mt-4 text-sm",
             href
-              ? "text-[var(--ink-secondary)] group-hover:text-[var(--color-link)]"
+              ? "text-[var(--color-link)] group-hover:text-[var(--color-primary)] group-hover:underline"
               : "text-[var(--ink-secondary)]",
           ].join(" ")}
         >
