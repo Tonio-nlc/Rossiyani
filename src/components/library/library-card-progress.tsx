@@ -26,7 +26,7 @@ export function LibraryCardProgress({ textId, compact = false }: LibraryCardProg
   if (compact) {
     return (
       <p className="library-catalog-card-progress">
-        {progress.percent} % · {formatLastReadLabel(progress.lastReadAt)}
+        {progress.percent} % &bull; {formatLastReadLabel(progress.lastReadAt)}
       </p>
     );
   }

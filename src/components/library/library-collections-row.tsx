@@ -13,31 +13,32 @@ export function LibraryCollectionsRow({ active, onSelect }: LibraryCollectionsRo
   const collections = getAllCollections();
 
   return (
-    <section
-      className="library-page-section library-catalog-filters-section pb-0"
-      aria-label="Collections"
-    >
-      <div className="library-catalog-filter-row" role="group" aria-label="Collections">
+    <div className="library-catalog-filter-row" role="group" aria-label="Collections">
+      <button
+        type="button"
+        aria-pressed={active === "all"}
+        onClick={() => onSelect("all")}
+        className={[
+          "library-catalog-filter focus-kb",
+          active === "all" ? "library-catalog-filter-active" : "",
+        ].join(" ")}
+      >
+        Toutes
+      </button>
+      {collections.map((collection) => (
         <button
+          key={collection.id}
           type="button"
-          aria-pressed={active === "all"}
-          onClick={() => onSelect("all")}
-          className="library-catalog-filter focus-kb"
+          aria-pressed={active === collection.id}
+          onClick={() => onSelect(collection.id as CollectionId)}
+          className={[
+            "library-catalog-filter focus-kb",
+            active === collection.id ? "library-catalog-filter-active" : "",
+          ].join(" ")}
         >
-          Toutes
+          {collection.name}
         </button>
-        {collections.map((collection) => (
-          <button
-            key={collection.id}
-            type="button"
-            aria-pressed={active === collection.id}
-            onClick={() => onSelect(collection.id as CollectionId)}
-            className="library-catalog-filter focus-kb"
-          >
-            {collection.name}
-          </button>
-        ))}
-      </div>
-    </section>
+      ))}
+    </div>
   );
 }

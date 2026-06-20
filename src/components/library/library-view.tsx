@@ -29,20 +29,6 @@ type LibraryViewProps = {
 
 type DialogTarget = TextListItem | null;
 
-function hasActiveFilters(
-  search: string,
-  level: CefrLevel | "all",
-  collection: LibraryCollectionFilter,
-  category: LibraryCategoryFilter,
-): boolean {
-  return (
-    search.trim().length > 0 ||
-    level !== "all" ||
-    collection !== "all" ||
-    category !== "all"
-  );
-}
-
 export function LibraryView({ initialTexts }: LibraryViewProps) {
   const { toast } = useToast();
   const [texts, setTexts] = useState(initialTexts);
@@ -59,8 +45,6 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
     () => filterLibraryTexts(texts, search, level, collection, category),
     [texts, search, level, collection, category],
   );
-
-  const filtersActive = hasActiveFilters(search, level, collection, category);
 
   const handleRenameConfirm = useCallback(
     async (title: string) => {
@@ -131,7 +115,7 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
   }, []);
 
   return (
-    <div className="pb-4">
+    <div className="library-catalog-body">
       <LibraryCollectionsRow active={collection} onSelect={handleCollectionSelect} />
 
       <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
@@ -141,28 +125,16 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
         category={category}
         onLevelChange={setLevel}
         onCategoryChange={setCategory}
-        onResetAll={
-          filtersActive
-            ? () => {
-                setSearch("");
-                setLevel("all");
-                setCategory("all");
-                setCollection("all");
-              }
-            : undefined
-        }
       />
 
-      <section className="library-page-section pt-0">
-        <LibraryGrid
-          texts={filtered}
-          hasAnyTexts={texts.length > 0}
-          busyTextId={busyTextId}
-          removingTextId={removingTextId}
-          onRename={setRenameTarget}
-          onDelete={setDeleteTarget}
-        />
-      </section>
+      <LibraryGrid
+        texts={filtered}
+        hasAnyTexts={texts.length > 0}
+        busyTextId={busyTextId}
+        removingTextId={removingTextId}
+        onRename={setRenameTarget}
+        onDelete={setDeleteTarget}
+      />
 
       <RenameTextDialog
         open={renameTarget !== null}

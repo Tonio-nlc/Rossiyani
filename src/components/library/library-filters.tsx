@@ -11,7 +11,6 @@ type LibraryFiltersProps = {
   category: LibraryCategoryFilter;
   onLevelChange: (level: CefrLevel | "all") => void;
   onCategoryChange: (category: LibraryCategoryFilter) => void;
-  onResetAll?: () => void;
 };
 
 function CatalogFilter({
@@ -28,7 +27,10 @@ function CatalogFilter({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className="library-catalog-filter focus-kb"
+      className={[
+        "library-catalog-filter focus-kb",
+        active ? "library-catalog-filter-active" : "",
+      ].join(" ")}
     >
       {children}
     </button>
@@ -40,13 +42,14 @@ export function LibraryFilters({
   category,
   onLevelChange,
   onCategoryChange,
-  onResetAll,
 }: LibraryFiltersProps) {
-  const hasActiveFilter = level !== "all" || category !== "all";
-
   return (
-    <section className="library-page-section library-catalog-filters-section" aria-label="Filtres">
-      <div className="library-catalog-filter-row" role="group" aria-label="Niveau">
+    <>
+      <div
+        className="library-catalog-filter-row"
+        role="group"
+        aria-label="Niveau"
+      >
         <CatalogFilter active={level === "all"} onClick={() => onLevelChange("all")}>
           Tous
         </CatalogFilter>
@@ -58,9 +61,9 @@ export function LibraryFilters({
       </div>
 
       <div
-        className="library-catalog-filter-row library-catalog-filter-row-secondary"
+        className="library-catalog-filter-row"
         role="group"
-        aria-label="Catégories"
+        aria-label="Types"
       >
         <CatalogFilter active={category === "all"} onClick={() => onCategoryChange("all")}>
           Toutes
@@ -75,12 +78,6 @@ export function LibraryFilters({
           </CatalogFilter>
         ))}
       </div>
-
-      {hasActiveFilter && onResetAll ? (
-        <button type="button" onClick={onResetAll} className="library-catalog-reset focus-kb">
-          Réinitialiser
-        </button>
-      ) : null}
-    </section>
+    </>
   );
 }

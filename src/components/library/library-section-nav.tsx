@@ -20,7 +20,7 @@ export function LibrarySectionNav({ active }: LibrarySectionNavProps) {
   return (
     <nav
       aria-label="Sections de la bibliothèque"
-      className="library-page-section library-catalog-nav flex flex-wrap gap-x-5 gap-y-1"
+      className="library-catalog-nav"
     >
       {SECTIONS.map((section) => (
         <Link
@@ -28,7 +28,7 @@ export function LibrarySectionNav({ active }: LibrarySectionNavProps) {
           href={section.href}
           aria-current={active === section.id ? "page" : undefined}
           className={[
-            "library-catalog-nav-link focus-kb transition",
+            "library-catalog-nav-link focus-kb",
             active === section.id ? "library-catalog-nav-link-active" : "",
           ].join(" ")}
         >

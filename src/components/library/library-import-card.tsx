@@ -1,13 +1,19 @@
-import { GhostButton } from "@/components/design-system";
+import Link from "next/link";
 
 export function LibraryImportCard() {
   return (
-    <section className="library-page-section library-catalog-suggest" aria-label="Suggérer un texte">
+    <section className="library-catalog-suggest" aria-label="Suggérer un texte">
       <p className="library-catalog-suggest-label">Suggérer un texte</p>
       <div className="library-catalog-suggest-actions">
-        <GhostButton href="/import#paste">Coller →</GhostButton>
-        <GhostButton href="/import#file">Importer →</GhostButton>
-        <GhostButton href="/import#history">Imports récents →</GhostButton>
+        <Link href="/import#paste" className="library-catalog-suggest-link focus-kb">
+          Coller &rarr;
+        </Link>
+        <Link href="/import#file" className="library-catalog-suggest-link focus-kb">
+          Importer &rarr;
+        </Link>
+        <Link href="/import#history" className="library-catalog-suggest-link focus-kb">
+          Imports récents &rarr;
+        </Link>
       </div>
     </section>
   );

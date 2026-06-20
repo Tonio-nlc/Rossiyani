@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { memo } from "react";
 
-import { getCategoryLabel } from "@/content/categories";
 import type { TextListItem } from "@/features/texts";
 
 import { LibraryCardActions } from "./library-card-actions";
@@ -12,7 +11,6 @@ import {
   estimateReadingMinutes,
   estimateWordCount,
   formatStat,
-  getTextCategoryIds,
   getTextPreviewLine,
   splitLibraryTitle,
 } from "./library-utils";
@@ -32,17 +30,15 @@ export const LibraryCard = memo(function LibraryCard({
 }: LibraryCardProps) {
   const minutes = estimateReadingMinutes(text.sentenceCount);
   const words = formatStat(estimateWordCount(text.sentenceCount));
-  const { russian, french } = splitLibraryTitle(text.title);
-  const categories = getTextCategoryIds(text);
-  const translation =
-    french ?? (categories[0] ? getCategoryLabel(categories[0]) : null);
+  const { russian } = splitLibraryTitle(text.title);
   const preview = getTextPreviewLine(text.collectionId);
 
   return (
     <article className="library-catalog-card group relative h-full">
-      <div className="absolute right-1.5 top-1.5 z-30">
+      <div className="library-catalog-card-menu">
         <LibraryCardActions
           disabled={disabled}
+          catalog
           onRename={() => onRename(text)}
           onDelete={() => onDelete(text)}
         />
@@ -51,17 +47,17 @@ export const LibraryCard = memo(function LibraryCard({
       <p className="library-catalog-card-level">{text.level}</p>
 
       <h2 className="library-catalog-card-title font-reader break-russian">
-        <Link href={`/texts/${text.id}`} prefetch className="focus-kb outline-none after:absolute after:inset-0">
+        <Link
+          href={`/texts/${text.id}`}
+          prefetch
+          className="focus-kb outline-none after:absolute after:inset-0"
+        >
           {russian}
         </Link>
       </h2>
 
-      {translation ? (
-        <p className="library-catalog-card-translation">{translation}</p>
-      ) : null}
-
       <p className="library-catalog-card-meta">
-        {minutes} min · {words} mots
+        {minutes} min &bull; {words} mots
       </p>
 
       <p className="library-catalog-card-preview">{preview}</p>
@@ -74,7 +70,7 @@ export const LibraryCard = memo(function LibraryCard({
           prefetch
           className="library-catalog-card-cta-link focus-kb relative z-10 outline-none"
         >
-          Lire →
+          Lire &rarr;
         </Link>
       </p>
     </article>

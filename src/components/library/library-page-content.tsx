@@ -78,7 +78,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
   }
 
   return (
-    <div className="library-catalog pb-6">
+    <div className="library-catalog">
       <LibraryPageIntro />
       <LibrarySectionNav active="texts" />
       <LibraryView initialTexts={initialTexts} />
