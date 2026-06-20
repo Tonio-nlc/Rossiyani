@@ -85,10 +85,8 @@ export function ManualLevelGrid({ counts }: ManualLevelGridProps) {
           <EditorialCard
             key={level}
             href={href}
-            eyebrow="Niveau"
             title={MANUAL_LEVEL_LABELS[level]}
             meta={`${count} leçon${count > 1 ? "s" : ""}`}
-            footer={<GhostButton href={href}>Parcourir →</GhostButton>}
           />
         );
       })}
@@ -123,10 +121,8 @@ export function ManualCategoryGrid({ counts }: ManualCategoryGridProps) {
           <EditorialCard
             key={category}
             href={href}
-            eyebrow="Thème"
             title={MANUAL_CATEGORY_LABELS[category]}
             meta={`${count} leçon${count > 1 ? "s" : ""}`}
-            footer={<GhostButton href={href}>Parcourir →</GhostButton>}
           />
         );
       })}

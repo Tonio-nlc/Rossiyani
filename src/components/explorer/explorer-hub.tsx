@@ -1,11 +1,7 @@
 import type { ExplorerEditorialData } from "@/features/explorer/get-explorer-editorial";
 import { discoveryMetadataLine } from "@/features/discovery/discovery-metadata";
 
-import {
-  EditorialCard,
-  GhostButton,
-  SectionHeader,
-} from "@/components/design-system";
+import { EditorialCard } from "@/components/design-system";
 import { KnowledgeChain, MarginNote, Reference } from "@/components/editorial";
 
 import { ExplorerEditorialGrid, ExplorerEditorialSection } from "./explorer-editorial-grid";
@@ -17,11 +13,11 @@ import {
 } from "./explorer-hub-links";
 
 const INDEX_LINKS = [
-  { label: "Lemmes", href: "/explorer/lemmas", description: "Entrées lexicales du graphe" },
-  { label: "Concepts", href: "/explorer/concepts", description: "Motifs grammaticaux et constructions" },
-  { label: "Cas", href: "/explorer/cases", description: "Les six cas (+ locatif)" },
-  { label: "Terminaisons", href: "/explorer/endings", description: "Formes fléchies et paradigmes" },
-  { label: "Collocations", href: "/explorer/collocations", description: "Cooccurrences fréquentes" },
+  { label: "Lemmes", href: "/explorer/lemmas", description: "Entrées lexicales" },
+  { label: "Concepts", href: "/explorer/concepts", description: "Motifs grammaticaux" },
+  { label: "Cas", href: "/explorer/cases", description: "Les six cas" },
+  { label: "Terminaisons", href: "/explorer/endings", description: "Paradigmes fléchis" },
+  { label: "Collocations", href: "/explorer/collocations", description: "Cooccurrences" },
   { label: "Expressions", href: "/explorer/expressions", description: "Tournures idiomatiques" },
 ] as const;
 
@@ -47,20 +43,12 @@ function ExplorerEditorialSections({ editorial }: ExplorerEditorialSectionsProps
             title={todaysLanguage.displayLabel}
             subtitle={`« ${todaysLanguage.subtitle} »`}
             meta={discoveryMetadataLine(todaysLanguage)}
-            footer={
-              <div className="space-y-3">
-                <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">
-                  {todaysLanguage.explanation}
-                </p>
-                <GhostButton href={todaysLanguage.explorerHref}>Explorer →</GhostButton>
-              </div>
-            }
           />
         </ExplorerEditorialSection>
       ) : null}
 
       {popularConstructions.length > 0 ? (
-        <ExplorerEditorialSection eyebrow="Constructions" title="Constructions fréquentes">
+        <ExplorerEditorialSection eyebrow="Constructions">
           <ExplorerEditorialGrid
             items={popularConstructions.map((pick) => ({
               label: pick.label,
@@ -72,7 +60,7 @@ function ExplorerEditorialSections({ editorial }: ExplorerEditorialSectionsProps
       ) : null}
 
       {nativeExpressions.length > 0 ? (
-        <ExplorerEditorialSection eyebrow="Expressions" title="Tournures natives">
+        <ExplorerEditorialSection eyebrow="Expressions">
           <ExplorerEditorialGrid
             items={nativeExpressions.map((pick) => ({
               label: pick.label,
@@ -84,7 +72,7 @@ function ExplorerEditorialSections({ editorial }: ExplorerEditorialSectionsProps
       ) : null}
 
       {grammarSpotlight ? (
-        <ExplorerEditorialSection eyebrow="Grammaire" title="Point grammatical">
+        <ExplorerEditorialSection eyebrow="Grammaire">
           <div className="max-w-2xl space-y-4">
             <p className="font-reader text-2xl text-[var(--ink)]">
               <Reference href={grammarSpotlight.focalHref}>
@@ -95,7 +83,6 @@ function ExplorerEditorialSections({ editorial }: ExplorerEditorialSectionsProps
             {grammarSpotlight.note ? (
               <MarginNote kind="grammar">{grammarSpotlight.note}</MarginNote>
             ) : null}
-            <GhostButton href={grammarSpotlight.focalHref}>Explorer →</GhostButton>
           </div>
         </ExplorerEditorialSection>
       ) : null}
@@ -105,7 +92,7 @@ function ExplorerEditorialSections({ editorial }: ExplorerEditorialSectionsProps
 
 function ExplorerReferenceIndex() {
   return (
-    <ExplorerEditorialSection eyebrow="Index" title="Parcourir le graphe">
+    <ExplorerEditorialSection eyebrow="Index">
       <ExplorerEditorialGrid
         items={INDEX_LINKS.map((link) => ({
           label: link.label,
@@ -119,15 +106,13 @@ function ExplorerReferenceIndex() {
 
 function ExplorerTopicLinks({
   eyebrow,
-  title,
   links,
 }: {
   eyebrow: string;
-  title: string;
   links: Array<{ label: string; href: string; description?: string }>;
 }) {
   return (
-    <ExplorerEditorialSection eyebrow={eyebrow} title={title}>
+    <ExplorerEditorialSection eyebrow={eyebrow}>
       <ExplorerEditorialGrid
         items={links.map((link) => ({
           label: link.label,
@@ -142,29 +127,13 @@ function ExplorerTopicLinks({
 export function ExplorerHub({ editorial, isEmpty }: ExplorerHubProps) {
   return (
     <div className="pb-8">
-      <header className="editorial-page-section pb-0">
-        <SectionHeader
-          eyebrow="Explorer"
-          title="Référence linguistique"
-          description="Découvrir le russe par les connexions — lemmes, constructions, cas et expressions issues de vos textes."
-        />
-      </header>
-
       <ExplorerSearchPanel autoFocus={!isEmpty} />
 
       <ExplorerReferenceIndex />
 
-      <ExplorerTopicLinks
-        eyebrow="Grammaire"
-        title="Thèmes grammaticaux"
-        links={EXPLORER_GRAMMAR_LINKS}
-      />
+      <ExplorerTopicLinks eyebrow="Grammaire" links={EXPLORER_GRAMMAR_LINKS} />
 
-      <ExplorerTopicLinks
-        eyebrow="Vocabulaire"
-        title="Champs lexicaux"
-        links={EXPLORER_VOCABULARY_LINKS}
-      />
+      <ExplorerTopicLinks eyebrow="Vocabulaire" links={EXPLORER_VOCABULARY_LINKS} />
 
       {isEmpty ? (
         <section className="editorial-page-section">
@@ -176,7 +145,7 @@ export function ExplorerHub({ editorial, isEmpty }: ExplorerHubProps) {
         </section>
       ) : (
         <>
-          <ExplorerEditorialSection eyebrow="Récent" title="Continuer l'exploration">
+          <ExplorerEditorialSection eyebrow="Récent">
             <ExplorerRecentSection />
           </ExplorerEditorialSection>
 

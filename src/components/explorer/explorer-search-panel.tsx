@@ -204,12 +204,6 @@ function ExplorerSearchPanelInner({ autoFocus = false }: { autoFocus?: boolean }
           Aucune relation trouvée. Parcourez l&apos;index ci-dessous.
         </p>
       ) : null}
-
-      {!hasQuery ? (
-        <p className="text-metadata leading-relaxed text-[var(--ink-muted)]">
-          La recherche ouvre des chemins — jamais une liste de résultats isolés.
-        </p>
-      ) : null}
     </div>
   );
 }

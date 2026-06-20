@@ -1,370 +1,256 @@
-# Rossiyani — Project Context
+# PROJECT CONTEXT
 
-## Project Goal
-
-Rossiyani is a French-native Russian learning application.
-
-The purpose is NOT to be a dictionary, translator, flashcard app, or grammar encyclopedia.
-
-The purpose is to make Russian sentence structure, endings, declensions, and native constructions visually obvious.
-
-The learner should understand:
-
-- why a form exists
-- why a case is used
-- why the word order is chosen
-- how Russian logic differs from French logic
-
-The target audience is French-speaking learners of Russian.
-
-All pedagogical decisions should prioritize French ↔ Russian comparison.
+Last updated: 2026-06-20
 
 ---
 
-# Current Product Philosophy
+# 1. PRODUCT
 
-This project is built around one central idea:
+## Name
 
-Russian endings should be visually dominant.
+Rossiyani
 
-Example:
+## Mission
 
-городке
+Rossiyani is an immersive language learning platform designed for advanced learners who want to understand authentic content instead of memorizing vocabulary.
 
-The learner should immediately see:
+The product prioritizes deep comprehension, context, media integration and natural language acquisition.
 
-городок
-↓
-городке
-
-stem = городк
-ending = е
-
-case = locative
-
-reason = в + locative
-
-The eye should identify the ending before reading explanations.
+It should feel like a premium productivity tool, not a gamified language app.
 
 ---
 
-# Architecture Decisions
+# 2. CORE PRINCIPLES
 
-Russian-only application.
+Everything must follow these priorities:
 
-No multilingual support.
+1. Clarity over decoration
+2. Fast access to content
+3. Minimal cognitive load
+4. Beautiful typography
+5. High information density
+6. Premium dark interface
+7. Smooth interactions
+8. Native feeling
 
-No user accounts.
+---
 
-No gamification.
+# 3. DESIGN PHILOSOPHY
 
-No SRS.
+The interface should feel inspired by:
 
-No Anki integration.
+- Linear
+- Raycast
+- Apple
+- Notion
+- Readwise
 
-No audio features (yet).
+Avoid:
 
-No statistics features (yet).
+- Large empty heroes
+- Marketing pages
+- Huge cards
+- Excessive gradients
+- Visual noise
 
-The project currently focuses only on:
+Spacing should remain compact.
+
+---
+
+# 4. PRODUCT AREAS
+
+Current sections:
+
+- Home
+- Library
+- Reader
+- Explorer
+- Compose
+- Practice
+- Settings
+
+Reader is the primary experience.
+
+---
+
+# 5. LIBRARY
+
+Purpose:
+
+Manage learning content.
+
+Supports:
+
+- Collections
+- Categories
+- Texts
+
+Do NOT use "Sources".
+
+Collections are curated groups like:
+
+- Everyday Russian
+- News
+- Literature
+- Podcasts
+
+---
+
+# 6. READER
+
+The reader is the flagship feature.
+
+Goals:
+
+- Comfortable reading
+- Sentence-by-sentence audio
+- Word analysis
+- Grammar analysis
+- Instant translations
+- Minimal distractions
+
+Never redesign the reader without explicit instruction.
+
+---
+
+# 7. AI ANALYSIS
+
+Pipeline:
 
 Text
-→ Analysis
-→ Understanding
-
----
-
-# Tech Stack
-
-- Next.js
-- TypeScript
-- Prisma
-- SQLite
-- OpenAI / Anthropic providers
-- Zod validation
-
-AI providers are abstracted through:
-
-AIProvider
-
-Current providers:
-
-- OpenAIProvider
-- ClaudeProvider
-
-Selected through:
-
-AI_PROVIDER
-
-environment variable.
-
----
-
-# Database Structure
-
-Core entities:
-
-## Text
-
-Stores imported texts.
-
-## Sentence
-
-Stores sentence-level analysis:
-
-- russianText
-- literalTranslation
-- naturalTranslation
-- russianLogic
-- orderExplanation
-- nativeUsageNotes
-- register
-- difficultyScore
-- needsReview
-- reviewMessage
-
-## Word
-
-Stores word-level analysis:
-
-- original
-- lemma
-- stressMarked
-- stem
-- ending
-- partOfSpeech
-- case
-- gender
-- number
-- tense
-- aspect
-- explanation
-- frequency
-- frequencyTier
-
-## PhraseGroup
-
-Types:
-
-- COLLOCATION
-- FIXED_EXPRESSION
-- NATIVE_CONSTRUCTION
-
-Fields:
-
-- label
-- explanation
-- startPosition
-- endPosition
-
----
-
-# Major Decisions Already Made
-
-## Punctuation
-
-Punctuation is NOT stored as Word entries.
-
-Words contain only linguistic tokens.
-
-The display layer reconstructs punctuation.
-
-Decision: KEEP.
-
----
-
-## Stem + Ending
-
-The application relies heavily on:
-
-stem
-+
-ending
-
-for pedagogical visualization.
-
-Decision: KEEP.
-
----
-
-## Register
-
-Supported:
-
-- neutral
-- informal
-- formal
-- literary
-- slang
-
-Decision: KEEP.
-
----
-
-## Native Usage Notes
-
-Sentence-level note explaining how common or natural a construction is.
-
-Decision: KEEP.
-
----
-
-# Problems Already Solved
-
-## Import Pipeline
-
-Fixed:
-
-- OpenAI integration
-- JSON parsing
-- Zod validation
-- Prisma persistence
-
-Import now works successfully.
-
----
-
-## PhraseGroup Schema Mismatch
-
-Resolved.
-
-Canonical format:
-
-{
-  "type": "...",
-  "label": "...",
-  "startPosition": 0,
-  "endPosition": 1,
-  "explanation": "..."
-}
-
----
-
-## Stem Validation
-
-Resolved.
-
-Validation now supports:
-
-- surface stems
-- normalized stems
-- model-generated lemma-based stems
-
----
-
-# Current UI Evaluation
-
-The MVP works.
-
-However:
-
-The interface still behaves more like an annotated reader than a Russian-learning machine.
-
-The biggest weakness is:
-
-Russian endings do not stand out enough.
-
-This is the main area of active development.
-
----
-
-# Approved UI Direction
-
-Pedagogy-first redesign.
-
-Priority order:
-
-1. EndingBadge
-2. Case visual system
-3. MorphologyLadder
-4. WhyThisForm panel
-5. ReaderWorkspace redesign
-6. SentenceInsightBar
-
----
-
-# Educational Priorities
-
-Highest priority:
-
-- endings
-- cases
-- declensions
-- Russian logic
-- French comparison
-
-Lower priority:
-
-- POS information
-- frequency information
-
----
-
-# French Comparison Principle
-
-Whenever possible:
-
-Show:
-
-Russian structure
 
 ↓
 
-French structure
+Sentence segmentation
 
 ↓
 
-Explanation of difference
+Morphological analysis
 
-Example:
+↓
 
-в городке
+Grammar analysis
 
-French:
+↓
 
-dans la petite ville
+Translation
 
-Why:
+↓
 
-Russian uses locative.
-French uses a preposition without case marking.
+Audio generation
 
-This comparison is central to the product.
+↓
 
----
+Media Layer generation
 
-# Current Known Issue
+Store analysis permanently.
 
-After the latest Reader UI redesign, a runtime error appeared:
-
-undefined is not an object (evaluating 'originalFactory.call')
-
-Backend works.
-
-Import works.
-
-Database works.
-
-The issue is believed to be inside one of the new reader components:
-
-- EndingBadge
-- WordToken
-- MorphologyLadder
-- ReaderWorkspace
-- SentenceInsightBar
-
-This should be investigated before continuing UI work.
+Never recompute if already available.
 
 ---
 
-# Development Rule
+# 8. AUDIO
 
-Do NOT redesign architecture.
+Audio should be:
 
-Do NOT redesign database schema.
+- generated automatically
+- sentence separated
+- reusable
+- cached
+- synchronized with reader highlighting
 
-Do NOT add major features.
+---
 
-Focus on pedagogical improvements and UI clarity.
+# 9. MEDIA LAYER
 
-The project's success depends on making Russian grammar visually obvious.
+Every analyzed text may contain:
+
+- images
+- maps
+- videos
+- cultural references
+- historical references
+- person cards
+
+Media is contextual, never decorative.
+
+---
+
+# 10. DESIGN SYSTEM
+
+Typography:
+
+Information first.
+
+Buttons:
+
+Compact.
+
+Cards:
+
+Small radius.
+
+Spacing:
+
+Dense but breathable.
+
+No oversized titles.
+
+No giant heroes.
+
+Desktop first.
+
+---
+
+# 11. CURRENT STATE
+
+Completed:
+
+- Home redesign
+- Library redesign
+- Navigation improvements
+
+In progress:
+
+- Compose redesign
+- Audio integration
+- Media Layer
+
+Next priorities:
+
+1. Audio pipeline
+2. Media Layer
+3. Collections
+4. Reader improvements
+
+---
+
+# 12. LONG TERM VISION
+
+Rossiyani should become the best platform for learning languages through authentic content.
+
+The competitive advantage is:
+
+- superior linguistic analysis
+- reusable knowledge graph
+- integrated media
+- premium UX
+- low API cost through persistent computation
+
+---
+
+# 13. RULES FOR AI AGENTS
+
+Before modifying anything:
+
+- Understand existing architecture.
+- Preserve design consistency.
+- Avoid unnecessary refactors.
+- Prefer extending over rewriting.
+- Never create duplicate components.
+- Keep code modular.
+- Keep performance in mind.
+
+Always explain major architectural decisions.
+
+Never introduce temporary hacks if a clean solution exists.
