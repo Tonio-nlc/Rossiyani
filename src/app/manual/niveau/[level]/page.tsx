@@ -27,9 +27,8 @@ export default async function ManualLevelPage({ params }: PageProps) {
         <GhostButton href="/manual">← Manuel</GhostButton>
         <div className="mt-4">
           <SectionHeader
-            eyebrow="Niveau"
             title={MANUAL_LEVEL_LABELS[typedLevel]}
-            description={`Table des matières — ${lessons.length} leçon${lessons.length > 1 ? "s" : ""} pour ce niveau.`}
+            meta={`${lessons.length} leçon${lessons.length > 1 ? "s" : ""}`}
           />
         </div>
       </header>

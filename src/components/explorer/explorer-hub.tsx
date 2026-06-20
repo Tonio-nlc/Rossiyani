@@ -1,16 +1,17 @@
 import type { ExplorerEditorialData } from "@/features/explorer/get-explorer-editorial";
-import { discoveryMetadataLine } from "@/features/discovery/discovery-metadata";
 
-import { EditorialCard } from "@/components/design-system";
+import { EditorialCard, GhostButton } from "@/components/design-system";
 import { KnowledgeChain, MarginNote, Reference } from "@/components/editorial";
 
 import { ExplorerEditorialGrid, ExplorerEditorialSection } from "./explorer-editorial-grid";
 import { ExplorerRecentSection } from "./explorer-recent-section";
 import { ExplorerSearchPanel } from "./explorer-search-panel";
-import {
-  EXPLORER_GRAMMAR_LINKS,
-  EXPLORER_VOCABULARY_LINKS,
-} from "./explorer-hub-links";
+
+const PRIMARY_LINKS = [
+  { label: "Lemmes", href: "/explorer/lemmas", emoji: "📚" },
+  { label: "Concepts", href: "/explorer/concepts", emoji: "🧠" },
+  { label: "Expressions", href: "/explorer/expressions", emoji: "📝" },
+] as const;
 
 const INDEX_LINKS = [
   { label: "Lemmes", href: "/explorer/lemmas", description: "Entrées lexicales", emoji: "📚" },
@@ -30,6 +31,22 @@ type ExplorerEditorialSectionsProps = {
   editorial: ExplorerEditorialData;
 };
 
+function ExplorerPrimaryEntry() {
+  return (
+    <section className="editorial-page-section pb-0" aria-label="Entrées">
+      <ul className="flex flex-wrap gap-3">
+        {PRIMARY_LINKS.map((link) => (
+          <li key={link.href}>
+            <GhostButton href={link.href}>
+              {link.emoji} {link.label} →
+            </GhostButton>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function ExplorerEditorialSections({ editorial }: ExplorerEditorialSectionsProps) {
   const { todaysLanguage, popularConstructions, nativeExpressions, grammarSpotlight } = editorial;
 
@@ -42,7 +59,6 @@ function ExplorerEditorialSections({ editorial }: ExplorerEditorialSectionsProps
             featured
             title={todaysLanguage.displayLabel}
             subtitle={`« ${todaysLanguage.subtitle} »`}
-            meta={discoveryMetadataLine(todaysLanguage)}
           />
         </ExplorerEditorialSection>
       ) : null}
@@ -53,7 +69,6 @@ function ExplorerEditorialSections({ editorial }: ExplorerEditorialSectionsProps
             items={popularConstructions.map((pick) => ({
               label: pick.label,
               href: pick.href,
-              subtitle: pick.subtitle,
             }))}
           />
         </ExplorerEditorialSection>
@@ -65,7 +80,6 @@ function ExplorerEditorialSections({ editorial }: ExplorerEditorialSectionsProps
             items={nativeExpressions.map((pick) => ({
               label: pick.label,
               href: pick.href,
-              subtitle: pick.subtitle,
             }))}
           />
         </ExplorerEditorialSection>
@@ -97,27 +111,6 @@ function ExplorerReferenceIndex() {
         items={INDEX_LINKS.map((link) => ({
           label: "emoji" in link && link.emoji ? `${link.emoji} ${link.label}` : link.label,
           href: link.href,
-          subtitle: link.description,
-        }))}
-      />
-    </ExplorerEditorialSection>
-  );
-}
-
-function ExplorerTopicLinks({
-  eyebrow,
-  links,
-}: {
-  eyebrow: string;
-  links: Array<{ label: string; href: string; description?: string }>;
-}) {
-  return (
-    <ExplorerEditorialSection eyebrow={eyebrow}>
-      <ExplorerEditorialGrid
-        items={links.map((link) => ({
-          label: link.label,
-          href: link.href,
-          subtitle: link.description,
         }))}
       />
     </ExplorerEditorialSection>
@@ -129,25 +122,17 @@ export function ExplorerHub({ editorial, isEmpty }: ExplorerHubProps) {
     <div className="pb-8">
       <ExplorerSearchPanel autoFocus={!isEmpty} />
 
+      <ExplorerPrimaryEntry />
+
       <ExplorerReferenceIndex />
-
-      <ExplorerTopicLinks eyebrow="Grammaire" links={EXPLORER_GRAMMAR_LINKS} />
-
-      <ExplorerTopicLinks eyebrow="Vocabulaire" links={EXPLORER_VOCABULARY_LINKS} />
 
       {isEmpty ? (
         <section className="editorial-page-section">
-          <p className="text-metadata text-[var(--ink-muted)]">
-            Le graphe est encore vide.{" "}
-            <Reference href="/import">Importer un texte</Reference> pour commencer
-            l&apos;exploration.
-          </p>
+          <GhostButton href="/import">Importer →</GhostButton>
         </section>
       ) : (
         <>
-          <ExplorerEditorialSection eyebrow="Récent">
-            <ExplorerRecentSection />
-          </ExplorerEditorialSection>
+          <ExplorerRecentSection />
 
           <ExplorerEditorialSections editorial={editorial} />
         </>

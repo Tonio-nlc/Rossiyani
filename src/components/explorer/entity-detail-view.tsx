@@ -7,10 +7,11 @@ import {
 } from "@/lib/explorer/tutor-copy";
 import { practicePath } from "@/lib/practice/constants";
 
+import { GhostButton } from "@/components/design-system";
+
 import { ExplorerLayout } from "./explorer-layout";
 import { ExplorerDiscoveryGrid } from "./explorer-discovery-grid";
 import {
-  ExplorerTutorAction,
   ExplorerTutorAdvanced,
   ExplorerTutorAdvancedSection,
   ExplorerTutorExample,
@@ -56,46 +57,46 @@ export function EntityDetailView({ data }: EntityDetailViewProps) {
     ? textPath(data.relatedTexts[0].textId)
     : null;
   const explanation = tutorSimpleExplanationFromEntity(data);
-  const secondaryActions = [
-    readExamplesHref
-      ? { label: "Lire dans vos textes", href: readExamplesHref }
-      : null,
-    primaryLesson
-      ? { label: "Ouvrir la leçon", href: `/manual/lecons/${primaryLesson.slug}` }
-      : null,
-  ].filter(Boolean) as Array<{ label: string; href: string }>;
+  const practiceHref = practicePath({
+    structure: data.practiceStructure,
+    mode: "structure",
+    from: "explorer",
+  });
 
   return (
     <ExplorerLayout breadcrumb={data.breadcrumb}>
-      <article className="space-y-10 pb-12">
+      <article className="space-y-6 pb-8">
         <ExplorerTutorTitle label={data.label} translation={data.translation} />
 
         <ExplorerTutorWhy text={tutorWhyFromEntity(data)} />
+
+        <div className="editorial-page-section pb-0">
+          <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            <li>
+              <GhostButton href={practiceHref}>Pratiquer →</GhostButton>
+            </li>
+            {readExamplesHref ? (
+              <li>
+                <GhostButton href={readExamplesHref}>Lire →</GhostButton>
+              </li>
+            ) : null}
+            {primaryLesson ? (
+              <li>
+                <GhostButton href={`/manual/lecons/${primaryLesson.slug}`}>Lire →</GhostButton>
+              </li>
+            ) : null}
+          </ul>
+        </div>
 
         {primaryExample ? (
           <ExplorerTutorExample
             russian={primaryExample.russian}
             translation={primaryExample.translation}
             explanation={primaryExample.explanation}
-            sourceHref={primaryExample.textId ? textPath(primaryExample.textId) : null}
-            sourceLabel={primaryExample.textTitle ?? null}
           />
         ) : null}
 
         <ExplorerTutorExplanation text={explanation} commonMistakes={data.commonMistakes} />
-
-        <ExplorerTutorAction
-          primary={{
-            label: "Pratiquer maintenant",
-            href: practicePath({
-              structure: data.practiceStructure,
-              mode: "structure",
-              from: "explorer",
-            }),
-            description: "Écrivez une phrase avec cette structure et recevez un retour détaillé.",
-          }}
-          secondary={secondaryActions}
-        />
 
         <ExplorerTutorAdvanced>
           <ExplorerTutorAdvancedSection label="Type et niveau">

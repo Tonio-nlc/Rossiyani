@@ -38,24 +38,25 @@ export function ReaderHeader({
       : null;
 
   return (
-    <header className="editorial-page-section space-y-4 pb-0">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0 space-y-2">
-          <h1 className="editorial-lead-title font-semibold leading-tight tracking-tight">
+    <header className="editorial-page-section space-y-2 pb-0">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <p className="text-eyebrow">Lecture</p>
+          <h1 className="font-reader text-lg font-medium leading-snug tracking-tight text-[var(--ink-secondary)]">
             {title}
           </h1>
-          <p className="text-sm text-[var(--ink-secondary)]">{collectionName}</p>
-          <MetadataLine items={metaItems} />
+          <p className="text-metadata">{collectionName}</p>
+          <MetadataLine items={metaItems} className="text-metadata" />
         </div>
         <GhostButton onClick={() => onFocusModeChange(!focusMode)}>
-          {focusMode ? "Quitter le focus" : "Mode focus"}
+          {focusMode ? "Quitter le focus" : "Focus →"}
         </GhostButton>
       </div>
 
       <div className="flex items-center gap-4">
         <ProgressBar value={percent} className="flex-1" aria-label="Progression de lecture" />
         {sentenceLabel ? (
-          <p className="shrink-0 text-[10px] tracking-wide text-[var(--ink-muted)]">{sentenceLabel}</p>
+          <p className="shrink-0 text-metadata">{sentenceLabel}</p>
         ) : null}
       </div>
     </header>

@@ -337,11 +337,7 @@ export function ContextTranslationWorkspace({
       <header className="editorial-page-section pb-0">
         <GhostButton href="/practice">← Pratique</GhostButton>
         <div className="mt-4">
-          <SectionHeader
-            eyebrow="Traduction contextualisée"
-            title="Penser comme un locuteur natif"
-            description="Écrivez une phrase en français, anglais ou russe."
-          />
+          <SectionHeader title="Traduction contextualisée" />
         </div>
       </header>
 

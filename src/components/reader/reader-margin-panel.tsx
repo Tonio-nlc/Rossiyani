@@ -85,7 +85,7 @@ export function ReaderMarginPanel({
     panel.foundIn.length > 0;
 
   return (
-    <div key={panelKey} className="animate-reader-panel-fade space-y-5">
+    <div key={panelKey} className="animate-reader-panel-fade space-y-4">
       <header className="space-y-2 border-b border-[var(--hairline)] pb-4">
         {lemmaFirst ? (
           <>
@@ -112,10 +112,10 @@ export function ReaderMarginPanel({
 
       <div className="flex flex-wrap gap-x-5 gap-y-2">
         {panel.explorerHref ? (
-          <GhostButton href={panel.explorerHref}>🔍 Explorer</GhostButton>
+          <GhostButton href={panel.explorerHref}>Explorer →</GhostButton>
         ) : null}
         {panel.practiceHref ? (
-          <GhostButton href={panel.practiceHref}>✍️ Pratiquer</GhostButton>
+          <GhostButton href={panel.practiceHref}>Pratiquer →</GhostButton>
         ) : null}
         <GhostButton
           onClick={() => {
@@ -127,17 +127,19 @@ export function ReaderMarginPanel({
             setSaved(true);
           }}
         >
-          {saved ? "💾 Enregistré" : "💾 Enregistrer"}
+          {saved ? "Enregistré" : "Enregistrer →"}
         </GhostButton>
       </div>
 
-      <ul className="space-y-1">
-        {rationales.map((line) => (
-          <li key={line} className="text-xs leading-relaxed text-[var(--ink-muted)]">
-            {line}
-          </li>
-        ))}
-      </ul>
+      {rationales.length > 0 ? (
+        <ul className="space-y-1">
+          {rationales.map((line) => (
+            <li key={line} className="text-xs leading-relaxed text-[var(--ink-muted)]">
+              {line}
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       {panel.example ? (
         <section className="space-y-2">

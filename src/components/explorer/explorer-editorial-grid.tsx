@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { EditorialCard, GhostButton } from "@/components/design-system";
+import { EditorialCard } from "@/components/design-system";
 
 export type ExplorerGridItem = {
   label: string;
@@ -30,7 +30,6 @@ export function ExplorerEditorialGrid({ items }: ExplorerEditorialGridProps) {
           subtitle={item.subtitle}
           meta={item.meta}
           featured={item.featured}
-          footer={<GhostButton href={item.href}>Ouvrir →</GhostButton>}
         />
       ))}
     </div>

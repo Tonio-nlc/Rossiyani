@@ -4,17 +4,12 @@ import Link from "next/link";
 import { memo } from "react";
 
 import { Tag } from "@/components/design-system";
-import { getCategoryLabel } from "@/content/categories";
 import { getCollectionName } from "@/content/collections";
 import type { TextListItem } from "@/features/texts";
 
 import { LibraryCardActions } from "./library-card-actions";
 import { LibraryCardProgress } from "./library-card-progress";
-import {
-  estimateReadingMinutes,
-  estimateWordCount,
-  getTextCategoryIds,
-} from "./library-utils";
+import { estimateReadingMinutes } from "./library-utils";
 
 type LibraryCardProps = {
   text: TextListItem;
@@ -29,9 +24,7 @@ export const LibraryCard = memo(function LibraryCard({
   onRename,
   onDelete,
 }: LibraryCardProps) {
-  const tags = getTextCategoryIds(text);
   const minutes = estimateReadingMinutes(text.sentenceCount);
-  const wordEstimate = estimateWordCount(text.sentenceCount);
   const collectionName = getCollectionName(text.collectionId);
 
   return (
@@ -58,32 +51,12 @@ export const LibraryCard = memo(function LibraryCard({
           {text.title}
         </h2>
 
-        <p className="mt-1.5 text-sm text-[var(--ink-secondary)]">{collectionName}</p>
-
-        {tags.length > 0 ? (
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {tags.map((tagId) => (
-              <Tag key={tagId}>{getCategoryLabel(tagId)}</Tag>
-            ))}
-          </div>
-        ) : null}
+        <p className="mt-2 text-metadata">
+          {collectionName} · {minutes} min
+        </p>
 
         <LibraryCardProgress textId={text.id} />
-
-        <div className="mt-auto grid grid-cols-2 gap-2 border-t border-[var(--hairline)] pt-4">
-          <Metric label="Phrases" value={String(text.sentenceCount)} />
-          <Metric label="Mots" value={`≈${wordEstimate}`} muted />
-        </div>
       </Link>
     </article>
   );
 });
-
-function Metric({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
-  return (
-    <div>
-      <p className={muted ? "text-metadata" : "text-sm font-medium text-[var(--ink)]"}>{value}</p>
-      <p className="text-eyebrow mt-0.5">{label}</p>
-    </div>
-  );
-}

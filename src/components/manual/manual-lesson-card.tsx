@@ -24,12 +24,11 @@ export function ManualLessonCard({ lesson }: ManualLessonCardProps) {
   return (
     <EditorialCard
       href={href}
-      eyebrow={lesson.level.toUpperCase()}
       title={primary}
       subtitle={secondary ?? undefined}
       footer={
         <>
-          <GhostButton href={href}>Lire la leçon →</GhostButton>
+          <GhostButton href={href}>Lire →</GhostButton>
           <p className="mt-3 text-metadata">
             {`${MANUAL_CATEGORY_LABELS[lesson.category]} · ${lesson.estimatedReadingTime} min · difficulté ${lesson.difficulty}/5`}
           </p>
@@ -90,7 +89,7 @@ export function ManualLevelGrid({ counts }: ManualLevelGridProps) {
             title={MANUAL_LEVEL_LABELS[level]}
             footer={
               <>
-                <GhostButton href={href}>Parcourir →</GhostButton>
+                <GhostButton href={href}>Lire →</GhostButton>
                 <p className="mt-3 text-metadata">
                   {count} leçon{count > 1 ? "s" : ""}
                 </p>
@@ -133,7 +132,7 @@ export function ManualCategoryGrid({ counts }: ManualCategoryGridProps) {
             title={MANUAL_CATEGORY_LABELS[category]}
             footer={
               <>
-                <GhostButton href={href}>Parcourir →</GhostButton>
+                <GhostButton href={href}>Lire →</GhostButton>
                 <p className="mt-3 text-metadata">
                   {count} leçon{count > 1 ? "s" : ""}
                 </p>

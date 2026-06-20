@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 
+import { GhostButton } from "@/components/design-system";
 import { getExplorationHistory } from "@/lib/explorer/exploration-history";
 
-import { ExplorerDiscoveryGrid } from "./explorer-discovery-grid";
+import { ExplorerEditorialSection } from "./explorer-editorial-grid";
+
+const RECENT_LIMIT = 4;
 
 export function ExplorerRecentSection() {
   const [entries, setEntries] = useState<Array<{ label: string; href: string }>>([]);
@@ -15,7 +18,7 @@ export function ExplorerRecentSection() {
     const source = lemmas.length > 0 ? lemmas : history;
 
     setEntries(
-      source.slice(0, 6).map((entry) => ({
+      source.slice(0, RECENT_LIMIT).map((entry) => ({
         label: entry.label,
         href: entry.href,
       })),
@@ -23,12 +26,18 @@ export function ExplorerRecentSection() {
   }, []);
 
   if (entries.length === 0) {
-    return (
-      <p className="text-sm leading-relaxed text-[var(--ink-muted)]">
-        Vos mots consultés récemment apparaîtront ici au fil de l&apos;exploration.
-      </p>
-    );
+    return null;
   }
 
-  return <ExplorerDiscoveryGrid items={entries} />;
+  return (
+    <ExplorerEditorialSection eyebrow="Récent">
+      <ul className="flex flex-wrap gap-3">
+        {entries.map((entry) => (
+          <li key={`${entry.href}-${entry.label}`}>
+            <GhostButton href={entry.href}>{entry.label}</GhostButton>
+          </li>
+        ))}
+      </ul>
+    </ExplorerEditorialSection>
+  );
 }

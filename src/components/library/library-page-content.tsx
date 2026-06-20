@@ -40,8 +40,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
           <LibraryContextTranslationLessons />
         </div>
         <p className="text-metadata">
-          Grammar lessons live in the Manual.{" "}
-          <Reference href="/manual">Open Manual →</Reference>
+          <Reference href="/manual">Leçons de grammaire →</Reference>
         </p>
       </div>
     );
@@ -81,9 +80,9 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
   return (
     <div className="pb-8">
       <LibraryPageIntro />
-      <LibraryImportCard />
       <LibrarySectionNav active="texts" />
       <LibraryView initialTexts={initialTexts} />
+      <LibraryImportCard />
     </div>
   );
 }

@@ -14,15 +14,11 @@ export function LibraryCollectionsRow({ active, onSelect }: LibraryCollectionsRo
   const collections = getAllCollections();
 
   return (
-    <section className="library-page-section space-y-4" aria-label="Collections éditoriales">
-      <div>
-        <p className="text-eyebrow">Collections</p>
-        <h2 className="editorial-section-title mt-2">Univers éditoriaux</h2>
-      </div>
+    <section className="library-page-section space-y-3" aria-label="Collections éditoriales">
+      <p className="text-eyebrow">Collections</p>
       <div className="library-collections-scroll">
         <CollectionCard
           name="Toutes"
-          description="Parcourir l'ensemble de la bibliothèque"
           active={active === "all"}
           onClick={() => onSelect("all")}
         />

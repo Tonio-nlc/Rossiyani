@@ -71,7 +71,7 @@ export function ExplorerTutorExample({
 
   return (
     <section className="editorial-page-section space-y-4 pb-0">
-      <p className="text-eyebrow">Exemples</p>
+      <p className="text-eyebrow">Exemple</p>
       <blockquote className="max-w-2xl border-l-2 border-[var(--hairline)] pl-5">
         <p className="break-russian font-reader text-[clamp(1.125rem,2.5vw,1.375rem)] leading-snug text-[var(--ink)]">
           {russian}
@@ -154,7 +154,7 @@ export function ExplorerTutorAction({ primary, secondary = [] }: ExplorerTutorAc
         featured
         title={primary.label}
         meta={primary.description}
-        footer={<PrimaryButton href={primary.href}>Commencer</PrimaryButton>}
+        footer={<PrimaryButton href={primary.href}>Pratiquer →</PrimaryButton>}
       />
       {secondary.length > 0 ? (
         <ul className="flex flex-wrap gap-x-5 gap-y-2">

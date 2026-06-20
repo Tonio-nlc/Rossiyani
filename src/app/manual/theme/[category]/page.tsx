@@ -31,9 +31,8 @@ export default async function ManualCategoryPage({ params }: PageProps) {
         <GhostButton href="/manual">← Manuel</GhostButton>
         <div className="mt-4">
           <SectionHeader
-            eyebrow="Thème"
             title={MANUAL_CATEGORY_LABELS[typedCategory]}
-            description={`Table des matières — ${lessons.length} leçon${lessons.length > 1 ? "s" : ""} sur ce thème.`}
+            meta={`${lessons.length} leçon${lessons.length > 1 ? "s" : ""}`}
           />
         </div>
       </header>

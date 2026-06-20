@@ -8,11 +8,12 @@ import {
 } from "@/lib/explorer/tutor-copy";
 import { practicePath } from "@/lib/practice/constants";
 
+import { GhostButton } from "@/components/design-system";
+
 import { ExplorerDiscoveryGrid } from "./explorer-discovery-grid";
 import { ExplorerLayout } from "./explorer-layout";
 import { endingPath, lemmaPath, textPath, conceptPath } from "./explorer-routes";
 import {
-  ExplorerTutorAction,
   ExplorerTutorAdvanced,
   ExplorerTutorAdvancedSection,
   ExplorerTutorExample,
@@ -63,41 +64,39 @@ export function ConceptDetailView({ concept, relatedTexts }: ConceptDetailViewPr
     ...relatedTexts.slice(0, 3).map((item) => textChip(item.textId, item.textTitle)),
   ];
 
+  const practiceHref = practicePath({
+    structure: concept.concept.title,
+    mode: "structure",
+    from: "explorer",
+  });
+
   return (
     <ExplorerLayout
       breadcrumb={[{ label: "Explorer", href: "/explorer" }, { label: concept.concept.title }]}
     >
-      <article className="space-y-10 pb-12">
+      <article className="space-y-6 pb-8">
         <ExplorerTutorTitle label={concept.concept.title} />
 
         <ExplorerTutorWhy text={tutorWhyFromConcept(concept, question)} />
 
+        <div className="editorial-page-section pb-0">
+          <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            <li>
+              <GhostButton href={practiceHref}>Pratiquer →</GhostButton>
+            </li>
+            {readExamplesHref ? (
+              <li>
+                <GhostButton href={readExamplesHref}>Lire →</GhostButton>
+              </li>
+            ) : null}
+          </ul>
+        </div>
+
         {primaryText ? (
-          <ExplorerTutorExample
-            russian={primaryText.sentenceRussian}
-            sourceHref={readExamplesHref}
-            sourceLabel={primaryText.textTitle}
-          />
+          <ExplorerTutorExample russian={primaryText.sentenceRussian} />
         ) : null}
 
         <ExplorerTutorExplanation text={tutorSimpleExplanationFromConcept(concept)} />
-
-        <ExplorerTutorAction
-          primary={{
-            label: "Pratiquer cette construction",
-            href: practicePath({
-              structure: concept.concept.title,
-              mode: "structure",
-              from: "explorer",
-            }),
-            description: `Écrivez une phrase qui mobilise « ${concept.concept.title} » en contexte.`,
-          }}
-          secondary={
-            readExamplesHref
-              ? [{ label: "Voir des exemples authentiques", href: readExamplesHref }]
-              : []
-          }
-        />
 
         <ExplorerTutorAdvanced>
           <ExplorerTutorAdvancedSection label="Statistiques">

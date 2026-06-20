@@ -151,6 +151,7 @@ function ExplorerSearchPanelInner({ autoFocus = false }: { autoFocus?: boolean }
 
   return (
     <div id="recherche" className="editorial-page-section space-y-4 pb-0">
+      <p className="text-eyebrow">Rechercher</p>
       <SearchField
         inputRef={inputRef}
         value={query}
@@ -167,12 +168,11 @@ function ExplorerSearchPanelInner({ autoFocus = false }: { autoFocus?: boolean }
       />
 
       {loading ? (
-        <p className="text-metadata text-[var(--ink-muted)]">Ouverture des relations…</p>
+        <p className="text-metadata text-[var(--ink-muted)]">Recherche…</p>
       ) : null}
 
       {!loading && hasQuery && expansionChain.length > 0 ? (
         <div className="space-y-4">
-          <p className="text-eyebrow">Depuis votre recherche</p>
           <KnowledgeChain items={expansionChain} />
           {conceptGraph?.concept.canonicalExplanation ? (
             <MarginNote kind="usage">
@@ -201,7 +201,7 @@ function ExplorerSearchPanelInner({ autoFocus = false }: { autoFocus?: boolean }
 
       {!loading && hasQuery && expansionChain.length === 0 ? (
         <p className="text-metadata text-[var(--ink-muted)]">
-          Aucune relation trouvée. Parcourez l&apos;index ci-dessous.
+          Aucun résultat. Parcourez l&apos;index.
         </p>
       ) : null}
     </div>

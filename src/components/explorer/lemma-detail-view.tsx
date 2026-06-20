@@ -32,7 +32,7 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
     <ExplorerLayout
       breadcrumb={[{ label: "Explorer", href: "/explorer" }, { label: knowledge.lemma }]}
     >
-      <article className="space-y-10 pb-12">
+      <article className="space-y-6 pb-8">
         <ExplorerTutorTitle
           label={knowledge.stressMarked ?? knowledge.lemma}
           translation={knowledge.primaryTranslation}
@@ -42,9 +42,11 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
 
         <div className="editorial-page-section pb-0">
           <ul className="flex flex-wrap gap-x-5 gap-y-2">
-            <li>
-              <GhostButton href="#exemple">Comprendre →</GhostButton>
-            </li>
+            {primaryExample ? (
+              <li>
+                <GhostButton href="#exemple">Lire →</GhostButton>
+              </li>
+            ) : null}
             <li>
               <GhostButton href={exploreHref}>Explorer →</GhostButton>
             </li>

@@ -1,5 +1,4 @@
 import { EditorialCard, GhostButton } from "@/components/design-system";
-import { PHRASE_GROUP_TYPE_LABELS } from "@/types/domain";
 import type { PhraseKnowledge } from "@/types/knowledge-graph";
 
 import { ExplorerLayout } from "./explorer-layout";
@@ -29,11 +28,10 @@ export function PhraseDetailView({
     <ExplorerLayout
       breadcrumb={[{ label: categoryLabel, href: categoryHref }, { label: knowledge.label }]}
       title={knowledge.label}
-      subtitle={`${PHRASE_GROUP_TYPE_LABELS[knowledge.type]} · ${knowledge.occurrenceCount}× · ${knowledge.seenInTexts} texte${knowledge.seenInTexts > 1 ? "s" : ""}`}
     >
-      <article className="space-y-0 pb-8">
+      <article className="space-y-6 pb-8">
         {knowledge.canonicalExplanation ? (
-          <section className="editorial-page-section space-y-4 pb-0">
+          <section className="editorial-page-section space-y-3 pb-0">
             <p className="text-eyebrow">Définition</p>
             <p className="max-w-2xl font-reader text-lg leading-relaxed text-[var(--ink)]">
               {knowledge.canonicalExplanation}
@@ -42,8 +40,10 @@ export function PhraseDetailView({
         ) : null}
 
         {knowledge.exampleSentences.length > 0 ? (
-          <section className="editorial-page-section space-y-4 pb-0">
-            <p className="text-eyebrow">Exemples</p>
+          <section className="editorial-page-section space-y-3 pb-0">
+            <p className="text-eyebrow">
+              {knowledge.exampleSentences.length === 1 ? "Exemple" : "Exemples"}
+            </p>
             <ul className="max-w-2xl space-y-3">
               {knowledge.exampleSentences.map((s) => (
                 <li key={s} className="ds-microscope-panel font-reader text-[var(--ink)]">
@@ -55,15 +55,15 @@ export function PhraseDetailView({
         ) : null}
 
         {knowledge.relatedTexts.length > 0 ? (
-          <section className="editorial-page-section space-y-4 pb-0">
+          <section className="editorial-page-section space-y-3 pb-0">
             <p className="text-eyebrow">Textes</p>
             <div className="library-editorial-grid max-w-2xl">
               {knowledge.relatedTexts.map((t) => (
                 <EditorialCard
                   key={t.textId}
                   href={`/texts/${t.textId}`}
-                  eyebrow={t.textTitle}
-                  title={t.sentenceRussian}
+                  title={t.textTitle}
+                  subtitle={t.sentenceRussian}
                   footer={<GhostButton href={`/texts/${t.textId}`}>Lire →</GhostButton>}
                 />
               ))}
@@ -71,7 +71,7 @@ export function PhraseDetailView({
           </section>
         ) : null}
 
-        <RelatedNavigation items={related} title="Mots et notions liés" />
+        <RelatedNavigation items={related} title="Liens" />
       </article>
     </ExplorerLayout>
   );

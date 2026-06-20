@@ -2,13 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import {
-  EditorialCard,
-  GhostButton,
-  PrimaryButton,
-  Tag,
-} from "@/components/design-system";
+import { GhostButton, PrimaryButton, Tag } from "@/components/design-system";
 import { LibraryCardProgress } from "@/components/library/library-card-progress";
+import type { TodaysDiscovery } from "@/features/discovery";
 import type { HomeJournalData } from "@/features/home";
 import type { TextListItem } from "@/features/texts";
 import { getSavedComposePhrases } from "@/lib/compose/saved-phrases";
@@ -32,7 +28,6 @@ type HomeSessionJournalProps = {
   texts: TextListItem[];
 };
 
-const TODAY_LIMIT = 3;
 const REVIEW_LIMIT = 5;
 
 function textIdFromHref(href?: string): string | null {
@@ -42,50 +37,50 @@ function textIdFromHref(href?: string): string | null {
   return href.slice("/texts/".length).split("/")[0] ?? null;
 }
 
-function todayEntries(
-  narrative: SessionJournal,
-  journal: HomeJournalData,
-): SessionJournalEntry[] {
-  const recent = narrative.recentlyLearned.slice(0, TODAY_LIMIT);
-  if (recent.length > 0) {
-    return recent;
-  }
-
-  if (journal.todaysDiscovery) {
-    return [
-      {
-        label: journal.todaysDiscovery.displayLabel,
-        detail: journal.todaysDiscovery.subtitle,
-        href: journal.todaysDiscovery.explorerHref,
-      },
-    ];
-  }
-
-  return [];
+function NextActionSection({ step }: { step: SessionJournalEntry }) {
+  return (
+    <section className="editorial-page-section space-y-3 pb-0" aria-label="Prochaine action">
+      <p className="text-eyebrow">Prochaine action</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="font-reader text-[var(--ink)]">{step.label}</p>
+        <PrimaryButton href={step.href ?? "/practice"}>Pratiquer →</PrimaryButton>
+      </div>
+      {step.detail ? <p className="text-metadata">{step.detail}</p> : null}
+    </section>
+  );
 }
 
-function QuickNavSection({ narrative }: { narrative: SessionJournal }) {
-  const continueHref = narrative.continueReading?.href ?? "/library";
-  const reviewHref = narrative.toReview[0]?.href ?? "/practice";
-  const practiceHref = narrative.nextStep?.href ?? "/practice";
-
+function DailyDiscoverySection({ discovery }: { discovery: TodaysDiscovery }) {
   return (
-    <nav className="editorial-page-section pb-0" aria-label="Actions rapides">
-      <ul className="flex flex-wrap gap-x-5 gap-y-2">
-        <li>
-          <GhostButton href={continueHref}>📖 Continuer la lecture</GhostButton>
-        </li>
-        <li>
-          <GhostButton href="/explorer">🔍 Explorer un mot</GhostButton>
-        </li>
-        <li>
-          <GhostButton href={reviewHref}>🧠 Réviser</GhostButton>
-        </li>
-        <li>
-          <GhostButton href={practiceHref}>✍️ Pratiquer</GhostButton>
-        </li>
-      </ul>
-    </nav>
+    <section className="editorial-page-section space-y-3 pb-0" aria-label="Découverte du jour">
+      <p className="text-eyebrow">Découverte du jour</p>
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <p className="break-russian font-reader text-xl text-[var(--ink)]">
+          {discovery.displayLabel}
+        </p>
+        <GhostButton href={discovery.explorerHref}>Explorer →</GhostButton>
+      </div>
+      {discovery.subtitle && discovery.subtitle !== "—" ? (
+        <p className="text-metadata italic">&ldquo;{discovery.subtitle}&rdquo;</p>
+      ) : null}
+    </section>
+  );
+}
+
+function WordOfDaySection({ entry }: { entry: SessionJournalEntry }) {
+  return (
+    <section className="editorial-page-section space-y-3 pb-0" aria-label="Mot du jour">
+      <p className="text-eyebrow">Mot du jour</p>
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <p className="break-russian font-reader text-xl text-[var(--ink)]">{entry.label}</p>
+        {entry.href ? (
+          <GhostButton href={entry.href}>Explorer →</GhostButton>
+        ) : (
+          <Tag>{entry.label}</Tag>
+        )}
+      </div>
+      {entry.detail ? <p className="text-metadata">{entry.detail}</p> : null}
+    </section>
   );
 }
 
@@ -93,51 +88,16 @@ function ContinueReadingSection({ entry }: { entry: SessionJournalEntry }) {
   const textId = textIdFromHref(entry.href);
 
   return (
-    <section className="editorial-page-section space-y-4" aria-label="Continuer la lecture">
-      <p className="text-eyebrow">Continuer la lecture</p>
-      <EditorialCard
-        href={entry.href ?? "/library"}
-        featured
-        eyebrow={entry.collectionName ?? "Lecture en cours"}
-        title={entry.label}
-        meta={entry.detail}
-        footer={
-          <div className="space-y-4">
-            {textId ? <LibraryCardProgress textId={textId} /> : null}
-            <PrimaryButton href={entry.href ?? "/library"}>Reprendre</PrimaryButton>
-          </div>
-        }
-      />
-    </section>
-  );
-}
-
-function ContinueReadingEmpty() {
-  return (
-    <section className="editorial-page-section space-y-4" aria-label="Continuer la lecture">
-      <p className="text-eyebrow">Continuer la lecture</p>
-      <PrimaryButton href="/import">Importer un texte</PrimaryButton>
-    </section>
-  );
-}
-
-function TodaySection({ entries }: { entries: SessionJournalEntry[] }) {
-  return (
-    <section className="editorial-page-section space-y-4" aria-label="Aujourd'hui">
-      <p className="text-eyebrow">Aujourd&apos;hui</p>
-      {entries.length > 0 ? (
-        <div className="library-editorial-grid">
-          {entries.map((entry, index) => (
-            <EditorialCard
-              key={`${entry.label}-${entry.href ?? index}`}
-              href={entry.href}
-              featured={index === 0}
-              title={entry.label}
-              meta={entry.detail}
-            />
-          ))}
+    <section className="editorial-page-section space-y-3 pb-0" aria-label="En cours">
+      <p className="text-eyebrow">En cours</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-reader text-[var(--ink)]">{entry.label}</p>
+          {entry.detail ? <p className="text-metadata">{entry.detail}</p> : null}
         </div>
-      ) : null}
+        <GhostButton href={entry.href ?? "/library"}>Lire →</GhostButton>
+      </div>
+      {textId ? <LibraryCardProgress textId={textId} /> : null}
     </section>
   );
 }
@@ -145,38 +105,50 @@ function TodaySection({ entries }: { entries: SessionJournalEntry[] }) {
 function ReviewSection({ entries }: { entries: SessionJournalEntry[] }) {
   const visible = entries.slice(0, REVIEW_LIMIT);
 
+  if (visible.length === 0) {
+    return null;
+  }
+
   return (
-    <section className="editorial-page-section space-y-4" aria-label="À revoir">
+    <section className="editorial-page-section space-y-3 pb-0" aria-label="À revoir">
       <p className="text-eyebrow">À revoir</p>
-      {visible.length > 0 ? (
-        <ul className="flex flex-wrap gap-3">
-          {visible.map((entry) => (
-            <li key={`${entry.label}-${entry.href ?? entry.detail ?? ""}`}>
-              {entry.href ? (
-                <GhostButton href={entry.href}>{entry.label}</GhostButton>
-              ) : (
-                <Tag>{entry.label}</Tag>
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      <ul className="flex flex-wrap gap-3">
+        {visible.map((entry) => (
+          <li key={`${entry.label}-${entry.href ?? entry.detail ?? ""}`}>
+            {entry.href ? (
+              <GhostButton href={entry.href}>{entry.label}</GhostButton>
+            ) : (
+              <Tag>{entry.label}</Tag>
+            )}
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
 
-function RecommendedPracticeSection({ step }: { step: SessionJournalEntry }) {
+function QuickLinksSection({ narrative }: { narrative: SessionJournal }) {
+  const continueHref = narrative.continueReading?.href ?? "/library";
+  const reviewHref = narrative.toReview[0]?.href ?? "/practice";
+  const practiceHref = narrative.nextStep?.href ?? "/practice";
+
   return (
-    <section className="editorial-page-section space-y-4" aria-label="Prochaine étape">
-      <p className="text-eyebrow">Prochaine étape</p>
-      <EditorialCard
-        href={step.href ?? "/practice"}
-        featured
-        title={step.label}
-        meta={step.detail}
-        footer={<PrimaryButton href={step.href ?? "/practice"}>Commencer</PrimaryButton>}
-      />
-    </section>
+    <nav className="editorial-page-section" aria-label="Raccourcis">
+      <ul className="flex flex-wrap gap-x-5 gap-y-2">
+        <li>
+          <GhostButton href={continueHref}>Lire →</GhostButton>
+        </li>
+        <li>
+          <GhostButton href="/explorer">Explorer →</GhostButton>
+        </li>
+        <li>
+          <GhostButton href={reviewHref}>Réviser →</GhostButton>
+        </li>
+        <li>
+          <GhostButton href={practiceHref}>Pratiquer →</GhostButton>
+        </li>
+      </ul>
+    </nav>
   );
 }
 
@@ -201,25 +173,37 @@ export function HomeSessionJournal({ journal, texts }: HomeSessionJournalProps) 
     );
   }, [journal, texts]);
 
-  const today = useMemo(() => todayEntries(narrative, journal), [narrative, journal]);
+  const wordOfDay = useMemo(() => {
+    const recent = narrative.recentlyLearned[0];
+    if (!recent) {
+      return null;
+    }
+    if (
+      journal.todaysDiscovery &&
+      recent.label === journal.todaysDiscovery.displayLabel
+    ) {
+      return null;
+    }
+    return recent;
+  }, [journal.todaysDiscovery, narrative.recentlyLearned]);
 
   return (
     <div className="pb-8">
-      <QuickNavSection narrative={narrative} />
+      {narrative.nextStep ? <NextActionSection step={narrative.nextStep} /> : null}
+
+      {journal.todaysDiscovery ? (
+        <DailyDiscoverySection discovery={journal.todaysDiscovery} />
+      ) : null}
+
+      {wordOfDay ? <WordOfDaySection entry={wordOfDay} /> : null}
 
       {narrative.continueReading ? (
         <ContinueReadingSection entry={narrative.continueReading} />
-      ) : (
-        <ContinueReadingEmpty />
-      )}
-
-      <TodaySection entries={today} />
+      ) : null}
 
       <ReviewSection entries={narrative.toReview} />
 
-      {narrative.nextStep ? (
-        <RecommendedPracticeSection step={narrative.nextStep} />
-      ) : null}
+      <QuickLinksSection narrative={narrative} />
     </div>
   );
 }

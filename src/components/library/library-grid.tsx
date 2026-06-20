@@ -25,8 +25,8 @@ export function LibraryGrid({
       <EmptyState
         icon="📚"
         title="Votre bibliothèque est vide"
-        description="Importez votre premier texte russe pour commencer à lire avec le microscope linguistique."
-        action={{ label: "Importer un texte", href: "/import" }}
+        description="Importez un texte pour commencer."
+        action={{ label: "Importer →", href: "/import" }}
       />
     );
   }
@@ -36,7 +36,7 @@ export function LibraryGrid({
       <EmptyState
         icon="🔍"
         title="Aucun texte ne correspond"
-        description="Essayez d'autres mots-clés ou retirez les filtres actifs."
+        description="Modifiez les filtres."
       />
     );
   }

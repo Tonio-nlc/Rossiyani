@@ -292,11 +292,7 @@ export function PracticeWorkspace() {
       }}
     >
       <header className="editorial-page-section pb-0">
-        <SectionHeader
-          eyebrow="Pratique"
-          title="Exprimer une idée en russe"
-          description="Transformez une pensée en russe naturel — l'exercice est l'interface."
-        />
+        <SectionHeader title="Pratiquer" />
       </header>
 
       {structureMode && structureContext ? (
@@ -333,18 +329,35 @@ export function PracticeWorkspace() {
         <section className="editorial-page-section pb-0">
           <InputField
             id="practice-context"
-            label="Que voulez-vous dire ?"
+            label="Votre idée"
             type="text"
             value={context}
             onChange={(event: ChangeEvent<HTMLInputElement>) => setContext(event.target.value)}
-            placeholder="Optionnel — votre idée dans n'importe quelle langue"
+            placeholder="En français ou en russe"
           />
         </section>
       ) : null}
 
+      <section className="editorial-page-section pb-0">
+        <PracticeInput
+          id="practice-russian"
+          label={structureMode ? "Votre phrase" : "Votre phrase en russe"}
+          value={russianText}
+          onChange={(event) => setRussianText(event.target.value)}
+          rows={5}
+          required
+          placeholder="Ваше предложение…"
+        />
+        <div className="mt-4">
+          <PrimaryButton type="submit" disabled={loading || !russianText.trim()}>
+            {loading ? "Analyse…" : "Pratiquer →"}
+          </PrimaryButton>
+        </div>
+      </section>
+
       {showSuggestions ? (
         <section className="editorial-page-section pb-0">
-          <p className="text-eyebrow mb-3">Besoin d&apos;inspiration ?</p>
+          <p className="text-metadata mb-3">Suggestions</p>
           <ul className="flex flex-wrap gap-2">
             {PRACTICE_SUGGESTIONS.map((suggestion) => (
               <li key={suggestion.label}>
@@ -354,20 +367,6 @@ export function PracticeWorkspace() {
           </ul>
         </section>
       ) : null}
-
-      <section className="editorial-page-section">
-        <PracticeInput
-          id="practice-russian"
-          label={
-            structureMode ? "Exprimez votre propre idée" : "Écrivez naturellement en russe"
-          }
-          value={russianText}
-          onChange={(event) => setRussianText(event.target.value)}
-          rows={5}
-          required
-          placeholder="Ваше предложение…"
-        />
-      </section>
 
       {advancedOpen ? (
         <section className="editorial-page-section pb-0">
@@ -417,18 +416,11 @@ export function PracticeWorkspace() {
         </section>
       ) : null}
 
-      <footer className="editorial-page-section flex flex-wrap items-center justify-between gap-4 border-t border-[var(--hairline)] pt-6">
-        <div className="flex flex-wrap items-center gap-4">
-          <GhostButton onClick={() => setAdvancedOpen((open) => !open)}>
-            {advancedOpen ? "Masquer les options" : "Options avancées"}
-          </GhostButton>
-          <GhostButton href="/practice/context-translation">
-            Traduction contextualisée →
-          </GhostButton>
-        </div>
-        <PrimaryButton type="submit" disabled={loading || !russianText.trim()}>
-          {loading ? "Analyse…" : "Analyser →"}
-        </PrimaryButton>
+      <footer className="editorial-page-section flex flex-wrap items-center gap-x-5 gap-y-2">
+        <GhostButton onClick={() => setAdvancedOpen((open) => !open)}>
+          {advancedOpen ? "Masquer les options" : "Options →"}
+        </GhostButton>
+        <GhostButton href="/practice/context-translation">Traduction contextualisée →</GhostButton>
       </footer>
     </form>
   );
@@ -473,9 +465,7 @@ function StructureContextNote({ context, referenceSentence }: StructureContextNo
 
       <div className="mt-4 flex flex-wrap gap-4">
         {context.readerHref ? (
-          <Reference href={context.readerHref}>
-            {context.readerTitle ? "Ouvrir dans le Reader →" : "Ouvrir dans le Reader →"}
-          </Reference>
+          <Reference href={context.readerHref}>Lire →</Reference>
         ) : null}
         <Reference href={context.explorerHref}>Explorer →</Reference>
       </div>

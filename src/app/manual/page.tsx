@@ -14,21 +14,16 @@ export default function ManualPage() {
   return (
     <div className="pb-8">
       <header className="editorial-page-section pb-0">
-        <SectionHeader
-          eyebrow="Manuel"
-          title="Grammaire et usage"
-          description="Un manuel académique — grammaire, vocabulaire, prononciation et usage natif, structuré comme un cours universitaire."
-          meta={`${stats.totalLessons} leçons`}
-        />
+        <SectionHeader title="Apprendre" />
       </header>
 
       <section className="editorial-page-section pb-0">
-        <p className="text-eyebrow mb-4">Par niveau</p>
+        <p className="text-eyebrow mb-3">Niveaux</p>
         <ManualLevelGrid counts={stats.byLevel} />
       </section>
 
       <section className="editorial-page-section">
-        <p className="text-eyebrow mb-4">Par thème</p>
+        <p className="text-eyebrow mb-3">Thèmes</p>
         <ManualCategoryGrid counts={stats.byCategory} />
       </section>
     </div>
