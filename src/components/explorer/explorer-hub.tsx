@@ -13,12 +13,12 @@ import {
 } from "./explorer-hub-links";
 
 const INDEX_LINKS = [
-  { label: "Lemmes", href: "/explorer/lemmas", description: "Entrées lexicales" },
-  { label: "Concepts", href: "/explorer/concepts", description: "Motifs grammaticaux" },
-  { label: "Cas", href: "/explorer/cases", description: "Les six cas" },
+  { label: "Lemmes", href: "/explorer/lemmas", description: "Entrées lexicales", emoji: "📚" },
+  { label: "Concepts", href: "/explorer/concepts", description: "Motifs grammaticaux", emoji: "🧠" },
+  { label: "Cas", href: "/explorer/cases", description: "Les six cas", emoji: "🔤" },
   { label: "Terminaisons", href: "/explorer/endings", description: "Paradigmes fléchis" },
   { label: "Collocations", href: "/explorer/collocations", description: "Cooccurrences" },
-  { label: "Expressions", href: "/explorer/expressions", description: "Tournures idiomatiques" },
+  { label: "Expressions", href: "/explorer/expressions", description: "Tournures idiomatiques", emoji: "📝" },
 ] as const;
 
 type ExplorerHubProps = {
@@ -95,7 +95,7 @@ function ExplorerReferenceIndex() {
     <ExplorerEditorialSection eyebrow="Index">
       <ExplorerEditorialGrid
         items={INDEX_LINKS.map((link) => ({
-          label: link.label,
+          label: "emoji" in link && link.emoji ? `${link.emoji} ${link.label}` : link.label,
           href: link.href,
           subtitle: link.description,
         }))}

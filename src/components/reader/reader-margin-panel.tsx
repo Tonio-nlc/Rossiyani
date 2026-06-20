@@ -17,6 +17,8 @@ import {
 } from "@/lib/reader/word-sheet-rationale";
 import type { WordDetailGraph } from "@/types/word-detail-graph";
 
+import { GhostButton } from "@/components/design-system";
+
 type ReaderMarginPanelProps = {
   detail: WordDetailGraph | null;
   loading?: boolean;
@@ -31,23 +33,6 @@ type ReaderMarginPanelProps = {
 
 function PanelLabel({ children }: { children: ReactNode }) {
   return <p className="text-eyebrow">{children}</p>;
-}
-
-function EditorialLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
-    >
-      {children}
-    </Link>
-  );
 }
 
 export function ReaderMarginPanel({
@@ -124,6 +109,27 @@ export function ReaderMarginPanel({
           <p className="text-sm text-[var(--ink-muted)]">…</p>
         ) : null}
       </header>
+
+      <div className="flex flex-wrap gap-x-5 gap-y-2">
+        {panel.explorerHref ? (
+          <GhostButton href={panel.explorerHref}>🔍 Explorer</GhostButton>
+        ) : null}
+        {panel.practiceHref ? (
+          <GhostButton href={panel.practiceHref}>✍️ Pratiquer</GhostButton>
+        ) : null}
+        <GhostButton
+          onClick={() => {
+            saveReaderWord({
+              displayForm: panel.displayForm,
+              lemma: panel.lemma,
+              textId: detail.textId,
+            });
+            setSaved(true);
+          }}
+        >
+          {saved ? "💾 Enregistré" : "💾 Enregistrer"}
+        </GhostButton>
+      </div>
 
       <ul className="space-y-1">
         {rationales.map((line) => (
@@ -245,37 +251,6 @@ export function ReaderMarginPanel({
           ) : null}
         </div>
       ) : null}
-
-      <section className="space-y-2 border-t border-[var(--hairline)] pt-4">
-        <ul className="flex flex-wrap gap-x-4 gap-y-1">
-          {panel.explorerHref ? (
-            <li>
-              <EditorialLink href={panel.explorerHref}>Explorer</EditorialLink>
-            </li>
-          ) : null}
-          {panel.practiceHref ? (
-            <li>
-              <EditorialLink href={panel.practiceHref}>Pratiquer</EditorialLink>
-            </li>
-          ) : null}
-          <li>
-            <button
-              type="button"
-              onClick={() => {
-                saveReaderWord({
-                  displayForm: panel.displayForm,
-                  lemma: panel.lemma,
-                  textId: detail.textId,
-                });
-                setSaved(true);
-              }}
-              className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
-            >
-              {saved ? "✓ Enregistré" : "Enregistrer"}
-            </button>
-          </li>
-        </ul>
-      </section>
 
       <button
         type="button"

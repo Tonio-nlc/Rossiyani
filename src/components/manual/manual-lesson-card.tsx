@@ -27,11 +27,14 @@ export function ManualLessonCard({ lesson }: ManualLessonCardProps) {
       eyebrow={lesson.level.toUpperCase()}
       title={primary}
       subtitle={secondary ?? undefined}
-      meta={`${MANUAL_CATEGORY_LABELS[lesson.category]} · ${lesson.estimatedReadingTime} min · difficulté ${lesson.difficulty}/5`}
       footer={
         <>
+          <GhostButton href={href}>Lire la leçon →</GhostButton>
+          <p className="mt-3 text-metadata">
+            {`${MANUAL_CATEGORY_LABELS[lesson.category]} · ${lesson.estimatedReadingTime} min · difficulté ${lesson.difficulty}/5`}
+          </p>
           {lesson.keywords.length > 0 ? (
-            <ul className="mb-4 flex flex-wrap gap-2">
+            <ul className="mt-3 flex flex-wrap gap-2">
               {lesson.keywords.slice(0, 4).map((keyword) => (
                 <li key={keyword}>
                   <Tag>{keyword}</Tag>
@@ -39,7 +42,6 @@ export function ManualLessonCard({ lesson }: ManualLessonCardProps) {
               ))}
             </ul>
           ) : null}
-          <GhostButton href={href}>Lire la leçon →</GhostButton>
         </>
       }
     />
@@ -86,7 +88,14 @@ export function ManualLevelGrid({ counts }: ManualLevelGridProps) {
             key={level}
             href={href}
             title={MANUAL_LEVEL_LABELS[level]}
-            meta={`${count} leçon${count > 1 ? "s" : ""}`}
+            footer={
+              <>
+                <GhostButton href={href}>Parcourir →</GhostButton>
+                <p className="mt-3 text-metadata">
+                  {count} leçon{count > 1 ? "s" : ""}
+                </p>
+              </>
+            }
           />
         );
       })}
@@ -122,7 +131,14 @@ export function ManualCategoryGrid({ counts }: ManualCategoryGridProps) {
             key={category}
             href={href}
             title={MANUAL_CATEGORY_LABELS[category]}
-            meta={`${count} leçon${count > 1 ? "s" : ""}`}
+            footer={
+              <>
+                <GhostButton href={href}>Parcourir →</GhostButton>
+                <p className="mt-3 text-metadata">
+                  {count} leçon{count > 1 ? "s" : ""}
+                </p>
+              </>
+            }
           />
         );
       })}

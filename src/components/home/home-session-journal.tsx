@@ -64,6 +64,31 @@ function todayEntries(
   return [];
 }
 
+function QuickNavSection({ narrative }: { narrative: SessionJournal }) {
+  const continueHref = narrative.continueReading?.href ?? "/library";
+  const reviewHref = narrative.toReview[0]?.href ?? "/practice";
+  const practiceHref = narrative.nextStep?.href ?? "/practice";
+
+  return (
+    <nav className="editorial-page-section pb-0" aria-label="Actions rapides">
+      <ul className="flex flex-wrap gap-x-5 gap-y-2">
+        <li>
+          <GhostButton href={continueHref}>📖 Continuer la lecture</GhostButton>
+        </li>
+        <li>
+          <GhostButton href="/explorer">🔍 Explorer un mot</GhostButton>
+        </li>
+        <li>
+          <GhostButton href={reviewHref}>🧠 Réviser</GhostButton>
+        </li>
+        <li>
+          <GhostButton href={practiceHref}>✍️ Pratiquer</GhostButton>
+        </li>
+      </ul>
+    </nav>
+  );
+}
+
 function ContinueReadingSection({ entry }: { entry: SessionJournalEntry }) {
   const textId = textIdFromHref(entry.href);
 
@@ -180,6 +205,8 @@ export function HomeSessionJournal({ journal, texts }: HomeSessionJournalProps) 
 
   return (
     <div className="pb-8">
+      <QuickNavSection narrative={narrative} />
+
       {narrative.continueReading ? (
         <ContinueReadingSection entry={narrative.continueReading} />
       ) : (

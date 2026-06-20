@@ -1,7 +1,6 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useMemo } from "react";
 
 import { Reference } from "@/components/editorial";
 
@@ -30,11 +29,6 @@ function parseSection(value: string | null): LibrarySection {
 export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
   const searchParams = useSearchParams();
   const section = parseSection(searchParams.get("section"));
-
-  const collectionStats = useMemo(() => {
-    const sentenceCount = initialTexts.reduce((sum, text) => sum + text.sentenceCount, 0);
-    return { textCount: initialTexts.length, sentenceCount };
-  }, [initialTexts]);
 
   if (section === "lessons") {
     return (
@@ -86,10 +80,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   return (
     <div className="pb-8">
-      <LibraryPageIntro
-        textCount={collectionStats.textCount}
-        sentenceCount={collectionStats.sentenceCount}
-      />
+      <LibraryPageIntro />
       <LibraryImportCard />
       <LibrarySectionNav active="texts" />
       <LibraryView initialTexts={initialTexts} />

@@ -5,9 +5,10 @@ import {
 } from "@/lib/explorer/tutor-copy";
 import { practicePath } from "@/lib/practice/constants";
 
+import { GhostButton } from "@/components/design-system";
+
 import { ExplorerLayout } from "./explorer-layout";
 import {
-  ExplorerTutorAction,
   ExplorerTutorExample,
   ExplorerTutorExplanation,
   ExplorerTutorTitle,
@@ -20,6 +21,12 @@ type LemmaDetailViewProps = {
 
 export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
   const primaryExample = knowledge.examples[0];
+  const practiceHref = practicePath({
+    structure: knowledge.lemma,
+    mode: "structure",
+    from: "explorer",
+  });
+  const exploreHref = `/explorer?q=${encodeURIComponent(knowledge.lemma)}`;
 
   return (
     <ExplorerLayout
@@ -33,25 +40,32 @@ export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
 
         <ExplorerTutorWhy text={tutorWhyFromLemma(knowledge)} />
 
+        <div className="editorial-page-section pb-0">
+          <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            <li>
+              <GhostButton href="#exemple">Comprendre →</GhostButton>
+            </li>
+            <li>
+              <GhostButton href={exploreHref}>Explorer →</GhostButton>
+            </li>
+            <li>
+              <GhostButton href={practiceHref}>Pratiquer →</GhostButton>
+            </li>
+          </ul>
+        </div>
+
         {primaryExample ? (
-          <ExplorerTutorExample
-            russian={primaryExample.sentenceRussian}
-            translation={primaryExample.naturalTranslation}
-          />
+          <div id="exemple">
+            <ExplorerTutorExample
+              russian={primaryExample.sentenceRussian}
+              translation={primaryExample.naturalTranslation}
+            />
+          </div>
         ) : null}
 
-        <ExplorerTutorExplanation text={tutorSimpleExplanationFromLemma(knowledge)} />
-
-        <ExplorerTutorAction
-          primary={{
-            label: "Pratiquer ce mot",
-            href: practicePath({
-              structure: knowledge.lemma,
-              mode: "structure",
-              from: "explorer",
-            }),
-          }}
-        />
+        <div id="usage">
+          <ExplorerTutorExplanation text={tutorSimpleExplanationFromLemma(knowledge)} />
+        </div>
       </article>
     </ExplorerLayout>
   );
