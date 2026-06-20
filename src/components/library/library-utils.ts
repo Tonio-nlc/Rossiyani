@@ -4,7 +4,7 @@ import {
   inferCategoryIdsFromText,
 } from "@/content/categories";
 import type { CollectionId } from "@/content/collections";
-import { getAllCollections, getCollectionName } from "@/content/collections";
+import { getAllCollections, getCollectionById, getCollectionName } from "@/content/collections";
 import type { CefrLevel } from "@/types";
 import type { TextListItem } from "@/features/texts";
 
@@ -43,6 +43,37 @@ export function formatStat(value: number): string {
     return `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)}k`;
   }
   return value.toLocaleString("fr-FR");
+}
+
+const CYRILLIC_PATTERN = /[а-яА-ЯёЁ]/;
+
+/** Display-only split when title follows "French : Russian" editorial patterns. */
+export function splitLibraryTitle(title: string): { russian: string; french: string | null } {
+  const colonMatch = title.match(/^(.+?)\s*:\s*(.+)$/);
+  if (!colonMatch) {
+    return { russian: title, french: null };
+  }
+
+  const part1 = colonMatch[1].trim();
+  const part2 = colonMatch[2].trim();
+  const part1Cyrillic = CYRILLIC_PATTERN.test(part1);
+  const part2Cyrillic = CYRILLIC_PATTERN.test(part2);
+
+  if (part2Cyrillic && !part1Cyrillic) {
+    return { russian: part2, french: part1 };
+  }
+  if (part1Cyrillic && !part2Cyrillic) {
+    return { russian: part1, french: part2 };
+  }
+
+  return { russian: title, french: null };
+}
+
+/** First sentence of collection description — one-line card preview. */
+export function getTextPreviewLine(collectionId: CollectionId): string {
+  const description = getCollectionById(collectionId).description;
+  const sentence = description.split(/(?<=[.!?])\s+/)[0]?.trim() ?? description;
+  return sentence.length > 120 ? `${sentence.slice(0, 117).trimEnd()}…` : sentence;
 }
 
 export function filterLibraryTexts(

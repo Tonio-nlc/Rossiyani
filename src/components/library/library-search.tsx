@@ -10,12 +10,12 @@ type LibrarySearchProps = {
 
 export function LibrarySearch({ value, onChange, resultCount }: LibrarySearchProps) {
   return (
-    <div className="sticky top-[var(--header-height)] z-30 -mx-[var(--layout-padding-inline)] bg-[var(--paper)]/95 px-[var(--layout-padding-inline)] py-3 backdrop-blur-sm">
+    <div className="library-catalog-search">
       <SearchField
         value={value}
         onChange={onChange}
         resultCount={resultCount}
-        placeholder="Rechercher par titre, collection ou niveau…"
+        placeholder="Rechercher un titre…"
         ariaLabel="Rechercher dans la bibliothèque"
       />
     </div>

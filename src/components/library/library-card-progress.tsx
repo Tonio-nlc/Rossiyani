@@ -5,14 +5,14 @@ import { useEffect, useState } from "react";
 import {
   formatLastReadLabel,
   getTextReadingProgress,
-  renderProgressBlocks,
 } from "@/lib/reader/reading-progress";
 
 type LibraryCardProgressProps = {
   textId: string;
+  compact?: boolean;
 };
 
-export function LibraryCardProgress({ textId }: LibraryCardProgressProps) {
+export function LibraryCardProgress({ textId, compact = false }: LibraryCardProgressProps) {
   const [progress, setProgress] = useState(() => getTextReadingProgress(textId));
 
   useEffect(() => {
@@ -23,10 +23,18 @@ export function LibraryCardProgress({ textId }: LibraryCardProgressProps) {
     return null;
   }
 
+  if (compact) {
+    return (
+      <p className="library-catalog-card-progress">
+        {progress.percent} % · {formatLastReadLabel(progress.lastReadAt)}
+      </p>
+    );
+  }
+
   return (
     <div className="mt-4 space-y-1.5 border border-[var(--hairline)] bg-[var(--surface-primary)] px-3 py-2.5">
       <p className="font-mono text-xs tabular-nums text-[var(--color-primary)]">
-        {renderProgressBlocks(progress.percent)} {progress.percent} %
+        {progress.percent} %
       </p>
       <p className="text-xs text-[var(--muted)]">
         {progress.wordsSeenIds.length} / {progress.totalWords} mots vus

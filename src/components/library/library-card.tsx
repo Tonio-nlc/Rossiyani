@@ -3,13 +3,19 @@
 import Link from "next/link";
 import { memo } from "react";
 
-import { Tag } from "@/components/design-system";
-import { getCollectionName } from "@/content/collections";
+import { getCategoryLabel } from "@/content/categories";
 import type { TextListItem } from "@/features/texts";
 
 import { LibraryCardActions } from "./library-card-actions";
 import { LibraryCardProgress } from "./library-card-progress";
-import { estimateReadingMinutes } from "./library-utils";
+import {
+  estimateReadingMinutes,
+  estimateWordCount,
+  formatStat,
+  getTextCategoryIds,
+  getTextPreviewLine,
+  splitLibraryTitle,
+} from "./library-utils";
 
 type LibraryCardProps = {
   text: TextListItem;
@@ -25,11 +31,16 @@ export const LibraryCard = memo(function LibraryCard({
   onDelete,
 }: LibraryCardProps) {
   const minutes = estimateReadingMinutes(text.sentenceCount);
-  const collectionName = getCollectionName(text.collectionId);
+  const words = formatStat(estimateWordCount(text.sentenceCount));
+  const { russian, french } = splitLibraryTitle(text.title);
+  const categories = getTextCategoryIds(text);
+  const translation =
+    french ?? (categories[0] ? getCategoryLabel(categories[0]) : null);
+  const preview = getTextPreviewLine(text.collectionId);
 
   return (
-    <article className="ds-editorial-card group relative h-full">
-      <div className="absolute right-2 top-2 z-30">
+    <article className="library-catalog-card group relative h-full">
+      <div className="absolute right-1.5 top-1.5 z-30">
         <LibraryCardActions
           disabled={disabled}
           onRename={() => onRename(text)}
@@ -37,26 +48,35 @@ export const LibraryCard = memo(function LibraryCard({
         />
       </div>
 
-      <Link
-        href={`/texts/${text.id}`}
-        prefetch
-        className="focus-kb ds-editorial-card-link flex h-full flex-col pr-8 outline-none"
-      >
-        <div className="flex items-center justify-between gap-3">
-          <Tag>{text.level}</Tag>
-          <span className="text-metadata">{minutes} min</span>
-        </div>
+      <p className="library-catalog-card-level">{text.level}</p>
 
-        <h2 className="mt-3 font-reader text-lg font-medium leading-snug text-[var(--ink)] break-russian transition group-hover:text-[var(--color-primary)]">
-          {text.title}
-        </h2>
+      <h2 className="library-catalog-card-title font-reader break-russian">
+        <Link href={`/texts/${text.id}`} prefetch className="focus-kb outline-none after:absolute after:inset-0">
+          {russian}
+        </Link>
+      </h2>
 
-        <p className="mt-2 text-metadata">
-          {collectionName} · {minutes} min
-        </p>
+      {translation ? (
+        <p className="library-catalog-card-translation">{translation}</p>
+      ) : null}
 
-        <LibraryCardProgress textId={text.id} />
-      </Link>
+      <p className="library-catalog-card-meta">
+        {minutes} min · {words} mots
+      </p>
+
+      <p className="library-catalog-card-preview">{preview}</p>
+
+      <LibraryCardProgress textId={text.id} compact />
+
+      <p className="library-catalog-card-cta">
+        <Link
+          href={`/texts/${text.id}`}
+          prefetch
+          className="library-catalog-card-cta-link focus-kb relative z-10 outline-none"
+        >
+          Lire →
+        </Link>
+      </p>
     </article>
   );
 });

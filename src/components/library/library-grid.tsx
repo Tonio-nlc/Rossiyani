@@ -42,15 +42,18 @@ export function LibraryGrid({
   }
 
   return (
-    <div className="library-editorial-grid">
+    <div className="library-catalog-grid">
       {texts.map((text, index) => (
         <div
           key={text.id}
-          className={removingTextId === text.id ? "animate-fade-out" : "animate-fade-up"}
+          className={[
+            "library-catalog-grid-item",
+            removingTextId === text.id ? "animate-fade-out" : "animate-fade-up",
+          ].join(" ")}
           style={
             removingTextId === text.id
               ? undefined
-              : { animationDelay: `${Math.min(index * 40, 320)}ms` }
+              : { animationDelay: `${Math.min(index * 30, 240)}ms` }
           }
         >
           <LibraryCard

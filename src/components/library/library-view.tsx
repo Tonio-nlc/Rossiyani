@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-import { GhostButton } from "@/components/design-system";
 import { DeleteTextDialog } from "@/components/library/delete-text-dialog";
 import { RenameTextDialog } from "@/components/library/rename-text-dialog";
 import { useToast } from "@/components/ui/toast-provider";
@@ -10,7 +9,7 @@ import type { CefrLevel } from "@/types";
 import type { TextListItem } from "@/features/texts";
 import { clearLastReadTextIfMatches } from "@/lib/last-read-text";
 import { deleteTextRequest, renameTextRequest } from "@/lib/library/text-library-api";
-import { clearTextReadingProgress, getAllReadingProgress } from "@/lib/reader/reading-progress";
+import { clearTextReadingProgress } from "@/lib/reader/reading-progress";
 
 import { LibraryCollectionsRow } from "./library-collections-row";
 import { LibraryFilters } from "./library-filters";
@@ -62,36 +61,6 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
   );
 
   const filtersActive = hasActiveFilters(search, level, collection, category);
-
-  const [inProgressTexts, setInProgressTexts] = useState<TextListItem[]>([]);
-  const [recentTexts, setRecentTexts] = useState<TextListItem[]>([]);
-
-  useEffect(() => {
-    const progress = getAllReadingProgress();
-    const inProgress = texts
-      .filter((text) => {
-        const entry = progress[text.id];
-        return entry && entry.percent > 0 && entry.percent < 100;
-      })
-      .sort(
-        (left, right) =>
-          new Date(progress[right.id]!.lastReadAt).getTime() -
-          new Date(progress[left.id]!.lastReadAt).getTime(),
-      )
-      .slice(0, 3);
-    const inProgressIds = new Set(inProgress.map((text) => text.id));
-    const recent = Object.values(progress)
-      .sort(
-        (left, right) =>
-          new Date(right.lastReadAt).getTime() - new Date(left.lastReadAt).getTime(),
-      )
-      .map((entry) => texts.find((text) => text.id === entry.textId))
-      .filter((text): text is TextListItem => Boolean(text))
-      .filter((text) => !inProgressIds.has(text.id))
-      .slice(0, 3);
-    setInProgressTexts(inProgress);
-    setRecentTexts(recent);
-  }, [texts]);
 
   const handleRenameConfirm = useCallback(
     async (title: string) => {
@@ -162,41 +131,7 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
   }, []);
 
   return (
-    <div className="space-y-0 pb-8">
-      {inProgressTexts.length > 0 && !filtersActive ? (
-        <section className="library-page-section space-y-3 pb-0" aria-label="En cours">
-          <p className="text-eyebrow">En cours</p>
-          <ul className="space-y-3">
-            {inProgressTexts.map((text) => (
-              <li
-                key={text.id}
-                className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--hairline)] pb-3 last:border-0 last:pb-0"
-              >
-                <p className="min-w-0 font-reader text-[var(--ink)]">{text.title}</p>
-                <GhostButton href={`/texts/${text.id}`}>Lire →</GhostButton>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {recentTexts.length > 0 && !filtersActive ? (
-        <section className="library-page-section space-y-3 pb-0" aria-label="Récents">
-          <p className="text-eyebrow">Récents</p>
-          <ul className="space-y-3">
-            {recentTexts.map((text) => (
-              <li
-                key={text.id}
-                className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--hairline)] pb-3 last:border-0 last:pb-0"
-              >
-                <p className="min-w-0 font-reader text-[var(--ink)]">{text.title}</p>
-                <GhostButton href={`/texts/${text.id}`}>Lire →</GhostButton>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
+    <div className="pb-4">
       <LibraryCollectionsRow active={collection} onSelect={handleCollectionSelect} />
 
       <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
@@ -218,7 +153,7 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
         }
       />
 
-      <section className="library-page-section">
+      <section className="library-page-section pt-0">
         <LibraryGrid
           texts={filtered}
           hasAnyTexts={texts.length > 0}

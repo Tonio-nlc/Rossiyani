@@ -1,10 +1,9 @@
 import type { ReactNode } from "react";
 
 import { getAllCategories } from "@/content/categories";
-import { Divider, Tag } from "@/components/design-system";
 import type { CefrLevel } from "@/types";
 
-import type { LibraryCategoryFilter, LibraryCollectionFilter } from "./library-utils";
+import type { LibraryCategoryFilter } from "./library-utils";
 import { LIBRARY_LEVELS } from "./library-utils";
 
 type LibraryFiltersProps = {
@@ -15,12 +14,24 @@ type LibraryFiltersProps = {
   onResetAll?: () => void;
 };
 
-function FilterGroup({ label, children }: { label: string; children: ReactNode }) {
+function CatalogFilter({
+  active,
+  children,
+  onClick,
+}: {
+  active: boolean;
+  children: ReactNode;
+  onClick: () => void;
+}) {
   return (
-    <div className="space-y-2">
-      <p className="text-eyebrow">{label}</p>
-      <div className="flex flex-wrap gap-2">{children}</div>
-    </div>
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className="library-catalog-filter focus-kb"
+    >
+      {children}
+    </button>
   );
 }
 
@@ -34,34 +45,40 @@ export function LibraryFilters({
   const hasActiveFilter = level !== "all" || category !== "all";
 
   return (
-    <section className="library-page-section space-y-4" aria-label="Filtres">
-      <FilterGroup label="Niveau">
-        <Tag active={level === "all"} onClick={() => onLevelChange("all")}>
+    <section className="library-page-section library-catalog-filters-section" aria-label="Filtres">
+      <div className="library-catalog-filter-row" role="group" aria-label="Niveau">
+        <CatalogFilter active={level === "all"} onClick={() => onLevelChange("all")}>
           Tous
-        </Tag>
+        </CatalogFilter>
         {LIBRARY_LEVELS.map((l) => (
-          <Tag key={l} active={level === l} onClick={() => onLevelChange(l)}>
+          <CatalogFilter key={l} active={level === l} onClick={() => onLevelChange(l)}>
             {l}
-          </Tag>
+          </CatalogFilter>
         ))}
-      </FilterGroup>
+      </div>
 
-      <Divider />
-
-      <FilterGroup label="Catégories">
-        <Tag active={category === "all"} onClick={() => onCategoryChange("all")}>
+      <div
+        className="library-catalog-filter-row library-catalog-filter-row-secondary"
+        role="group"
+        aria-label="Catégories"
+      >
+        <CatalogFilter active={category === "all"} onClick={() => onCategoryChange("all")}>
           Toutes
-        </Tag>
+        </CatalogFilter>
         {getAllCategories().map(({ id, label }) => (
-          <Tag key={id} active={category === id} onClick={() => onCategoryChange(id)}>
+          <CatalogFilter
+            key={id}
+            active={category === id}
+            onClick={() => onCategoryChange(id)}
+          >
             {label}
-          </Tag>
+          </CatalogFilter>
         ))}
-      </FilterGroup>
+      </div>
 
       {hasActiveFilter && onResetAll ? (
-        <button type="button" onClick={onResetAll} className="ds-ghost-btn focus-kb text-xs">
-          Réinitialiser les filtres
+        <button type="button" onClick={onResetAll} className="library-catalog-reset focus-kb">
+          Réinitialiser
         </button>
       ) : null}
     </section>

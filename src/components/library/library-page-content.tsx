@@ -32,7 +32,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "lessons") {
     return (
-      <div className="space-y-8 pb-8">
+      <div className="library-catalog space-y-4 pb-6">
         <LibraryPageIntro />
         <LibrarySectionNav active="lessons" />
         <div className="editorial-page-section space-y-3">
@@ -48,7 +48,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "saved") {
     return (
-      <div className="space-y-6 pb-8">
+      <div className="library-catalog space-y-4 pb-6">
         <LibraryPageIntro />
         <LibrarySectionNav active="saved" />
         <LibrarySavedSentences />
@@ -58,7 +58,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "discoveries") {
     return (
-      <div className="space-y-6 pb-8">
+      <div className="library-catalog space-y-4 pb-6">
         <LibraryPageIntro />
         <LibrarySectionNav active="discoveries" />
         <LibraryMyDiscoveries />
@@ -68,7 +68,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "phrases") {
     return (
-      <div className="space-y-6 pb-8">
+      <div className="library-catalog space-y-4 pb-6">
         <LibraryPageIntro />
         <LibrarySectionNav active="phrases" />
         <LibrarySavedPhrases />
@@ -78,7 +78,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
   }
 
   return (
-    <div className="pb-8">
+    <div className="library-catalog pb-6">
       <LibraryPageIntro />
       <LibrarySectionNav active="texts" />
       <LibraryView initialTexts={initialTexts} />

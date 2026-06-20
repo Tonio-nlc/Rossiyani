@@ -1,7 +1,6 @@
 "use client";
 
 import { getAllCollections, type CollectionId } from "@/content/collections";
-import { CollectionCard } from "@/components/design-system";
 
 import type { LibraryCollectionFilter } from "./library-utils";
 
@@ -14,22 +13,29 @@ export function LibraryCollectionsRow({ active, onSelect }: LibraryCollectionsRo
   const collections = getAllCollections();
 
   return (
-    <section className="library-page-section space-y-3" aria-label="Collections éditoriales">
-      <p className="text-eyebrow">Collections</p>
-      <div className="library-collections-scroll">
-        <CollectionCard
-          name="Toutes"
-          active={active === "all"}
+    <section
+      className="library-page-section library-catalog-filters-section pb-0"
+      aria-label="Collections"
+    >
+      <div className="library-catalog-filter-row" role="group" aria-label="Collections">
+        <button
+          type="button"
+          aria-pressed={active === "all"}
           onClick={() => onSelect("all")}
-        />
+          className="library-catalog-filter focus-kb"
+        >
+          Toutes
+        </button>
         {collections.map((collection) => (
-          <CollectionCard
+          <button
             key={collection.id}
-            name={collection.name}
-            description={collection.description}
-            active={active === collection.id}
+            type="button"
+            aria-pressed={active === collection.id}
             onClick={() => onSelect(collection.id as CollectionId)}
-          />
+            className="library-catalog-filter focus-kb"
+          >
+            {collection.name}
+          </button>
         ))}
       </div>
     </section>
