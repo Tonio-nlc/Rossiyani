@@ -18,12 +18,21 @@ export { validateEditorialStyle } from "./editorial-lint";
 export {
   clearManualLessonCache,
   getLessonBySlug,
+  getLessonsByCaseKeyword,
   getLessonsByCategory,
   getLessonsByLevel,
   getManualStats,
   listLessonSummaries,
   loadAllLessons,
 } from "./load-lessons";
+export {
+  getManualCurriculumCase,
+  isManualCaseId,
+  MANUAL_CASE_IDS,
+  MANUAL_CURRICULUM_CASES,
+  type ManualCaseId,
+  type ManualCurriculumCase,
+} from "./curriculum-cases";
 export { extractPresentSections, parseLessonFile, validateLessonSections } from "./parse-lesson";
 export { ManualLessonFrontmatterSchema } from "./schema";
 export type { ManualLesson, ManualLessonFrontmatter, ManualLessonSummary } from "./types";

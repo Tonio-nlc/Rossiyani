@@ -109,6 +109,18 @@ export function getLessonsByCategory(
     .sort(sortLessons);
 }
 
+export function getLessonsByCaseKeyword(
+  keyword: string,
+  contentRoot?: string,
+): ManualLessonSummary[] {
+  const needle = keyword.toLowerCase();
+  return listLessonSummaries(contentRoot)
+    .filter((lesson) =>
+      lesson.keywords.some((item) => item.toLowerCase().includes(needle)),
+    )
+    .sort(sortLessons);
+}
+
 export function getManualStats(contentRoot?: string): {
   totalLessons: number;
   byLevel: Record<ManualLevel, number>;

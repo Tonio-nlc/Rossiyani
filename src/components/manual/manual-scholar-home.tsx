@@ -1,44 +1,19 @@
 import Link from "next/link";
 
+import { MANUAL_CURRICULUM_CASES } from "@/features/manual";
+
 const METHODOLOGY_CARDS = [
   {
     title: "Structured Immersion",
     description:
-      "Progress through Russian grammar as an architecture to be inhabited — not a checklist to memorise. Each lesson builds on the last with deliberate spacing.",
+      "Progress through Russian grammar as an architecture — not a checklist to memorise.",
     tags: ["Syntax First", "Deep Reading"],
   },
   {
     title: "Cognitive Stamina",
     description:
-      "Sustained attention to morphology and case government trains the reading mind. Short sessions, full concentration, no gamified distraction.",
+      "Sustained attention to morphology and case government trains the reading mind.",
     tags: ["Focus", "Endurance"],
-  },
-] as const;
-
-const GRAMMAR_CASES = [
-  {
-    name: "Nominative",
-    description: "The subject case — who or what performs the action.",
-  },
-  {
-    name: "Genitive",
-    description: "Possession, absence, and the realm of «нет» — nothing exists without it.",
-  },
-  {
-    name: "Dative",
-    description: "The indirect object — to whom, for whom, the direction of giving.",
-  },
-  {
-    name: "Accusative",
-    description: "The direct object — what receives the action of the verb.",
-  },
-  {
-    name: "Instrumental",
-    description: "Means and accompaniment — with what, by whom, together with.",
-  },
-  {
-    name: "Prepositional",
-    description: "Location and topic — about what, in what place (always with a preposition).",
   },
 ] as const;
 
@@ -72,7 +47,10 @@ export function ManualScholarHome() {
         <div className="manual-scholar-hero__rule" aria-hidden />
       </header>
 
-      <section className="manual-scholar-section" aria-labelledby="methodology-heading">
+      <section
+        className="manual-scholar-section manual-scholar-section--methodology"
+        aria-labelledby="methodology-heading"
+      >
         <div className="manual-scholar-section__head">
           <SectionIcon type="methodology" />
           <h2 id="methodology-heading" className="manual-scholar-section__title">
@@ -93,13 +71,12 @@ export function ManualScholarHome() {
             </article>
           ))}
         </div>
-
-        <figure className="manual-scholar-figure" aria-label="Illustration éditoriale">
-          <div className="manual-scholar-figure__inner" />
-        </figure>
       </section>
 
-      <section className="manual-scholar-section" aria-labelledby="grammar-heading">
+      <section
+        className="manual-scholar-section manual-scholar-section--grammar"
+        aria-labelledby="grammar-heading"
+      >
         <div className="manual-scholar-section__head">
           <SectionIcon type="grammar" />
           <h2 id="grammar-heading" className="manual-scholar-section__title">
@@ -114,11 +91,18 @@ export function ManualScholarHome() {
         </p>
 
         <div className="manual-scholar-cases">
-          {GRAMMAR_CASES.map((grammarCase) => (
-            <div key={grammarCase.name} className="manual-scholar-cases__row">
+          {MANUAL_CURRICULUM_CASES.map((grammarCase) => (
+            <Link
+              key={grammarCase.id}
+              href={`/manual/curriculum/${grammarCase.id}`}
+              className="manual-scholar-cases__row focus-kb"
+            >
               <p className="manual-scholar-cases__name">{grammarCase.name}</p>
               <p className="manual-scholar-cases__desc">{grammarCase.description}</p>
-            </div>
+              <span className="manual-scholar-cases__action" aria-hidden>
+                Open &rarr;
+              </span>
+            </Link>
           ))}
         </div>
       </section>

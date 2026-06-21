@@ -67,6 +67,10 @@ export function resolveManualScholarNavId(pathname: string): ManualScholarNavId 
     return "curriculum";
   }
 
+  if (pathname.startsWith("/manual/curriculum/")) {
+    return "grammar";
+  }
+
   const themeMatch = pathname.match(/^\/manual\/theme\/([^/]+)/);
   if (themeMatch) {
     const theme = themeMatch[1];
