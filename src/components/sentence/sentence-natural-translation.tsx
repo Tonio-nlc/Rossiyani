@@ -16,7 +16,7 @@ export function SentenceNaturalTranslation({
   return (
     <p
       className={[
-        "mt-2 max-w-[92%] text-metadata italic leading-relaxed text-[var(--ink-muted)]",
+        "reader-sentence-block__translation mt-2 max-w-[92%] italic leading-relaxed text-[var(--ink-muted)]",
         visible ? "animate-sentence-translation-fade opacity-100" : "opacity-0",
       ].join(" ")}
       aria-label={`Traduction de la phrase ${sentenceId}`}

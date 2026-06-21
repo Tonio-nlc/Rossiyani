@@ -57,7 +57,7 @@ export const ReaderSentence = memo(function ReaderSentence({
         onSelectSentence();
       }}
       className={[
-        "min-w-0 py-1.5 transition-opacity duration-150",
+        "reader-paragraph min-w-0 transition-opacity duration-150",
         dimmed ? "opacity-35" : "opacity-100",
       ].join(" ")}
     >

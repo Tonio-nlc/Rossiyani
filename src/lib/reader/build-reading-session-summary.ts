@@ -3,11 +3,6 @@ import type { ReaderTextData } from "@/features/texts";
 import { practicePath } from "@/lib/practice/constants";
 import { isDisplayableUiText } from "@/lib/formatting/ui-placeholder-guard";
 
-export type ReadingSessionDiscovery = {
-  label: string;
-  detail?: string;
-};
-
 export type ReadingSessionContinueAction = {
   label: string;
   rationale: string;
@@ -15,19 +10,8 @@ export type ReadingSessionContinueAction = {
 };
 
 export type ReadingSessionSummary = {
-  discoveries: ReadingSessionDiscovery[];
   continueActions: ReadingSessionContinueAction[];
 };
-
-function glossFromExplanation(explanation: string): string | undefined {
-  const trimmed = explanation.trim();
-  if (!isDisplayableUiText(trimmed) || trimmed.length < 2) {
-    return undefined;
-  }
-
-  const first = trimmed.split(/(?<=[.!?])\s+/)[0]?.trim() ?? trimmed;
-  return first.length > 80 ? `${first.slice(0, 77)}…` : first;
-}
 
 function isConstructionType(type: string): boolean {
   return (
@@ -42,10 +26,8 @@ export function buildReadingSessionSummary(
   seenWordIds: string[],
 ): ReadingSessionSummary {
   const seenSet = new Set(seenWordIds);
-  const lemmaDiscoveries = new Map<string, ReadingSessionDiscovery>();
+  const lemmaDiscoveries = new Map<string, { lemma: string; partOfSpeech: string }>();
   const constructions = new Map<string, { explanation: string }>();
-  let grammarLemma: { lemma: string; partOfSpeech: string; caseLabel: string } | null =
-    null;
 
   for (const sentence of text.sentences) {
     for (const word of sentence.words) {
@@ -56,22 +38,9 @@ export function buildReadingSessionSummary(
       const lemmaKey = word.lemma.trim().toLowerCase();
       if (lemmaKey && !lemmaDiscoveries.has(lemmaKey) && isDisplayableUiText(word.lemma)) {
         lemmaDiscoveries.set(lemmaKey, {
-          label: word.lemma,
-          detail: glossFromExplanation(word.explanation),
-        });
-      }
-
-      if (
-        !grammarLemma &&
-        word.case &&
-        word.case !== "nominative" &&
-        isDisplayableUiText(word.lemma)
-      ) {
-        grammarLemma = {
           lemma: word.lemma,
           partOfSpeech: word.partOfSpeech,
-          caseLabel: word.case,
-        };
+        });
       }
     }
 
@@ -93,53 +62,70 @@ export function buildReadingSessionSummary(
     }
   }
 
-  const discoveries: ReadingSessionDiscovery[] = [
-    ...Array.from(constructions.keys()).map((label) => ({
-      label,
-      detail: "Construction repérée dans ce texte",
-    })),
-    ...Array.from(lemmaDiscoveries.values()),
-  ].slice(0, 6);
-
-  const continueActions: ReadingSessionContinueAction[] = [];
   const topConstruction = constructions.keys().next().value;
-
-  if (topConstruction) {
-    continueActions.push({
-      label: `Pratiquer · ${topConstruction}`,
-      rationale: `Rencontrée dans ${text.title}`,
-      href: practicePath({
-        structure: topConstruction,
-        mode: "structure",
-        from: "reader",
-        context: `Utilisez ${topConstruction} dans une phrase inspirée de ce texte.`,
-      }),
-    });
-  }
-
-  if (grammarLemma) {
-    continueActions.push({
-      label: `Comprendre · ${grammarLemma.lemma}`,
-      rationale: `Forme ${grammarLemma.caseLabel} observée dans ${text.title}`,
-      href: lemmaPath(grammarLemma.lemma, grammarLemma.partOfSpeech),
-    });
-  }
-
   const topLemma = lemmaDiscoveries.values().next().value;
-  if (topLemma) {
-    continueActions.push({
-      label: `Explorer · ${topLemma.label}`,
-      rationale: `Mot rencontré dans ${text.title}`,
-      href: `/explorer?q=${encodeURIComponent(topLemma.label)}`,
-    });
-  } else if (text.sentences[0]?.words[0]?.lemma) {
-    const fallback = text.sentences[0].words[0];
-    continueActions.push({
-      label: `Explorer · ${fallback.lemma}`,
-      rationale: `Mot clé de ${text.title}`,
-      href: lemmaPath(fallback.lemma, fallback.partOfSpeech),
-    });
-  }
+  const fallbackLemma = text.sentences[0]?.words[0];
 
-  return { discoveries, continueActions: continueActions.slice(0, 3) };
+  const practiceAction: ReadingSessionContinueAction = topConstruction
+    ? {
+        label: `Pratiquer · ${topConstruction}`,
+        rationale: `Rencontrée dans ${text.title}`,
+        href: practicePath({
+          structure: topConstruction,
+          mode: "structure",
+          from: "reader",
+          context: `Utilisez ${topConstruction} dans une phrase inspirée de ce texte.`,
+        }),
+      }
+    : topLemma
+      ? {
+          label: `Pratiquer · ${topLemma.lemma}`,
+          rationale: `Mot clé de ${text.title}`,
+          href: practicePath({
+            lemma: topLemma.lemma,
+            mode: "lemma",
+            from: "reader",
+            context: `Formez une phrase avec ${topLemma.lemma}.`,
+          }),
+        }
+      : {
+          label: "Pratiquer les points clés",
+          rationale: `Structures et vocabulaire de ${text.title}`,
+          href: "/practice",
+        };
+
+  const explorerAction: ReadingSessionContinueAction = topLemma
+    ? {
+        label: `Explorer · ${topLemma.lemma}`,
+        rationale: `Mot rencontré dans ${text.title}`,
+        href: lemmaPath(topLemma.lemma, topLemma.partOfSpeech),
+      }
+    : fallbackLemma
+      ? {
+          label: `Explorer · ${fallbackLemma.lemma}`,
+          rationale: `Mot clé de ${text.title}`,
+          href: lemmaPath(fallbackLemma.lemma, fallbackLemma.partOfSpeech),
+        }
+      : {
+          label: "Ouvrir l'Explorer",
+          rationale: "Parcourir le lexique et les observations",
+          href: "/explorer",
+        };
+
+  const continueActions: ReadingSessionContinueAction[] = [
+    {
+      label: "Continuer la lecture",
+      rationale: "Choisir un autre texte dans votre bibliothèque",
+      href: "/library",
+    },
+    practiceAction,
+    explorerAction,
+    {
+      label: "Retourner à la bibliothèque",
+      rationale: "Revoir vos textes et votre progression",
+      href: "/library",
+    },
+  ];
+
+  return { continueActions };
 }

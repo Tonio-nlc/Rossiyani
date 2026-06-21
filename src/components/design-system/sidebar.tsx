@@ -46,7 +46,21 @@ export function Sidebar({
           {title || onClose ? (
             <div className="flex shrink-0 items-center justify-between border-b border-[var(--hairline)] px-5 py-3">
               {title ? (
-                <p className="text-eyebrow normal-case tracking-[0.14em]">{title}</p>
+                <p className={["ds-sidebar__title", className.includes("reader-sidebar") ? "reader-sidebar__title" : "text-eyebrow normal-case tracking-[0.14em]"].join(" ")}>
+                  {className.includes("reader-sidebar") ? (
+                    <span className="reader-sidebar__title-inner">
+                      <span className="reader-sidebar__icon" aria-hidden>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.25" />
+                          <path d="M9.5 9.5L12 12" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+                        </svg>
+                      </span>
+                      {title}
+                    </span>
+                  ) : (
+                    title
+                  )}
+                </p>
               ) : (
                 <span />
               )}
@@ -74,8 +88,22 @@ export function Sidebar({
   return (
     <aside className={["ds-sidebar ds-sidebar-inline", className].filter(Boolean).join(" ")} aria-label={ariaLabel}>
       {title ? (
-        <header className="border-b border-[var(--hairline)] px-5 py-3">
-          <p className="text-eyebrow normal-case tracking-[0.14em]">{title}</p>
+        <header className="ds-sidebar__header border-b border-[var(--hairline)] px-5 py-3">
+          <p className={["ds-sidebar__title", className.includes("reader-sidebar") ? "reader-sidebar__title" : "text-eyebrow normal-case tracking-[0.14em]"].join(" ")}>
+            {className.includes("reader-sidebar") ? (
+              <span className="reader-sidebar__title-inner">
+                <span className="reader-sidebar__icon" aria-hidden>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.25" />
+                    <path d="M9.5 9.5L12 12" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+                  </svg>
+                </span>
+                {title}
+              </span>
+            ) : (
+              title
+            )}
+          </p>
         </header>
       ) : null}
       <div className="px-5 py-5">{children}</div>

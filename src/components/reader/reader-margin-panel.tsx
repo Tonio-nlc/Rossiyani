@@ -31,8 +31,19 @@ type ReaderMarginPanelProps = {
   onToggleAllTranslations: (value: boolean) => void;
 };
 
-function PanelLabel({ children }: { children: ReactNode }) {
-  return <p className="text-eyebrow">{children}</p>;
+function MicroscopeBlock({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="reader-microscope__block">
+      <p className="reader-microscope__block-label">{label}</p>
+      <div className="reader-microscope__block-body">{children}</div>
+    </div>
+  );
 }
 
 export function ReaderMarginPanel({
@@ -85,39 +96,40 @@ export function ReaderMarginPanel({
     panel.foundIn.length > 0;
 
   return (
-    <div key={panelKey} className="animate-reader-panel-fade space-y-4">
-      <header className="space-y-2 border-b border-[var(--hairline)] pb-4">
+    <div key={panelKey} className="reader-microscope animate-reader-panel-fade">
+      <header className="reader-microscope__word">
         {lemmaFirst ? (
           <>
-            <p className="break-russian font-reader text-[clamp(1.5rem,3vw,1.875rem)] leading-none text-[var(--ink)]">
-              {panel.lemma}
-            </p>
-            <p className="break-russian text-sm text-[var(--ink-muted)]">
+            <p className="reader-microscope__headline break-russian">{panel.lemma}</p>
+            <p className="reader-microscope__surface break-russian">
               {panel.displayForm}
               {formLabel ? ` · ${formLabel}` : null}
             </p>
           </>
         ) : (
-          <p className="break-russian font-reader text-[clamp(1.5rem,3vw,1.875rem)] leading-none text-[var(--ink)]">
-            {panel.displayForm}
-          </p>
+          <p className="reader-microscope__headline break-russian">{panel.displayForm}</p>
         )}
 
         {panel.translation ? (
-          <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">{panel.translation}</p>
+          <p className="reader-microscope__definition">{panel.translation}</p>
         ) : loading ? (
-          <p className="text-sm text-[var(--ink-muted)]">…</p>
+          <p className="reader-microscope__definition reader-microscope__definition--loading">…</p>
         ) : null}
       </header>
 
-      <div className="flex flex-wrap gap-x-5 gap-y-2">
+      <div className="reader-microscope__actions">
         {panel.explorerHref ? (
-          <GhostButton href={panel.explorerHref}>Explorer →</GhostButton>
+          <GhostButton href={panel.explorerHref} className="reader-microscope__action">
+            Explorer →
+          </GhostButton>
         ) : null}
         {panel.practiceHref ? (
-          <GhostButton href={panel.practiceHref}>Pratiquer →</GhostButton>
+          <GhostButton href={panel.practiceHref} className="reader-microscope__action">
+            Pratiquer →
+          </GhostButton>
         ) : null}
         <GhostButton
+          className="reader-microscope__action"
           onClick={() => {
             saveReaderWord({
               displayForm: panel.displayForm,
@@ -132,123 +144,103 @@ export function ReaderMarginPanel({
       </div>
 
       {rationales.length > 0 ? (
-        <ul className="space-y-1">
+        <ul className="reader-microscope__notes">
           {rationales.map((line) => (
-            <li key={line} className="text-xs leading-relaxed text-[var(--ink-muted)]">
-              {line}
-            </li>
+            <li key={line}>{line}</li>
           ))}
         </ul>
       ) : null}
 
       {panel.example ? (
-        <section className="space-y-2">
-          <PanelLabel>Exemple</PanelLabel>
-          <p className="break-russian font-reader text-sm leading-relaxed text-[var(--ink-secondary)]">
-            {panel.example}
-          </p>
-        </section>
+        <MicroscopeBlock label="Exemple">
+          <p className="reader-microscope__example break-russian">{panel.example}</p>
+        </MicroscopeBlock>
       ) : null}
 
       {hasAdvancedContent ? (
-        <div>
+        <div className="reader-microscope__more">
           <button
             type="button"
             onClick={() => setExpanded((value) => !value)}
-            className="focus-kb text-sm font-medium text-[var(--ink)] underline-offset-4 transition hover:text-[var(--color-link)] hover:underline"
+            className="reader-microscope__more-toggle focus-kb"
             aria-expanded={expanded}
           >
             {expanded ? "Voir moins" : "Voir plus"}
           </button>
 
           {expanded ? (
-            <div className="mt-5 space-y-5 border-t border-[var(--hairline)] pt-5">
+            <div className="reader-microscope__more-body">
               {panel.partOfSpeech ? (
-                <p className="text-xs text-[var(--ink-muted)]">{panel.partOfSpeech}</p>
+                <p className="reader-microscope__pos">{panel.partOfSpeech}</p>
               ) : null}
 
               {panel.usedHere.length > 0 ? (
-                <section className="space-y-2">
-                  <PanelLabel>Grammaire</PanelLabel>
-                  <dl className="space-y-1.5">
+                <MicroscopeBlock label="Grammaire">
+                  <dl className="reader-microscope__facts">
                     {panel.usedHere.map((row) => (
-                      <div key={row.label} className="flex justify-between gap-3 text-sm">
-                        <dt className="text-[var(--ink-muted)]">{row.label}</dt>
-                        <dd className="text-[var(--ink-secondary)]">{row.value}</dd>
+                      <div key={row.label}>
+                        <dt>{row.label}</dt>
+                        <dd>{row.value}</dd>
                       </div>
                     ))}
                   </dl>
-                </section>
+                </MicroscopeBlock>
               ) : null}
 
               {panel.contextNotes.length > 0 ? (
-                <section className="space-y-2">
-                  <PanelLabel>Pourquoi cette forme</PanelLabel>
+                <MicroscopeBlock label="Pourquoi cette forme">
                   {panel.contextNotes.map((note) => (
-                    <p key={note} className="text-sm leading-relaxed text-[var(--ink-secondary)]">
+                    <p key={note} className="reader-microscope__note-text">
                       {note}
                     </p>
                   ))}
-                </section>
+                </MicroscopeBlock>
               ) : null}
 
               {panel.collocations.length > 0 ? (
-                <section className="space-y-2">
-                  <PanelLabel>Mots liés</PanelLabel>
-                  <ul className="space-y-1.5">
+                <MicroscopeBlock label="Mots liés">
+                  <ul className="reader-microscope__chip-list">
                     {panel.collocations.map((label) => {
                       const href = collocationHref(label);
                       if (!href) {
                         return (
-                          <li
-                            key={label}
-                            className="break-russian font-reader text-sm text-[var(--ink-secondary)]"
-                          >
-                            {label}
+                          <li key={label}>
+                            <span className="reader-microscope__chip reader-microscope__chip--static break-russian">
+                              {label}
+                            </span>
                           </li>
                         );
                       }
                       return (
                         <li key={label}>
-                          <Link
-                            href={href}
-                            className="focus-kb break-russian font-reader text-sm text-[var(--ink)] underline-offset-2 hover:underline"
-                          >
+                          <Link href={href} className="reader-microscope__chip focus-kb break-russian">
                             {label}
                           </Link>
                         </li>
                       );
                     })}
                   </ul>
-                </section>
+                </MicroscopeBlock>
               ) : null}
 
               {panel.foundIn.length > 0 ? (
-                <section className="space-y-2">
-                  <PanelLabel>Occurrences</PanelLabel>
-                  <ul className="space-y-2">
+                <MicroscopeBlock label="Occurrences">
+                  <ul className="reader-microscope__text-list">
                     {panel.foundIn.map((item) => (
                       <li key={item.label}>
-                        <Link
-                          href={item.href}
-                          className="focus-kb group block transition hover:text-[var(--color-link)]"
-                        >
-                          <span className="text-sm text-[var(--ink)]">{item.label}</span>
-                          <span className="mt-0.5 block text-xs text-[var(--ink-muted)] group-hover:text-[var(--ink-secondary)]">
-                            {item.detail}
-                          </span>
+                        <Link href={item.href} className="reader-microscope__text-link focus-kb">
+                          <span className="reader-microscope__text-title">{item.label}</span>
+                          <span className="reader-microscope__text-detail">{item.detail}</span>
                         </Link>
                       </li>
                     ))}
                   </ul>
-                </section>
+                </MicroscopeBlock>
               ) : null}
 
-              <section className="space-y-2 border-t border-[var(--hairline)] pt-4">
-                <p className="text-xs text-[var(--ink-muted)]">
-                  {textWords.length} mots interactifs dans ce texte
-                </p>
-              </section>
+              <p className="reader-microscope__interactive-count">
+                {textWords.length} mots interactifs dans ce texte
+              </p>
             </div>
           ) : null}
         </div>
@@ -257,7 +249,7 @@ export function ReaderMarginPanel({
       <button
         type="button"
         onClick={() => onToggleAllTranslations(!showAllTranslations)}
-        className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 hover:underline"
+        className="reader-microscope__translations-toggle focus-kb"
       >
         {showAllTranslations ? "Masquer les traductions" : "Afficher les traductions"}
       </button>

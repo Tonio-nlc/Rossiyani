@@ -416,6 +416,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     <div className="reader-fullscreen min-w-0 pb-8">
       <ReaderHeader
         title={text.title}
+        subtitle={textIntroduction?.summary ?? text.sentences[0]?.naturalTranslation ?? null}
         collectionName={getCollectionName(text.collectionId)}
         level={text.level}
         estimatedMinutes={estimatedMinutes}
@@ -444,7 +445,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
 
       <ReadingLayout
         main={
-          <article className="space-y-10">
+          <article className="reader-article">
             {text.sentences.map((sentence) => {
               const dimmed = focusMode && selectedSentenceId !== sentence.id;
               const analyzing = isSentenceAnalyzing(
@@ -521,7 +522,11 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
         }
         sidebar={
           microscopePanel ? (
-            <Sidebar title="Compréhension" aria-label="Fiche mot">
+            <Sidebar
+              title="Microscope"
+              className="reader-sidebar"
+              aria-label="Microscope linguistique"
+            >
               {microscopePanel}
             </Sidebar>
           ) : null
@@ -530,7 +535,6 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
           <>
             <ReaderCompletionCard
               textTitle={text.title}
-              discoveries={readingSessionSummary.discoveries}
               continueActions={readingSessionSummary.continueActions}
             />
             {textIntroduction ? (
@@ -544,8 +548,9 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
         variant="sheet"
         open={selectedWordSnapshot !== null}
         onClose={closeMicroscope}
-        title="Compréhension"
-        aria-label="Fiche mot"
+        title="Microscope"
+        className="reader-sidebar"
+        aria-label="Microscope linguistique"
       >
         {microscopePanel}
       </Sidebar>

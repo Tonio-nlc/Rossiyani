@@ -1,10 +1,11 @@
 "use client";
 
 import { MetadataLine } from "@/components/editorial";
-import { GhostButton, ProgressBar } from "@/components/design-system";
+import { ProgressBar } from "@/components/design-system";
 
 type ReaderHeaderProps = {
   title: string;
+  subtitle?: string | null;
   collectionName: string;
   level: string;
   estimatedMinutes: number;
@@ -17,6 +18,7 @@ type ReaderHeaderProps = {
 
 export function ReaderHeader({
   title,
+  subtitle,
   collectionName,
   level,
   estimatedMinutes,
@@ -38,26 +40,57 @@ export function ReaderHeader({
       : null;
 
   return (
-    <header className="editorial-page-section space-y-2 pb-0">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0 space-y-1">
-          <p className="text-eyebrow">Lecture</p>
-          <h1 className="font-reader text-lg font-medium leading-snug tracking-tight text-[var(--ink-secondary)]">
-            {title}
-          </h1>
-          <p className="text-metadata">{collectionName}</p>
-          <MetadataLine items={metaItems} className="text-metadata" />
-        </div>
-        <GhostButton onClick={() => onFocusModeChange(!focusMode)}>
-          {focusMode ? "Quitter le focus" : "Focus →"}
-        </GhostButton>
+    <header className="reader-header">
+      <p className="reader-header__eyebrow">
+        <span className="reader-header__collection">{collectionName}</span>
+        <span className="reader-header__eyebrow-sep" aria-hidden>
+          ·
+        </span>
+        <span className="reader-header__level">{level}</span>
+      </p>
+
+      <div className="reader-header__title-row">
+        <h1 className="reader-header__title">{title}</h1>
+        <button
+          type="button"
+          onClick={() => onFocusModeChange(!focusMode)}
+          className={[
+            "reader-header__focus focus-kb",
+            focusMode ? "reader-header__focus--active" : "",
+          ].join(" ")}
+          aria-pressed={focusMode}
+        >
+          <span className="reader-header__focus-icon" aria-hidden>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle
+                cx="7"
+                cy="7"
+                r="5.5"
+                stroke="currentColor"
+                strokeWidth="1.25"
+                strokeDasharray={focusMode ? "0" : "2 2"}
+              />
+              <circle cx="7" cy="7" r="2" fill="currentColor" />
+            </svg>
+          </span>
+          {focusMode ? "Quitter l'immersion" : "Lecture immersive"}
+        </button>
       </div>
 
-      <div className="flex items-center gap-4">
-        <ProgressBar value={percent} className="flex-1" aria-label="Progression de lecture" />
-        {sentenceLabel ? (
-          <p className="shrink-0 text-metadata">{sentenceLabel}</p>
-        ) : null}
+      {subtitle ? <p className="reader-header__subtitle">{subtitle}</p> : null}
+
+      <MetadataLine items={metaItems} className="reader-header__meta" />
+
+      <div className="reader-header__progress">
+        <div className="reader-header__progress-track">
+          <ProgressBar value={percent} aria-label="Progression de lecture" />
+        </div>
+        <div className="reader-header__progress-meta">
+          <span className="reader-header__percent">{percent} %</span>
+          {sentenceLabel ? (
+            <span className="reader-header__sentence">{sentenceLabel}</span>
+          ) : null}
+        </div>
       </div>
     </header>
   );
