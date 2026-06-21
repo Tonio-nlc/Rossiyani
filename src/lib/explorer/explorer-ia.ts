@@ -24,11 +24,13 @@ export type ExplorerTextOccurrence = {
   textId: string;
   textTitle: string;
   occurrenceCount: number;
+  previewSnippet?: string | null;
 };
 
 export type ExplorerRelatedWord = {
   label: string;
   href: string;
+  hint?: string;
 };
 
 export type ExplorerLinkItem = {
@@ -149,11 +151,22 @@ export function buildLemmaDefinitions(knowledge: LemmaKnowledge): ExplorerLemmaD
   return definitions.slice(0, 3);
 }
 
+function trimPreviewSnippet(sentence: string, max = 64): string {
+  const trimmed = sentence.trim();
+  if (trimmed.length <= max) {
+    return trimmed;
+  }
+  return `${trimmed.slice(0, max - 1).trim()}…`;
+}
+
 export function mapTextOccurrences(texts: LemmaTextRef[]): ExplorerTextOccurrence[] {
   return texts.map((text) => ({
     textId: text.textId,
     textTitle: text.textTitle,
     occurrenceCount: text.occurrenceCount,
+    previewSnippet: text.sentenceRussian
+      ? trimPreviewSnippet(text.sentenceRussian)
+      : null,
   }));
 }
 
@@ -254,6 +267,7 @@ export function groupOccurrencesByText(
   occurrences: Array<{
     textId: string | null;
     textTitle: string | null;
+    sentenceRussian?: string | null;
   }>,
 ): ExplorerTextOccurrence[] {
   const grouped = new Map<string, ExplorerTextOccurrence>();
@@ -273,6 +287,9 @@ export function groupOccurrencesByText(
       textId: occurrence.textId,
       textTitle: occurrence.textTitle,
       occurrenceCount: 1,
+      previewSnippet: occurrence.sentenceRussian
+        ? trimPreviewSnippet(occurrence.sentenceRussian)
+        : null,
     });
   }
 

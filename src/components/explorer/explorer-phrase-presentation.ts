@@ -101,6 +101,7 @@ function mapRelatedWords(graph: PhraseGraph | null): ExplorerRelatedWord[] {
   return graph.relatedLemmas.slice(0, 6).map((lemma) => ({
     label: lemma.lemma,
     href: lemmaPath(lemma.lemma, lemma.partOfSpeech),
+    hint: "Appears in the same phrase",
   }));
 }
 
@@ -147,6 +148,9 @@ function foundInTextsFromPhrase(
       textId: text.textId,
       textTitle: text.textTitle,
       occurrenceCount: 1,
+      previewSnippet: text.sentenceRussian
+        ? text.sentenceRussian.slice(0, 64)
+        : null,
     });
     return acc;
   }, []);
@@ -169,6 +173,7 @@ export function presentationFromPhrase(input: {
   const similarExpressions = similarPhrases.map((phrase) => ({
     label: phrase.label,
     href: phrase.href,
+    hint: "Similar native phrasing",
   }));
 
   const microscopeBase: ExplorerMicroscopeData = {

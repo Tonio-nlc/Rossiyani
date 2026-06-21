@@ -111,6 +111,7 @@ function mapCommonWords(graph: EndingGraph): ExplorerRelatedWord[] {
         href: lemma
           ? lemmaPath(lemma.lemma, lemma.partOfSpeech)
           : `/explorer?q=${encodeURIComponent(form.original)}`,
+        hint: "Shares this ending",
       });
       return acc;
     }, [])

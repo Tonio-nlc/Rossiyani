@@ -1,9 +1,11 @@
 import { getCaseLegendEntry } from "@/features/grammar/case-legend-data";
 import type { ConceptKnowledge } from "@/types/knowledge-graph";
 import { firstSentence } from "@/features/explorer/entity/types";
-import { pickShortSentences } from "@/lib/explorer/explorer-ia";
+import { groupOccurrencesByText, pickShortSentences } from "@/lib/explorer/explorer-ia";
 
 import { ExplorerLemmaCardGrid, ExplorerTextCardGrid } from "./explorer-card-grid";
+import { ExplorerEntityHeader } from "./explorer-entity-header";
+import { ExplorerExampleList } from "./explorer-example-list";
 import { ExplorerSection } from "./explorer-section";
 
 type ConceptDetailViewProps = {
@@ -28,6 +30,7 @@ function conceptQuestion(concept: ConceptKnowledge): string | null {
 }
 
 export function ConceptDetailView({ concept, relatedTexts }: ConceptDetailViewProps) {
+  const title = concept.concept.title.replace(/\s+case$/i, "").trim();
   const question = conceptQuestion(concept);
   const role = conceptRole(concept);
   const observedExamples = pickShortSentences(
@@ -38,68 +41,70 @@ export function ConceptDetailView({ concept, relatedTexts }: ConceptDetailViewPr
     5,
   );
 
-  const textsGrouped = relatedTexts.reduce<
-    Array<{ textId: string; textTitle: string; occurrenceCount: number }>
-  >((acc, text) => {
-    const existing = acc.find((item) => item.textId === text.textId);
-    if (existing) {
-      existing.occurrenceCount += 1;
-      return acc;
-    }
-    acc.push({
+  const textsGrouped = groupOccurrencesByText(
+    relatedTexts.map((text) => ({
       textId: text.textId,
       textTitle: text.textTitle,
-      occurrenceCount: 1,
-    });
-    return acc;
-  }, []);
+      sentenceRussian: text.sentenceRussian,
+    })),
+  );
 
   const commonWords = concept.lemmas.slice(0, 6).map((lemma) => ({
     label: lemma.lemma,
     href: `/explorer/lemmas/${encodeURIComponent(lemma.lemma)}?pos=${encodeURIComponent(lemma.partOfSpeech)}`,
+    hint: "Shows this pattern often",
   }));
 
   return (
     <div className="explorer-workspace-pane explorer-workspace-pane--detail">
-      <article className="explorer-word">
-        <header className="explorer-word__hero">
-          <h1 className="explorer-word__lemma">
-            {concept.concept.title.replace(/\s+case$/i, "").trim()}
-          </h1>
-        </header>
+      <article className="explorer-word explorer-word--detail">
+        <ExplorerEntityHeader
+          breadcrumb={[
+            { label: "Explorer", href: "/explorer" },
+            { label: "Concepts", href: "/explorer/concepts" },
+            { label: title },
+          ]}
+          title={title}
+          subtitle="Grammar pattern from your texts"
+          badges={<span className="explorer-word__badge explorer-word__badge--accent">Concept</span>}
+        />
 
         {question ? (
-          <ExplorerSection title="Question">
+          <ExplorerSection title="Question" icon="question" lead="How to recognize this pattern">
             <p className="explorer-word-section__prose">{question}</p>
           </ExplorerSection>
         ) : null}
 
-        <ExplorerSection title="Role">
+        <ExplorerSection title="Role" icon="role" lead="What job it plays in a sentence">
           <p className="explorer-word-section__prose">{role}</p>
         </ExplorerSection>
 
         {observedExamples.length > 0 ? (
-          <ExplorerSection title="Observed examples">
-            <ul className="explorer-word-example-list">
-              {observedExamples.map((example) => (
-                <li key={example} className="explorer-word-example">
-                  <p className="explorer-word-example__russian break-russian font-reader">
-                    {example}
-                  </p>
-                </li>
-              ))}
-            </ul>
+          <ExplorerSection
+            title="Observed examples"
+            icon="examples"
+            lead="Lines where you have seen it"
+          >
+            <ExplorerExampleList examples={observedExamples} />
           </ExplorerSection>
         ) : null}
 
         {textsGrouped.length > 0 ? (
-          <ExplorerSection title="Seen in texts">
+          <ExplorerSection
+            title="Seen in texts"
+            icon="texts"
+            lead="Your readings that contain this pattern"
+          >
             <ExplorerTextCardGrid items={textsGrouped} />
           </ExplorerSection>
         ) : null}
 
         {commonWords.length > 0 ? (
-          <ExplorerSection title="Common words">
+          <ExplorerSection
+            title="Common words"
+            icon="related-words"
+            lead="Lemmas that illustrate this idea"
+          >
             <ExplorerLemmaCardGrid items={commonWords} />
           </ExplorerSection>
         ) : null}

@@ -76,6 +76,7 @@ export function presentationFromLemma(
     relatedWords: knowledge.familyLemmas.slice(0, 6).map((family) => ({
       label: family.lemma,
       href: lemmaPath(family.lemma, family.partOfSpeech),
+      hint: "Same word family",
     })),
     microscope: {
       facts: [
@@ -132,6 +133,7 @@ export function presentationFromEntity(
         textId: text.textId,
         textTitle: text.textTitle ?? "Text",
         occurrenceCount: 1,
+        previewSnippet: text.russian ? text.russian.slice(0, 64) : null,
       });
       return acc;
     }, []);

@@ -1,18 +1,9 @@
 import Link from "next/link";
 
 import { seenInText } from "@/lib/explorer/explorer-ia";
+import type { ExplorerRelatedWord, ExplorerTextOccurrence } from "@/lib/explorer/explorer-ia";
 
-type ExplorerLemmaCard = {
-  label: string;
-  href: string;
-  meta?: string;
-};
-
-type ExplorerTextCard = {
-  textId: string;
-  textTitle: string;
-  occurrenceCount: number;
-};
+type ExplorerLemmaCard = ExplorerRelatedWord;
 
 export function ExplorerLemmaCardGrid({ items }: { items: ExplorerLemmaCard[] }) {
   if (items.length === 0) {
@@ -20,40 +11,43 @@ export function ExplorerLemmaCardGrid({ items }: { items: ExplorerLemmaCard[] })
   }
 
   return (
-    <div className="explorer-explore-grid">
+    <div className="explorer-related-grid">
       {items.map((item) => (
-        <Link key={item.href} href={item.href} className="explorer-explore-card focus-kb">
-          <div className="explorer-explore-card__body">
-            <p className="explorer-explore-card__title break-russian">{item.label}</p>
-            {item.meta ? (
-              <p className="explorer-explore-card__context">{item.meta}</p>
-            ) : null}
+        <Link key={item.href} href={item.href} className="explorer-related-card focus-kb">
+          <div className="explorer-related-card__body">
+            <p className="explorer-related-card__title break-russian">{item.label}</p>
+            {item.hint ? <p className="explorer-related-card__hint">{item.hint}</p> : null}
           </div>
-          <span className="explorer-explore-card__cta">Explore →</span>
+          <span className="explorer-related-card__cta">Explore →</span>
         </Link>
       ))}
     </div>
   );
 }
 
-export function ExplorerTextCardGrid({ items }: { items: ExplorerTextCard[] }) {
+export function ExplorerTextCardGrid({ items }: { items: ExplorerTextOccurrence[] }) {
   if (items.length === 0) {
     return null;
   }
 
   return (
-    <div className="explorer-explore-grid">
+    <div className="explorer-text-grid">
       {items.map((item) => (
         <Link
           key={item.textId}
           href={`/texts/${item.textId}`}
-          className="explorer-explore-card focus-kb"
+          className="explorer-text-card focus-kb"
         >
-          <div className="explorer-explore-card__body">
-            <p className="explorer-explore-card__title">{item.textTitle}</p>
-            <p className="explorer-explore-card__context">{seenInText(item.occurrenceCount)}</p>
+          <div className="explorer-text-card__body">
+            <p className="explorer-text-card__title">{item.textTitle}</p>
+            <p className="explorer-text-card__context">{seenInText(item.occurrenceCount)}</p>
+            {item.previewSnippet ? (
+              <p className="explorer-text-card__preview break-russian font-reader">
+                “{item.previewSnippet}”
+              </p>
+            ) : null}
           </div>
-          <span className="explorer-explore-card__cta">Open →</span>
+          <span className="explorer-text-card__cta">Open →</span>
         </Link>
       ))}
     </div>
