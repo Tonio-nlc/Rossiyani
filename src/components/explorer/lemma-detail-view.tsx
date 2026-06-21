@@ -1,40 +1,11 @@
-import type { LemmaKnowledge } from "@/types/knowledge-graph";
-import { practicePath } from "@/lib/practice/constants";
-
-import { ExplorerMicroscopePanel } from "./explorer-microscope-panel";
-import { ExplorerStudyShell } from "./explorer-study-shell";
-import { ExplorerStudySidebar } from "./explorer-study-sidebar";
-import { ExplorerWordMain } from "./explorer-word-main";
-import { presentationFromLemma } from "./explorer-word-presentation";
+import type { ExplorerWordPresentation } from "./explorer-word-presentation";
+import { ExplorerWordPane } from "./explorer-word-pane";
 
 type LemmaDetailViewProps = {
-  knowledge: LemmaKnowledge;
+  presentation: ExplorerWordPresentation;
+  breadcrumb: Array<{ label: string; href?: string }>;
 };
 
-export function LemmaDetailView({ knowledge }: LemmaDetailViewProps) {
-  const readExamplesHref = knowledge.examples[0]?.textId
-    ? `/texts/${knowledge.examples[0].textId}`
-    : null;
-  const presentation = presentationFromLemma(knowledge, {
-    practiceHref: practicePath({
-      structure: knowledge.lemma,
-      mode: "structure",
-      from: "explorer",
-    }),
-    exploreHref: `/explorer?q=${encodeURIComponent(knowledge.lemma)}`,
-    readExamplesHref,
-  });
-
-  return (
-    <ExplorerStudyShell
-      sidebar={<ExplorerStudySidebar showWordNav />}
-      main={
-        <ExplorerWordMain
-          presentation={presentation}
-          breadcrumb={[{ label: "Explorer", href: "/explorer" }, { label: knowledge.lemma }]}
-        />
-      }
-      microscope={<ExplorerMicroscopePanel presentation={presentation} />}
-    />
-  );
+export function LemmaDetailView({ presentation, breadcrumb }: LemmaDetailViewProps) {
+  return <ExplorerWordPane presentation={presentation} breadcrumb={breadcrumb} />;
 }

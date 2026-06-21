@@ -1,27 +1,18 @@
 import type { ExplorerEditorialData } from "@/features/explorer/get-explorer-editorial";
 
-import { EditorialCard, GhostButton } from "@/components/design-system";
-import { KnowledgeChain, MarginNote, Reference } from "@/components/editorial";
+import { GhostButton } from "@/components/design-system";
 
-import { ExplorerEditorialGrid, ExplorerEditorialSection } from "./explorer-editorial-grid";
+import { ExplorerCompactList } from "./explorer-compact-list";
 import { ExplorerRecentSection } from "./explorer-recent-section";
 import { ExplorerSearchPanel } from "./explorer-search-panel";
-import { ExplorerStudyShell } from "./explorer-study-shell";
-import { ExplorerStudySidebar } from "./explorer-study-sidebar";
-
-const PRIMARY_LINKS = [
-  { label: "Lemmes", href: "/explorer/lemmas", emoji: "📚" },
-  { label: "Concepts", href: "/explorer/concepts", emoji: "🧠" },
-  { label: "Expressions", href: "/explorer/expressions", emoji: "📝" },
-] as const;
 
 const INDEX_LINKS = [
-  { label: "Lemmes", href: "/explorer/lemmas", description: "Entrées lexicales", emoji: "📚" },
-  { label: "Concepts", href: "/explorer/concepts", description: "Motifs grammaticaux", emoji: "🧠" },
-  { label: "Cas", href: "/explorer/cases", description: "Les six cas", emoji: "🔤" },
-  { label: "Terminaisons", href: "/explorer/endings", description: "Paradigmes fléchis" },
-  { label: "Collocations", href: "/explorer/collocations", description: "Cooccurrences" },
-  { label: "Expressions", href: "/explorer/expressions", description: "Tournures idiomatiques", emoji: "📝" },
+  { label: "Lemmes", href: "/explorer/lemmas", meta: "Archive" },
+  { label: "Concepts", href: "/explorer/concepts", meta: "Grammaire" },
+  { label: "Cas", href: "/explorer/cases", meta: "6 cas" },
+  { label: "Terminaisons", href: "/explorer/endings", meta: "Paradigmes" },
+  { label: "Collocations", href: "/explorer/collocations", meta: "Cooccurrences" },
+  { label: "Expressions", href: "/explorer/expressions", meta: "Idiomes" },
 ] as const;
 
 type ExplorerHubProps = {
@@ -29,121 +20,50 @@ type ExplorerHubProps = {
   isEmpty: boolean;
 };
 
-type ExplorerEditorialSectionsProps = {
-  editorial: ExplorerEditorialData;
-};
+function ExplorerEditorialPicks({ editorial }: { editorial: ExplorerEditorialData }) {
+  const { todaysLanguage, popularConstructions, nativeExpressions } = editorial;
+  const picks = [
+    ...(todaysLanguage
+      ? [
+          {
+            label: todaysLanguage.displayLabel,
+            href: todaysLanguage.explorerHref,
+            subtitle: todaysLanguage.subtitle,
+          },
+        ]
+      : []),
+    ...popularConstructions.map((pick) => ({
+      label: pick.label,
+      href: pick.href,
+    })),
+    ...nativeExpressions.map((pick) => ({
+      label: pick.label,
+      href: pick.href,
+    })),
+  ];
 
-function ExplorerPrimaryEntry() {
-  return (
-    <section className="editorial-page-section pb-0" aria-label="Entrées">
-      <ul className="flex flex-wrap gap-3">
-        {PRIMARY_LINKS.map((link) => (
-          <li key={link.href}>
-            <GhostButton href={link.href}>
-              {link.emoji} {link.label} →
-            </GhostButton>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
+  if (picks.length === 0) {
+    return null;
+  }
 
-function ExplorerEditorialSections({ editorial }: ExplorerEditorialSectionsProps) {
-  const { todaysLanguage, popularConstructions, nativeExpressions, grammarSpotlight } = editorial;
-
-  return (
-    <div className="space-y-0">
-      {todaysLanguage ? (
-        <ExplorerEditorialSection eyebrow="Langue du jour">
-          <EditorialCard
-            href={todaysLanguage.explorerHref}
-            featured
-            title={todaysLanguage.displayLabel}
-            subtitle={`« ${todaysLanguage.subtitle} »`}
-          />
-        </ExplorerEditorialSection>
-      ) : null}
-
-      {popularConstructions.length > 0 ? (
-        <ExplorerEditorialSection eyebrow="Constructions">
-          <ExplorerEditorialGrid
-            items={popularConstructions.map((pick) => ({
-              label: pick.label,
-              href: pick.href,
-            }))}
-          />
-        </ExplorerEditorialSection>
-      ) : null}
-
-      {nativeExpressions.length > 0 ? (
-        <ExplorerEditorialSection eyebrow="Expressions">
-          <ExplorerEditorialGrid
-            items={nativeExpressions.map((pick) => ({
-              label: pick.label,
-              href: pick.href,
-            }))}
-          />
-        </ExplorerEditorialSection>
-      ) : null}
-
-      {grammarSpotlight ? (
-        <ExplorerEditorialSection eyebrow="Grammaire">
-          <div className="max-w-2xl space-y-4">
-            <p className="font-reader text-2xl text-[var(--ink)]">
-              <Reference href={grammarSpotlight.focalHref}>
-                {grammarSpotlight.focalLabel}
-              </Reference>
-            </p>
-            <KnowledgeChain items={grammarSpotlight.chain} />
-            {grammarSpotlight.note ? (
-              <MarginNote kind="grammar">{grammarSpotlight.note}</MarginNote>
-            ) : null}
-          </div>
-        </ExplorerEditorialSection>
-      ) : null}
-    </div>
-  );
-}
-
-function ExplorerReferenceIndex() {
-  return (
-    <ExplorerEditorialSection eyebrow="Index">
-      <ExplorerEditorialGrid
-        items={INDEX_LINKS.map((link) => ({
-          label: "emoji" in link && link.emoji ? `${link.emoji} ${link.label}` : link.label,
-          href: link.href,
-        }))}
-      />
-    </ExplorerEditorialSection>
-  );
+  return <ExplorerCompactList title="Sélection" items={picks} />;
 }
 
 export function ExplorerHub({ editorial, isEmpty }: ExplorerHubProps) {
   return (
-    <ExplorerStudyShell
-      sidebar={<ExplorerStudySidebar />}
-      main={
-        <div className="explorer-hub-main pb-8">
-          <ExplorerSearchPanel autoFocus={!isEmpty} />
-
-          <ExplorerPrimaryEntry />
-
-          <ExplorerReferenceIndex />
-
-          {isEmpty ? (
-            <section className="editorial-page-section">
-              <GhostButton href="/import">Importer →</GhostButton>
-            </section>
-          ) : (
-            <>
-              <ExplorerRecentSection />
-
-              <ExplorerEditorialSections editorial={editorial} />
-            </>
-          )}
+    <div className="explorer-workspace-pane">
+      <ExplorerSearchPanel autoFocus={!isEmpty} />
+      <ExplorerCompactList title="Index" items={[...INDEX_LINKS]} />
+      {!isEmpty ? (
+        <>
+          <ExplorerRecentSection />
+          <ExplorerEditorialPicks editorial={editorial} />
+        </>
+      ) : (
+        <div className="explorer-workspace-pane__empty">
+          <GhostButton href="/import">Importer →</GhostButton>
         </div>
-      }
-    />
+      )}
+    </div>
   );
 }

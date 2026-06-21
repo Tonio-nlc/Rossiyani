@@ -8,10 +8,8 @@ export default async function CollocationsBrowsePage() {
 
   return (
     <CategoryBrowse
-      title="Native constructions"
-      subtitle="What sounds natural in Russian — frequent word pairings from your texts."
-      breadcrumbLabel="Collocations"
-      featuredTitle="Popular"
+      featuredTitle="Collocations"
+      searchPlaceholder="Rechercher une collocation…"
       featured={(metrics?.topCollocations ?? []).map((p) => ({
         label: p.label,
         href: collocationPath(p.label),

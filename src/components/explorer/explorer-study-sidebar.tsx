@@ -4,18 +4,51 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type ExplorerStudySidebarProps = {
-  showWordNav?: boolean;
+type WorkspaceTabId = "definitions" | "etymology" | "usage" | "conjugation";
+
+type NavItem = {
+  id: WorkspaceTabId;
+  label: string;
+  href: string;
 };
 
-const WORD_NAV = [
+const WORD_NAV: NavItem[] = [
   { id: "definitions", label: "Lexicon", href: "#definitions" },
   { id: "etymology", label: "Etymology", href: "#etymology" },
   { id: "usage", label: "Usage", href: "#usage" },
   { id: "conjugation", label: "Conjugation", href: "#conjugation" },
-] as const;
+];
 
-function NavIcon({ id }: { id: string }) {
+const WORKSPACE_NAV: NavItem[] = [
+  { id: "definitions", label: "Lexicon", href: "/explorer" },
+  { id: "etymology", label: "Etymology", href: "/explorer/concepts" },
+  { id: "usage", label: "Usage", href: "/explorer/expressions" },
+  { id: "conjugation", label: "Conjugation", href: "/explorer/cases" },
+];
+
+const LEMMA_WORD_PAGE = /^\/explorer\/lemmas\/[^/]+$/;
+
+function isLemmaWordPage(pathname: string): boolean {
+  return LEMMA_WORD_PAGE.test(pathname);
+}
+
+function workspaceTabFromPath(pathname: string): WorkspaceTabId {
+  if (pathname === "/explorer" || pathname.startsWith("/explorer/lemmas")) {
+    return "definitions";
+  }
+  if (pathname.startsWith("/explorer/concepts")) {
+    return "etymology";
+  }
+  if (pathname.startsWith("/explorer/expressions") || pathname.startsWith("/explorer/collocations")) {
+    return "usage";
+  }
+  if (pathname.startsWith("/explorer/cases") || pathname.startsWith("/explorer/endings")) {
+    return "conjugation";
+  }
+  return "definitions";
+}
+
+function NavIcon({ id }: { id: WorkspaceTabId }) {
   const className = "explorer-study-sidebar__icon";
   switch (id) {
     case "definitions":
@@ -47,23 +80,31 @@ function NavIcon({ id }: { id: string }) {
   }
 }
 
-export function ExplorerStudySidebar({ showWordNav = false }: ExplorerStudySidebarProps) {
-  const pathname = usePathname();
-  const onHub = pathname === "/explorer";
-  const [activeSection, setActiveSection] = useState("definitions");
+export function ExplorerStudySidebar() {
+  const pathname = usePathname() ?? "/explorer";
+  const wordPage = isLemmaWordPage(pathname);
+  const [wordSection, setWordSection] = useState<WorkspaceTabId>("definitions");
+  const workspaceTab = workspaceTabFromPath(pathname);
 
   useEffect(() => {
-    if (!showWordNav) {
+    if (!wordPage) {
       return;
     }
     const sync = () => {
-      const hash = window.location.hash.replace("#", "");
-      setActiveSection(hash || "definitions");
+      const hash = window.location.hash.replace("#", "") as WorkspaceTabId;
+      if (WORD_NAV.some((item) => item.id === hash)) {
+        setWordSection(hash);
+      } else {
+        setWordSection("definitions");
+      }
     };
     sync();
     window.addEventListener("hashchange", sync);
     return () => window.removeEventListener("hashchange", sync);
-  }, [showWordNav]);
+  }, [wordPage]);
+
+  const navItems = wordPage ? WORD_NAV : WORKSPACE_NAV;
+  const activeId = wordPage ? wordSection : workspaceTab;
 
   return (
     <aside className="explorer-study-sidebar" aria-label="Study Tools">
@@ -72,47 +113,29 @@ export function ExplorerStudySidebar({ showWordNav = false }: ExplorerStudySideb
         <p className="explorer-study-sidebar__subtitle">Deep Lexical Analysis</p>
       </div>
 
-      <nav className="explorer-study-sidebar__nav">
-        {showWordNav ? (
-          WORD_NAV.map((item) => (
-            <a
-              key={item.id}
-              href={item.href}
-              className={[
-                "explorer-study-sidebar__link focus-kb",
-                activeSection === item.id ? "explorer-study-sidebar__link-active" : "",
-              ].join(" ")}
-            >
+      <nav className="explorer-study-sidebar__nav" aria-label="Workspace">
+        {navItems.map((item) => {
+          const className = [
+            "explorer-study-sidebar__link focus-kb",
+            activeId === item.id ? "explorer-study-sidebar__link-active" : "",
+          ].join(" ");
+
+          if (wordPage) {
+            return (
+              <a key={item.id} href={item.href} className={className}>
+                <NavIcon id={item.id} />
+                <span>{item.label}</span>
+              </a>
+            );
+          }
+
+          return (
+            <Link key={item.id} href={item.href} className={className}>
               <NavIcon id={item.id} />
               <span>{item.label}</span>
-            </a>
-          ))
-        ) : (
-          <>
-            <Link
-              href="/explorer"
-              className={[
-                "explorer-study-sidebar__link focus-kb",
-                onHub ? "explorer-study-sidebar__link-active" : "",
-              ].join(" ")}
-            >
-              <NavIcon id="definitions" />
-              <span>Lexicon</span>
             </Link>
-            <Link href="/explorer/concepts" className="explorer-study-sidebar__link focus-kb">
-              <NavIcon id="etymology" />
-              <span>Etymology</span>
-            </Link>
-            <Link href="/explorer/expressions" className="explorer-study-sidebar__link focus-kb">
-              <NavIcon id="usage" />
-              <span>Usage</span>
-            </Link>
-            <Link href="/explorer/cases" className="explorer-study-sidebar__link focus-kb">
-              <NavIcon id="conjugation" />
-              <span>Conjugation</span>
-            </Link>
-          </>
-        )}
+          );
+        })}
       </nav>
 
       <div className="explorer-study-sidebar__footer">
@@ -120,7 +143,7 @@ export function ExplorerStudySidebar({ showWordNav = false }: ExplorerStudySideb
           Open Archive
         </Link>
         <div className="explorer-study-sidebar__meta-links">
-          <Link href="/explorer" className="explorer-study-sidebar__meta-link focus-kb">
+          <Link href="/settings" className="explorer-study-sidebar__meta-link focus-kb">
             Settings
           </Link>
           <Link href="/explorer" className="explorer-study-sidebar__meta-link focus-kb">

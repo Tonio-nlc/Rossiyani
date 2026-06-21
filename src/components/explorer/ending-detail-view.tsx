@@ -6,7 +6,6 @@ import { tutorWhyFromEnding } from "@/lib/explorer/tutor-copy";
 import { pickCanonicalExplanation } from "@/services/knowledge-graph/graph-mappers";
 import type { EndingGraph } from "@/types/knowledge-graph";
 
-import { ExplorerLayout } from "./explorer-layout";
 import {
   ExplorerTutorAction,
   ExplorerTutorAdvanced,
@@ -62,13 +61,8 @@ export function EndingDetailView({ graph }: EndingDetailViewProps) {
   ];
 
   return (
-    <ExplorerLayout
-      breadcrumb={[
-        { label: "Terminaisons", href: "/explorer/endings" },
-        { label: endingLabel },
-      ]}
-    >
-      <article className="space-y-10 pb-12">
+    <div className="explorer-workspace-pane explorer-workspace-pane--detail">
+      <article className="explorer-word">
         <header className="space-y-3">
           <EndingBadge
             endingText={endingLabel}
@@ -156,6 +150,6 @@ export function EndingDetailView({ graph }: EndingDetailViewProps) {
           <RelatedNavigation items={related} />
         </ExplorerTutorAdvanced>
       </article>
-    </ExplorerLayout>
+    </div>
   );
 }

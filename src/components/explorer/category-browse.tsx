@@ -1,32 +1,29 @@
-import { EmptyState, GhostButton } from "@/components/design-system";
+import type { ReactNode } from "react";
 
-import { BrowseList } from "./browse-list";
-import { ExplorerLayout } from "./explorer-layout";
+import { EmptyState } from "@/components/design-system";
+
+import { ExplorerCompactList } from "./explorer-compact-list";
 import { UniversalSearchPanel } from "./universal-search-panel";
 
 type CategoryBrowseProps = {
-  title: string;
-  subtitle: string;
-  breadcrumbLabel: string;
   featuredTitle: string;
   featured: Array<{ label: string; href: string; meta?: string }>;
-  children?: React.ReactNode;
+  children?: ReactNode;
+  searchPlaceholder?: string;
 };
 
 export function CategoryBrowse({
-  title,
-  subtitle,
-  breadcrumbLabel,
   featuredTitle,
   featured,
   children,
+  searchPlaceholder,
 }: CategoryBrowseProps) {
   return (
-    <ExplorerLayout breadcrumb={[{ label: breadcrumbLabel }]} title={title} subtitle={subtitle}>
-      <UniversalSearchPanel placeholder={`Rechercher dans ${breadcrumbLabel.toLowerCase()}…`} />
+    <div className="explorer-workspace-pane">
+      <UniversalSearchPanel placeholder={searchPlaceholder} />
       {children}
       {featured.length > 0 ? (
-        <BrowseList title={featuredTitle} items={featured} />
+        <ExplorerCompactList title={featuredTitle} items={featured} />
       ) : !children ? (
         <EmptyState
           title="Rien à afficher pour l'instant"
@@ -34,9 +31,6 @@ export function CategoryBrowse({
           action={{ label: "Importer des textes", href: "/import" }}
         />
       ) : null}
-      <div className="editorial-page-section pt-0">
-        <GhostButton href="/explorer">← Retour à Explorer</GhostButton>
-      </div>
-    </ExplorerLayout>
+    </div>
   );
 }

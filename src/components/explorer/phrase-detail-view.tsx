@@ -1,7 +1,7 @@
-import { EditorialCard, GhostButton } from "@/components/design-system";
 import type { PhraseKnowledge } from "@/types/knowledge-graph";
 
-import { ExplorerLayout } from "./explorer-layout";
+import { ExplorerCompactList } from "./explorer-compact-list";
+
 import {
   conceptChip,
   RelatedNavigation,
@@ -25,11 +25,8 @@ export function PhraseDetailView({
   ];
 
   return (
-    <ExplorerLayout
-      breadcrumb={[{ label: categoryLabel, href: categoryHref }, { label: knowledge.label }]}
-      title={knowledge.label}
-    >
-      <article className="space-y-6 pb-8">
+    <div className="explorer-workspace-pane explorer-workspace-pane--detail">
+      <article className="explorer-word">
         {knowledge.canonicalExplanation ? (
           <section className="editorial-page-section space-y-3 pb-0">
             <p className="text-eyebrow">Définition</p>
@@ -55,24 +52,22 @@ export function PhraseDetailView({
         ) : null}
 
         {knowledge.relatedTexts.length > 0 ? (
-          <section className="editorial-page-section space-y-3 pb-0">
-            <p className="text-eyebrow">Textes</p>
-            <div className="library-editorial-grid max-w-2xl">
-              {knowledge.relatedTexts.map((t) => (
-                <EditorialCard
-                  key={t.textId}
-                  href={`/texts/${t.textId}`}
-                  title={t.textTitle}
-                  subtitle={t.sentenceRussian}
-                  footer={<GhostButton href={`/texts/${t.textId}`}>Lire →</GhostButton>}
-                />
-              ))}
-            </div>
+          <section className="explorer-word-section explorer-word-section--archive">
+            <h2 className="explorer-word-section__title explorer-word-section__title--subtle">
+              Textes
+            </h2>
+            <ExplorerCompactList
+              items={knowledge.relatedTexts.map((t) => ({
+                label: t.textTitle,
+                href: `/texts/${t.textId}`,
+                subtitle: t.sentenceRussian,
+              }))}
+            />
           </section>
         ) : null}
 
         <RelatedNavigation items={related} title="Liens" />
       </article>
-    </ExplorerLayout>
+    </div>
   );
 }

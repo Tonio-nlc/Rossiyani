@@ -11,7 +11,6 @@ import { practicePath } from "@/lib/practice/constants";
 import { GhostButton } from "@/components/design-system";
 
 import { ExplorerDiscoveryGrid } from "./explorer-discovery-grid";
-import { ExplorerLayout } from "./explorer-layout";
 import { endingPath, lemmaPath, textPath, conceptPath } from "./explorer-routes";
 import {
   ExplorerTutorAdvanced,
@@ -71,10 +70,8 @@ export function ConceptDetailView({ concept, relatedTexts }: ConceptDetailViewPr
   });
 
   return (
-    <ExplorerLayout
-      breadcrumb={[{ label: "Explorer", href: "/explorer" }, { label: concept.concept.title }]}
-    >
-      <article className="space-y-6 pb-8">
+    <div className="explorer-workspace-pane explorer-workspace-pane--detail">
+      <article className="explorer-word">
         <ExplorerTutorTitle label={concept.concept.title} />
 
         <ExplorerTutorWhy text={tutorWhyFromConcept(concept, question)} />
@@ -168,6 +165,6 @@ export function ConceptDetailView({ concept, relatedTexts }: ConceptDetailViewPr
           <RelatedNavigation items={related} />
         </ExplorerTutorAdvanced>
       </article>
-    </ExplorerLayout>
+    </div>
   );
 }

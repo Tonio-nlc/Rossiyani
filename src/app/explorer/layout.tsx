@@ -1,3 +1,11 @@
-export default function ExplorerLayout({ children }: { children: React.ReactNode }) {
-  return <div className="explorer-study-root">{children}</div>;
+import { ExplorerWorkspaceLayout } from "@/components/explorer/explorer-workspace-layout";
+
+export default function ExplorerLayout({
+  children,
+  microscope,
+}: {
+  children: React.ReactNode;
+  microscope: React.ReactNode;
+}) {
+  return <ExplorerWorkspaceLayout microscope={microscope}>{children}</ExplorerWorkspaceLayout>;
 }

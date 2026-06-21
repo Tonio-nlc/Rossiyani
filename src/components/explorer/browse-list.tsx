@@ -1,5 +1,5 @@
-import type { ExplorerGridItem } from "./explorer-editorial-grid";
-import { ExplorerEditorialGrid } from "./explorer-editorial-grid";
+import type { ExplorerCompactItem } from "./explorer-compact-list";
+import { ExplorerCompactList } from "./explorer-compact-list";
 
 type BrowseListItem = {
   label: string;
@@ -13,20 +13,11 @@ type BrowseListProps = {
 };
 
 export function BrowseList({ title, items }: BrowseListProps) {
-  if (items.length === 0) {
-    return null;
-  }
-
-  const gridItems: ExplorerGridItem[] = items.map((item) => ({
+  const compactItems: ExplorerCompactItem[] = items.map((item) => ({
     label: item.label,
     href: item.href,
     meta: item.meta,
   }));
 
-  return (
-    <section className="space-y-4">
-      <p className="text-eyebrow">{title}</p>
-      <ExplorerEditorialGrid items={gridItems} />
-    </section>
-  );
+  return <ExplorerCompactList title={title} items={compactItems} />;
 }

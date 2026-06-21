@@ -1,7 +1,7 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import type { PartOfSpeech } from "@prisma/client";
 
-import { LemmaDetailView } from "@/components/explorer";
+import { ExplorerMicroscopePanel } from "@/components/explorer/explorer-microscope-panel";
 import { loadLemmaWorkspace } from "@/features/explorer/load-lemma-workspace";
 
 type PageProps = {
@@ -9,23 +9,14 @@ type PageProps = {
   searchParams: Promise<{ pos?: string }>;
 };
 
-export default async function LemmaDetailPage({ params, searchParams }: PageProps) {
+export default async function LemmaMicroscopePage({ params, searchParams }: PageProps) {
   const { lemma } = await params;
   const { pos } = await searchParams;
   const result = await loadLemmaWorkspace(lemma, pos as PartOfSpeech | undefined);
-
-  if (result.status === "redirect") {
-    redirect(result.path);
-  }
 
   if (result.status !== "ok") {
     notFound();
   }
 
-  return (
-    <LemmaDetailView
-      presentation={result.data.presentation}
-      breadcrumb={result.data.breadcrumb}
-    />
-  );
+  return <ExplorerMicroscopePanel presentation={result.data.presentation} />;
 }

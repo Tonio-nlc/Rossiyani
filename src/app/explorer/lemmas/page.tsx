@@ -8,10 +8,8 @@ export default async function LemmasBrowsePage() {
 
   return (
     <CategoryBrowse
-      title="Vocabulary"
-      subtitle="Words you've encountered — each one a doorway to constructions, texts, and practice."
-      breadcrumbLabel="Lemmes"
-      featuredTitle="Frequently used"
+      featuredTitle="Lemmes fréquents"
+      searchPlaceholder="Rechercher un lemme…"
       featured={(metrics?.topLemmas ?? []).map((l) => ({
         label: l.lemma,
         href: lemmaPath(l.lemma, "noun"),

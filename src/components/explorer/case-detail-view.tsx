@@ -4,7 +4,6 @@ import { CASE_LEGEND_ENTRIES } from "@/features/grammar/case-legend-data";
 import type { CaseGraph } from "@/types/knowledge-graph";
 import { tutorWhyFromCase } from "@/lib/explorer/tutor-copy";
 
-import { ExplorerLayout } from "./explorer-layout";
 import {
   ExplorerTutorAction,
   ExplorerTutorAdvanced,
@@ -43,10 +42,8 @@ export function CaseDetailView({ graph }: CaseDetailViewProps) {
   ];
 
   return (
-    <ExplorerLayout
-      breadcrumb={[{ label: "Cas", href: "/explorer/cases" }, { label: graph.caseNode.titleFr }]}
-    >
-      <article className="space-y-10 pb-12">
+    <div className="explorer-workspace-pane explorer-workspace-pane--detail">
+      <article className="explorer-word">
         <ExplorerTutorTitle
           label={graph.caseNode.titleFr}
           translation={legend?.question ?? graph.caseNode.caseKey}
@@ -129,6 +126,6 @@ export function CaseDetailView({ graph }: CaseDetailViewProps) {
           <RelatedNavigation items={related} />
         </ExplorerTutorAdvanced>
       </article>
-    </ExplorerLayout>
+    </div>
   );
 }
