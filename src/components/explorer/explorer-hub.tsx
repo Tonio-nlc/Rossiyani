@@ -1,65 +1,67 @@
-import type { ExplorerEditorialData } from "@/features/explorer/get-explorer-editorial";
-
 import { GhostButton } from "@/components/design-system";
 
-import { ExplorerCompactList } from "./explorer-compact-list";
-import { ExplorerRecentSection } from "./explorer-recent-section";
+import type { LemmaBrowseCard, PortalBrowseCard } from "@/features/explorer/get-explorer-browse-data";
+import { ExplorerExploreGrid } from "./explorer-explore-grid";
 import { ExplorerSearchPanel } from "./explorer-search-panel";
 
-const INDEX_LINKS = [
-  { label: "Lemmes", href: "/explorer/lemmas", meta: "Archive" },
-  { label: "Concepts", href: "/explorer/concepts", meta: "Grammaire" },
-  { label: "Cas", href: "/explorer/cases", meta: "6 cas" },
-  { label: "Terminaisons", href: "/explorer/endings", meta: "Paradigmes" },
-  { label: "Collocations", href: "/explorer/collocations", meta: "Cooccurrences" },
-  { label: "Expressions", href: "/explorer/expressions", meta: "Idiomes" },
-] as const;
+const PORTAL_INDEX: PortalBrowseCard[] = [
+  {
+    kind: "portal",
+    title: "Lemmes",
+    href: "/explorer/lemmas",
+    description: "Entrées lexicales de vos textes importés.",
+    meta: "Archive",
+  },
+  {
+    kind: "portal",
+    title: "Concepts",
+    href: "/explorer/concepts",
+    description: "Motifs grammaticaux et régularités observées.",
+    meta: "Grammaire",
+  },
+  {
+    kind: "portal",
+    title: "Cas",
+    href: "/explorer/cases",
+    description: "Les six cas comme portails d'étude.",
+    meta: "6 cas",
+  },
+  {
+    kind: "portal",
+    title: "Terminaisons",
+    href: "/explorer/endings",
+    description: "Paradigmes fléchis et terminaisons récurrentes.",
+  },
+  {
+    kind: "portal",
+    title: "Collocations",
+    href: "/explorer/collocations",
+    description: "Cooccurrences naturelles du russe authentique.",
+  },
+  {
+    kind: "portal",
+    title: "Expressions",
+    href: "/explorer/expressions",
+    description: "Tournures idiomatiques et constructions natives.",
+  },
+];
 
 type ExplorerHubProps = {
-  editorial: ExplorerEditorialData;
   isEmpty: boolean;
+  featuredLemmas: LemmaBrowseCard[];
 };
 
-function ExplorerEditorialPicks({ editorial }: { editorial: ExplorerEditorialData }) {
-  const { todaysLanguage, popularConstructions, nativeExpressions } = editorial;
-  const picks = [
-    ...(todaysLanguage
-      ? [
-          {
-            label: todaysLanguage.displayLabel,
-            href: todaysLanguage.explorerHref,
-            subtitle: todaysLanguage.subtitle,
-          },
-        ]
-      : []),
-    ...popularConstructions.map((pick) => ({
-      label: pick.label,
-      href: pick.href,
-    })),
-    ...nativeExpressions.map((pick) => ({
-      label: pick.label,
-      href: pick.href,
-    })),
-  ];
+export function ExplorerHub({ isEmpty, featuredLemmas }: ExplorerHubProps) {
+  const spotlightCards = featuredLemmas.slice(0, 4);
 
-  if (picks.length === 0) {
-    return null;
-  }
-
-  return <ExplorerCompactList title="Sélection" items={picks} />;
-}
-
-export function ExplorerHub({ editorial, isEmpty }: ExplorerHubProps) {
   return (
     <div className="explorer-workspace-pane">
       <ExplorerSearchPanel autoFocus={!isEmpty} />
-      <ExplorerCompactList title="Index" items={[...INDEX_LINKS]} />
-      {!isEmpty ? (
-        <>
-          <ExplorerRecentSection />
-          <ExplorerEditorialPicks editorial={editorial} />
-        </>
-      ) : (
+      <ExplorerExploreGrid title="Index" cards={PORTAL_INDEX} />
+      {!isEmpty && spotlightCards.length > 0 ? (
+        <ExplorerExploreGrid title="Entrées fréquentes" cards={spotlightCards} />
+      ) : null}
+      {!isEmpty ? null : (
         <div className="explorer-workspace-pane__empty">
           <GhostButton href="/import">Importer →</GhostButton>
         </div>

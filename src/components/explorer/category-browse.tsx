@@ -1,20 +1,19 @@
 import type { ReactNode } from "react";
 
-import { EmptyState } from "@/components/design-system";
-
-import { ExplorerCompactList } from "./explorer-compact-list";
+import type { ExplorerExploreCardData } from "./explorer-explore-card";
+import { ExplorerExploreGrid } from "./explorer-explore-grid";
 import { UniversalSearchPanel } from "./universal-search-panel";
 
 type CategoryBrowseProps = {
-  featuredTitle: string;
-  featured: Array<{ label: string; href: string; meta?: string }>;
+  title?: string;
+  cards: ExplorerExploreCardData[];
   children?: ReactNode;
   searchPlaceholder?: string;
 };
 
 export function CategoryBrowse({
-  featuredTitle,
-  featured,
+  title,
+  cards,
   children,
   searchPlaceholder,
 }: CategoryBrowseProps) {
@@ -22,15 +21,7 @@ export function CategoryBrowse({
     <div className="explorer-workspace-pane">
       <UniversalSearchPanel placeholder={searchPlaceholder} />
       {children}
-      {featured.length > 0 ? (
-        <ExplorerCompactList title={featuredTitle} items={featured} />
-      ) : !children ? (
-        <EmptyState
-          title="Rien à afficher pour l'instant"
-          description="Utilisez la recherche ci-dessus ou importez des textes pour enrichir cette catégorie."
-          action={{ label: "Importer des textes", href: "/import" }}
-        />
-      ) : null}
+      <ExplorerExploreGrid title={title} cards={cards} />
     </div>
   );
 }

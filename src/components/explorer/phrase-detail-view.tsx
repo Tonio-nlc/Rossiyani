@@ -16,8 +16,6 @@ type PhraseDetailViewProps = {
 
 export function PhraseDetailView({
   knowledge,
-  categoryLabel,
-  categoryHref,
 }: PhraseDetailViewProps) {
   const related = [
     ...knowledge.concepts.map((c) => conceptChip(c.conceptKey, c.title)),

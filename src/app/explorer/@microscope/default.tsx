@@ -1,5 +1,8 @@
-import { ExplorerMicroscopeEmpty } from "@/components/explorer/explorer-microscope-empty";
+import { getExplorerContextPanelData } from "@/features/explorer/get-explorer-context-panel";
 
-export default function ExplorerMicroscopeDefault() {
-  return <ExplorerMicroscopeEmpty />;
+import { ExplorerContextPanel } from "@/components/explorer/explorer-context-panel";
+
+export default async function ExplorerMicroscopeDefault() {
+  const data = await getExplorerContextPanelData();
+  return <ExplorerContextPanel data={data} />;
 }

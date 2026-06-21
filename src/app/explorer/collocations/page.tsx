@@ -1,20 +1,15 @@
-import { getKnowledgeMetrics } from "@/features/admin";
+import { getCollocationBrowseCards } from "@/features/explorer/get-explorer-browse-data";
 
 import { CategoryBrowse } from "@/components/explorer/category-browse";
-import { collocationPath } from "@/components/explorer/explorer-routes";
 
 export default async function CollocationsBrowsePage() {
-  const metrics = await getKnowledgeMetrics().catch(() => null);
+  const cards = await getCollocationBrowseCards(12).catch(() => []);
 
   return (
     <CategoryBrowse
-      featuredTitle="Collocations"
+      title="Collocations"
       searchPlaceholder="Rechercher une collocation…"
-      featured={(metrics?.topCollocations ?? []).map((p) => ({
-        label: p.label,
-        href: collocationPath(p.label),
-        meta: `${p.occurrenceCount}×`,
-      }))}
+      cards={cards}
     />
   );
 }

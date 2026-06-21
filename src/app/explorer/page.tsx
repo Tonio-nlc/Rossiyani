@@ -1,16 +1,16 @@
 import { getKnowledgeMetrics } from "@/features/admin";
-import { getExplorerEditorialData } from "@/features/explorer/get-explorer-editorial";
+import { getLemmaBrowseCards } from "@/features/explorer/get-explorer-browse-data";
 import { ExplorerHub } from "@/components/explorer";
 
 export default async function ExplorerPage() {
-  const [metrics, editorial] = await Promise.all([
+  const [metrics, featuredLemmas] = await Promise.all([
     getKnowledgeMetrics().catch(() => null),
-    getExplorerEditorialData(),
+    getLemmaBrowseCards(8).catch(() => []),
   ]);
 
   const isEmpty =
     !metrics ||
     (metrics.graphSize.lemmas === 0 && metrics.graphSize.concepts === 0);
 
-  return <ExplorerHub editorial={editorial} isEmpty={isEmpty} />;
+  return <ExplorerHub isEmpty={isEmpty} featuredLemmas={featuredLemmas} />;
 }

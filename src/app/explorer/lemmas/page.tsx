@@ -1,20 +1,15 @@
-import { getKnowledgeMetrics } from "@/features/admin";
+import { getLemmaBrowseCards } from "@/features/explorer/get-explorer-browse-data";
 
 import { CategoryBrowse } from "@/components/explorer/category-browse";
-import { lemmaPath } from "@/components/explorer/explorer-routes";
 
 export default async function LemmasBrowsePage() {
-  const metrics = await getKnowledgeMetrics().catch(() => null);
+  const cards = await getLemmaBrowseCards(12).catch(() => []);
 
   return (
     <CategoryBrowse
-      featuredTitle="Lemmes fréquents"
+      title="Lemmes fréquents"
       searchPlaceholder="Rechercher un lemme…"
-      featured={(metrics?.topLemmas ?? []).map((l) => ({
-        label: l.lemma,
-        href: lemmaPath(l.lemma, "noun"),
-        meta: `${l.occurrenceCount}×`,
-      }))}
+      cards={cards}
     />
   );
 }

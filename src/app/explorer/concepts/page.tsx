@@ -1,20 +1,15 @@
-import { getKnowledgeMetrics } from "@/features/admin";
+import { getConceptBrowseCards } from "@/features/explorer/get-explorer-browse-data";
 
 import { CategoryBrowse } from "@/components/explorer/category-browse";
-import { conceptPath } from "@/components/explorer/explorer-routes";
 
 export default async function ConceptsBrowsePage() {
-  const metrics = await getKnowledgeMetrics().catch(() => null);
+  const cards = await getConceptBrowseCards(12).catch(() => []);
 
   return (
     <CategoryBrowse
-      featuredTitle="Concepts"
+      title="Concepts grammaticaux"
       searchPlaceholder="Rechercher un concept…"
-      featured={(metrics?.topConcepts ?? []).map((c) => ({
-        label: c.title,
-        href: conceptPath(c.title),
-        meta: `${c.hitCount}×`,
-      }))}
+      cards={cards}
     />
   );
 }

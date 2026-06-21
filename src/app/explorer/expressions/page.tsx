@@ -3,13 +3,13 @@ import { CategoryBrowse } from "@/components/explorer/category-browse";
 export default function ExpressionsBrowsePage() {
   return (
     <CategoryBrowse
-      featuredTitle="Expressions"
+      title="Expressions"
       searchPlaceholder="Rechercher une expression…"
-      featured={[]}
+      cards={[]}
     >
       <p className="explorer-workspace-pane__hint">
-        Recherchez une expression par libellé russe ou français. Les résultats de type expression
-        mènent vers une fiche détaillée.
+        Recherchez une expression par libellé russe ou français. Les résultats mènent vers une fiche
+        détaillée dans cet espace de travail.
       </p>
     </CategoryBrowse>
   );
