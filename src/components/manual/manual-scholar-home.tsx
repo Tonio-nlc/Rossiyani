@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const METHODOLOGY_CARDS = [
   {
     title: "Structured Immersion",
@@ -124,18 +126,18 @@ export function ManualScholarHome() {
       <footer className="manual-scholar-footer">
         <p className="manual-scholar-footer__copy">Rossiyani &copy; 2024 &bull; Academic Reading Room</p>
         <nav className="manual-scholar-footer__nav" aria-label="Liens institutionnels">
-          <a href="/library" className="manual-scholar-footer__link focus-kb">
+          <Link href="/library" className="manual-scholar-footer__link focus-kb">
             Library
-          </a>
-          <a href="/explorer" className="manual-scholar-footer__link focus-kb">
+          </Link>
+          <Link href="/explorer" className="manual-scholar-footer__link focus-kb">
             Explorer
-          </a>
-          <a href="/practice" className="manual-scholar-footer__link focus-kb">
+          </Link>
+          <Link href="/practice" className="manual-scholar-footer__link focus-kb">
             Practice
-          </a>
-          <a href="/manual/theme/declensions" className="manual-scholar-footer__link focus-kb">
+          </Link>
+          <Link href="/manual/theme/declensions" className="manual-scholar-footer__link focus-kb">
             Declensions
-          </a>
+          </Link>
         </nav>
       </footer>
     </div>
