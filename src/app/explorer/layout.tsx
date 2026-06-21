@@ -1,3 +1,3 @@
 export default function ExplorerLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <div className="explorer-study-root">{children}</div>;
 }

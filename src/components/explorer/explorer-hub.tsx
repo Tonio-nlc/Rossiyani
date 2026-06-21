@@ -6,6 +6,8 @@ import { KnowledgeChain, MarginNote, Reference } from "@/components/editorial";
 import { ExplorerEditorialGrid, ExplorerEditorialSection } from "./explorer-editorial-grid";
 import { ExplorerRecentSection } from "./explorer-recent-section";
 import { ExplorerSearchPanel } from "./explorer-search-panel";
+import { ExplorerStudyShell } from "./explorer-study-shell";
+import { ExplorerStudySidebar } from "./explorer-study-sidebar";
 
 const PRIMARY_LINKS = [
   { label: "Lemmes", href: "/explorer/lemmas", emoji: "📚" },
@@ -119,24 +121,29 @@ function ExplorerReferenceIndex() {
 
 export function ExplorerHub({ editorial, isEmpty }: ExplorerHubProps) {
   return (
-    <div className="pb-8">
-      <ExplorerSearchPanel autoFocus={!isEmpty} />
+    <ExplorerStudyShell
+      sidebar={<ExplorerStudySidebar />}
+      main={
+        <div className="explorer-hub-main pb-8">
+          <ExplorerSearchPanel autoFocus={!isEmpty} />
 
-      <ExplorerPrimaryEntry />
+          <ExplorerPrimaryEntry />
 
-      <ExplorerReferenceIndex />
+          <ExplorerReferenceIndex />
 
-      {isEmpty ? (
-        <section className="editorial-page-section">
-          <GhostButton href="/import">Importer →</GhostButton>
-        </section>
-      ) : (
-        <>
-          <ExplorerRecentSection />
+          {isEmpty ? (
+            <section className="editorial-page-section">
+              <GhostButton href="/import">Importer →</GhostButton>
+            </section>
+          ) : (
+            <>
+              <ExplorerRecentSection />
 
-          <ExplorerEditorialSections editorial={editorial} />
-        </>
-      )}
-    </div>
+              <ExplorerEditorialSections editorial={editorial} />
+            </>
+          )}
+        </div>
+      }
+    />
   );
 }
