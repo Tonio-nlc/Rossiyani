@@ -13,14 +13,14 @@ export function LibraryCollectionsRow({ active, onSelect }: LibraryCollectionsRo
   const collections = getAllCollections();
 
   return (
-    <div className="library-catalog-filter-row" role="group" aria-label="Collections">
+    <div className="lib-filter-row" role="group" aria-label="Collections">
       <button
         type="button"
         aria-pressed={active === "all"}
         onClick={() => onSelect("all")}
         className={[
-          "library-catalog-filter focus-kb",
-          active === "all" ? "library-catalog-filter-active" : "",
+          "lib-filter focus-kb",
+          active === "all" ? "lib-filter-active" : "",
         ].join(" ")}
       >
         Toutes
@@ -32,8 +32,8 @@ export function LibraryCollectionsRow({ active, onSelect }: LibraryCollectionsRo
           aria-pressed={active === collection.id}
           onClick={() => onSelect(collection.id as CollectionId)}
           className={[
-            "library-catalog-filter focus-kb",
-            active === collection.id ? "library-catalog-filter-active" : "",
+            "lib-filter focus-kb",
+            active === collection.id ? "lib-filter-active" : "",
           ].join(" ")}
         >
           {collection.name}

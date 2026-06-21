@@ -12,9 +12,11 @@ import { deleteTextRequest, renameTextRequest } from "@/lib/library/text-library
 import { clearTextReadingProgress } from "@/lib/reader/reading-progress";
 
 import { LibraryCollectionsRow } from "./library-collections-row";
+import { LibraryEditorialGrid } from "./library-editorial-grid";
+import { LibraryEditorialHero } from "./library-editorial-hero";
 import { LibraryFilters } from "./library-filters";
-import { LibraryGrid } from "./library-grid";
 import { LibrarySearch } from "./library-search";
+import { LibrarySectionNav } from "./library-section-nav";
 import {
   filterLibraryTexts,
   type LibraryCategoryFilter,
@@ -115,19 +117,17 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
   }, []);
 
   return (
-    <div className="library-catalog-body">
+    <div className="lib-editorial-page">
+      <LibraryEditorialHero level={level} onLevelChange={setLevel} />
+      <LibrarySectionNav active="texts" />
+
       <LibraryCollectionsRow active={collection} onSelect={handleCollectionSelect} />
 
       <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
 
-      <LibraryFilters
-        level={level}
-        category={category}
-        onLevelChange={setLevel}
-        onCategoryChange={setCategory}
-      />
+      <LibraryFilters category={category} onCategoryChange={setCategory} />
 
-      <LibraryGrid
+      <LibraryEditorialGrid
         texts={filtered}
         hasAnyTexts={texts.length > 0}
         busyTextId={busyTextId}

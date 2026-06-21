@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import { Reference } from "@/components/editorial";
 
 import { LibraryContextTranslationLessons } from "./library-context-translation-lessons";
-import { LibraryImportCard } from "./library-import-card";
 import { LibraryMyDiscoveries } from "./library-my-discoveries";
 import { LibraryMyPhrases } from "./library-my-phrases";
 import { LibraryPageIntro } from "./library-page-intro";
@@ -79,10 +78,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   return (
     <div className="library-catalog">
-      <LibraryPageIntro />
-      <LibrarySectionNav active="texts" />
       <LibraryView initialTexts={initialTexts} />
-      <LibraryImportCard />
     </div>
   );
 }

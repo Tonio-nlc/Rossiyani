@@ -76,6 +76,33 @@ export function getTextPreviewLine(collectionId: CollectionId): string {
   return sentence.length > 120 ? `${sentence.slice(0, 117).trimEnd()}…` : sentence;
 }
 
+const CEFR_LEVEL_LABELS: Record<CefrLevel, string> = {
+  A1: "DÉBUTANT",
+  A2: "INTERMÉDIAIRE",
+  B1: "AVANCÉ",
+  B2: "SUPÉRIEUR",
+  C1: "EXPERT",
+  Native: "NATIF",
+};
+
+export function getCefrLevelLabel(level: CefrLevel): string {
+  return CEFR_LEVEL_LABELS[level];
+}
+
+/** Two to three lines of editorial description for text cards. */
+export function getTextDescription(collectionId: CollectionId): string {
+  const description = getCollectionById(collectionId).description;
+  const excerpt = description
+    .split(/(?<=[.!?])\s+/)
+    .slice(0, 2)
+    .join(" ")
+    .trim();
+  if (excerpt.length <= 200) {
+    return excerpt;
+  }
+  return `${excerpt.slice(0, 197).trimEnd()}…`;
+}
+
 export function filterLibraryTexts(
   texts: TextListItem[],
   query: string,

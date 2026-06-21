@@ -1,9 +1,10 @@
 import { EmptyState } from "@/components/ui/empty-state";
 import type { TextListItem } from "@/features/texts";
 
-import { LibraryCard } from "./library-card";
+import { LibrarySuggestCard } from "./library-suggest-card";
+import { LibraryTextCard } from "./library-text-card";
 
-type LibraryGridProps = {
+type LibraryEditorialGridProps = {
   texts: TextListItem[];
   hasAnyTexts: boolean;
   busyTextId?: string | null;
@@ -12,14 +13,14 @@ type LibraryGridProps = {
   onDelete: (text: TextListItem) => void;
 };
 
-export function LibraryGrid({
+export function LibraryEditorialGrid({
   texts,
   hasAnyTexts,
   busyTextId = null,
   removingTextId = null,
   onRename,
   onDelete,
-}: LibraryGridProps) {
+}: LibraryEditorialGridProps) {
   if (texts.length === 0 && !hasAnyTexts) {
     return (
       <EmptyState
@@ -41,22 +42,34 @@ export function LibraryGrid({
     );
   }
 
+  const [featured, ...rest] = texts;
+
   return (
-    <div className="library-catalog-grid">
-      {texts.map((text, index) => (
+    <div className="lib-editorial-grid">
+      <div
+        className={[
+          "lib-editorial-grid__cell lib-editorial-grid__cell-featured",
+          removingTextId === featured.id ? "animate-fade-out" : "",
+        ].join(" ")}
+      >
+        <LibraryTextCard
+          text={featured}
+          featured
+          disabled={busyTextId === featured.id}
+          onRename={onRename}
+          onDelete={onDelete}
+        />
+      </div>
+
+      {rest.map((text) => (
         <div
           key={text.id}
           className={[
-            "library-catalog-grid-item",
-            removingTextId === text.id ? "animate-fade-out" : "animate-fade-up",
+            "lib-editorial-grid__cell",
+            removingTextId === text.id ? "animate-fade-out" : "",
           ].join(" ")}
-          style={
-            removingTextId === text.id
-              ? undefined
-              : { animationDelay: `${Math.min(index * 30, 240)}ms` }
-          }
         >
-          <LibraryCard
+          <LibraryTextCard
             text={text}
             disabled={busyTextId === text.id}
             onRename={onRename}
@@ -64,6 +77,10 @@ export function LibraryGrid({
           />
         </div>
       ))}
+
+      <div className="lib-editorial-grid__cell">
+        <LibrarySuggestCard />
+      </div>
     </div>
   );
 }
