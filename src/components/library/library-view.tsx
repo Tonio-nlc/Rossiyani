@@ -11,17 +11,11 @@ import { clearLastReadTextIfMatches } from "@/lib/last-read-text";
 import { deleteTextRequest, renameTextRequest } from "@/lib/library/text-library-api";
 import { clearTextReadingProgress } from "@/lib/reader/reading-progress";
 
-import { LibraryCollectionsRow } from "./library-collections-row";
 import { LibraryEditorialGrid } from "./library-editorial-grid";
 import { LibraryEditorialHero } from "./library-editorial-hero";
-import { LibraryFilters } from "./library-filters";
 import { LibrarySearch } from "./library-search";
 import { LibrarySectionNav } from "./library-section-nav";
-import {
-  filterLibraryTexts,
-  type LibraryCategoryFilter,
-  type LibraryCollectionFilter,
-} from "./library-utils";
+import { filterLibraryTexts } from "./library-utils";
 
 const REMOVE_ANIMATION_MS = 280;
 
@@ -36,16 +30,14 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
   const [texts, setTexts] = useState(initialTexts);
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState<CefrLevel | "all">("all");
-  const [collection, setCollection] = useState<LibraryCollectionFilter>("all");
-  const [category, setCategory] = useState<LibraryCategoryFilter>("all");
   const [renameTarget, setRenameTarget] = useState<DialogTarget>(null);
   const [deleteTarget, setDeleteTarget] = useState<DialogTarget>(null);
   const [busyTextId, setBusyTextId] = useState<string | null>(null);
   const [removingTextId, setRemovingTextId] = useState<string | null>(null);
 
   const filtered = useMemo(
-    () => filterLibraryTexts(texts, search, level, collection, category),
-    [texts, search, level, collection, category],
+    () => filterLibraryTexts(texts, search, level, "all", "all"),
+    [texts, search, level],
   );
 
   const handleRenameConfirm = useCallback(
@@ -112,21 +104,11 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
     }
   }, [deleteTarget, toast]);
 
-  const handleCollectionSelect = useCallback((value: LibraryCollectionFilter) => {
-    setCollection(value);
-  }, []);
-
   return (
     <div className="lib-editorial-page">
       <LibraryEditorialHero level={level} onLevelChange={setLevel} />
       <LibrarySectionNav active="texts" />
-
-      <LibraryCollectionsRow active={collection} onSelect={handleCollectionSelect} />
-
       <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
-
-      <LibraryFilters category={category} onCategoryChange={setCategory} />
-
       <LibraryEditorialGrid
         texts={filtered}
         hasAnyTexts={texts.length > 0}
