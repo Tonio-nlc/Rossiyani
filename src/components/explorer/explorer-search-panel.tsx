@@ -50,7 +50,13 @@ function secondaryPaths(items: SearchNavItem[], primaryHref: string): SearchNavI
   return items.filter((item) => item.href !== primaryHref).slice(0, 8);
 }
 
-function ExplorerSearchPanelInner({ autoFocus = false }: { autoFocus?: boolean }) {
+function ExplorerSearchPanelInner({
+  autoFocus = false,
+  compact = false,
+}: {
+  autoFocus?: boolean;
+  compact?: boolean;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") ?? "";
@@ -150,14 +156,19 @@ function ExplorerSearchPanelInner({ autoFocus = false }: { autoFocus?: boolean }
   const hasQuery = query.trim().length > 0;
 
   return (
-    <div id="recherche" className="editorial-page-section space-y-4 pb-0">
-      <p className="text-eyebrow">Rechercher</p>
+    <div
+      id="recherche"
+      className={[
+        "explorer-search-panel",
+        compact ? "explorer-search-panel--compact" : "",
+      ].join(" ")}
+    >
       <SearchField
         inputRef={inputRef}
         value={query}
         onChange={setQuery}
-        placeholder="Chercher un mot, un concept, une expression…"
-        ariaLabel="Recherche exploratoire"
+        placeholder="Search words, concepts, expressions…"
+        ariaLabel="Explorer search"
         resultCount={hasQuery && !loading && navItems.length > 0 ? navItems.length : undefined}
         onKeyDown={(event) => {
           if (event.key === "Enter" && expansionChain[0]?.href) {
@@ -168,19 +179,19 @@ function ExplorerSearchPanelInner({ autoFocus = false }: { autoFocus?: boolean }
       />
 
       {loading ? (
-        <p className="text-metadata text-[var(--ink-muted)]">Recherche…</p>
+        <p className="explorer-search-panel__status">Searching…</p>
       ) : null}
 
       {!loading && hasQuery && expansionChain.length > 0 ? (
-        <div className="space-y-4">
+        <div className="explorer-search-panel__results">
           <KnowledgeChain items={expansionChain} />
-          {conceptGraph?.concept.canonicalExplanation ? (
+          {!compact && conceptGraph?.concept.canonicalExplanation ? (
             <MarginNote kind="usage">
               {conceptGraph.concept.canonicalExplanation.slice(0, 220)}
             </MarginNote>
           ) : null}
           {alternates.length > 0 ? (
-            <ul className="divide-y divide-[var(--hairline)] border-t border-[var(--hairline)]">
+            <ul className="explorer-search-panel__alternates">
               {alternates.map((item) => (
                 <li key={item.id}>
                   <Link
@@ -200,18 +211,22 @@ function ExplorerSearchPanelInner({ autoFocus = false }: { autoFocus?: boolean }
       ) : null}
 
       {!loading && hasQuery && expansionChain.length === 0 ? (
-        <p className="text-metadata text-[var(--ink-muted)]">
-          Aucun résultat. Parcourez l&apos;index.
-        </p>
+        <p className="explorer-search-panel__status">No results.</p>
       ) : null}
     </div>
   );
 }
 
-export function ExplorerSearchPanel({ autoFocus = false }: { autoFocus?: boolean }) {
+export function ExplorerSearchPanel({
+  autoFocus = false,
+  compact = false,
+}: {
+  autoFocus?: boolean;
+  compact?: boolean;
+}) {
   return (
     <Suspense fallback={null}>
-      <ExplorerSearchPanelInner autoFocus={autoFocus} />
+      <ExplorerSearchPanelInner autoFocus={autoFocus} compact={compact} />
     </Suspense>
   );
 }

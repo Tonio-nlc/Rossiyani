@@ -27,9 +27,9 @@ describe("explorer eligibility", () => {
     ).toBe(false);
   });
 
-  it("allows grammar concepts but rejects phrase-derived junk concepts", () => {
+  it("routes case concepts to Cases, not Concepts", () => {
     expect(isConceptExplorerEligible("case:accusative", "Accusative case", "GRAMMATICAL_CASE")).toBe(
-      true,
+      false,
     );
     expect(
       isConceptExplorerEligible(

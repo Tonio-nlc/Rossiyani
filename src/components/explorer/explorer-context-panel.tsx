@@ -72,8 +72,8 @@ export function ExplorerContextPanel({ data }: ExplorerContextPanelProps) {
               {randomDiscovery.title}
             </p>
             <p className="explorer-context-panel__discovery-meta">{randomDiscovery.description}</p>
-            {randomDiscovery.meta ? (
-              <p className="explorer-context-panel__discovery-type">{randomDiscovery.meta}</p>
+            {randomDiscovery.context ? (
+              <p className="explorer-context-panel__discovery-type">{randomDiscovery.context}</p>
             ) : null}
           </Link>
         </section>

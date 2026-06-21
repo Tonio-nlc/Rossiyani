@@ -1,8 +1,10 @@
 import { notFound, redirect } from "next/navigation";
 
 import { ConceptDetailView, EntityDetailView } from "@/components/explorer";
+import { caseKeyFromConceptKey, casePath } from "@/components/explorer/explorer-routes";
 import {
   buildEntityPageFromConceptCurated,
+  isCaseConcept,
   labelsEquivalent,
   resolveConceptEntity,
 } from "@/features/explorer/entity";
@@ -58,6 +60,14 @@ export default async function ConceptDetailPage({ params }: PageProps) {
   }
 
   if (resolved.knowledge) {
+    const { concept } = resolved.knowledge;
+    if (isCaseConcept(concept.conceptKey, concept.category)) {
+      const caseKey = caseKeyFromConceptKey(concept.conceptKey);
+      if (caseKey) {
+        redirect(casePath(caseKey));
+      }
+    }
+
     const relatedTexts = await collectRelatedTexts(resolved.knowledge);
     return <ConceptDetailView concept={resolved.knowledge} relatedTexts={relatedTexts} />;
   }

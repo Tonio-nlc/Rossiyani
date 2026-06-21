@@ -1,49 +1,13 @@
 import type { PartOfSpeech } from "@/types";
 
-export const EXPLORER_CATEGORIES = [
-  {
-    id: "concepts",
-    href: "/explorer/concepts",
-    label: "Concepts",
-    icon: "🧠",
-    description: "Patterns grammaticaux, cas, constructions",
-  },
-  {
-    id: "cases",
-    href: "/explorer/cases",
-    label: "Cas",
-    icon: "📐",
-    description: "Les six cas + locatif",
-  },
-  {
-    id: "endings",
-    href: "/explorer/endings",
-    label: "Terminaisons",
-    icon: "✦",
-    description: "Terminaisons réutilisables et leur fonction",
-  },
-  {
-    id: "lemmas",
-    href: "/explorer/lemmas",
-    label: "Lemmes",
-    icon: "📖",
-    description: "Dictionnaire cumulatif du graphe",
-  },
-  {
-    id: "expressions",
-    href: "/explorer/expressions",
-    label: "Expressions",
-    icon: "💬",
-    description: "Expressions figées et constructions natives",
-  },
-  {
-    id: "collocations",
-    href: "/explorer/collocations",
-    label: "Collocations",
-    icon: "🔗",
-    description: "Cooccurrences fréquentes entre mots",
-  },
-] as const;
+export {
+  EXPLORER_CATEGORIES,
+  EXPLORER_DISCOVERY_FRAMING,
+  EXPLORER_EMPTY_MESSAGE,
+  categoryPortalCards,
+  getExplorerCategory,
+  type ExplorerCategoryMeta,
+} from "./explorer-categories";
 
 export function conceptPath(conceptKey: string): string {
   return `/explorer/concepts/${encodeURIComponent(conceptKey)}`;
@@ -72,4 +36,14 @@ export function collocationPath(label: string): string {
 
 export function textPath(textId: string): string {
   return `/texts/${textId}`;
+}
+
+/** Case concepts belong under Cases, not Concepts. */
+export function caseKeyFromConceptKey(conceptKey: string): string | null {
+  const normalized = conceptKey.trim().toLowerCase();
+  if (!normalized.startsWith("case:")) {
+    return null;
+  }
+  const caseKey = normalized.slice("case:".length);
+  return caseKey || null;
 }

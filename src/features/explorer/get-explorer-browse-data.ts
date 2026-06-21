@@ -1,10 +1,9 @@
 import type { PartOfSpeech } from "@prisma/client";
 
-import { casePath, collocationPath, conceptPath, endingPath, lemmaPath } from "@/components/explorer/explorer-routes";
+import { casePath, collocationPath, conceptPath, endingPath, expressionPath, lemmaPath } from "@/components/explorer/explorer-routes";
 import { CASE_LEGEND_ENTRIES } from "@/features/grammar/case-legend-data";
-import { getLessonsByCaseKeyword } from "@/features/manual/load-lessons";
-import { MANUAL_CURRICULUM_CASES } from "@/features/manual/curriculum-cases";
 import { formatPosLabelFr, pickLemmaTranslation } from "@/lib/explorer/lemma-display";
+import { observedInContexts, patternObservedInTexts } from "@/lib/explorer/explorer-ia";
 import { firstSentence } from "@/features/explorer/entity/types";
 import { prisma } from "@/lib/prisma";
 
@@ -33,7 +32,6 @@ export type CaseBrowseCard = {
   href: string;
   description: string;
   exampleCount: number;
-  lessonCount: number;
   textCount: number;
 };
 
@@ -42,7 +40,9 @@ export type PortalBrowseCard = {
   title: string;
   href: string;
   description: string;
-  meta?: string;
+  examples?: string[];
+  context?: string;
+  portalKind?: "category" | "entity";
 };
 
 function trimPreview(sentence: string, max = 72): string {
@@ -107,6 +107,10 @@ export async function getLemmaBrowseCards(limit = 12): Promise<LemmaBrowseCard[]
 
 export async function getConceptBrowseCards(limit = 12): Promise<ConceptBrowseCard[]> {
   const rows = await prisma.knowledgeConcept.findMany({
+    where: {
+      category: { not: "GRAMMATICAL_CASE" },
+      NOT: { conceptKey: { startsWith: "case:" } },
+    },
     orderBy: { hitCount: "desc" },
     take: limit,
     select: {
@@ -162,14 +166,8 @@ async function getCaseStats(caseKey: string): Promise<{ exampleCount: number; te
 }
 
 export async function getCaseBrowseCards(): Promise<CaseBrowseCard[]> {
-  const manualById = new Map(
-    MANUAL_CURRICULUM_CASES.map((item) => [item.id as string, item]),
-  );
-
   return Promise.all(
     CASE_LEGEND_ENTRIES.map(async (entry) => {
-      const manual = manualById.get(entry.key);
-      const keyword = manual?.keyword ?? entry.frenchName.toLowerCase();
       const stats = await getCaseStats(entry.key);
 
       return {
@@ -178,7 +176,6 @@ export async function getCaseBrowseCards(): Promise<CaseBrowseCard[]> {
         href: casePath(entry.key),
         description: caseDescription(entry.question),
         exampleCount: stats.exampleCount,
-        lessonCount: getLessonsByCaseKeyword(keyword).length,
         textCount: stats.textCount,
       };
     }),
@@ -199,10 +196,11 @@ export async function getEndingBrowseCards(limit = 12) {
 
   return rows.map((row) => ({
     kind: "portal" as const,
+    portalKind: "entity" as const,
     title: `-${row.ending}`,
     href: endingPath(row.ending, row.caseKey),
     description: firstSentence(row.explanationFr),
-    meta: `${row.hitCount} formes`,
+    context: observedInContexts(row.hitCount),
   }));
 }
 
@@ -221,10 +219,34 @@ export async function getCollocationBrowseCards(limit = 12) {
 
   return rows.map((row) => ({
     kind: "portal" as const,
+    portalKind: "entity" as const,
     title: row.label,
     href: collocationPath(row.label),
     description: firstSentence(row.canonicalExplanation ?? row.explanation),
-    meta: `${row.occurrenceCount} occurrences`,
+    context: observedInContexts(row.occurrenceCount),
+  }));
+}
+
+export async function getExpressionBrowseCards(limit = 12) {
+  const rows = await prisma.knowledgePhrase.findMany({
+    where: { type: { in: ["FIXED_EXPRESSION", "NATIVE_CONSTRUCTION"] } },
+    orderBy: { occurrenceCount: "desc" },
+    take: limit,
+    select: {
+      label: true,
+      occurrenceCount: true,
+      canonicalExplanation: true,
+      explanation: true,
+    },
+  });
+
+  return rows.map((row) => ({
+    kind: "portal" as const,
+    portalKind: "entity" as const,
+    title: row.label,
+    href: expressionPath(row.label),
+    description: firstSentence(row.canonicalExplanation ?? row.explanation),
+    context: observedInContexts(row.occurrenceCount),
   }));
 }
 
@@ -242,6 +264,10 @@ export async function getRandomDiscoveryCard(): Promise<PortalBrowseCard | null>
       },
     }),
     prisma.knowledgeConcept.findMany({
+      where: {
+        category: { not: "GRAMMATICAL_CASE" },
+        NOT: { conceptKey: { startsWith: "case:" } },
+      },
       orderBy: { hitCount: "desc" },
       take: 8,
       select: {
@@ -258,19 +284,20 @@ export async function getRandomDiscoveryCard(): Promise<PortalBrowseCard | null>
       const translation = pickLemmaTranslation(row.frenchComparison);
       return {
         kind: "portal" as const,
+        portalKind: "entity" as const,
         title: row.lemma,
         href: lemmaPath(row.lemma, row.partOfSpeech),
-        description:
-          translation ?? `${row.occurrenceCount} occurrences dans vos textes importés`,
-        meta: "Lemme",
+        description: translation ?? "Word from your reading library",
+        context: observedInContexts(row.occurrenceCount),
       };
     }),
     ...conceptRows.map((row) => ({
       kind: "portal" as const,
+      portalKind: "entity" as const,
       title: formatConceptTitle(row.title),
       href: conceptPath(row.conceptKey),
       description: firstSentence(row.canonicalExplanation),
-      meta: "Concept",
+      context: patternObservedInTexts(row.hitCount),
     })),
   ];
 

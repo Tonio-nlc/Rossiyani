@@ -55,7 +55,11 @@ export async function loadLemmaWorkspace(
           exploreHref: `/explorer?q=${encodeURIComponent(knowledge.lemma)}`,
           readExamplesHref,
         }),
-        breadcrumb: [{ label: "Explorer", href: "/explorer" }, { label: knowledge.lemma }],
+        breadcrumb: [
+          { label: "Explorer", href: "/explorer" },
+          { label: "Lemmas", href: "/explorer/lemmas" },
+          { label: knowledge.lemma },
+        ],
       },
     };
   }

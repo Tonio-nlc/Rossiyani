@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { EndingDetailView } from "@/components/explorer";
+import { ExplorerMicroscopePanel } from "@/components/explorer/explorer-microscope-panel";
 import { loadEndingWorkspace } from "@/features/explorer/load-ending-workspace";
 
 type PageProps = {
@@ -8,7 +8,7 @@ type PageProps = {
   searchParams: Promise<{ case?: string }>;
 };
 
-export default async function EndingDetailPage({ params, searchParams }: PageProps) {
+export default async function EndingMicroscopePage({ params, searchParams }: PageProps) {
   const { ending } = await params;
   const { case: caseKey } = await searchParams;
   const result = await loadEndingWorkspace(ending, caseKey);
@@ -17,5 +17,5 @@ export default async function EndingDetailPage({ params, searchParams }: PagePro
     notFound();
   }
 
-  return <EndingDetailView presentation={result.data.presentation} />;
+  return <ExplorerMicroscopePanel microscope={result.data.presentation.microscope} />;
 }

@@ -1,169 +1,108 @@
-import Link from "next/link";
-
 import { getCaseLegendEntry } from "@/features/grammar/case-legend-data";
 import type { ConceptKnowledge } from "@/types/knowledge-graph";
-import {
-  tutorSimpleExplanationFromConcept,
-  tutorWhyFromConcept,
-} from "@/lib/explorer/tutor-copy";
-import { practicePath } from "@/lib/practice/constants";
+import { firstSentence } from "@/features/explorer/entity/types";
+import { pickShortSentences } from "@/lib/explorer/explorer-ia";
 
-import { GhostButton } from "@/components/design-system";
-
-import { ExplorerDiscoveryGrid } from "./explorer-discovery-grid";
-import { endingPath, lemmaPath, textPath, conceptPath } from "./explorer-routes";
-import {
-  ExplorerTutorAdvanced,
-  ExplorerTutorAdvancedSection,
-  ExplorerTutorExample,
-  ExplorerTutorExplanation,
-  ExplorerTutorMetaLine,
-  ExplorerTutorTitle,
-  ExplorerTutorWhy,
-} from "./explorer-tutor-sections";
-import { RelatedNavigation } from "./related-navigation";
-import {
-  collocationChip,
-  conceptChip,
-  endingChip,
-  expressionChip,
-  lemmaChip,
-  textChip,
-} from "./related-navigation";
+import { ExplorerLemmaCardGrid, ExplorerTextCardGrid } from "./explorer-card-grid";
+import { ExplorerSection } from "./explorer-section";
 
 type ConceptDetailViewProps = {
   concept: ConceptKnowledge;
   relatedTexts: Array<{ textId: string; textTitle: string; sentenceRussian: string }>;
 };
 
-function grammaticalQuestion(concept: ConceptKnowledge): string | null {
+function conceptRole(concept: ConceptKnowledge): string {
+  if (concept.concept.frenchComparison?.trim()) {
+    return firstSentence(concept.concept.frenchComparison.trim());
+  }
+  return firstSentence(concept.concept.canonicalExplanation);
+}
+
+function conceptQuestion(concept: ConceptKnowledge): string | null {
   const caseNode = concept.cases[0];
   if (caseNode) {
     const legend = getCaseLegendEntry(caseNode.caseKey as import("@/features/grammar").CaseKey);
-    return legend?.question ?? caseNode.titleFr;
-  }
-  if (concept.concept.category === "GRAMMATICAL_CASE") {
-    return "Quelle fonction grammaticale ce concept décrit-il ?";
+    return legend?.question ?? null;
   }
   return null;
 }
 
 export function ConceptDetailView({ concept, relatedTexts }: ConceptDetailViewProps) {
-  const question = grammaticalQuestion(concept);
-  const primaryText = relatedTexts[0];
-  const readExamplesHref = primaryText ? textPath(primaryText.textId) : null;
+  const question = conceptQuestion(concept);
+  const role = conceptRole(concept);
+  const observedExamples = pickShortSentences(
+    [
+      ...relatedTexts.map((text) => text.sentenceRussian),
+      ...concept.phrases.map((phrase) => phrase.label),
+    ],
+    5,
+  );
 
-  const related = [
-    ...concept.relatedConcepts.slice(0, 6).map((item) => conceptChip(item.conceptKey, item.title)),
-    ...concept.lemmas.slice(0, 4).map((item) => lemmaChip(item.lemma, item.partOfSpeech)),
-    ...concept.phrases.slice(0, 4).map((item) =>
-      item.type === "COLLOCATION" ? collocationChip(item.label) : expressionChip(item.label),
-    ),
-    ...concept.endings.slice(0, 4).map((item) => endingChip(item.ending, item.caseKey)),
-    ...relatedTexts.slice(0, 3).map((item) => textChip(item.textId, item.textTitle)),
-  ];
+  const textsGrouped = relatedTexts.reduce<
+    Array<{ textId: string; textTitle: string; occurrenceCount: number }>
+  >((acc, text) => {
+    const existing = acc.find((item) => item.textId === text.textId);
+    if (existing) {
+      existing.occurrenceCount += 1;
+      return acc;
+    }
+    acc.push({
+      textId: text.textId,
+      textTitle: text.textTitle,
+      occurrenceCount: 1,
+    });
+    return acc;
+  }, []);
 
-  const practiceHref = practicePath({
-    structure: concept.concept.title,
-    mode: "structure",
-    from: "explorer",
-  });
+  const commonWords = concept.lemmas.slice(0, 6).map((lemma) => ({
+    label: lemma.lemma,
+    href: `/explorer/lemmas/${encodeURIComponent(lemma.lemma)}?pos=${encodeURIComponent(lemma.partOfSpeech)}`,
+  }));
 
   return (
     <div className="explorer-workspace-pane explorer-workspace-pane--detail">
       <article className="explorer-word">
-        <ExplorerTutorTitle label={concept.concept.title} />
+        <header className="explorer-word__hero">
+          <h1 className="explorer-word__lemma">
+            {concept.concept.title.replace(/\s+case$/i, "").trim()}
+          </h1>
+        </header>
 
-        <ExplorerTutorWhy text={tutorWhyFromConcept(concept, question)} />
-
-        <div className="editorial-page-section pb-0">
-          <ul className="flex flex-wrap gap-x-5 gap-y-2">
-            <li>
-              <GhostButton href={practiceHref}>Pratiquer →</GhostButton>
-            </li>
-            {readExamplesHref ? (
-              <li>
-                <GhostButton href={readExamplesHref}>Lire →</GhostButton>
-              </li>
-            ) : null}
-          </ul>
-        </div>
-
-        {primaryText ? (
-          <ExplorerTutorExample russian={primaryText.sentenceRussian} />
+        {question ? (
+          <ExplorerSection title="Question">
+            <p className="explorer-word-section__prose">{question}</p>
+          </ExplorerSection>
         ) : null}
 
-        <ExplorerTutorExplanation text={tutorSimpleExplanationFromConcept(concept)} />
+        <ExplorerSection title="Role">
+          <p className="explorer-word-section__prose">{role}</p>
+        </ExplorerSection>
 
-        <ExplorerTutorAdvanced>
-          <ExplorerTutorAdvancedSection label="Statistiques">
-            <ExplorerTutorMetaLine>
-              {concept.concept.hitCount.toLocaleString("fr-FR")} occurrences ·{" "}
-              {concept.stats.lemmaCount} lemmes associés
-            </ExplorerTutorMetaLine>
-          </ExplorerTutorAdvancedSection>
+        {observedExamples.length > 0 ? (
+          <ExplorerSection title="Observed examples">
+            <ul className="explorer-word-example-list">
+              {observedExamples.map((example) => (
+                <li key={example} className="explorer-word-example">
+                  <p className="explorer-word-example__russian break-russian font-reader">
+                    {example}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </ExplorerSection>
+        ) : null}
 
-          {question ? (
-            <ExplorerTutorAdvancedSection label="Question grammaticale">
-              <p className="font-reader text-lg text-[var(--ink)]">{question}</p>
-            </ExplorerTutorAdvancedSection>
-          ) : null}
+        {textsGrouped.length > 0 ? (
+          <ExplorerSection title="Seen in texts">
+            <ExplorerTextCardGrid items={textsGrouped} />
+          </ExplorerSection>
+        ) : null}
 
-          {concept.lemmas.length > 0 ? (
-            <ExplorerTutorAdvancedSection label="Lemmes fréquents">
-              <ExplorerDiscoveryGrid
-                items={concept.lemmas.slice(0, 12).map((lemma) => ({
-                  label: lemma.lemma,
-                  href: lemmaPath(lemma.lemma, lemma.partOfSpeech),
-                }))}
-              />
-            </ExplorerTutorAdvancedSection>
-          ) : null}
-
-          {relatedTexts.length > 1 ? (
-            <ExplorerTutorAdvancedSection label="Autres occurrences">
-              <div className="grid gap-3 lg:grid-cols-2">
-                {relatedTexts.slice(1).map((text) => (
-                  <Link
-                    key={`${text.textId}-${text.sentenceRussian.slice(0, 20)}`}
-                    href={textPath(text.textId)}
-                    className="focus-kb ds-microscope-panel transition hover:border-[var(--hairline-strong)]"
-                  >
-                    <p className="text-sm font-medium text-[var(--ink)]">{text.textTitle}</p>
-                    <p className="mt-2 font-reader text-sm leading-relaxed text-[var(--ink-secondary)]">
-                      {text.sentenceRussian}
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </ExplorerTutorAdvancedSection>
-          ) : null}
-
-          {concept.relatedConcepts.length > 0 ? (
-            <ExplorerTutorAdvancedSection label="Concepts voisins">
-              <ExplorerDiscoveryGrid
-                items={concept.relatedConcepts.map((item) => ({
-                  label: item.title,
-                  href: conceptPath(item.conceptKey),
-                }))}
-              />
-            </ExplorerTutorAdvancedSection>
-          ) : null}
-
-          {concept.endings.length > 0 ? (
-            <ExplorerTutorAdvancedSection label="Formes liées">
-              <ExplorerDiscoveryGrid
-                items={concept.endings.map((ending) => ({
-                  label: `-${ending.ending}`,
-                  href: endingPath(ending.ending, ending.caseKey),
-                  meta: ending.caseKey ?? undefined,
-                }))}
-              />
-            </ExplorerTutorAdvancedSection>
-          ) : null}
-
-          <RelatedNavigation items={related} />
-        </ExplorerTutorAdvanced>
+        {commonWords.length > 0 ? (
+          <ExplorerSection title="Common words">
+            <ExplorerLemmaCardGrid items={commonWords} />
+          </ExplorerSection>
+        ) : null}
       </article>
     </div>
   );

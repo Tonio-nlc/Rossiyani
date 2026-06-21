@@ -1,27 +1,38 @@
 import type { ReactNode } from "react";
 
+import type { ExplorerSidebarCategoryId } from "./explorer-sidebar-nav";
 import type { ExplorerExploreCardData } from "./explorer-explore-card";
+import { getExplorerCategory } from "./explorer-categories";
+import { ExplorerCategoryEmpty } from "./explorer-category-empty";
+import { ExplorerCategoryHeader } from "./explorer-category-header";
 import { ExplorerExploreGrid } from "./explorer-explore-grid";
-import { UniversalSearchPanel } from "./universal-search-panel";
 
 type CategoryBrowseProps = {
-  title?: string;
+  categoryId: ExplorerSidebarCategoryId;
   cards: ExplorerExploreCardData[];
   children?: ReactNode;
-  searchPlaceholder?: string;
+  /** Grid section title when cards exist — defaults to "From your texts". */
+  gridTitle?: string;
 };
 
 export function CategoryBrowse({
-  title,
+  categoryId,
   cards,
   children,
-  searchPlaceholder,
+  gridTitle = "From your texts",
 }: CategoryBrowseProps) {
+  const category = getExplorerCategory(categoryId);
+  const hasContent = cards.length > 0;
+
   return (
-    <div className="explorer-workspace-pane">
-      <UniversalSearchPanel placeholder={searchPlaceholder} />
+    <div className="explorer-workspace-pane explorer-workspace-pane--category">
+      <ExplorerCategoryHeader category={category} />
       {children}
-      <ExplorerExploreGrid title={title} cards={cards} />
+      {hasContent ? (
+        <ExplorerExploreGrid title={gridTitle} cards={cards} />
+      ) : (
+        <ExplorerCategoryEmpty />
+      )}
     </div>
   );
 }

@@ -1,69 +1,65 @@
+import Link from "next/link";
+
 import { GhostButton } from "@/components/design-system";
+import type { TodaysDiscovery } from "@/features/discovery/types";
+import { categoryPortalCards } from "@/components/explorer/explorer-categories";
+import type { LemmaBrowseCard } from "@/features/explorer/get-explorer-browse-data";
 
-import type { LemmaBrowseCard, PortalBrowseCard } from "@/features/explorer/get-explorer-browse-data";
 import { ExplorerExploreGrid } from "./explorer-explore-grid";
+import { ExplorerHubIntro } from "./explorer-hub-intro";
+import { ExplorerHubRecent } from "./explorer-hub-recent";
 import { ExplorerSearchPanel } from "./explorer-search-panel";
-
-const PORTAL_INDEX: PortalBrowseCard[] = [
-  {
-    kind: "portal",
-    title: "Lemmes",
-    href: "/explorer/lemmas",
-    description: "Entrées lexicales de vos textes importés.",
-    meta: "Archive",
-  },
-  {
-    kind: "portal",
-    title: "Concepts",
-    href: "/explorer/concepts",
-    description: "Motifs grammaticaux et régularités observées.",
-    meta: "Grammaire",
-  },
-  {
-    kind: "portal",
-    title: "Cas",
-    href: "/explorer/cases",
-    description: "Les six cas comme portails d'étude.",
-    meta: "6 cas",
-  },
-  {
-    kind: "portal",
-    title: "Terminaisons",
-    href: "/explorer/endings",
-    description: "Paradigmes fléchis et terminaisons récurrentes.",
-  },
-  {
-    kind: "portal",
-    title: "Collocations",
-    href: "/explorer/collocations",
-    description: "Cooccurrences naturelles du russe authentique.",
-  },
-  {
-    kind: "portal",
-    title: "Expressions",
-    href: "/explorer/expressions",
-    description: "Tournures idiomatiques et constructions natives.",
-  },
-];
 
 type ExplorerHubProps = {
   isEmpty: boolean;
-  featuredLemmas: LemmaBrowseCard[];
+  frequentLemmas: LemmaBrowseCard[];
+  discovery: TodaysDiscovery | null;
 };
 
-export function ExplorerHub({ isEmpty, featuredLemmas }: ExplorerHubProps) {
-  const spotlightCards = featuredLemmas.slice(0, 4);
+export function ExplorerHub({ isEmpty, frequentLemmas, discovery }: ExplorerHubProps) {
+  const frequentCards = frequentLemmas.slice(0, 6);
 
   return (
-    <div className="explorer-workspace-pane">
-      <ExplorerSearchPanel autoFocus={!isEmpty} />
-      <ExplorerExploreGrid title="Index" cards={PORTAL_INDEX} />
-      {!isEmpty && spotlightCards.length > 0 ? (
-        <ExplorerExploreGrid title="Entrées fréquentes" cards={spotlightCards} />
-      ) : null}
-      {!isEmpty ? null : (
+    <div className="explorer-workspace-pane explorer-workspace-pane--hub">
+      <ExplorerHubIntro />
+      <ExplorerSearchPanel autoFocus={!isEmpty} compact />
+
+      <ExplorerExploreGrid title="What can you discover?" cards={categoryPortalCards()} />
+
+      {!isEmpty ? (
+        <>
+          <ExplorerHubRecent />
+
+          {frequentCards.length > 0 ? (
+            <ExplorerExploreGrid title="Most frequent observations" cards={frequentCards} />
+          ) : null}
+
+          {discovery ? (
+            <section className="explorer-explore-grid-block">
+              <h2 className="explorer-explore-grid-block__title">Discovery of the day</h2>
+              <Link
+                href={discovery.explorerHref}
+                className="explorer-explore-card explorer-explore-card--discovery focus-kb"
+              >
+                <div className="explorer-explore-card__body">
+                  <p className="explorer-explore-card__title break-russian">
+                    {discovery.displayLabel}
+                  </p>
+                  <p className="explorer-explore-card__description">{discovery.subtitle}</p>
+                  {discovery.exampleRussian ? (
+                    <p className="explorer-explore-card__preview break-russian font-reader">
+                      {discovery.exampleRussian}
+                    </p>
+                  ) : null}
+                </div>
+                <span className="explorer-explore-card__cta">Open →</span>
+              </Link>
+            </section>
+          ) : null}
+        </>
+      ) : (
         <div className="explorer-workspace-pane__empty">
-          <GhostButton href="/import">Importer →</GhostButton>
+          <GhostButton href="/import">Import texts →</GhostButton>
         </div>
       )}
     </div>

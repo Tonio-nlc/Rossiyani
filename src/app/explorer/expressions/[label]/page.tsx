@@ -1,12 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
-import { EntityDetailView } from "@/components/explorer/entity-detail-view";
-import {
-  buildEntityPageFromCuratedPhrase,
-  buildEntityPageFromPhraseKnowledge,
-  redirectIfCanonicalMismatch,
-  resolvePhraseEntity,
-} from "@/features/explorer/entity";
+import { PhraseDetailView } from "@/components/explorer";
+import { loadPhraseWorkspace } from "@/features/explorer/load-phrase-workspace";
 
 type PageProps = {
   params: Promise<{ label: string }>;
@@ -14,33 +9,15 @@ type PageProps = {
 
 export default async function ExpressionDetailPage({ params }: PageProps) {
   const { label } = await params;
-  const resolved = await resolvePhraseEntity(label, { routeKind: "expression" });
+  const result = await loadPhraseWorkspace(label, "expression");
 
-  if (!resolved) {
+  if (result.status === "redirect") {
+    redirect(result.path);
+  }
+
+  if (result.status !== "ok") {
     notFound();
   }
 
-  redirectIfCanonicalMismatch(
-    resolved.requestedLabel,
-    resolved.canonicalLabel,
-    resolved.canonicalPath,
-  );
-
-  if (resolved.knowledge) {
-    const pageData = await buildEntityPageFromPhraseKnowledge(
-      resolved.knowledge,
-      resolved.routeHint,
-    );
-    return <EntityDetailView data={pageData} />;
-  }
-
-  if (resolved.curated) {
-    const pageData = await buildEntityPageFromCuratedPhrase(
-      resolved.curated,
-      resolved.routeHint,
-    );
-    return <EntityDetailView data={pageData} />;
-  }
-
-  notFound();
+  return <PhraseDetailView presentation={result.data.presentation} />;
 }

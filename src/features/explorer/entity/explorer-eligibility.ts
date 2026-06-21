@@ -48,6 +48,13 @@ function looksLikeFullSentence(label: string): boolean {
 }
 
 /**
+ * Grammar cases live under /explorer/cases — not the Concepts category.
+ */
+export function isCaseConcept(conceptKey: string, category: KnowledgeConceptCategory | string): boolean {
+  return conceptKey.includes("case:") || category === "GRAMMATICAL_CASE";
+}
+
+/**
  * Would a learner intentionally search for this phrase in Explorer?
  * Curated entries bypass this check at resolution time.
  */
@@ -97,8 +104,8 @@ export function isConceptExplorerEligible(
   title: string,
   category: KnowledgeConceptCategory | string,
 ): boolean {
-  if (conceptKey.includes("case:") || category === "GRAMMATICAL_CASE") {
-    return true;
+  if (isCaseConcept(conceptKey, category)) {
+    return false;
   }
 
   if (category === "PREPOSITION_PATTERN") {

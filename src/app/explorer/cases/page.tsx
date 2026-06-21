@@ -6,6 +6,10 @@ export default async function CasesBrowsePage() {
   const cards = await getCaseBrowseCards().catch(() => []);
 
   return (
-    <CategoryBrowse title="Les six cas" searchPlaceholder="Rechercher un cas…" cards={cards} />
+    <CategoryBrowse
+      categoryId="cases"
+      cards={cards}
+      gridTitle="The six cases"
+    />
   );
 }

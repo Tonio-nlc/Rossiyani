@@ -18,5 +18,5 @@ export default async function LemmaMicroscopePage({ params, searchParams }: Page
     notFound();
   }
 
-  return <ExplorerMicroscopePanel presentation={result.data.presentation} />;
+  return <ExplorerMicroscopePanel microscope={result.data.presentation.microscope} />;
 }
