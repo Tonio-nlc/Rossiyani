@@ -4,7 +4,7 @@ type ProgressBarProps = {
   "aria-label"?: string;
 };
 
-/** Flat editorial progress — Oxford Blue fill, 4px height, no gradient. */
+/** Flat editorial progress — Rossiyani gold fill, warm track. */
 export function ProgressBar({ value, className = "", "aria-label": ariaLabel }: ProgressBarProps) {
   const clamped = Math.min(100, Math.max(0, value));
 

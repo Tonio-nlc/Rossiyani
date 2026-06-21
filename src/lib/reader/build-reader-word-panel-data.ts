@@ -37,7 +37,6 @@ export type ReaderWordPanelData = {
   usedHere: ReaderWordPanelRow[];
   contextNotes: string[];
   collocations: string[];
-  example: string | null;
   foundIn: ReaderFoundInLink[];
   explorerHref: string | null;
   practiceHref: string | null;
@@ -280,11 +279,6 @@ export function buildReaderWordPanelData(
     detail.lemmaKnowledge?.primaryTranslation ||
     null;
 
-  const example =
-    detail.examples[0]?.trim() ||
-    detail.lemmaKnowledge?.exampleSentences[0]?.trim() ||
-    null;
-
   const explorerLemma = isDisplayableUiText(occurrence.lemma) ? occurrence.lemma : null;
 
   return {
@@ -298,7 +292,6 @@ export function buildReaderWordPanelData(
       frequencyTier: detail.lemmaKnowledge?.frequencyTier ?? null,
     }),
     collocations: buildCollocations(detail, textIndex),
-    example,
     foundIn: buildFoundInLinks(detail),
     explorerHref: explorerLemma ? lemmaPath(explorerLemma, occurrence.partOfSpeech) : null,
     practiceHref: explorerLemma

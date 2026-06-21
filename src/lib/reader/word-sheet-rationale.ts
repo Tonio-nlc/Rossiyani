@@ -51,7 +51,7 @@ export function buildWordSheetRationales(input: {
   panel: ReaderWordPanelData;
   timesSeenInText: number;
 }): string[] {
-  const lines: string[] = [`Rencontré dans : ${input.textTitle}`];
+  const lines: string[] = [];
 
   if (input.timesSeenInText > 1) {
     lines.push(

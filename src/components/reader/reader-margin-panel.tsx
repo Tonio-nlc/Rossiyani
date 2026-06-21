@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   buildReaderWordPanelData,
   collocationHref,
   type ReaderTextPhraseIndex,
 } from "@/lib/reader/build-reader-word-panel-data";
+import { buildReaderMicroscopeFacts } from "@/lib/reader/build-reader-microscope-facts";
 import type { InteractiveWordEntry } from "@/lib/reader/build-interactive-words";
 import { isReaderWordSaved, saveReaderWord } from "@/lib/reader/saved-words";
 import {
@@ -31,21 +32,6 @@ type ReaderMarginPanelProps = {
   onToggleAllTranslations: (value: boolean) => void;
 };
 
-function MicroscopeBlock({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="reader-microscope__block">
-      <p className="reader-microscope__block-label">{label}</p>
-      <div className="reader-microscope__block-body">{children}</div>
-    </div>
-  );
-}
-
 export function ReaderMarginPanel({
   detail,
   loading = false,
@@ -60,6 +46,10 @@ export function ReaderMarginPanel({
   const panel = useMemo(
     () => (detail ? buildReaderWordPanelData(detail, textIndex, agreementTarget) : null),
     [detail, textIndex, agreementTarget],
+  );
+  const linguisticFacts = useMemo(
+    () => (detail ? buildReaderMicroscopeFacts(detail, textIndex) : []),
+    [detail, textIndex],
   );
   const [saved, setSaved] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -89,11 +79,10 @@ export function ReaderMarginPanel({
   });
   const lemmaFirst = shouldShowLemmaFirst(panel);
   const formLabel = surfaceFormLabel(panel);
-  const hasAdvancedContent =
-    panel.usedHere.length > 0 ||
-    panel.contextNotes.length > 0 ||
-    panel.collocations.length > 0 ||
-    panel.foundIn.length > 0;
+  const showCollocationChips =
+    panel.collocations.length > 0 &&
+    !linguisticFacts.some((fact) => fact.label === "Collocation" || fact.label === "Observé avec");
+  const hasAdvancedContent = panel.foundIn.length > 0;
 
   return (
     <div key={panelKey} className="reader-microscope animate-reader-panel-fade">
@@ -143,6 +132,17 @@ export function ReaderMarginPanel({
         </GhostButton>
       </div>
 
+      {linguisticFacts.length > 0 ? (
+        <dl className="reader-microscope__dashboard">
+          {linguisticFacts.map((fact) => (
+            <div key={`${fact.label}-${fact.value}`} className="reader-microscope__fact">
+              <dt className="reader-microscope__fact-label">{fact.label}</dt>
+              <dd className="reader-microscope__fact-value break-russian">{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+
       {rationales.length > 0 ? (
         <ul className="reader-microscope__notes">
           {rationales.map((line) => (
@@ -151,10 +151,31 @@ export function ReaderMarginPanel({
         </ul>
       ) : null}
 
-      {panel.example ? (
-        <MicroscopeBlock label="Exemple">
-          <p className="reader-microscope__example break-russian">{panel.example}</p>
-        </MicroscopeBlock>
+      {showCollocationChips ? (
+        <div className="reader-microscope__block">
+          <p className="reader-microscope__block-label">Constructions</p>
+          <ul className="reader-microscope__chip-list">
+            {panel.collocations.map((label) => {
+              const href = collocationHref(label);
+              if (!href) {
+                return (
+                  <li key={label}>
+                    <span className="reader-microscope__chip reader-microscope__chip--static break-russian">
+                      {label}
+                    </span>
+                  </li>
+                );
+              }
+              return (
+                <li key={label}>
+                  <Link href={href} className="reader-microscope__chip focus-kb break-russian">
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       ) : null}
 
       {hasAdvancedContent ? (
@@ -165,66 +186,14 @@ export function ReaderMarginPanel({
             className="reader-microscope__more-toggle focus-kb"
             aria-expanded={expanded}
           >
-            {expanded ? "Voir moins" : "Voir plus"}
+            {expanded ? "Voir moins" : "Explorer davantage"}
           </button>
 
           {expanded ? (
             <div className="reader-microscope__more-body">
-              {panel.partOfSpeech ? (
-                <p className="reader-microscope__pos">{panel.partOfSpeech}</p>
-              ) : null}
-
-              {panel.usedHere.length > 0 ? (
-                <MicroscopeBlock label="Grammaire">
-                  <dl className="reader-microscope__facts">
-                    {panel.usedHere.map((row) => (
-                      <div key={row.label}>
-                        <dt>{row.label}</dt>
-                        <dd>{row.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </MicroscopeBlock>
-              ) : null}
-
-              {panel.contextNotes.length > 0 ? (
-                <MicroscopeBlock label="Pourquoi cette forme">
-                  {panel.contextNotes.map((note) => (
-                    <p key={note} className="reader-microscope__note-text">
-                      {note}
-                    </p>
-                  ))}
-                </MicroscopeBlock>
-              ) : null}
-
-              {panel.collocations.length > 0 ? (
-                <MicroscopeBlock label="Mots liés">
-                  <ul className="reader-microscope__chip-list">
-                    {panel.collocations.map((label) => {
-                      const href = collocationHref(label);
-                      if (!href) {
-                        return (
-                          <li key={label}>
-                            <span className="reader-microscope__chip reader-microscope__chip--static break-russian">
-                              {label}
-                            </span>
-                          </li>
-                        );
-                      }
-                      return (
-                        <li key={label}>
-                          <Link href={href} className="reader-microscope__chip focus-kb break-russian">
-                            {label}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </MicroscopeBlock>
-              ) : null}
-
               {panel.foundIn.length > 0 ? (
-                <MicroscopeBlock label="Occurrences">
+                <div className="reader-microscope__block">
+                  <p className="reader-microscope__block-label">Liens</p>
                   <ul className="reader-microscope__text-list">
                     {panel.foundIn.map((item) => (
                       <li key={item.label}>
@@ -235,7 +204,7 @@ export function ReaderMarginPanel({
                       </li>
                     ))}
                   </ul>
-                </MicroscopeBlock>
+                </div>
               ) : null}
 
               <p className="reader-microscope__interactive-count">

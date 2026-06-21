@@ -24,8 +24,10 @@
   --color-exception: #8c3a32;
   --color-discovery: #8c3a32;
 
-  /* Progress — warm clay track, Oxford fill */
-  --progress-track: #e8ddd0;
+  /* Progress — warm clay track, Rossiyani gold fill */
+  --progress-track: #e8e0d3;
+  --progress-fill: #b08d57;
+  --progress-fill-hover: #a8844a;
 
   /* Hairlines */
   --hairline: #dbdad5;
@@ -2098,8 +2100,14 @@ a.ds-exercise-card {
 .ds-progress-fill {
   height: 100%;
   border-radius: var(--ds-radius);
-  background: var(--color-primary);
-  transition: width var(--duration-normal) ease;
+  background: var(--progress-fill, var(--accent-gold, #b08d57));
+  transition:
+    width var(--duration-normal) ease,
+    background var(--duration-fast) ease;
+}
+
+.ds-progress:hover .ds-progress-fill {
+  background: var(--progress-fill-hover, #a8844a);
 }
 
 /* ─── Design system — empty state ─── */
@@ -2463,6 +2471,39 @@ a.ds-exercise-card {
   flex-wrap: wrap;
   gap: 0.35rem 0.75rem;
   margin-bottom: 14px;
+}
+
+.reader-microscope__dashboard {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 12px 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--hairline) 80%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--warm-ivory, #f5f3ee) 50%, white);
+}
+
+.reader-microscope__fact {
+  display: grid;
+  gap: 3px;
+}
+
+.reader-microscope__fact-label {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink-muted) 85%, var(--accent-gold, #b08d57));
+}
+
+.reader-microscope__fact-value {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--ink) 88%, var(--ink-secondary));
 }
 
 .reader-microscope__action {
