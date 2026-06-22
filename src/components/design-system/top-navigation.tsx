@@ -4,13 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { GhostButton } from "./ghost-button";
-
-const NAV = [
+const MAIN_NAV = [
   {
-    href: "/",
-    label: "Accueil",
-    match: (path: string) => path === "/",
+    href: "/library",
+    label: "Bibliothèque",
+    match: (path: string) => path === "/library" || path.startsWith("/library/"),
   },
   {
     href: "/reader",
@@ -32,12 +30,40 @@ const NAV = [
     label: "Manuel",
     match: (path: string) => path === "/manual" || path.startsWith("/manual/"),
   },
-  {
-    href: "/library",
-    label: "Bibliothèque",
-    match: (path: string) => path === "/library" || path.startsWith("/library/"),
-  },
 ] as const;
+
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden className="ds-top-nav__search-icon">
+      <circle cx="7" cy="7" r="4.25" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M10.25 10.25 13 13" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ProfileIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden className="ds-top-nav__profile-icon">
+      <circle cx="8" cy="5.5" r="2.25" stroke="currentColor" strokeWidth="1.2" />
+      <path
+        d="M3.5 13.5c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function navLinkClass(active: boolean, mobile = false) {
+  return [
+    "ds-top-nav__link focus-kb",
+    mobile ? "ds-top-nav__link--mobile" : "",
+    active ? "ds-top-nav__link--active" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
 
 type TopNavigationProps = {
   onOpenSearch?: () => void;
@@ -46,6 +72,7 @@ type TopNavigationProps = {
 export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const profileActive = pathname === "/settings" || pathname.startsWith("/settings/");
 
   useEffect(() => {
     setMobileOpen(false);
@@ -60,32 +87,21 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
   }, [mobileOpen]);
 
   return (
-    <header className="ds-top-nav sticky top-0 z-30 border-b border-[var(--hairline)] bg-[var(--paper)]">
-      <div className="ds-editorial-container grid h-[var(--header-height)] grid-cols-[1fr_auto] items-center lg:grid-cols-[1fr_auto_1fr]">
-        <Link
-          href="/"
-          className="focus-kb font-reader text-lg font-medium tracking-tight text-[var(--ink)]"
-        >
+    <header className="ds-top-nav">
+      <div className="ds-top-nav__inner ds-editorial-container">
+        <Link href="/" className="ds-top-nav__brand focus-kb">
           Rossiyani
         </Link>
 
-        <nav
-          aria-label="Navigation principale"
-          className="hidden items-center justify-center gap-5 xl:gap-6 lg:flex"
-        >
-          {NAV.map((item) => {
+        <nav aria-label="Navigation principale" className="ds-top-nav__nav">
+          {MAIN_NAV.map((item) => {
             const active = item.match(pathname);
             return (
               <Link
-                key={item.label}
+                key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={[
-                  "focus-kb text-sm font-medium transition",
-                  active
-                    ? "text-[var(--color-primary)]"
-                    : "text-[var(--ink-secondary)] hover:text-[var(--color-primary)]",
-                ].join(" ")}
+                className={navLinkClass(active)}
               >
                 {item.label}
               </Link>
@@ -93,26 +109,46 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
           })}
         </nav>
 
-        <div className="flex items-center justify-end gap-2 lg:min-w-[7.5rem]">
+        <div className="ds-top-nav__tools">
           {onOpenSearch ? (
             <button
               type="button"
               onClick={onOpenSearch}
-              className="focus-kb hidden text-sm text-[var(--ink-secondary)] transition hover:text-[var(--color-primary)] lg:inline-flex"
+              className="ds-top-nav__search focus-kb"
               aria-label="Rechercher"
             >
-              Rechercher
+              <SearchIcon />
+              <span className="ds-top-nav__search-label">Rechercher</span>
+              <kbd className="ds-top-nav__search-kbd" aria-hidden>
+                /
+              </kbd>
             </button>
           ) : null}
+
+          <Link
+            href="/settings"
+            aria-current={profileActive ? "page" : undefined}
+            className={[
+              "ds-top-nav__profile focus-kb",
+              profileActive ? "ds-top-nav__profile--active" : "",
+            ].join(" ")}
+            aria-label="Profil et préférences"
+          >
+            <ProfileIcon />
+            <span className="ds-top-nav__profile-label">Profil</span>
+          </Link>
+
           <button
             type="button"
-            className="focus-kb px-2 py-1 text-lg leading-none text-[var(--ink-secondary)] lg:hidden"
+            className="ds-top-nav__menu-toggle focus-kb"
             aria-expanded={mobileOpen}
             aria-controls="mobile-main-nav"
             aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
             onClick={() => setMobileOpen((open) => !open)}
           >
-            {mobileOpen ? "✕" : "☰"}
+            <span className="ds-top-nav__menu-icon" aria-hidden>
+              {mobileOpen ? "✕" : "☰"}
+            </span>
           </button>
         </div>
       </div>
@@ -121,22 +157,17 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
         <nav
           id="mobile-main-nav"
           aria-label="Navigation mobile"
-          className="border-t border-[var(--hairline)] lg:hidden"
+          className="ds-top-nav__mobile"
         >
-          <ul className="ds-editorial-container flex flex-col gap-1 py-3">
-            {NAV.map((item) => {
+          <ul className="ds-top-nav__mobile-list ds-editorial-container">
+            {MAIN_NAV.map((item) => {
               const active = item.match(pathname);
               return (
-                <li key={item.label}>
+                <li key={item.href}>
                   <Link
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    className={[
-                      "focus-kb block py-2.5 text-sm font-medium transition",
-                      active
-                        ? "text-[var(--color-primary)]"
-                        : "text-[var(--ink-secondary)] hover:text-[var(--color-primary)]",
-                    ].join(" ")}
+                    className={navLinkClass(active, true)}
                   >
                     {item.label}
                   </Link>
@@ -145,11 +176,32 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
             })}
             {onOpenSearch ? (
               <li>
-                <GhostButton onClick={() => { setMobileOpen(false); onOpenSearch(); }}>
-                  Rechercher
-                </GhostButton>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    onOpenSearch();
+                  }}
+                  className="ds-top-nav__search ds-top-nav__search--mobile focus-kb"
+                >
+                  <SearchIcon />
+                  <span>Rechercher</span>
+                </button>
               </li>
             ) : null}
+            <li>
+              <Link
+                href="/settings"
+                aria-current={profileActive ? "page" : undefined}
+                className={[
+                  "ds-top-nav__profile ds-top-nav__profile--mobile focus-kb",
+                  profileActive ? "ds-top-nav__profile--active" : "",
+                ].join(" ")}
+              >
+                <ProfileIcon />
+                <span>Profil</span>
+              </Link>
+            </li>
           </ul>
         </nav>
       ) : null}

@@ -19,11 +19,11 @@ const UniversalSearchDialog = dynamic(
 );
 
 const NAV_SHORTCUTS = [
-  { href: "/reader", shortcut: "1" },
-  { href: "/explorer", shortcut: "2" },
-  { href: "/practice", shortcut: "3" },
-  { href: "/manual", shortcut: "4" },
-  { href: "/library", shortcut: "5" },
+  { href: "/library", shortcut: "1" },
+  { href: "/reader", shortcut: "2" },
+  { href: "/explorer", shortcut: "3" },
+  { href: "/practice", shortcut: "4" },
+  { href: "/manual", shortcut: "5" },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
