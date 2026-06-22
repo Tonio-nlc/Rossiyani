@@ -22,7 +22,6 @@ import type {
 } from "@/lib/context-translation/types";
 
 import { PracticeExerciseHeader } from "./practice-exercise-header";
-import { PracticeMicroscopePanel } from "./practice-microscope-panel";
 
 type SectionKey =
   | "best"
@@ -333,8 +332,8 @@ export function ContextTranslationResult({
         subtitle={analysis.sourceText}
       />
 
-      <div className="practice-split-layout">
-        <div className="practice-split-layout__main">
+      <div className="practice-exercise-layout">
+        <div className="practice-results">
           {show("best") ? (
             <section className="practice-section animate-fade-up-subtle">
               <h2 className="practice-section__label">Meilleure formulation native</h2>
@@ -523,10 +522,6 @@ export function ContextTranslationResult({
           <footer className="practice-footer-submit">
             <PrimaryButton onClick={onStartOver}>Nouvelle phrase →</PrimaryButton>
           </footer>
-        </div>
-
-        <div className="practice-split-layout__aside">
-          <PracticeMicroscopePanel analysis={analysis} loading={enrichmentLoading} />
         </div>
       </div>
     </article>

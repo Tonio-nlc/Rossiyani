@@ -8,7 +8,6 @@ import {
   InputField,
   PracticeInput,
   PrimaryButton,
-  Tag,
 } from "@/components/design-system";
 import { Reference, TextEditorialContext } from "@/components/editorial";
 import { useToast } from "@/components/ui/toast-provider";
@@ -21,7 +20,6 @@ import type {
 } from "@/lib/compose/types";
 import { COMPOSE_REGISTERS, COMPOSE_THEMES } from "@/lib/compose/types";
 import { saveComposePhrase, getComposePhraseById } from "@/lib/compose/saved-phrases";
-import { PRACTICE_SUGGESTIONS } from "@/lib/practice/constants";
 
 import { PracticeAnalysisView } from "./practice-analysis-view";
 import { PracticeExerciseHeader } from "../practice/practice-exercise-header";
@@ -300,7 +298,6 @@ export function PracticeWorkspace() {
     );
   }
 
-  const showSuggestions = !russianText.trim() && !structureMode;
   const exerciseType = structureMode ? "Structure ciblée" : "Constructeur de phrases";
   const sourceTitle =
     structureContext?.readerTitle ?? searchParams.get("textTitle") ?? null;
@@ -382,26 +379,17 @@ export function PracticeWorkspace() {
           </div>
 
           <div className="practice-main-card__actions">
-            <PrimaryButton type="submit" disabled={loading || !russianText.trim()}>
+            <PrimaryButton
+              type="submit"
+              variant="gold"
+              disabled={loading || !russianText.trim()}
+            >
               {loading ? "Analyse…" : "Valider →"}
             </PrimaryButton>
             <GhostButton onClick={() => setAdvancedOpen((open) => !open)}>
               {advancedOpen ? "Masquer les options" : "Options →"}
             </GhostButton>
           </div>
-
-          {showSuggestions ? (
-            <div className="practice-suggestions">
-              <p className="practice-suggestions__label">Pistes de départ</p>
-              <ul className="practice-suggestions__list">
-                {PRACTICE_SUGGESTIONS.map((suggestion) => (
-                  <li key={suggestion.label}>
-                    <Tag onClick={() => setContext(suggestion.context)}>{suggestion.label}</Tag>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
 
           {advancedOpen ? (
             <div className="practice-advanced">

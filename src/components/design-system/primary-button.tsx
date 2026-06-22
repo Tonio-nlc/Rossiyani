@@ -8,6 +8,7 @@ type PrimaryButtonProps = {
   className?: string;
   disabled?: boolean;
   type?: "button" | "submit";
+  variant?: "default" | "gold";
 };
 
 export function PrimaryButton({
@@ -17,8 +18,15 @@ export function PrimaryButton({
   className = "",
   disabled,
   type = "button",
+  variant = "default",
 }: PrimaryButtonProps) {
-  const classes = ["ds-primary-btn focus-kb", className].filter(Boolean).join(" ");
+  const classes = [
+    "ds-primary-btn focus-kb",
+    variant === "gold" ? "ds-primary-btn--gold" : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   if (href) {
     return (

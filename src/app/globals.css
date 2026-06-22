@@ -943,6 +943,22 @@ body.modal-open {
   cursor: not-allowed;
 }
 
+.ds-primary-btn--gold {
+  background: var(--progress-fill, #b08d57);
+  color: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--progress-fill-hover, #a8844a) 55%, #b08d57);
+  transition:
+    background var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    opacity var(--duration-normal) ease;
+}
+
+.ds-primary-btn--gold:hover:not(:disabled) {
+  opacity: 1;
+  background: var(--progress-fill-hover, #a8844a);
+  border-color: color-mix(in srgb, var(--progress-fill-hover, #a8844a) 80%, #8a6d3b);
+}
+
 .ds-ghost-btn {
   display: inline-flex;
   align-items: center;
@@ -5141,6 +5157,67 @@ article:has(.manual-prose) .text-eyebrow {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.practice-history {
+  margin-top: var(--space-4);
+}
+
+.practice-history__label {
+  margin: 0 0 12px;
+  font-family: var(--font-ui);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink-muted) 88%, var(--accent-gold, #b08d57));
+}
+
+.practice-history__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.practice-history__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--hairline) 88%, transparent);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--warm-ivory, #f5f3ee) 42%, var(--paper));
+}
+
+.practice-history__check {
+  flex-shrink: 0;
+  margin-top: 0.1em;
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, var(--accent-gold, #b08d57) 85%, var(--ink-secondary));
+}
+
+.practice-history__line {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+}
+
+.practice-history__source {
+  color: var(--ink);
+}
+
+.practice-history__arrow {
+  color: color-mix(in srgb, var(--accent-gold, #b08d57) 70%, var(--ink-muted));
+}
+
+.practice-history__translation {
+  color: var(--ink-secondary);
 }
 
 /* ─── Reduced motion ─── */

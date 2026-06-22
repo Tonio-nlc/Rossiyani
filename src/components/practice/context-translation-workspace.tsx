@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { GhostButton, PracticeInput, PrimaryButton, Tag } from "@/components/design-system";
+import { GhostButton, PracticeInput, PrimaryButton } from "@/components/design-system";
 import { useToast } from "@/components/ui/toast-provider";
 import type {
   ContextTranslationAnalysis,
@@ -15,18 +15,15 @@ import {
   getContextTranslationLessonById,
   saveContextTranslationLesson,
 } from "@/lib/context-translation/saved-lessons";
+import {
+  appendContextTranslationHistory,
+  getContextTranslationHistory,
+  type ContextTranslationHistoryEntry,
+} from "@/lib/context-translation/translation-history";
 
+import { ContextTranslationHistory } from "./context-translation-history";
 import { ContextTranslationResult } from "./context-translation-result";
 import { PracticeExerciseHeader } from "./practice-exercise-header";
-import { PracticeMicroscopePanel } from "./practice-microscope-panel";
-
-const EXAMPLE_INPUTS = [
-  "On est foutu.",
-  "I'm exhausted.",
-  "Мы сломаны.",
-  "Ça vaut le coup.",
-  "Take it easy.",
-];
 
 const PROGRESS_STEPS: Array<{ phase: ContextTranslationProgressPhase; label: string }> = [
   { phase: "bestTranslation", label: "Meilleure traduction" },
@@ -100,6 +97,11 @@ export function ContextTranslationWorkspace({
     [],
   );
   const [followUpLoading, setFollowUpLoading] = useState(false);
+  const [history, setHistory] = useState<ContextTranslationHistoryEntry[]>([]);
+
+  useEffect(() => {
+    setHistory(getContextTranslationHistory().slice(0, 8));
+  }, []);
 
   useEffect(() => {
     if (!initialLessonId) {
@@ -232,6 +234,8 @@ export function ContextTranslationWorkspace({
           if (event.type === "complete") {
             setAnalysis(event.analysis);
             setEnrichmentLoading(false);
+            appendContextTranslationHistory(trimmed, event.analysis.bestTranslation);
+            setHistory(getContextTranslationHistory().slice(0, 8));
           }
 
           if (event.type === "error") {
@@ -263,6 +267,7 @@ export function ContextTranslationWorkspace({
     setProgressPhase(null);
     setVisibleSections(0);
     setEnrichmentLoading(false);
+    setHistory(getContextTranslationHistory().slice(0, 8));
   }, []);
 
   const handleFollowUp = useCallback(
@@ -336,75 +341,64 @@ export function ContextTranslationWorkspace({
         subtitle="Pensez comme un locuteur natif — pas mot à mot."
       />
 
-      <div className="practice-split-layout">
-        <div className="practice-split-layout__main">
-          <div className="practice-main-card">
-            <div className="practice-context-card practice-context-card--prompt">
-              <p className="practice-context-card__label">Phrase à traduire</p>
-              <PracticeInput
-                compact
-                value={sourceText}
-                onChange={(event) => setSourceText(event.target.value)}
-                rows={4}
-                placeholder={"Traduire une idée, pas des mots…\n\nExemple :\nOn est foutu."}
-              />
-            </div>
+      <div className="practice-exercise-layout">
+        <div className="practice-main-card">
+          <div className="practice-context-card practice-context-card--prompt">
+            <p className="practice-context-card__label">Phrase à traduire</p>
+            <PracticeInput
+              compact
+              value={sourceText}
+              onChange={(event) => setSourceText(event.target.value)}
+              rows={4}
+              placeholder="Traduire une idée, pas des mots…"
+            />
+          </div>
 
-            {loading && progressPhase ? (
-              <ul className="practice-progress-steps" aria-label="Progression de l'analyse">
-                {PROGRESS_STEPS.map((step) => {
-                  const stepIndex = PROGRESS_STEPS.findIndex((item) => item.phase === step.phase);
-                  const currentIndex = PROGRESS_STEPS.findIndex(
-                    (item) => item.phase === progressPhase,
-                  );
-                  const isDone = currentIndex > stepIndex || progressPhase === "complete";
-                  const isCurrent = step.phase === progressPhase;
-                  return (
-                    <li
-                      key={step.phase}
-                      className={[
-                        "practice-progress-steps__item",
-                        isDone ? "practice-progress-steps__item--done" : "",
-                        isCurrent ? "practice-progress-steps__item--current" : "",
-                      ].join(" ")}
-                    >
-                      {step.label}
-                      {isCurrent ? "…" : ""}
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : null}
-
-            <div className="practice-suggestions">
-              <p className="practice-suggestions__label">Exemples</p>
-              <ul className="practice-suggestions__list">
-                {EXAMPLE_INPUTS.map((example) => (
-                  <li key={example}>
-                    <Tag onClick={() => setSourceText(example)}>{example}</Tag>
+          {loading && progressPhase ? (
+            <ul className="practice-progress-steps" aria-label="Progression de l'analyse">
+              {PROGRESS_STEPS.map((step) => {
+                const stepIndex = PROGRESS_STEPS.findIndex((item) => item.phase === step.phase);
+                const currentIndex = PROGRESS_STEPS.findIndex(
+                  (item) => item.phase === progressPhase,
+                );
+                const isDone = currentIndex > stepIndex || progressPhase === "complete";
+                const isCurrent = step.phase === progressPhase;
+                return (
+                  <li
+                    key={step.phase}
+                    className={[
+                      "practice-progress-steps__item",
+                      isDone ? "practice-progress-steps__item--done" : "",
+                      isCurrent ? "practice-progress-steps__item--current" : "",
+                    ].join(" ")}
+                  >
+                    {step.label}
+                    {isCurrent ? "…" : ""}
                   </li>
-                ))}
-              </ul>
-            </div>
+                );
+              })}
+            </ul>
+          ) : null}
 
-            <div className="practice-main-card__actions">
-              <PrimaryButton type="submit" disabled={!sourceText.trim() || loading}>
-                {loading ? (
-                  <>
-                    Analyse… <AnalyzingDots />
-                  </>
-                ) : (
-                  "Valider →"
-                )}
-              </PrimaryButton>
-              <GhostButton href="/practice">← Modes de pratique</GhostButton>
-            </div>
+          <div className="practice-main-card__actions">
+            <PrimaryButton
+              type="submit"
+              variant="gold"
+              disabled={!sourceText.trim() || loading}
+            >
+              {loading ? (
+                <>
+                  Analyse… <AnalyzingDots />
+                </>
+              ) : (
+                "Valider →"
+              )}
+            </PrimaryButton>
+            <GhostButton href="/practice">← Modes de pratique</GhostButton>
           </div>
         </div>
 
-        <div className="practice-split-layout__aside">
-          <PracticeMicroscopePanel analysis={analysis} loading={loading} />
-        </div>
+        <ContextTranslationHistory entries={history} />
       </div>
     </form>
   );
