@@ -96,32 +96,43 @@ export const LibraryTextCard = memo(function LibraryTextCard({
         />
       </div>
 
-      <h2 className="lib-text-card__title font-reader break-russian">
-        <Link href={`/texts/${text.id}`} prefetch className="lib-text-card__title-link focus-kb">
-          {russian}
+      <div className="lib-text-card__body">
+        <h2 className="lib-text-card__title font-reader break-russian">
+          <Link href={`/texts/${text.id}`} prefetch className="lib-text-card__title-link focus-kb">
+            {russian}
+          </Link>
+        </h2>
+
+        <p className="lib-text-card__translation">
+          <em>{translation}</em>
+        </p>
+
+        <p className="lib-text-card__description">{description}</p>
+      </div>
+
+      <footer className="lib-text-card__footer">
+        <div className="lib-text-card__meta">
+          <span className="lib-text-card__meta-item">
+            <BookIcon />
+            {words} mots
+          </span>
+          <span className="lib-text-card__meta-sep" aria-hidden>
+            &bull;
+          </span>
+          <span className="lib-text-card__meta-item">
+            <ClockIcon />
+            {minutes} min
+          </span>
+          <span className="lib-text-card__meta-sep" aria-hidden>
+            &bull;
+          </span>
+          <span className="lib-text-card__meta-item">
+            {text.sentenceCount} phrase{text.sentenceCount > 1 ? "s" : ""}
+          </span>
+        </div>
+        <Link href={`/texts/${text.id}`} prefetch className="lib-text-card__cta focus-kb">
+          Lire →
         </Link>
-      </h2>
-
-      <p className="lib-text-card__translation">
-        <em>{translation}</em>
-      </p>
-
-      <p className="lib-text-card__description">{description}</p>
-
-      <div className="lib-text-card__rule" aria-hidden />
-
-      <footer className="lib-text-card__meta">
-        <span className="lib-text-card__meta-item">
-          <BookIcon />
-          {words} mots
-        </span>
-        <span className="lib-text-card__meta-sep" aria-hidden>
-          &bull;
-        </span>
-        <span className="lib-text-card__meta-item">
-          <ClockIcon />
-          {minutes} min
-        </span>
       </footer>
     </article>
   );

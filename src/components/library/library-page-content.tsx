@@ -31,14 +31,13 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "lessons") {
     return (
-      <div className="library-catalog space-y-4 pb-6">
+      <div className="library-catalog pb-6">
         <LibraryPageIntro />
         <LibrarySectionNav active="lessons" />
-        <div className="editorial-page-section space-y-3">
-          <h2 className="editorial-section-title">Context translation</h2>
+        <section className="lib-editorial-section">
           <LibraryContextTranslationLessons />
-        </div>
-        <p className="text-metadata">
+        </section>
+        <p className="text-metadata px-0 pb-4">
           <Reference href="/manual">Leçons de grammaire →</Reference>
         </p>
       </div>
@@ -47,31 +46,39 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "saved") {
     return (
-      <div className="library-catalog space-y-4 pb-6">
+      <div className="library-catalog pb-6">
         <LibraryPageIntro />
         <LibrarySectionNav active="saved" />
-        <LibrarySavedSentences />
+        <section className="lib-editorial-section">
+          <LibrarySavedSentences />
+        </section>
       </div>
     );
   }
 
   if (section === "discoveries") {
     return (
-      <div className="library-catalog space-y-4 pb-6">
+      <div className="library-catalog pb-6">
         <LibraryPageIntro />
         <LibrarySectionNav active="discoveries" />
-        <LibraryMyDiscoveries />
+        <section className="lib-editorial-section">
+          <LibraryMyDiscoveries />
+        </section>
       </div>
     );
   }
 
   if (section === "phrases") {
     return (
-      <div className="library-catalog space-y-4 pb-6">
+      <div className="library-catalog pb-6">
         <LibraryPageIntro />
         <LibrarySectionNav active="phrases" />
-        <LibrarySavedPhrases />
-        <LibraryMyPhrases />
+        <section className="lib-editorial-section">
+          <LibrarySavedPhrases />
+        </section>
+        <section className="lib-editorial-section lib-editorial-section--secondary">
+          <LibraryMyPhrases />
+        </section>
       </div>
     );
   }

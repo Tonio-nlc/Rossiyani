@@ -589,11 +589,12 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
 
   return (
     <div className="import-shell">
-      <header className="import-hub__intro">
+      <header className="import-hub__intro import-editorial-section import-editorial-section--flat">
         <h1 className="import-hub__title">Importer du contenu</h1>
         <p className="import-hub__mission">
           Transformez du contenu russe authentique en lecture, exploration et matériel de pratique.
         </p>
+        <div className="import-hub__rule" aria-hidden />
       </header>
 
       {extractionProgress ? (
@@ -606,7 +607,8 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
       ) : null}
 
       {staged.length > 0 ? (
-        <ImportFilePreview
+        <section className="import-editorial-section import-editorial-section--primary">
+          <ImportFilePreview
           files={staged}
           disabled={processing || staging}
           onTitleChange={handleStagedTitleChange}
@@ -617,7 +619,9 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
           onImport={() => void handleStartImport()}
           onCancel={handleCancelStaged}
         />
+        </section>
       ) : (
+        <section className="import-editorial-section import-editorial-section--primary">
         <ImportSources
           pastedText={pastedText}
           pasteTitle={pasteTitle}
@@ -633,6 +637,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
           onPasteAnalyze={() => void handlePasteAnalyze()}
           onFiles={(files) => void handleFilesSelected(files)}
         />
+        </section>
       )}
 
       <ImportExtractionCards />
@@ -641,14 +646,14 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
       {showIdlePreview ? <ImportPreviewCards /> : null}
 
       {activeItem ? (
-        <section className="import-queue-section">
+        <section className="import-editorial-section import-queue-section">
           <h2 className="import-section-label">Transformation en cours</h2>
           <ImportQueueCard item={activeItem} />
         </section>
       ) : null}
 
       {!activeItem && failedItems.length > 0 ? (
-        <section className="import-queue-section">
+        <section className="import-editorial-section import-queue-section">
           <h2 className="import-section-label">Échec de transformation</h2>
           {failedItems.map((item) => (
             <ImportQueueCard key={item.id} item={item} />
@@ -657,12 +662,12 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
       ) : null}
 
       {report ? (
-        <section className="import-queue-section">
+        <section className="import-editorial-section import-queue-section">
           <ImportReportCard report={report} completedTextId={completedTextId} />
         </section>
       ) : null}
 
-      <div id="import-history" className="scroll-mt-24">
+      <div id="import-history" className="import-editorial-section scroll-mt-24">
         <ImportHistoryPanel
           localHistory={history}
           serverJobs={serverJobs}

@@ -1,56 +1,76 @@
+import { EditorialSectionHead } from "@/components/editorial/editorial-section-head";
+
+import {
+  ImportIconCases,
+  ImportIconConcepts,
+  ImportIconEndings,
+  ImportIconExtraction,
+  ImportIconExpressions,
+  ImportIconPractice,
+  ImportIconWords,
+} from "./import-extraction-icons";
+
 const EXTRACTION_ITEMS = [
   {
-    id: "lemmas",
-    title: "Mots et lemmes",
-    description: "Chaque forme est reliée à sa base lexicale pour le vocabulaire et la lecture.",
+    id: "words",
+    title: "Mots",
+    description: "Formes reliées à leurs lemmes pour le vocabulaire et la lecture.",
+    Icon: ImportIconWords,
   },
   {
     id: "concepts",
-    title: "Concepts grammaticaux",
-    description: "Temps, aspects, structures et règles détectés dans le texte.",
+    title: "Concepts",
+    description: "Structures grammaticales et règles détectées dans le texte.",
+    Icon: ImportIconConcepts,
   },
   {
     id: "cases",
-    title: "Cas et terminaisons",
-    description: "Déclinaisons, genres et formes fléchies annotées en contexte.",
+    title: "Cas",
+    description: "Déclinaisons et fonctions syntaxiques annotées en contexte.",
+    Icon: ImportIconCases,
   },
   {
-    id: "collocations",
-    title: "Collocations",
-    description: "Associations naturelles entre mots, prêtes à explorer.",
+    id: "endings",
+    title: "Terminaisons",
+    description: "Formes fléchies, genres et paradigmes morphologiques.",
+    Icon: ImportIconEndings,
   },
   {
     id: "expressions",
     title: "Expressions",
     description: "Tournures idiomatiques et formulations récurrentes.",
+    Icon: ImportIconExpressions,
   },
   {
     id: "practice",
-    title: "Matériel de pratique",
+    title: "Pratique",
     description: "Exercices générés à partir des structures du texte.",
+    Icon: ImportIconPractice,
   },
 ] as const;
 
 export function ImportExtractionCards() {
   return (
-    <section className="import-extraction" aria-labelledby="import-extraction-heading">
-      <h2 id="import-extraction-heading" className="import-section-label">
-        Ce que Rossiyani extrait
-      </h2>
-      <p className="import-extraction__lead">
-        Rossiyani analyse votre contenu et en tire un système d&apos;apprentissage complet.
-      </p>
-      <ul className="import-extraction-grid">
+    <section
+      className="import-editorial-section import-editorial-section--secondary"
+      aria-labelledby="import-extraction-heading"
+    >
+      <EditorialSectionHead
+        id="import-extraction-heading"
+        icon={<ImportIconExtraction className="editorial-section-head__icon" />}
+        title="Ce que Rossiyani extrait"
+        lead="Rossiyani analyse votre contenu et en tire un système d'apprentissage complet."
+      />
+
+      <ul className="import-feature-grid">
         {EXTRACTION_ITEMS.map((item) => (
           <li key={item.id}>
-            <article className="import-extraction-card">
-              <span className="import-extraction-card__check" aria-hidden>
-                ✓
+            <article className="import-feature-card">
+              <span className="import-feature-card__icon-wrap" aria-hidden>
+                <item.Icon className="import-feature-card__icon" />
               </span>
-              <div className="import-extraction-card__body">
-                <h3 className="import-extraction-card__title">{item.title}</h3>
-                <p className="import-extraction-card__description">{item.description}</p>
-              </div>
+              <h3 className="import-feature-card__title">{item.title}</h3>
+              <p className="import-feature-card__description">{item.description}</p>
             </article>
           </li>
         ))}

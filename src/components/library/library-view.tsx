@@ -11,6 +11,8 @@ import { clearLastReadTextIfMatches } from "@/lib/last-read-text";
 import { deleteTextRequest, renameTextRequest } from "@/lib/library/text-library-api";
 import { clearTextReadingProgress } from "@/lib/reader/reading-progress";
 
+import { EditorialSectionHead } from "@/components/editorial/editorial-section-head";
+
 import { LibraryEditorialGrid } from "./library-editorial-grid";
 import { LibraryEditorialHero } from "./library-editorial-hero";
 import { LibrarySearch } from "./library-search";
@@ -108,15 +110,32 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
     <div className="lib-editorial-page">
       <LibraryEditorialHero level={level} onLevelChange={setLevel} />
       <LibrarySectionNav active="texts" />
-      <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
-      <LibraryEditorialGrid
-        texts={filtered}
-        hasAnyTexts={texts.length > 0}
-        busyTextId={busyTextId}
-        removingTextId={removingTextId}
-        onRename={setRenameTarget}
-        onDelete={setDeleteTarget}
-      />
+
+      <section className="lib-editorial-section lib-editorial-section--secondary">
+        <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
+      </section>
+
+      <section className="lib-editorial-section" aria-labelledby="library-texts-heading">
+        <EditorialSectionHead
+          id="library-texts-heading"
+          icon={
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden className="editorial-section-head__icon">
+              <path d="M4 4.5h12v11H4z" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M7 8h6M7 11h6M7 14h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
+          }
+          title="Vos textes"
+          lead="Sélection curatée de lectures importées, prêtes à ouvrir."
+        />
+        <LibraryEditorialGrid
+          texts={filtered}
+          hasAnyTexts={texts.length > 0}
+          busyTextId={busyTextId}
+          removingTextId={removingTextId}
+          onRename={setRenameTarget}
+          onDelete={setDeleteTarget}
+        />
+      </section>
 
       <RenameTextDialog
         open={renameTarget !== null}

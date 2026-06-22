@@ -1,3 +1,7 @@
+import { EditorialSectionHead } from "@/components/editorial/editorial-section-head";
+
+import { ImportIconPreview } from "./import-extraction-icons";
+
 const PREVIEW_ITEMS = [
   {
     id: "word",
@@ -24,13 +28,17 @@ const PREVIEW_ITEMS = [
 
 export function ImportPreviewCards() {
   return (
-    <section className="import-preview" aria-labelledby="import-preview-heading">
-      <h2 id="import-preview-heading" className="import-section-label">
-        Aperçu de l&apos;analyse
-      </h2>
-      <p className="import-preview__lead">
-        Voici le type de découvertes que Rossiyani génère à partir d&apos;un texte.
-      </p>
+    <section
+      className="import-editorial-section import-editorial-section--secondary"
+      aria-labelledby="import-preview-heading"
+    >
+      <EditorialSectionHead
+        id="import-preview-heading"
+        icon={<ImportIconPreview className="editorial-section-head__icon" />}
+        title="Aperçu de l'analyse"
+        lead="Voici le type de découvertes que Rossiyani génère à partir d'un texte."
+      />
+
       <ul className="import-preview-grid">
         {PREVIEW_ITEMS.map((item) => (
           <li key={item.id}>

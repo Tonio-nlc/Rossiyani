@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+import { EditorialSectionHead } from "@/components/editorial/editorial-section-head";
+
+import { ImportIconPipeline } from "./import-extraction-icons";
+
 const PIPELINE_STEPS = [
   { id: "import", label: "Import", href: "/import" },
   { id: "read", label: "Lire", href: "/library" },
@@ -9,13 +13,17 @@ const PIPELINE_STEPS = [
 
 export function ImportPipeline() {
   return (
-    <section className="import-pipeline" aria-labelledby="import-pipeline-heading">
-      <h2 id="import-pipeline-heading" className="import-section-label">
-        Parcours d&apos;apprentissage
-      </h2>
-      <p className="import-pipeline__lead">
-        Chaque texte importé alimente lecture, exploration et pratique.
-      </p>
+    <section
+      className="import-editorial-section"
+      aria-labelledby="import-pipeline-heading"
+    >
+      <EditorialSectionHead
+        id="import-pipeline-heading"
+        icon={<ImportIconPipeline className="editorial-section-head__icon" />}
+        title="Parcours d'apprentissage"
+        lead="Chaque texte importé alimente lecture, exploration et pratique."
+      />
+
       <ol className="import-pipeline__flow">
         {PIPELINE_STEPS.map((step, index) => (
           <li key={step.id} className="import-pipeline__step">
