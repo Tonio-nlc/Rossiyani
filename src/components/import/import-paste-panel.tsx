@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { PrimaryButton } from "@/components/design-system/primary-button";
 import type { CategoryId } from "@/content/categories";
 import type { CollectionId } from "@/content/collections";
 import {
@@ -69,73 +70,69 @@ export function ImportPastePanel({
     onAnalyze();
   };
 
+  const showMetadata = hasImportText(text);
+
   return (
-    <section className="space-y-5">
-      <div className="flex items-center gap-2">
-        <span className="text-xl" aria-hidden>
-          📋
-        </span>
-        <h2 className="font-reader text-xl font-semibold text-[var(--foreground)]">
-          Coller un texte
-        </h2>
-        <span className="rounded-full bg-[var(--accent-violet)]/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--accent-violet-bright)]">
-          recommandé
-        </span>
-      </div>
-
-      <ImportMetadataFields
-        title={title}
-        collectionId={collectionId}
-        categoryId={categoryId}
-        level={level}
-        onTitleChange={(value) => {
-          setTitleTouched(true);
-          setTitleError(null);
-          onTitleChange(value);
-        }}
-        onCollectionChange={onCollectionChange}
-        onCategoryChange={onCategoryChange}
-        onLevelChange={onLevelChange}
-        disabled={disabled}
-        titleError={titleError}
-      />
-
+    <>
       <textarea
         value={text}
         onChange={(e) => onTextChange(e.target.value)}
         disabled={disabled}
         placeholder="Collez ici votre texte russe…"
         rows={10}
-        className="focus-kb w-full resize-y rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-4 font-reader text-lg leading-relaxed text-[var(--foreground)] placeholder:text-[var(--muted)]/60 focus:border-[var(--accent-violet)]/40 focus:shadow-[var(--shadow-glow)] disabled:opacity-50"
+        className="import-dropzone__textarea focus-kb"
+        aria-label="Texte russe à importer"
       />
 
-      <dl className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-        <div>
-          <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Caractères</dt>
-          <dd className="mt-0.5 font-semibold tabular-nums">{stats.characters.toLocaleString("fr-FR")}</dd>
-        </div>
-        <div>
-          <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Mots</dt>
-          <dd className="mt-0.5 font-semibold tabular-nums">{stats.words.toLocaleString("fr-FR")}</dd>
-        </div>
-        <div>
-          <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Phrases estimées</dt>
-          <dd className="mt-0.5 font-semibold tabular-nums">{stats.estimatedSentences}</dd>
-        </div>
-        <div>
-          <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Lecture estimée</dt>
-          <dd className="mt-0.5 font-semibold tabular-nums">~{stats.estimatedReadingMinutes} min</dd>
-        </div>
-      </dl>
+      {showMetadata ? (
+        <dl className="import-dropzone__stats">
+          <div className="import-dropzone__stat">
+            <dt>Caractères</dt>
+            <dd>{stats.characters.toLocaleString("fr-FR")}</dd>
+          </div>
+          <div className="import-dropzone__stat">
+            <dt>Mots</dt>
+            <dd>{stats.words.toLocaleString("fr-FR")}</dd>
+          </div>
+          <div className="import-dropzone__stat">
+            <dt>Phrases estimées</dt>
+            <dd>{stats.estimatedSentences}</dd>
+          </div>
+          <div className="import-dropzone__stat">
+            <dt>Lecture estimée</dt>
+            <dd>~{stats.estimatedReadingMinutes} min</dd>
+          </div>
+        </dl>
+      ) : null}
 
-      <button
-        type="button"
-        onClick={handleAnalyze}
-        disabled={disabled || !canAnalyze}
-        className="btn-primary focus-kb rounded-xl px-6 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        Créer le texte dans la bibliothèque
-      </button>
-    </section>
+      {showMetadata ? (
+        <div className="import-dropzone__metadata">
+          <ImportMetadataFields
+            title={title}
+            collectionId={collectionId}
+            categoryId={categoryId}
+            level={level}
+            onTitleChange={(value) => {
+              setTitleTouched(true);
+              setTitleError(null);
+              onTitleChange(value);
+            }}
+            onCollectionChange={onCollectionChange}
+            onCategoryChange={onCategoryChange}
+            onLevelChange={onLevelChange}
+            disabled={disabled}
+            titleError={titleError}
+          />
+        </div>
+      ) : null}
+
+      {showMetadata ? (
+        <div className="import-dropzone__actions">
+          <PrimaryButton variant="gold" onClick={handleAnalyze} disabled={disabled || !canAnalyze}>
+            Transformer en matériel d&apos;apprentissage
+          </PrimaryButton>
+        </div>
+      ) : null}
+    </>
   );
 }

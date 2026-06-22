@@ -118,8 +118,10 @@ export type ImportSessionReport = {
   knowledgeHits: number;
   knowledgeMisses: number;
   aiCalls: number;
+  lemmasCreated: number;
   conceptsCreated: number;
   collocationsCreated: number;
+  expressionsCreated: number;
   knowledgeHitPercent: number;
   aiCallPercent: number;
   quality?: {
@@ -337,10 +339,17 @@ export function buildSessionReport(
     metricsBefore && metricsAfter
       ? Math.max(0, metricsAfter.graphSize.concepts - metricsBefore.graphSize.concepts)
       : 0;
+  const lemmasCreated =
+    metricsBefore && metricsAfter
+      ? Math.max(0, metricsAfter.graphSize.lemmas - metricsBefore.graphSize.lemmas)
+      : 0;
+
   const collocationsCreated =
     metricsBefore && metricsAfter
       ? Math.max(0, metricsAfter.graphSize.phrases - metricsBefore.graphSize.phrases)
       : completed.reduce((s, i) => s + (i.result?.phraseGroupCount ?? 0), 0);
+
+  const expressionsCreated = completed.reduce((s, i) => s + (i.result?.phraseGroupCount ?? 0), 0);
 
   const qualityTokens = new Map<
     string,
@@ -407,8 +416,26 @@ export function buildSessionReport(
     knowledgeHits,
     knowledgeMisses,
     aiCalls,
+    lemmasCreated:
+      lemmasCreated > 0
+        ? lemmasCreated
+        : (() => {
+            const q = completed.reduce(
+              (acc, i) => {
+                const report = i.result?.qualityReport;
+                if (!report) return acc;
+                return {
+                  known: acc.known + report.knownCount,
+                  unknown: acc.unknown + report.unknownCount,
+                };
+              },
+              { known: 0, unknown: 0 },
+            );
+            return q.known + q.unknown;
+          })(),
     conceptsCreated,
     collocationsCreated,
+    expressionsCreated,
     knowledgeHitPercent: totalKnowledge > 0 ? Math.round((knowledgeHits / totalKnowledge) * 100) : 0,
     aiCallPercent:
       knowledgeHits + aiCalls > 0 ? Math.round((aiCalls / (knowledgeHits + aiCalls)) * 100) : 0,

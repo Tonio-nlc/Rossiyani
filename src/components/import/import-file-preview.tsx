@@ -1,5 +1,6 @@
 "use client";
 
+import { PrimaryButton } from "@/components/design-system/primary-button";
 import type { CategoryId } from "@/content/categories";
 import type { CollectionId } from "@/content/collections";
 import { countWords, formatFileSize, isImportTitleValid } from "@/lib/import-client";
@@ -39,22 +40,19 @@ export function ImportFilePreview({
   const allTitlesValid = files.every((f) => isImportTitleValid(f.title));
 
   return (
-    <section className="space-y-4 animate-fade-up">
+    <section className="import-staged animate-fade-up">
       <div>
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-          Créer {files.length > 1 ? "des textes" : "un texte"} dans la bibliothèque
+        <h2 className="import-section-label">
+          Préparer {files.length > 1 ? "les textes" : "le texte"}
         </h2>
-        <p className="mt-1 text-sm text-[var(--muted)]">
-          Vérifiez le nom, la collection, la catégorie et le niveau avant l&apos;import.
+        <p className="import-preview__lead">
+          Vérifiez le nom, la collection, la catégorie et le niveau avant la transformation.
         </p>
       </div>
 
       <ul className="space-y-4">
         {files.map((file) => (
-          <li
-            key={file.id}
-            className="surface-elevated rounded-2xl border border-[var(--border)] p-5"
-          >
+          <li key={file.id} className="import-staged__card">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1 space-y-4">
                 <ImportMetadataFields
@@ -152,20 +150,16 @@ export function ImportFilePreview({
         </p>
       ) : null}
 
-      <div className="flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={onImport}
-          disabled={disabled || !allTitlesValid}
-          className="btn-primary focus-kb rounded-xl px-6 py-3 text-sm font-semibold disabled:opacity-50"
-        >
-          Importer{files.length > 1 ? ` (${files.length})` : ""} dans la bibliothèque
-        </button>
+      <div className="import-dropzone__actions">
+        <PrimaryButton variant="gold" onClick={onImport} disabled={disabled || !allTitlesValid}>
+          Transformer en matériel d&apos;apprentissage
+          {files.length > 1 ? ` (${files.length})` : ""}
+        </PrimaryButton>
         <button
           type="button"
           onClick={onCancel}
           disabled={disabled}
-          className="focus-kb rounded-xl border border-[var(--border)] px-5 py-3 text-sm text-[var(--muted)] hover:border-[var(--border-strong)] hover:text-[var(--foreground)]"
+          className="import-report__link focus-kb border-none bg-transparent p-2"
         >
           Annuler
         </button>

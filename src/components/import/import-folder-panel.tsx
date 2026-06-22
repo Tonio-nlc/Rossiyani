@@ -22,17 +22,15 @@ export function ImportFolderPanel({ disabled, onFiles }: ImportFolderPanelProps)
   }, []);
 
   return (
-    <details className="group rounded-2xl border border-[var(--border)] bg-[var(--surface)]/50">
-      <summary className="focus-kb cursor-pointer list-none px-4 py-3 text-sm text-[var(--muted)] marker:content-none [&::-webkit-details-marker]:hidden">
-        <span className="inline-flex items-center gap-2">
-          <span aria-hidden>📁</span>
-          <span className="font-medium text-[var(--foreground)]">Importer un dossier</span>
-          <span className="text-[10px] uppercase tracking-wide">(option avancée)</span>
-          <span className="ml-1 text-[var(--muted)] transition group-open:rotate-180">▾</span>
+    <details className="import-folder group">
+      <summary className="focus-kb">
+        <span className="import-folder__title">Importer un dossier</span>
+        <span className="ml-2 text-[10px] uppercase tracking-wide text-[var(--ink-muted)]">
+          option avancée
         </span>
       </summary>
 
-      <div className="border-t border-[var(--border)] px-4 py-4">
+      <div className="import-folder__body">
         <input
           ref={folderInputRef}
           id={inputId}
@@ -45,13 +43,13 @@ export function ImportFolderPanel({ disabled, onFiles }: ImportFolderPanelProps)
             e.target.value = "";
           }}
         />
-        <p className="text-sm text-[var(--muted)]">
+        <p className="text-sm text-[var(--ink-muted)]">
           Sélectionnez un dossier entier. Tous les fichiers lisibles seront importés.
         </p>
         <label
           htmlFor={inputId}
           className={[
-            "focus-kb btn-interactive mt-3 inline-block cursor-pointer rounded-lg border border-[var(--border)] px-4 py-2 text-sm text-[var(--foreground)] hover:bg-[var(--surface-elevated)]",
+            "import-dropzone__file-btn focus-kb mt-3 inline-block",
             disabled ? "pointer-events-none opacity-50" : "",
           ].join(" ")}
         >

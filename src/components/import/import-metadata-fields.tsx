@@ -25,7 +25,7 @@ type ImportMetadataFieldsProps = {
 };
 
 const fieldClass =
-  "focus-kb mt-1.5 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 text-sm text-[var(--foreground)] focus:border-[var(--accent-violet)]/40";
+  "focus-kb mt-1.5 w-full rounded-sm border border-[color-mix(in_srgb,var(--hairline)_88%,transparent)] bg-[var(--paper)] px-3 py-2.5 text-sm text-[var(--ink)] focus:border-[color-mix(in_srgb,var(--accent-gold,#b08d57)_45%,transparent)]";
 
 export function ImportMetadataFields({
   title,
@@ -49,7 +49,7 @@ export function ImportMetadataFields({
       ].join(" ")}
     >
       <div className={compact ? "sm:col-span-2" : "lg:col-span-2"}>
-        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
+        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
           Nom du texte <span className="text-red-300">*</span>
         </label>
         <input
@@ -59,21 +59,21 @@ export function ImportMetadataFields({
           disabled={disabled}
           placeholder="Ex. : В метро"
           className={[
-            "focus-kb mt-1.5 w-full rounded-xl border bg-[var(--surface)] px-3 py-2.5 font-reader text-base text-[var(--foreground)] placeholder:text-[var(--muted)]/60",
+            "focus-kb mt-1.5 w-full rounded-sm border bg-[var(--paper)] px-3 py-2.5 font-reader text-base text-[var(--ink)] placeholder:text-[var(--ink-muted)]/60",
             titleError
               ? "border-red-500/40 focus:border-red-500/50"
-              : "border-[var(--border)] focus:border-[var(--accent-violet)]/40",
+              : "border-[color-mix(in_srgb,var(--hairline)_88%,transparent)] focus:border-[color-mix(in_srgb,var(--accent-gold,#b08d57)_45%,transparent)]",
           ].join(" ")}
         />
         {titleError ? (
           <p className="mt-1 text-xs text-red-300">{titleError}</p>
         ) : fileNameHint ? (
-          <p className="mt-1 text-xs text-[var(--muted)]">Fichier : {fileNameHint}</p>
+          <p className="mt-1 text-xs text-[var(--ink-muted)]">Fichier : {fileNameHint}</p>
         ) : null}
       </div>
 
       <div>
-        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
+        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
           Collection
         </label>
         <select
@@ -91,7 +91,7 @@ export function ImportMetadataFields({
       </div>
 
       <div>
-        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
+        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
           Catégorie
         </label>
         <select
@@ -110,7 +110,7 @@ export function ImportMetadataFields({
       </div>
 
       <div className={compact ? "sm:col-span-2" : "lg:col-span-2"}>
-        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
+        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
           Niveau CEFR
         </label>
         <select

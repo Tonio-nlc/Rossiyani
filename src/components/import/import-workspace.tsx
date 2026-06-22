@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -28,8 +28,11 @@ import {
 import { formatImportFailure } from "@/lib/import-error-format";
 import type { ImportParsePhase } from "@/services/import/parsers";
 
-import { ImportExtractionProgress } from "./import-extraction-progress";
+import { ImportExtractionCards } from "./import-extraction-cards";
+import { ImportPipeline } from "./import-pipeline";
+import { ImportPreviewCards } from "./import-preview-cards";
 
+import { ImportExtractionProgress } from "./import-extraction-progress";
 import { ImportFilePreview } from "./import-file-preview";
 import { ImportHistoryPanel } from "./import-history-panel";
 import { ImportQueueCard } from "./import-queue-card";
@@ -580,25 +583,18 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
   const activeItem = queue.find((i) => i.id === activeId) ?? queue.find((i) => i.status === "processing");
   const failedItems = queue.filter((i) => i.status === "failed" && i.errorDetails);
   const completedTextId = queue.find((i) => i.status === "completed" && i.textId)?.textId;
+  const hasHistory = history.length > 0 || serverJobs.length > 0;
+  const showIdlePreview =
+    !report && !processing && staged.length === 0 && !activeItem && queue.length === 0;
 
   return (
-    <div className="space-y-10 pb-16">
-      <header className="space-y-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--accent-violet-bright)]">
-          Lecture rapide
-        </p>
-        <h1 className="font-reader text-4xl font-semibold tracking-tight sm:text-5xl">Import</h1>
-        <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
-          Créez une entrée dans votre bibliothèque : nommez le texte, choisissez une collection et
-          un niveau, puis importez du russe depuis le presse-papier ou un fichier.
+    <div className="import-shell">
+      <header className="import-hub__intro">
+        <h1 className="import-hub__title">Importer du contenu</h1>
+        <p className="import-hub__mission">
+          Transformez du contenu russe authentique en lecture, exploration et matériel de pratique.
         </p>
       </header>
-
-      <div className="flex flex-wrap items-center gap-4">
-        <Link href="/library" className="focus-kb text-sm text-[var(--accent-violet-bright)] hover:underline">
-          Voir la bibliothèque →
-        </Link>
-      </div>
 
       {extractionProgress ? (
         <ImportExtractionProgress
@@ -639,20 +635,21 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
         />
       )}
 
+      <ImportExtractionCards />
+      <ImportPipeline />
+
+      {showIdlePreview ? <ImportPreviewCards /> : null}
+
       {activeItem ? (
-        <section className="space-y-3">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-            En cours
-          </h2>
+        <section className="import-queue-section">
+          <h2 className="import-section-label">Transformation en cours</h2>
           <ImportQueueCard item={activeItem} />
         </section>
       ) : null}
 
       {!activeItem && failedItems.length > 0 ? (
-        <section className="space-y-3">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-            Échec d&apos;import
-          </h2>
+        <section className="import-queue-section">
+          <h2 className="import-section-label">Échec de transformation</h2>
           {failedItems.map((item) => (
             <ImportQueueCard key={item.id} item={item} />
           ))}
@@ -660,24 +657,8 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
       ) : null}
 
       {report ? (
-        <section className="space-y-3">
-          <ImportReportCard report={report} />
-          <div className="flex flex-wrap gap-3">
-            {completedTextId ? (
-              <Link
-                href={`/texts/${completedTextId}`}
-                className="btn-primary focus-kb rounded-xl px-5 py-2.5 text-sm font-semibold"
-              >
-                Lire maintenant
-              </Link>
-            ) : null}
-            <Link href="/library" className="focus-kb rounded-xl border border-[var(--border)] px-5 py-2.5 text-sm">
-              Ouvrir la bibliothèque
-            </Link>
-            <Link href="/explorer" className="focus-kb rounded-xl border border-[var(--border)] px-5 py-2.5 text-sm">
-              Explorer le graphe
-            </Link>
-          </div>
+        <section className="import-queue-section">
+          <ImportReportCard report={report} completedTextId={completedTextId} />
         </section>
       ) : null}
 
@@ -688,6 +669,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
           onRetry={handleRetry}
           onResumeJob={(id) => void handleResumeJob(id)}
           onViewReport={report ? () => window.scrollTo({ top: 0, behavior: "smooth" }) : undefined}
+          showOnboarding={!hasHistory && !report && staged.length === 0 && !processing}
         />
       </div>
     </div>

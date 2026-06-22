@@ -1,3 +1,6 @@
+import Link from "next/link";
+
+import { PrimaryButton } from "@/components/design-system/primary-button";
 import type { ImportSessionReport } from "@/lib/import-client";
 
 import { ImportQualityReportCard } from "./import-quality-report-card";
@@ -5,93 +8,100 @@ import { ImportQualityReportCard } from "./import-quality-report-card";
 type ImportReportCardProps = {
   report: ImportSessionReport;
   animate?: boolean;
+  completedTextId?: string | null;
 };
 
-export function ImportReportCard({ report, animate = true }: ImportReportCardProps) {
+export function ImportReportCard({
+  report,
+  animate = true,
+  completedTextId,
+}: ImportReportCardProps) {
+  const successTitle = report.hasPartialSegments
+    ? "Contenu ajouté — analyse partielle"
+    : "Contenu ajouté avec succès";
+
+  const generatedStats = [
+    { label: "Lemmes", value: report.lemmasCreated },
+    { label: "Concepts", value: report.conceptsCreated },
+    { label: "Collocations", value: report.collocationsCreated },
+    { label: "Expressions", value: report.expressionsCreated },
+  ].filter((stat) => stat.value > 0);
+
   return (
-    <section
-      className={[
-        "surface-elevated overflow-hidden rounded-3xl border border-[var(--accent-violet)]/30 shadow-[var(--shadow-glow)]",
-        animate ? "animate-success-pop" : "",
-      ].join(" ")}
-    >
-      <div className="border-b border-[var(--border)] bg-gradient-to-r from-[var(--accent-violet)]/15 to-[var(--accent-cyan)]/10 px-6 py-5 text-center">
-        <h2 className="font-reader text-2xl font-semibold">
-          {report.hasPartialSegments ? "Import terminé avec avertissements" : "Import terminé"}
-        </h2>
-        <p className="mt-1 text-sm text-[var(--muted)]">
+    <section className={["import-report", animate ? "import-report--animate" : ""].join(" ")}>
+      <header className="import-report__header">
+        <h2 className="import-report__title">{successTitle}</h2>
+        <p className="import-report__subtitle">
           {report.hasPartialSegments
             ? "Certaines analyses détaillées seront générées plus tard."
-            : "Votre graphe linguistique s&apos;est enrichi"}
+            : "Votre système d'apprentissage s'est enrichi à partir de ce texte."}
         </p>
-      </div>
+      </header>
 
       {report.segmentStats ? (
-        <div className="border-b border-[var(--border)] px-6 py-4">
-          <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
-            <li className="text-[var(--foreground)]">
-              ✓ {report.segmentStats.complete} segment(s) analysé(s)
-            </li>
+        <div className="import-report__warnings">
+          <ul className="flex flex-wrap gap-x-4 gap-y-1">
+            <li>✓ {report.segmentStats.complete} segment(s) analysé(s)</li>
             {(report.segmentStats.partial > 0 || report.segmentStats.failed > 0) && (
-              <li className="text-amber-400">
-                ⚠ {report.segmentStats.partial + report.segmentStats.failed} segment(s) partiel(s)
-              </li>
+              <li>⚠ {report.segmentStats.partial + report.segmentStats.failed} segment(s) partiel(s)</li>
             )}
-            <li className={report.segmentStats.lost > 0 ? "text-red-400" : "text-[var(--muted)]"}>
-              ✗ {report.segmentStats.lost} segment(s) perdu(s)
-            </li>
+            {report.segmentStats.lost > 0 ? (
+              <li>✗ {report.segmentStats.lost} segment(s) perdu(s)</li>
+            ) : null}
           </ul>
         </div>
       ) : null}
 
-      <div className="grid gap-6 p-6 sm:grid-cols-2">
-        <StatBlock label="Textes importés" value={String(report.textsImported)} highlight />
-        <StatBlock label="Phrases analysées" value={String(report.sentencesProcessed)} highlight />
-        <StatBlock label="Knowledge hits" value={`${report.knowledgeHitPercent} %`} />
-        <StatBlock label="AI calls" value={`${report.aiCallPercent} %`} />
-        <StatBlock label="Concepts créés" value={String(report.conceptsCreated)} accent="cyan" />
-        <StatBlock label="Collocations" value={String(report.collocationsCreated)} accent="cyan" />
-      </div>
+      {generatedStats.length > 0 ? (
+        <div className="import-report__generated">
+          <p className="import-report__generated-label">Généré</p>
+          <dl className="import-report__stats">
+            {generatedStats.map((stat) => (
+              <div key={stat.label} className="import-report__stat">
+                <dt>{stat.label}</dt>
+                <dd>{stat.value.toLocaleString("fr-FR")}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      ) : (
+        <div className="import-report__generated">
+          <p className="import-report__generated-label">Généré</p>
+          <dl className="import-report__stats">
+            <div className="import-report__stat">
+              <dt>Phrases analysées</dt>
+              <dd>{report.sentencesProcessed.toLocaleString("fr-FR")}</dd>
+            </div>
+            <div className="import-report__stat">
+              <dt>Textes importés</dt>
+              <dd>{report.textsImported.toLocaleString("fr-FR")}</dd>
+            </div>
+          </dl>
+        </div>
+      )}
 
       {(report.textsSkipped > 0 || report.textsFailed > 0) && (
-        <p className="border-t border-[var(--border)] px-6 py-4 text-xs text-[var(--muted)]">
+        <p className="import-report__warnings">
           {report.textsSkipped > 0 ? `${report.textsSkipped} doublon(s) ignoré(s). ` : ""}
           {report.textsFailed > 0 ? `${report.textsFailed} échec(s).` : ""}
         </p>
       )}
 
+      <div className="import-report__actions">
+        {completedTextId ? (
+          <PrimaryButton href={`/texts/${completedTextId}`} variant="gold">
+            Lire maintenant
+          </PrimaryButton>
+        ) : null}
+        <Link href="/library" className="import-report__link focus-kb">
+          Ouvrir dans la bibliothèque →
+        </Link>
+        <Link href="/explorer" className="import-report__link focus-kb">
+          Explorer les découvertes →
+        </Link>
+      </div>
+
       {report.quality ? <ImportQualityReportCard quality={report.quality} /> : null}
     </section>
-  );
-}
-
-function StatBlock({
-  label,
-  value,
-  highlight,
-  accent,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-  accent?: "cyan";
-}) {
-  return (
-    <div
-      className={[
-        "rounded-2xl border px-4 py-4",
-        highlight ? "border-[var(--border-strong)] bg-[var(--surface)]" : "border-[var(--border)]",
-      ].join(" ")}
-    >
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">{label}</p>
-      <p
-        className={[
-          "mt-1 font-reader text-2xl font-semibold",
-          accent === "cyan" ? "text-[var(--accent-cyan-bright)]" : "text-[var(--foreground)]",
-        ].join(" ")}
-      >
-        {value}
-      </p>
-    </div>
   );
 }

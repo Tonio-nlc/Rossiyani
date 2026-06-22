@@ -40,11 +40,13 @@ export function ImportSources({
   onFiles,
 }: ImportSourcesProps) {
   return (
-    <div className="space-y-8">
-      <div
-        id="import-paste"
-        className="scroll-mt-24 rounded-2xl border border-[var(--hairline)] px-5 py-6 sm:px-7 sm:py-7"
-      >
+    <div className="import-dropzone-section">
+      <div id="import-paste" className="import-dropzone scroll-mt-24">
+        <p className="import-dropzone__intro">
+          Ajoutez du contenu russe authentique — Rossiyani le transforme en lecture, vocabulaire,
+          concepts et exercices.
+        </p>
+
         <ImportPastePanel
           text={pastedText}
           title={pasteTitle}
@@ -59,16 +61,14 @@ export function ImportSources({
           onLevelChange={onLevelChange}
           onAnalyze={onPasteAnalyze}
         />
-      </div>
 
-      <div className="flex items-center gap-4">
-        <div className="h-px flex-1 bg-[var(--hairline)]" />
-        <span className="text-xs uppercase tracking-wider text-[var(--ink-muted)]">or</span>
-        <div className="h-px flex-1 bg-[var(--hairline)]" />
-      </div>
+        <div className="import-dropzone__divider" aria-hidden>
+          ou
+        </div>
 
-      <div id="import-file" className="scroll-mt-24">
-        <ImportFilePanel disabled={disabled} onFiles={onFiles} />
+        <div id="import-file" className="scroll-mt-24">
+          <ImportFilePanel disabled={disabled} onFiles={onFiles} />
+        </div>
       </div>
 
       <ImportFolderPanel disabled={disabled} onFiles={onFiles} />

@@ -6,6 +6,8 @@ import type { ImportJobSummary } from "@/features/bulk-import";
 import { getCollectionName } from "@/content/collections";
 import type { ImportHistoryEntry } from "@/lib/import-client";
 
+import { ImportOnboarding } from "./import-onboarding";
+
 type ImportHistoryPanelProps = {
   localHistory: ImportHistoryEntry[];
   serverJobs: ImportJobSummary[];
@@ -13,16 +15,18 @@ type ImportHistoryPanelProps = {
   onResumeJob?: (jobId: string) => void;
   onViewReport?: () => void;
   loading?: boolean;
+  showOnboarding?: boolean;
 };
 
-const STATUS_STYLES: Record<string, string> = {
-  completed: "text-[var(--accent-cyan-bright)]",
-  failed: "text-red-300",
-  skipped: "text-[var(--muted)]",
-  COMPLETED: "text-[var(--accent-cyan-bright)]",
-  FAILED: "text-red-300",
-  PROCESSING: "text-[var(--accent-violet-bright)]",
-  PENDING: "text-[var(--muted)]",
+const STATUS_CLASS: Record<string, string> = {
+  completed: "import-history__status--completed",
+  failed: "import-history__status--failed",
+  skipped: "import-history__status--skipped",
+  COMPLETED: "import-history__status--completed",
+  FAILED: "import-history__status--failed",
+  PROCESSING: "import-history__status--processing",
+  PENDING: "import-history__status--pending",
+  PAUSED: "import-history__status--pending",
 };
 
 export function ImportHistoryPanel({
@@ -32,15 +36,14 @@ export function ImportHistoryPanel({
   onResumeJob,
   onViewReport,
   loading,
+  showOnboarding = false,
 }: ImportHistoryPanelProps) {
   const hasEntries = localHistory.length > 0 || serverJobs.length > 0;
 
   if (loading) {
     return (
-      <section className="space-y-3">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-          Historique
-        </h2>
+      <section className="import-history">
+        <h2 className="import-section-label">Historique</h2>
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
             <div key={i} className="skeleton-shimmer h-16 rounded-xl" />
@@ -51,27 +54,25 @@ export function ImportHistoryPanel({
   }
 
   if (!hasEntries) {
-    return null;
+    return showOnboarding ? <ImportOnboarding /> : null;
   }
 
   return (
-    <section className="space-y-4">
+    <section className="import-history">
       <div className="flex items-center justify-between">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-          Historique
-        </h2>
+        <h2 className="import-section-label">Historique</h2>
         {onViewReport ? (
           <button
             type="button"
             onClick={onViewReport}
-            className="focus-kb text-xs text-[var(--accent-violet-bright)] hover:underline"
+            className="import-report__link focus-kb border-none bg-transparent p-0"
           >
             Voir le rapport
           </button>
         ) : null}
       </div>
 
-      <ul className="divide-y divide-[var(--border)] rounded-2xl border border-[var(--border)] bg-[var(--surface)]">
+      <ul className="import-history__list">
         {localHistory.map((entry) => (
           <HistoryRow
             key={entry.id}
@@ -83,15 +84,12 @@ export function ImportHistoryPanel({
                 <button
                   type="button"
                   onClick={() => onRetry(entry)}
-                  className="focus-kb text-xs text-[var(--accent-violet-bright)] hover:underline"
+                  className="import-report__link focus-kb border-none bg-transparent p-0"
                 >
                   Relancer
                 </button>
               ) : entry.textId ? (
-                <Link
-                  href={`/texts/${entry.textId}`}
-                  className="focus-kb text-xs text-[var(--accent-violet-bright)] hover:underline"
-                >
+                <Link href={`/texts/${entry.textId}`} className="import-report__link focus-kb">
                   Lire
                 </Link>
               ) : null
@@ -110,7 +108,7 @@ export function ImportHistoryPanel({
                 <button
                   type="button"
                   onClick={() => onResumeJob?.(job.id)}
-                  className="focus-kb text-xs text-[var(--accent-violet-bright)] hover:underline"
+                  className="import-report__link focus-kb border-none bg-transparent p-0"
                 >
                   Reprendre
                 </button>
@@ -135,13 +133,13 @@ function HistoryRow({
   action?: React.ReactNode;
 }) {
   return (
-    <li className="flex items-center justify-between gap-4 px-4 py-3">
+    <li className="import-history__row">
       <div className="min-w-0">
-        <p className="truncate font-medium text-[var(--foreground)]">{title}</p>
-        <p className="mt-0.5 truncate text-xs text-[var(--muted)]">{meta}</p>
+        <p className="import-history__title truncate">{title}</p>
+        <p className="import-history__meta truncate">{meta}</p>
       </div>
       <div className="flex shrink-0 items-center gap-3">
-        <span className={`text-xs font-medium capitalize ${STATUS_STYLES[status] ?? ""}`}>
+        <span className={`import-history__status ${STATUS_CLASS[status] ?? ""}`}>
           {statusLabel(status)}
         </span>
         {action}

@@ -25,62 +25,41 @@ export function ImportFilePanel({ disabled, onFiles }: ImportFilePanelProps) {
   );
 
   return (
-    <section className="space-y-4">
-      <div className="flex items-center gap-2">
-        <span className="text-xl" aria-hidden>
-          📄
-        </span>
-        <h2 className="font-reader text-xl font-semibold text-[var(--foreground)]">
-          Choisir un fichier
-        </h2>
-      </div>
-
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragOver(true);
+    <div
+      onDragOver={(e) => {
+        e.preventDefault();
+        setDragOver(true);
+      }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setDragOver(false);
+        handleFiles(e.dataTransfer.files);
+      }}
+      className={[
+        "import-dropzone__file",
+        dragOver ? "import-dropzone__file--active" : "",
+        disabled ? "pointer-events-none opacity-50" : "",
+      ].join(" ")}
+    >
+      <input
+        ref={fileInputRef}
+        id="import-file-picker"
+        type="file"
+        accept={IMPORT_FILE_ACCEPT}
+        multiple
+        className="sr-only"
+        onChange={(e) => {
+          handleFiles(e.target.files);
+          e.target.value = "";
         }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragOver(false);
-          handleFiles(e.dataTransfer.files);
-        }}
-        className={[
-          "flex min-h-[160px] flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-8 text-center transition-all duration-300",
-          dragOver
-            ? "border-[var(--accent-violet-bright)] bg-[var(--accent-violet)]/10"
-            : "border-[var(--border)] bg-[var(--surface)]",
-          disabled ? "pointer-events-none opacity-50" : "",
-        ].join(" ")}
-      >
-        <input
-          ref={fileInputRef}
-          id="import-file-picker"
-          type="file"
-          accept={IMPORT_FILE_ACCEPT}
-          multiple
-          className="sr-only"
-          onChange={(e) => {
-            handleFiles(e.target.files);
-            e.target.value = "";
-          }}
-        />
+      />
 
-        <p className="text-sm text-[var(--muted)]">Glisser-déposer ou choisir un fichier</p>
-        <label
-          htmlFor="import-file-picker"
-          className={[
-            "focus-kb btn-interactive mt-4 cursor-pointer rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-5 py-2.5 text-sm font-medium text-[var(--foreground)] hover:border-[var(--accent-violet)]/40",
-            disabled ? "pointer-events-none opacity-50" : "",
-          ].join(" ")}
-        >
-          Choisir un fichier
-        </label>
-        <p className="mt-3 text-[11px] text-[var(--muted)]">
-          .txt · .md · .pdf · text/plain
-        </p>
-      </div>
-    </section>
+      <p className="import-dropzone__file-hint">Glissez un fichier ici ou parcourez votre appareil</p>
+      <label htmlFor="import-file-picker" className="import-dropzone__file-btn focus-kb">
+        Choisir un fichier
+      </label>
+      <p className="import-dropzone__file-formats">.txt · .md · .pdf</p>
+    </div>
   );
 }
