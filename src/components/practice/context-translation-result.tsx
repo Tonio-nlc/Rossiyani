@@ -3,14 +3,7 @@
 import Link from "next/link";
 import { useCallback, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 
-import {
-  GhostButton,
-  InputField,
-  PracticeMarginNote,
-  PrimaryButton,
-  SectionHeader,
-} from "@/components/design-system";
-
+import { GhostButton, InputField, PrimaryButton } from "@/components/design-system";
 import {
   isContextTranslationPhraseSaved,
   saveContextTranslationPhrase,
@@ -27,6 +20,9 @@ import type {
   ContextTranslationFollowUpMessage,
   ContextTranslationGrammarConcept,
 } from "@/lib/context-translation/types";
+
+import { PracticeExerciseHeader } from "./practice-exercise-header";
+import { PracticeMicroscopePanel } from "./practice-microscope-panel";
 
 type SectionKey =
   | "best"
@@ -101,9 +97,9 @@ function LessonSection({
   }
 
   return (
-    <section className="editorial-page-section animate-fade-up-subtle space-y-3 border-t border-[var(--hairline)] pt-6 pb-0">
-      <div className="flex items-baseline justify-between gap-4">
-        <p className="text-eyebrow">{label}</p>
+    <section className="practice-section animate-fade-up-subtle">
+      <div className="practice-section__head">
+        <h2 className="practice-section__label">{label}</h2>
         {action}
       </div>
       {children}
@@ -206,19 +202,16 @@ function GrammarConceptRow({
   }
 
   return (
-    <li className="flex items-center justify-between gap-4 py-2.5">
-      <div className="min-w-0 flex-1">
-        <Link
-          href={concept.href}
-          className="focus-kb text-sm text-[var(--ink)] underline-offset-2 hover:text-[var(--color-link)] hover:underline"
-        >
+    <li className="practice-grammar-row">
+      <div className="practice-grammar-row__body">
+        <Link href={concept.href} className="practice-grammar-row__link focus-kb">
           {concept.label}
         </Link>
         {concept.countLabel ? (
-          <p className="mt-0.5 text-xs text-[var(--ink-muted)]">{concept.countLabel}</p>
+          <p className="practice-grammar-row__meta">{concept.countLabel}</p>
         ) : null}
       </div>
-      <div className="flex shrink-0 items-center gap-3">
+      <div className="practice-grammar-row__actions">
         <GhostButton href={concept.href}>Explorer →</GhostButton>
         <GhostButton
           disabled={saved}
@@ -262,17 +255,19 @@ function FollowUpPanel({
   };
 
   return (
-    <section className="editorial-page-section animate-fade-up-subtle space-y-4 border-t border-[var(--hairline)] pt-6 pb-0">
-      <p className="text-eyebrow">Poser une question</p>
+    <section className="practice-section animate-fade-up-subtle">
+      <h2 className="practice-section__label">Poser une question</h2>
 
       {messages.length > 0 ? (
-        <ul className="space-y-3">
+        <ul className="practice-followup-messages">
           {messages.map((message, index) => (
             <li
               key={`${message.role}-${index}`}
               className={[
-                "text-sm leading-relaxed",
-                message.role === "user" ? "text-[var(--ink)]" : "text-[var(--ink-muted)]",
+                "practice-followup-messages__item",
+                message.role === "user"
+                  ? "practice-followup-messages__item--user"
+                  : "practice-followup-messages__item--assistant",
               ].join(" ")}
             >
               {message.content}
@@ -281,7 +276,7 @@ function FollowUpPanel({
         </ul>
       ) : null}
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
+      <form className="practice-followup-form" onSubmit={handleSubmit}>
         <InputField
           type="text"
           value={question}
@@ -330,207 +325,210 @@ export function ContextTranslationResult({
     setPhraseSaved(true);
   }, [analysis.bestTranslation, analysis.sourceText, thinkLikeNative.conceptualShift]);
 
-  const handleSaveLesson = useCallback(() => {
-    onSaveLesson();
-  }, [onSaveLesson]);
-
   return (
-    <article className="pb-8">
-      <header className="editorial-page-section pb-0">
-        <GhostButton href="/practice">← Pratique</GhostButton>
-        <div className="mt-4">
-          <SectionHeader
-            eyebrow="Traduction contextualisée"
-            title="Résultat"
-            description={analysis.sourceText}
-          />
-        </div>
-      </header>
-
-      {show("best") ? (
-        <section className="editorial-page-section animate-fade-up-subtle space-y-4 border-t border-[var(--hairline)] pt-6 pb-0">
-          <p className="text-eyebrow">Meilleure formulation native</p>
-          <p className="editorial-lead-title break-russian leading-tight">
-            {analysis.bestTranslation}
-          </p>
-
-          {analysis.naturalness ? (
-            <PracticeMarginNote>
-              <p className="text-sm">{naturalnessLabel(analysis.naturalness.score)}</p>
-              {analysis.naturalness.score < 85 ? (
-                <p className="mt-2 leading-relaxed">{analysis.naturalness.explanation}</p>
-              ) : null}
-              {analysis.naturalness.preferredExpression ? (
-                <p className="mt-3 break-russian font-reader text-base text-[var(--ink)]">
-                  {analysis.naturalness.preferredExpression}
-                </p>
-              ) : null}
-            </PracticeMarginNote>
-          ) : (
-            <p className="text-sm text-[var(--ink-muted)]">Formulation native</p>
-          )}
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
-            <CopyButton text={analysis.bestTranslation} />
-            <GhostButton disabled={phraseSaved} onClick={handleSavePhrase}>
-              {phraseSaved ? "Enregistré" : "Enregistrer la phrase"}
-            </GhostButton>
-            <GhostButton disabled={savedLesson || enrichmentLoading} onClick={handleSaveLesson}>
-              {savedLesson ? "Leçon enregistrée" : "Enregistrer la leçon"}
-            </GhostButton>
-          </div>
-        </section>
-      ) : null}
-
-      <LessonSection visible={show("think")} label="Penser comme un natif">
-        <PracticeMarginNote>
-          <div className="space-y-4 text-sm leading-relaxed">
-            <div className="space-y-1.5">
-              <p className="text-xs text-[var(--ink-muted)]">
-                Pensée {thinkLikeNative.sourceLanguageLabel.toLowerCase()}
-              </p>
-              <p className="font-reader text-base text-[var(--ink)]">
-                &ldquo;{thinkLikeNative.sourceThought}&rdquo;
-              </p>
-            </div>
-
-            <div className="space-y-1.5">
-              <p className="text-xs text-[var(--ink-muted)]">Image mentale</p>
-              <p>&ldquo;{thinkLikeNative.mentalImage}&rdquo;</p>
-            </div>
-
-            <div className="border-t border-[var(--hairline)] pt-4">
-              <p className="text-xs text-[var(--ink-muted)]">Pensée russe native</p>
-              <p className="mt-1.5">&ldquo;{thinkLikeNative.nativeThought}&rdquo;</p>
-            </div>
-
-            <p className="break-russian font-reader text-xl text-[var(--ink)]">
-              {thinkLikeNative.nativeFormulation}
-            </p>
-
-            <p className="border-t border-[var(--hairline)] pt-3">{thinkLikeNative.conceptualShift}</p>
-          </div>
-        </PracticeMarginNote>
-      </LessonSection>
-
-      {analysis.corrections.length > 0 ? (
-        <LessonSection visible={show("errors")} label="Analyse des erreurs">
-          <ul className="space-y-6">
-            {analysis.corrections.map((item) => (
-              <li key={`${item.userText}-${item.correction}`}>
-                <PracticeMarginNote>
-                  <p className="break-russian font-reader text-lg text-[var(--ink)]">{item.userText}</p>
-                  <dl className="mt-3 space-y-2 text-sm">
-                    <div>
-                      <dt className="text-xs text-[var(--ink-muted)]">Problème</dt>
-                      <dd className="mt-0.5">{item.problem}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-[var(--ink-muted)]">Ce que comprennent les natifs</dt>
-                      <dd className="mt-0.5">{item.nativeInterpretation}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-[var(--ink-muted)]">Correction native</dt>
-                      <dd className="mt-0.5 break-russian font-reader text-[var(--ink)]">
-                        {item.correction}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-[var(--ink-muted)]">Raison</dt>
-                      <dd className="mt-0.5">{item.reason}</dd>
-                    </div>
-                  </dl>
-                </PracticeMarginNote>
-              </li>
-            ))}
-          </ul>
-        </LessonSection>
-      ) : null}
-
-      <LessonSection visible={show("alternatives")} label="Expressions alternatives">
-        {enrichmentLoading && analysis.alternatives.length === 0 ? (
-          <p className="text-sm text-[var(--ink-muted)]">Recherche d&apos;alternatives…</p>
-        ) : alternativesByRegister.length > 0 ? (
-          <ul className="space-y-5">
-            {alternativesByRegister.map((group, groupIndex) => (
-              <li key={group.register}>
-                {groupIndex > 0 ? (
-                  <div className="mb-5 border-t border-[var(--hairline)]" aria-hidden />
-                ) : null}
-                <p className="text-xs text-[var(--ink-muted)]">
-                  {REGISTER_LABELS[group.register] ?? group.register}
-                </p>
-                <ul className="mt-2.5 space-y-4">
-                  {group.items.map((alt) => (
-                    <li
-                      key={alt.text}
-                      className="flex items-start justify-between gap-4"
-                    >
-                      <div className="min-w-0 space-y-1">
-                        <p className="break-russian font-reader text-lg text-[var(--ink)]">
-                          {alt.text}
-                        </p>
-                        <p className="text-sm text-[var(--ink-muted)]">{alt.nuance}</p>
-                        <p className="text-xs text-[var(--ink-muted)]">
-                          {alt.frequency} · {alt.whenToUse}
-                        </p>
-                      </div>
-                      <SavePhraseButton
-                        sourceSentence={analysis.sourceText}
-                        russianPhrase={alt.text}
-                        register={alt.register}
-                        nuance={alt.nuance}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </LessonSection>
-
-      {analysis.culturalNotes.length > 0 ? (
-        <LessonSection visible={show("cultural")} label="Notes culturelles">
-          <ul className="space-y-3 text-sm leading-relaxed">
-            {analysis.culturalNotes.map((note) => (
-              <li key={note} className="flex items-start justify-between gap-4">
-                <PracticeMarginNote>{note}</PracticeMarginNote>
-                <SaveNoteButton note={note} sourceSentence={analysis.sourceText} />
-              </li>
-            ))}
-          </ul>
-        </LessonSection>
-      ) : null}
-
-      {analysis.grammarConcepts.length > 0 ? (
-        <LessonSection visible={show("grammar")} label="Grammaire et concepts">
-          <ul className="divide-y divide-[var(--hairline)]">
-            {analysis.grammarConcepts.map((concept) => (
-              <GrammarConceptRow
-                key={concept.label}
-                concept={concept}
-                sourceSentence={analysis.sourceText}
-              />
-            ))}
-          </ul>
-        </LessonSection>
-      ) : enrichmentLoading ? (
-        <LessonSection visible={show("grammar")} label="Grammaire et concepts">
-          <p className="text-sm text-[var(--ink-muted)]">Analyse grammaticale…</p>
-        </LessonSection>
-      ) : null}
-
-      <FollowUpPanel
-        visible={show("followup")}
-        messages={followUpMessages}
-        loading={followUpLoading}
-        onSubmit={onFollowUp}
+    <article className="practice-shell pb-8">
+      <PracticeExerciseHeader
+        exerciseType="Traduction contextualisée"
+        title="Résultat"
+        subtitle={analysis.sourceText}
       />
 
-      <footer className="editorial-page-section flex justify-end border-t border-[var(--hairline)] pt-6">
-        <PrimaryButton onClick={onStartOver}>Nouvelle phrase →</PrimaryButton>
-      </footer>
+      <div className="practice-split-layout">
+        <div className="practice-split-layout__main">
+          {show("best") ? (
+            <section className="practice-section animate-fade-up-subtle">
+              <h2 className="practice-section__label">Meilleure formulation native</h2>
+              <div className="practice-result-card practice-result-card--success">
+                <p className="practice-result-card__sentence break-russian font-reader">
+                  {analysis.bestTranslation}
+                </p>
+
+                {analysis.naturalness ? (
+                  <div className="practice-learning-card">
+                    <p className="practice-learning-card__text">
+                      {naturalnessLabel(analysis.naturalness.score)}
+                    </p>
+                    {analysis.naturalness.score < 85 ? (
+                      <p className="practice-learning-card__text">
+                        {analysis.naturalness.explanation}
+                      </p>
+                    ) : null}
+                    {analysis.naturalness.preferredExpression ? (
+                      <p className="practice-result-card__structure break-russian font-reader">
+                        {analysis.naturalness.preferredExpression}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : (
+                  <p className="practice-learning-card__text">Formulation native</p>
+                )}
+
+                <div className="practice-footer-actions">
+                  <CopyButton text={analysis.bestTranslation} />
+                  <GhostButton disabled={phraseSaved} onClick={handleSavePhrase}>
+                    {phraseSaved ? "Enregistré" : "Enregistrer la phrase"}
+                  </GhostButton>
+                  <GhostButton disabled={savedLesson || enrichmentLoading} onClick={onSaveLesson}>
+                    {savedLesson ? "Leçon enregistrée" : "Enregistrer la leçon"}
+                  </GhostButton>
+                </div>
+              </div>
+            </section>
+          ) : null}
+
+          <LessonSection visible={show("think")} label="Penser comme un natif">
+            <div className="practice-learning-card">
+              <div className="practice-think-grid">
+                <div>
+                  <p className="practice-think-grid__label">
+                    Pensée {thinkLikeNative.sourceLanguageLabel.toLowerCase()}
+                  </p>
+                  <p className="practice-think-grid__quote font-reader">
+                    &ldquo;{thinkLikeNative.sourceThought}&rdquo;
+                  </p>
+                </div>
+
+                <div>
+                  <p className="practice-think-grid__label">Image mentale</p>
+                  <p className="practice-think-grid__quote">
+                    &ldquo;{thinkLikeNative.mentalImage}&rdquo;
+                  </p>
+                </div>
+
+                <div className="practice-think-grid__divider">
+                  <p className="practice-think-grid__label">Pensée russe native</p>
+                  <p className="practice-think-grid__quote">
+                    &ldquo;{thinkLikeNative.nativeThought}&rdquo;
+                  </p>
+                </div>
+
+                <p className="practice-result-card__sentence break-russian font-reader">
+                  {thinkLikeNative.nativeFormulation}
+                </p>
+
+                <p className="practice-learning-card__text">{thinkLikeNative.conceptualShift}</p>
+              </div>
+            </div>
+          </LessonSection>
+
+          {analysis.corrections.length > 0 ? (
+            <LessonSection visible={show("errors")} label="Analyse des erreurs">
+              <ul className="practice-card-list">
+                {analysis.corrections.map((item) => (
+                  <li key={`${item.userText}-${item.correction}`}>
+                    <div className="practice-learning-card practice-result-card--review">
+                      <p className="practice-result-card__sentence break-russian font-reader">
+                        {item.userText}
+                      </p>
+                      <dl className="practice-error-facts">
+                        <div>
+                          <dt>Problème</dt>
+                          <dd>{item.problem}</dd>
+                        </div>
+                        <div>
+                          <dt>Ce que comprennent les natifs</dt>
+                          <dd>{item.nativeInterpretation}</dd>
+                        </div>
+                        <div>
+                          <dt>Correction native</dt>
+                          <dd className="break-russian font-reader">{item.correction}</dd>
+                        </div>
+                        <div>
+                          <dt>Raison</dt>
+                          <dd>{item.reason}</dd>
+                        </div>
+                      </dl>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </LessonSection>
+          ) : null}
+
+          <LessonSection visible={show("alternatives")} label="Expressions alternatives">
+            {enrichmentLoading && analysis.alternatives.length === 0 ? (
+              <p className="practice-learning-card__text">Recherche d&apos;alternatives…</p>
+            ) : alternativesByRegister.length > 0 ? (
+              <ul className="practice-alt-groups">
+                {alternativesByRegister.map((group) => (
+                  <li key={group.register}>
+                    <p className="practice-alt-groups__register">
+                      {REGISTER_LABELS[group.register] ?? group.register}
+                    </p>
+                    <ul className="practice-card-list">
+                      {group.items.map((alt) => (
+                        <li key={alt.text} className="practice-alt-row">
+                          <div className="practice-alt-row__body">
+                            <p className="practice-result-card__sentence break-russian font-reader">
+                              {alt.text}
+                            </p>
+                            <p className="practice-learning-card__text">{alt.nuance}</p>
+                            <p className="practice-alt-row__meta">
+                              {alt.frequency} · {alt.whenToUse}
+                            </p>
+                          </div>
+                          <SavePhraseButton
+                            sourceSentence={analysis.sourceText}
+                            russianPhrase={alt.text}
+                            register={alt.register}
+                            nuance={alt.nuance}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </LessonSection>
+
+          {analysis.culturalNotes.length > 0 ? (
+            <LessonSection visible={show("cultural")} label="Notes culturelles">
+              <ul className="practice-card-list">
+                {analysis.culturalNotes.map((note) => (
+                  <li key={note} className="practice-note-row">
+                    <div className="practice-learning-card">{note}</div>
+                    <SaveNoteButton note={note} sourceSentence={analysis.sourceText} />
+                  </li>
+                ))}
+              </ul>
+            </LessonSection>
+          ) : null}
+
+          {analysis.grammarConcepts.length > 0 ? (
+            <LessonSection visible={show("grammar")} label="Grammaire et concepts">
+              <ul className="practice-grammar-list">
+                {analysis.grammarConcepts.map((concept) => (
+                  <GrammarConceptRow
+                    key={concept.label}
+                    concept={concept}
+                    sourceSentence={analysis.sourceText}
+                  />
+                ))}
+              </ul>
+            </LessonSection>
+          ) : enrichmentLoading ? (
+            <LessonSection visible={show("grammar")} label="Grammaire et concepts">
+              <p className="practice-learning-card__text">Analyse grammaticale…</p>
+            </LessonSection>
+          ) : null}
+
+          <FollowUpPanel
+            visible={show("followup")}
+            messages={followUpMessages}
+            loading={followUpLoading}
+            onSubmit={onFollowUp}
+          />
+
+          <footer className="practice-footer-submit">
+            <PrimaryButton onClick={onStartOver}>Nouvelle phrase →</PrimaryButton>
+          </footer>
+        </div>
+
+        <div className="practice-split-layout__aside">
+          <PracticeMicroscopePanel analysis={analysis} loading={enrichmentLoading} />
+        </div>
+      </div>
     </article>
   );
 }

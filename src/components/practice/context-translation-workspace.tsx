@@ -3,13 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-import {
-  GhostButton,
-  PracticeInput,
-  PrimaryButton,
-  SectionHeader,
-  Tag,
-} from "@/components/design-system";
+import { GhostButton, PracticeInput, PrimaryButton, Tag } from "@/components/design-system";
 import { useToast } from "@/components/ui/toast-provider";
 import type {
   ContextTranslationAnalysis,
@@ -23,6 +17,8 @@ import {
 } from "@/lib/context-translation/saved-lessons";
 
 import { ContextTranslationResult } from "./context-translation-result";
+import { PracticeExerciseHeader } from "./practice-exercise-header";
+import { PracticeMicroscopePanel } from "./practice-microscope-panel";
 
 const EXAMPLE_INPUTS = [
   "On est foutu.",
@@ -328,80 +324,88 @@ export function ContextTranslationWorkspace({
 
   return (
     <form
-      className="pb-8"
+      className="practice-shell pb-8"
       onSubmit={(event) => {
         event.preventDefault();
         void submit();
       }}
     >
-      <header className="editorial-page-section pb-0">
-        <GhostButton href="/practice">← Pratique</GhostButton>
-        <div className="mt-4">
-          <SectionHeader title="Traduction contextualisée" />
+      <PracticeExerciseHeader
+        exerciseType="Traduction contextualisée"
+        title="Traduire le sens"
+        subtitle="Pensez comme un locuteur natif — pas mot à mot."
+      />
+
+      <div className="practice-split-layout">
+        <div className="practice-split-layout__main">
+          <div className="practice-main-card">
+            <div className="practice-context-card practice-context-card--prompt">
+              <p className="practice-context-card__label">Phrase à traduire</p>
+              <PracticeInput
+                compact
+                value={sourceText}
+                onChange={(event) => setSourceText(event.target.value)}
+                rows={4}
+                placeholder={"Traduire une idée, pas des mots…\n\nExemple :\nOn est foutu."}
+              />
+            </div>
+
+            {loading && progressPhase ? (
+              <ul className="practice-progress-steps" aria-label="Progression de l'analyse">
+                {PROGRESS_STEPS.map((step) => {
+                  const stepIndex = PROGRESS_STEPS.findIndex((item) => item.phase === step.phase);
+                  const currentIndex = PROGRESS_STEPS.findIndex(
+                    (item) => item.phase === progressPhase,
+                  );
+                  const isDone = currentIndex > stepIndex || progressPhase === "complete";
+                  const isCurrent = step.phase === progressPhase;
+                  return (
+                    <li
+                      key={step.phase}
+                      className={[
+                        "practice-progress-steps__item",
+                        isDone ? "practice-progress-steps__item--done" : "",
+                        isCurrent ? "practice-progress-steps__item--current" : "",
+                      ].join(" ")}
+                    >
+                      {step.label}
+                      {isCurrent ? "…" : ""}
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : null}
+
+            <div className="practice-suggestions">
+              <p className="practice-suggestions__label">Exemples</p>
+              <ul className="practice-suggestions__list">
+                {EXAMPLE_INPUTS.map((example) => (
+                  <li key={example}>
+                    <Tag onClick={() => setSourceText(example)}>{example}</Tag>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="practice-main-card__actions">
+              <PrimaryButton type="submit" disabled={!sourceText.trim() || loading}>
+                {loading ? (
+                  <>
+                    Analyse… <AnalyzingDots />
+                  </>
+                ) : (
+                  "Valider →"
+                )}
+              </PrimaryButton>
+              <GhostButton href="/practice">← Modes de pratique</GhostButton>
+            </div>
+          </div>
         </div>
-      </header>
 
-      <section className="editorial-page-section">
-        <PracticeInput
-          compact
-          value={sourceText}
-          onChange={(event) => setSourceText(event.target.value)}
-          rows={4}
-          placeholder={"Traduire une idée, pas des mots…\n\nExemple :\nOn est foutu."}
-        />
-      </section>
-
-      {loading && progressPhase ? (
-        <section className="editorial-page-section pb-0">
-          <ul className="space-y-1.5 border-t border-[var(--hairline)] pt-4">
-            {PROGRESS_STEPS.map((step) => {
-              const stepIndex = PROGRESS_STEPS.findIndex((item) => item.phase === step.phase);
-              const currentIndex = PROGRESS_STEPS.findIndex((item) => item.phase === progressPhase);
-              const isDone = currentIndex > stepIndex || progressPhase === "complete";
-              const isCurrent = step.phase === progressPhase;
-              return (
-                <li
-                  key={step.phase}
-                  className={[
-                    "text-sm",
-                    isDone
-                      ? "text-[var(--ink-muted)]"
-                      : isCurrent
-                        ? "text-[var(--ink)]"
-                        : "text-[var(--ink-muted)]/45",
-                  ].join(" ")}
-                >
-                  {step.label}
-                  {isCurrent ? "…" : ""}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ) : null}
-
-      <section className="editorial-page-section pb-0">
-        <p className="text-eyebrow mb-3">Exemples</p>
-        <ul className="flex flex-wrap gap-2">
-          {EXAMPLE_INPUTS.map((example) => (
-            <li key={example}>
-              <Tag onClick={() => setSourceText(example)}>{example}</Tag>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <footer className="editorial-page-section flex justify-end border-t border-[var(--hairline)] pt-6">
-        <PrimaryButton type="submit" disabled={!sourceText.trim() || loading}>
-          {loading ? (
-            <>
-              Analyse… <AnalyzingDots />
-            </>
-          ) : (
-            "Traduire et expliquer →"
-          )}
-        </PrimaryButton>
-      </footer>
+        <div className="practice-split-layout__aside">
+          <PracticeMicroscopePanel analysis={analysis} loading={loading} />
+        </div>
+      </div>
     </form>
   );
 }

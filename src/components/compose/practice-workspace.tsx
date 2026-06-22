@@ -7,9 +7,7 @@ import {
   GhostButton,
   InputField,
   PracticeInput,
-  PracticeMarginNote,
   PrimaryButton,
-  SectionHeader,
   Tag,
 } from "@/components/design-system";
 import { Reference, TextEditorialContext } from "@/components/editorial";
@@ -26,6 +24,8 @@ import { saveComposePhrase, getComposePhraseById } from "@/lib/compose/saved-phr
 import { PRACTICE_SUGGESTIONS } from "@/lib/practice/constants";
 
 import { PracticeAnalysisView } from "./practice-analysis-view";
+import { PracticeExerciseHeader } from "../practice/practice-exercise-header";
+import { PracticeHub } from "../practice/practice-hub";
 
 type RewriteResult = {
   id: string;
@@ -58,6 +58,15 @@ function isStructureMode(searchParams: URLSearchParams): boolean {
     return true;
   }
   return !searchParams.has("text") && !searchParams.has("phraseId");
+}
+
+function hasExerciseEntry(searchParams: URLSearchParams): boolean {
+  return (
+    searchParams.get("mode") === "sentence" ||
+    Boolean(searchParams.get("structure")) ||
+    Boolean(searchParams.get("phraseId")) ||
+    Boolean(searchParams.get("text"))
+  );
 }
 
 export function PracticeWorkspace() {
@@ -263,6 +272,8 @@ export function PracticeWorkspace() {
     return (
       <PracticeAnalysisView
         analysis={analysis}
+        originalSentence={russianText.trim()}
+        structureContext={structureContext}
         expandedBlocks={expandedBlocks}
         onToggleBlock={(id) =>
           setExpandedBlocks((current) => ({ ...current, [id]: !current[id] }))
@@ -281,178 +292,197 @@ export function PracticeWorkspace() {
     );
   }
 
+  if (!hasExerciseEntry(searchParams)) {
+    return (
+      <div className="practice-shell pb-8">
+        <PracticeHub />
+      </div>
+    );
+  }
+
   const showSuggestions = !russianText.trim() && !structureMode;
+  const exerciseType = structureMode ? "Structure ciblée" : "Constructeur de phrases";
+  const sourceTitle =
+    structureContext?.readerTitle ?? searchParams.get("textTitle") ?? null;
+  const sourceHref =
+    structureContext?.readerHref ??
+    (searchParams.get("textId") ? `/texts/${searchParams.get("textId")}` : null);
 
   return (
     <form
-      className="pb-8"
+      className="practice-shell pb-8"
       onSubmit={(event) => {
         event.preventDefault();
         void analyze();
       }}
     >
-      <header className="editorial-page-section pb-0">
-        <SectionHeader title="Pratiquer" />
-      </header>
+      <PracticeExerciseHeader
+        exerciseType={exerciseType}
+        title={structureMode ? structureContext?.label ?? searchParams.get("structure") : "Composez en russe"}
+        subtitle={
+          structureMode
+            ? "Utilisez la structure rencontrée dans votre lecture."
+            : "Formulez une phrase à partir de ce que vous avez lu et observé."
+        }
+        sourceTitle={sourceTitle}
+        sourceHref={sourceHref}
+      />
 
-      {structureMode && structureContext ? (
-        <section className="editorial-page-section pb-0">
-          <StructureContextNote
-            context={structureContext}
-            referenceSentence={referenceSentence}
-          />
-        </section>
-      ) : null}
+      <div className="practice-exercise-layout">
+        <div className="practice-main-card">
+          {structureMode && structureContext ? (
+            <StructureContextPanel
+              context={structureContext}
+              referenceSentence={referenceSentence}
+            />
+          ) : null}
 
-      {structureMode && !structureContext && searchParams.get("structure") ? (
-        <section className="editorial-page-section pb-0">
-          <StructureContextNote
-            context={{
-              label: searchParams.get("structure") ?? "",
-              meaning: null,
-              explanation: null,
-              exampleSentence: referenceSentence,
-              readerHref: searchParams.get("textId")
-                ? `/texts/${searchParams.get("textId")}`
-                : null,
-              readerTitle: searchParams.get("textTitle"),
-              readerCollectionId: null,
-              readerCollectionName: null,
-              explorerHref: `/explorer?q=${encodeURIComponent(searchParams.get("structure") ?? "")}`,
-            }}
-            referenceSentence={referenceSentence}
-          />
-        </section>
-      ) : null}
+          {structureMode && !structureContext && searchParams.get("structure") ? (
+            <StructureContextPanel
+              context={{
+                label: searchParams.get("structure") ?? "",
+                meaning: null,
+                explanation: null,
+                exampleSentence: referenceSentence,
+                readerHref: searchParams.get("textId")
+                  ? `/texts/${searchParams.get("textId")}`
+                  : null,
+                readerTitle: searchParams.get("textTitle"),
+                readerCollectionId: null,
+                readerCollectionName: null,
+                explorerHref: `/explorer?q=${encodeURIComponent(searchParams.get("structure") ?? "")}`,
+              }}
+              referenceSentence={referenceSentence}
+            />
+          ) : null}
 
-      {!structureMode ? (
-        <section className="editorial-page-section pb-0">
-          <InputField
-            id="practice-context"
-            label="Votre idée"
-            type="text"
-            value={context}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => setContext(event.target.value)}
-            placeholder="En français ou en russe"
-          />
-        </section>
-      ) : null}
-
-      <section className="editorial-page-section pb-0">
-        <PracticeInput
-          id="practice-russian"
-          label={structureMode ? "Votre phrase" : "Votre phrase en russe"}
-          value={russianText}
-          onChange={(event) => setRussianText(event.target.value)}
-          rows={5}
-          required
-          placeholder="Ваше предложение…"
-        />
-        <div className="mt-4">
-          <PrimaryButton type="submit" disabled={loading || !russianText.trim()}>
-            {loading ? "Analyse…" : "Pratiquer →"}
-          </PrimaryButton>
-        </div>
-      </section>
-
-      {showSuggestions ? (
-        <section className="editorial-page-section pb-0">
-          <p className="text-metadata mb-3">Suggestions</p>
-          <ul className="flex flex-wrap gap-2">
-            {PRACTICE_SUGGESTIONS.map((suggestion) => (
-              <li key={suggestion.label}>
-                <Tag onClick={() => setContext(suggestion.context)}>{suggestion.label}</Tag>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {advancedOpen ? (
-        <section className="editorial-page-section pb-0">
-          <PracticeMarginNote>
-            <div className="grid gap-6 sm:grid-cols-2">
-              <fieldset>
-                <legend className="text-eyebrow mb-2">Thème</legend>
-                <ul className="space-y-1.5">
-                  {COMPOSE_THEMES.map((item) => (
-                    <li key={item.id}>
-                      <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--ink-muted)]">
-                        <input
-                          type="radio"
-                          name="theme"
-                          value={item.id}
-                          checked={theme === item.id}
-                          onChange={() => setTheme(item.id)}
-                        />
-                        {THEME_LABELS[item.id]}
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-              </fieldset>
-
-              <fieldset>
-                <legend className="text-eyebrow mb-2">Registre</legend>
-                <ul className="space-y-1.5">
-                  {COMPOSE_REGISTERS.map((item) => (
-                    <li key={item.id}>
-                      <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--ink-muted)]">
-                        <input
-                          type="radio"
-                          name="register"
-                          value={item.id}
-                          checked={register === item.id}
-                          onChange={() => setRegister(item.id)}
-                        />
-                        {REGISTER_LABELS[item.id]}
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-              </fieldset>
+          {!structureMode ? (
+            <div className="practice-field">
+              <InputField
+                id="practice-context"
+                label="Votre idée"
+                type="text"
+                value={context}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => setContext(event.target.value)}
+                placeholder="En français ou en russe"
+              />
             </div>
-          </PracticeMarginNote>
-        </section>
-      ) : null}
+          ) : null}
 
-      <footer className="editorial-page-section flex flex-wrap items-center gap-x-5 gap-y-2">
-        <GhostButton onClick={() => setAdvancedOpen((open) => !open)}>
-          {advancedOpen ? "Masquer les options" : "Options →"}
-        </GhostButton>
-        <GhostButton href="/practice/context-translation">Traduction contextualisée →</GhostButton>
-      </footer>
+          <div className="practice-field">
+            <PracticeInput
+              id="practice-russian"
+              label={structureMode ? "Votre phrase" : "Votre phrase en russe"}
+              value={russianText}
+              onChange={(event) => setRussianText(event.target.value)}
+              rows={5}
+              required
+              placeholder="Ваше предложение…"
+            />
+          </div>
+
+          <div className="practice-main-card__actions">
+            <PrimaryButton type="submit" disabled={loading || !russianText.trim()}>
+              {loading ? "Analyse…" : "Valider →"}
+            </PrimaryButton>
+            <GhostButton onClick={() => setAdvancedOpen((open) => !open)}>
+              {advancedOpen ? "Masquer les options" : "Options →"}
+            </GhostButton>
+          </div>
+
+          {showSuggestions ? (
+            <div className="practice-suggestions">
+              <p className="practice-suggestions__label">Pistes de départ</p>
+              <ul className="practice-suggestions__list">
+                {PRACTICE_SUGGESTIONS.map((suggestion) => (
+                  <li key={suggestion.label}>
+                    <Tag onClick={() => setContext(suggestion.context)}>{suggestion.label}</Tag>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {advancedOpen ? (
+            <div className="practice-advanced">
+              <div className="practice-advanced__grid">
+                <fieldset>
+                  <legend className="practice-advanced__legend">Thème</legend>
+                  <ul className="practice-advanced__options">
+                    {COMPOSE_THEMES.map((item) => (
+                      <li key={item.id}>
+                        <label className="practice-advanced__option">
+                          <input
+                            type="radio"
+                            name="theme"
+                            value={item.id}
+                            checked={theme === item.id}
+                            onChange={() => setTheme(item.id)}
+                          />
+                          {THEME_LABELS[item.id]}
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </fieldset>
+
+                <fieldset>
+                  <legend className="practice-advanced__legend">Registre</legend>
+                  <ul className="practice-advanced__options">
+                    {COMPOSE_REGISTERS.map((item) => (
+                      <li key={item.id}>
+                        <label className="practice-advanced__option">
+                          <input
+                            type="radio"
+                            name="register"
+                            value={item.id}
+                            checked={register === item.id}
+                            onChange={() => setRegister(item.id)}
+                          />
+                          {REGISTER_LABELS[item.id]}
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </fieldset>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
     </form>
   );
 }
 
-type StructureContextNoteProps = {
+type StructureContextPanelProps = {
   context: StructureContext;
   referenceSentence: string | null;
 };
 
-function StructureContextNote({ context, referenceSentence }: StructureContextNoteProps) {
+function StructureContextPanel({ context, referenceSentence }: StructureContextPanelProps) {
   const example = context.exampleSentence ?? referenceSentence;
 
   return (
-    <PracticeMarginNote>
-      <p className="text-eyebrow mb-2">Structure à utiliser</p>
-      <p className="break-russian font-reader text-xl text-[var(--ink)]">{context.label}</p>
+    <div className="practice-context-card">
+      <p className="practice-context-card__label">Structure à utiliser</p>
+      <p className="practice-context-card__target break-russian font-reader">
+        {context.label}
+      </p>
 
       {context.meaning ? (
-        <p className="mt-3 text-sm leading-relaxed">{context.meaning}</p>
+        <p className="practice-context-card__note">{context.meaning}</p>
       ) : null}
 
       {context.explanation ? (
-        <p className="mt-2 text-sm leading-relaxed">{context.explanation}</p>
+        <p className="practice-context-card__note">{context.explanation}</p>
       ) : null}
 
       {example ? (
-        <p className="mt-3 break-russian font-reader text-base text-[var(--ink)]">{example}</p>
+        <p className="practice-context-card__example break-russian font-reader">{example}</p>
       ) : null}
 
       {context.readerHref && context.readerTitle && context.readerCollectionId ? (
-        <div className="mt-4">
+        <div className="practice-context-card__source">
           <TextEditorialContext
             eyebrow="Basé sur :"
             title={context.readerTitle}
@@ -463,12 +493,10 @@ function StructureContextNote({ context, referenceSentence }: StructureContextNo
         </div>
       ) : null}
 
-      <div className="mt-4 flex flex-wrap gap-4">
-        {context.readerHref ? (
-          <Reference href={context.readerHref}>Lire →</Reference>
-        ) : null}
+      <div className="practice-context-card__links">
+        {context.readerHref ? <Reference href={context.readerHref}>Lire →</Reference> : null}
         <Reference href={context.explorerHref}>Explorer →</Reference>
       </div>
-    </PracticeMarginNote>
+    </div>
   );
 }

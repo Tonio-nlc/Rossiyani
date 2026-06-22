@@ -6,6 +6,30 @@ export const PRACTICE_SUGGESTIONS = [
   { label: "Use: несмотря на", context: "Use the structure: несмотря на" },
 ] as const;
 
+export type PracticeModeId = "sentence" | "context-translation";
+
+export type PracticeModeCard = {
+  id: PracticeModeId;
+  title: string;
+  description: string;
+  href: string;
+};
+
+export const PRACTICE_MODE_CARDS: PracticeModeCard[] = [
+  {
+    id: "sentence",
+    title: "Constructeur de phrases",
+    description: "Reconstituez et composez des phrases russes à partir de vos textes.",
+    href: "/practice?mode=sentence",
+  },
+  {
+    id: "context-translation",
+    title: "Traduction contextualisée",
+    description: "Traduisez le sens, pas des mots isolés.",
+    href: "/practice/context-translation",
+  },
+];
+
 export function practicePath(params: Record<string, string | undefined>): string {
   const search = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
