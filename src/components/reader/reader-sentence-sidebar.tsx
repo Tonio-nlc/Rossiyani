@@ -66,13 +66,7 @@ export function ReaderSentenceSidebar({
   };
 
   return (
-    <section className="reader-sentence-sidebar" aria-label="Phrase sélectionnée">
-      <p className="reader-sentence-sidebar__label">Phrase</p>
-      <p className="reader-sentence-sidebar__text break-russian">{sentenceText}</p>
-      {translation ? (
-        <p className="reader-sentence-sidebar__translation">{translation}</p>
-      ) : null}
-
+    <section className="reader-sentence-sidebar" aria-label="Actions sur la phrase">
       <div className="reader-sentence-sidebar__actions">
         <button
           type="button"

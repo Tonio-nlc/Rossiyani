@@ -1,8 +1,7 @@
 import type { HomeJournalData } from "@/features/home";
 import type { TextListItem } from "@/features/texts";
 
-import { HomeLanding } from "./home-landing";
-import { HomeSessionContinuation } from "./home-session-continuation";
+import { HomeDashboard } from "./home-dashboard";
 
 type HomeViewProps = {
   journal: HomeJournalData;
@@ -10,10 +9,5 @@ type HomeViewProps = {
 };
 
 export function HomeView({ journal, texts }: HomeViewProps) {
-  return (
-    <>
-      <HomeLanding />
-      <HomeSessionContinuation journal={journal} texts={texts} />
-    </>
-  );
+  return <HomeDashboard journal={journal} texts={texts} />;
 }

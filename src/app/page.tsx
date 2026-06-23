@@ -5,9 +5,9 @@ import { getHomeJournalData } from "@/features/home";
 import { listTexts } from "@/features/texts";
 
 export const metadata: Metadata = {
-  title: "Rossiyani — Read, understand and think in Russian",
+  title: "Rossiyani — Your Russian learning workspace",
   description:
-    "A Russian learning system built around authentic content. Import texts, discover vocabulary and grammar, practice what you encounter.",
+    "Continue reading, track your progress, and explore vocabulary from authentic Russian texts.",
 };
 
 export default async function HomePage() {

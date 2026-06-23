@@ -10,7 +10,6 @@ import { setLastReadTextId } from "@/lib/last-read-text";
 import type { ReaderSearchEntry } from "@/lib/reader/build-reader-search-index";
 import {
   buildInteractiveWordsBySentence,
-  buildTextWordIndex,
 } from "@/lib/reader/build-interactive-words";
 import { buildTextIntroduction } from "@/lib/reader/build-text-introduction";
 import { buildReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel-data";
@@ -105,10 +104,6 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   } = useReadingProgress(text);
 
   const interactiveBySentence = useMemo(() => buildInteractiveWordsBySentence(text), [text]);
-  const textWords = useMemo(
-    () => buildTextWordIndex(text, interactiveBySentence),
-    [text, interactiveBySentence],
-  );
   const textIndex = useMemo(() => buildReaderTextPhraseIndex(text), [text]);
   const textIntroduction = useMemo(
     () => buildTextIntroduction(text, estimatedMinutes),
@@ -192,42 +187,6 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     setHoveredWordSnapshot(null);
   }, []);
 
-  const agreementTarget = useMemo(() => {
-    if (!selectedWordSnapshot) {
-      return null;
-    }
-    const sentence = text.sentences.find((item) => item.id === selectedWordSnapshot.sentenceId);
-    if (!sentence || selectedWordSnapshot.partOfSpeech !== "adjective") {
-      return null;
-    }
-    const previous = sentence.words.find(
-      (word) => word.position === selectedWordSnapshot.position - 1,
-    );
-    return previous?.original ?? null;
-  }, [selectedWordSnapshot, text.sentences]);
-
-  const timesSeenInText = useMemo(() => {
-    if (!selectedWordSnapshot || !progress?.wordsSeenIds.length) {
-      return 0;
-    }
-
-    const lemma = selectedWordSnapshot.lemma.trim().toLowerCase();
-    if (!lemma) {
-      return 0;
-    }
-
-    const seenLemmaWordIds = new Set<string>();
-    for (const sentence of text.sentences) {
-      for (const word of sentence.words) {
-        if (word.lemma.trim().toLowerCase() === lemma) {
-          seenLemmaWordIds.add(word.id);
-        }
-      }
-    }
-
-    return progress.wordsSeenIds.filter((wordId) => seenLemmaWordIds.has(wordId)).length;
-  }, [selectedWordSnapshot, progress?.wordsSeenIds, text.sentences]);
-
   const readingSessionSummary = useMemo(
     () => buildReadingSessionSummary(text, progress?.wordsSeenIds ?? []),
     [text, progress?.wordsSeenIds],
@@ -237,25 +196,11 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     () => ({
       detail,
       loading,
-      textTitle: text.title,
       textIndex,
-      textWords,
-      timesSeenInText,
-      agreementTarget,
       showAllTranslations,
       onToggleAllTranslations: setShowAllTranslations,
     }),
-    [
-      detail,
-      loading,
-      text.title,
-      textIndex,
-      textWords,
-      timesSeenInText,
-      agreementTarget,
-      showAllTranslations,
-      setShowAllTranslations,
-    ],
+    [detail, loading, textIndex, showAllTranslations, setShowAllTranslations],
   );
 
   const selectedSentence = useMemo(
@@ -423,7 +368,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   const desktopSidebar =
     sentenceSidebar || microscopePanel ? (
       <Sidebar
-        title={microscopePanel ? "Microscope" : "Phrase"}
+        title={microscopePanel ? "Microscope" : "Actions"}
         className="reader-sidebar"
         aria-label="Panneau de lecture"
       >
@@ -573,7 +518,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
           (selectedWordSnapshot !== null || selectedSentence !== null)
         }
         onClose={closeSidebar}
-        title={microscopePanel ? "Microscope" : "Phrase"}
+        title={microscopePanel ? "Microscope" : "Actions"}
         className="reader-sidebar"
         aria-label="Panneau de lecture"
       >
