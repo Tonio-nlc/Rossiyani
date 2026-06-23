@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { GhostButton, PrimaryButton } from "@/components/design-system";
 import type { FeaturedCollectionFeature } from "@/lib/home/pick-featured-collection";
 
 import { HomeCollectionCover } from "./home-collection-cover";
@@ -11,13 +10,7 @@ type HomeWorkspaceFeaturedCollectionProps = {
 
 export function HomeWorkspaceFeaturedCollection({ feature }: HomeWorkspaceFeaturedCollectionProps) {
   return (
-    <section className="home-ws-section" aria-labelledby="home-ws-featured-collection-heading">
-      <div className="home-ws-section__head">
-        <h2 id="home-ws-featured-collection-heading" className="home-ws-section__title">
-          Featured collection
-        </h2>
-      </div>
-
+    <section className="home-ws-section" aria-label="Featured collection">
       <article className="home-ws-card home-ws-featured-collection">
         <HomeCollectionCover collectionId={feature.id} className="home-ws-featured-collection__cover" />
         <div className="home-ws-featured-collection__body">
@@ -27,11 +20,15 @@ export function HomeWorkspaceFeaturedCollection({ feature }: HomeWorkspaceFeatur
               {feature.textCount} text{feature.textCount === 1 ? "" : "s"}
             </span>
           </div>
-          <h3 className="home-ws-featured-collection__title">{feature.name}</h3>
+          <h2 className="home-ws-featured-collection__title">{feature.name}</h2>
           <p className="home-ws-featured-collection__description">{feature.description}</p>
           <div className="home-ws-featured-collection__actions">
-            <PrimaryButton href={feature.continueHref}>Continue Collection</PrimaryButton>
-            <GhostButton href={feature.viewHref}>View Collection</GhostButton>
+            <Link href={feature.continueHref} className="home-ws-btn focus-kb">
+              Continue Collection
+            </Link>
+            <Link href={feature.viewHref} className="home-ws-btn--ghost focus-kb">
+              View Collection
+            </Link>
           </div>
           <Link href="/library" className="home-ws-featured-collection__browse focus-kb">
             Browse all collections →

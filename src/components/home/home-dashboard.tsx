@@ -30,6 +30,7 @@ import { HomeWorkspaceContinue } from "./home-workspace-continue";
 import { HomeWorkspaceExploration } from "./home-workspace-exploration";
 import { HomeWorkspaceFeaturedCollection } from "./home-workspace-featured-collection";
 import { HomeWorkspaceMetrics } from "./home-workspace-metrics";
+import { HomeWorkspaceMotivation } from "./home-workspace-motivation";
 import { HomeWorkspaceRecommendedReading } from "./home-workspace-recommended-reading";
 import { HomeWorkspaceTodaysPractice } from "./home-workspace-todays-practice";
 
@@ -138,28 +139,21 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
 
   return (
     <div className="home-ws">
-      <header className="home-ws__bar">
-        <div>
-          <p className="home-ws__eyebrow">Rossiyani</p>
-          <h1 className="home-ws__title">Your learning journey</h1>
-        </div>
-        <p className="home-ws__subtitle">
-          {metrics.isReturning
-            ? "Pick up where you left off — or start something new."
-            : "Read a text, save a word, and your path will take shape."}
-        </p>
-      </header>
-
-      <div className="home-ws__top">
+      <section className="home-ws__hero" aria-label="Learning journey">
         {continueMeta ? <HomeWorkspaceContinue meta={continueMeta} /> : null}
         <HomeWorkspaceMetrics metrics={metrics} streak={streak} />
-      </div>
+      </section>
 
       <HomeWorkspaceFeaturedCollection feature={featuredCollection} />
       <HomeWorkspaceTodaysPractice cards={todaysPractice} />
       <HomeWorkspaceExploration
         savedWordCount={savedWordCount}
         explorationCount={explorationCount}
+      />
+      <HomeWorkspaceMotivation
+        metrics={metrics}
+        streak={streak}
+        continueHref={continueMeta?.href ?? null}
       />
       <HomeWorkspaceRecommendedReading texts={recommendedTexts} />
     </div>

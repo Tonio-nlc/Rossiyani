@@ -3,12 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { PrimaryButton } from "@/components/design-system";
 import { getCefrLevelLabel } from "@/components/library/library-utils";
 import type { ContinueReadingMeta } from "@/lib/home/resolve-continue-reading";
 import { getTextReadingProgress } from "@/lib/reader/reading-progress";
 
-import { HomeReadingCover } from "./home-reading-cover";
+import { HomeCollectionCover } from "./home-collection-cover";
 
 type HomeWorkspaceContinueProps = {
   meta: ContinueReadingMeta;
@@ -27,10 +26,14 @@ export function HomeWorkspaceContinue({ meta }: HomeWorkspaceContinueProps) {
   }, [meta.textId]);
 
   return (
-    <article className="home-ws-card home-ws-card--hero home-ws-continue">
-      <HomeReadingCover collectionId={meta.collectionId} className="home-ws-continue__cover" />
+    <article className="home-ws-card home-ws-continue">
+      <div className="home-ws-continue__visual">
+        {meta.collectionId ? (
+          <HomeCollectionCover collectionId={meta.collectionId} />
+        ) : null}
+      </div>
       <div className="home-ws-continue__body">
-        <p className="home-ws-continue__eyebrow">Continue learning</p>
+        <p className="home-ws-eyebrow">Continue Learning</p>
         <h2 className="home-ws-continue__title break-russian">{meta.title}</h2>
         <dl className="home-ws-continue__meta">
           <div>
@@ -46,25 +49,31 @@ export function HomeWorkspaceContinue({ meta }: HomeWorkspaceContinueProps) {
             </dd>
           </div>
           <div>
-            <dt>Reading time</dt>
+            <dt>Reading Time</dt>
             <dd>{meta.estimatedMinutes} min</dd>
           </div>
         </dl>
         <div className="home-ws-continue__progress">
           <div className="home-ws-continue__progress-head">
             <span>Progress</span>
-            <span className="home-ws-continue__progress-value">{percent}%</span>
+            <span className="home-ws-continue__progress-value">{percent}% complete</span>
           </div>
-          <div className="home-ws-continue__progress-track" aria-hidden>
+          <div
+            className="home-ws-continue__progress-track"
+            role="progressbar"
+            aria-valuenow={percent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Reading progress"
+          >
             <div className="home-ws-continue__progress-fill" style={{ width: `${percent}%` }} />
           </div>
         </div>
-        <p className="home-ws-continue__detail">{meta.detail}</p>
         <div className="home-ws-continue__actions">
-          <PrimaryButton href={meta.href} className="home-ws-continue__cta">
+          <Link href={meta.href} className="home-ws-btn home-ws-btn--large focus-kb">
             Continue Reading →
-          </PrimaryButton>
-          <Link href="/library" className="home-ws-continue__secondary focus-kb">
+          </Link>
+          <Link href="/library" className="home-ws-btn--text focus-kb">
             Library
           </Link>
         </div>

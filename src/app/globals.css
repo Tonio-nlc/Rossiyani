@@ -6444,7 +6444,7 @@ article:has(.manual-prose) .text-eyebrow {
 .ds-editorial-container:has(.home-landing),
 .ds-editorial-container:has(.home-dash),
 .ds-editorial-container:has(.home-ws) {
-  max-width: 76rem;
+  max-width: 87.5rem;
 }
 
 .home-landing {

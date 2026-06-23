@@ -17,7 +17,6 @@ type ExploreCard = {
   title: string;
   description: string;
   Icon: typeof HomeIconPractice;
-  accent: string;
   layout: "large" | "medium" | "small";
 };
 
@@ -31,7 +30,6 @@ export function HomeWorkspaceExploration({
       title: "Practice",
       description: "Compose sentences from structures you meet in reading.",
       Icon: HomeIconPractice,
-      accent: "practice",
       layout: "large",
     },
     {
@@ -39,7 +37,6 @@ export function HomeWorkspaceExploration({
       title: "Explorer",
       description: "Follow lemmas, grammar patterns, and expressions.",
       Icon: HomeIconExplore,
-      accent: "explorer",
       layout: "medium",
     },
     {
@@ -47,38 +44,35 @@ export function HomeWorkspaceExploration({
       title: "Manual",
       description: "Reference lessons and methodology when you need depth.",
       Icon: HomeIconManual,
-      accent: "manual",
       layout: "medium",
     },
     {
       href: "/library?section=discoveries",
-      title: "Saved words",
+      title: "Saved Words",
       description:
         savedWordCount > 0
           ? `${savedWordCount} word${savedWordCount === 1 ? "" : "s"} marked while reading.`
           : "Mark words in the Reader to build your list.",
       Icon: HomeIconRead,
-      accent: "saved",
       layout: "small",
     },
     {
       href: "/explorer",
-      title: "Recent discoveries",
+      title: "Recent Discoveries",
       description:
         explorationCount > 0
           ? `${explorationCount} exploration${explorationCount === 1 ? "" : "s"} in your history.`
           : "Exploration history appears as you study.",
       Icon: HomeIconExplore,
-      accent: "discoveries",
       layout: "small",
     },
   ];
 
   return (
-    <section className="home-ws-section home-ws-section--surface-cream" aria-labelledby="home-ws-explore-heading">
+    <section className="home-ws-section" aria-labelledby="home-ws-explore-heading">
       <div className="home-ws-section__head">
         <h2 id="home-ws-explore-heading" className="home-ws-section__title">
-          Continue your exploration
+          Continue Your Exploration
         </h2>
       </div>
 
@@ -88,7 +82,7 @@ export function HomeWorkspaceExploration({
             key={card.title}
             className={[
               "home-ws-explore-grid__item",
-              `home-ws-explore-grid__item--${card.layout}`,
+              card.layout === "large" ? "home-ws-explore-grid__item--large" : "",
             ].join(" ")}
           >
             <Link
@@ -96,7 +90,6 @@ export function HomeWorkspaceExploration({
               className={[
                 "home-ws-card",
                 "home-ws-explore-card",
-                `home-ws-explore-card--${card.accent}`,
                 `home-ws-explore-card--${card.layout}`,
                 "focus-kb",
               ].join(" ")}

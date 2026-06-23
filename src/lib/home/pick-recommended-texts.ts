@@ -1,5 +1,5 @@
 import { getCollectionName } from "@/content/collections";
-import { estimateReadingMinutes } from "@/components/library/library-utils";
+import { estimateReadingMinutes, getTextDescription } from "@/components/library/library-utils";
 import type { TextListItem } from "@/features/texts";
 import { isDisplayableLibraryText } from "@/lib/home/displayable-text";
 import type { TextReadingProgress } from "@/lib/reader/reading-progress";
@@ -7,6 +7,7 @@ import type { TextReadingProgress } from "@/lib/reader/reading-progress";
 export type RecommendedTextCard = {
   id: string;
   title: string;
+  description: string;
   collection: string;
   collectionId: TextListItem["collectionId"];
   level: string;
@@ -75,6 +76,7 @@ export function pickRecommendedTexts(
   return picked.map((text) => ({
     id: text.id,
     title: text.title,
+    description: getTextDescription(text.collectionId),
     collection: getCollectionName(text.collectionId),
     collectionId: text.collectionId,
     level: text.level,

@@ -25,29 +25,29 @@ export function buildTodaysPractice(input: BuildTodaysPracticeInput): TodaysPrac
     {
       id: "sentence",
       title: "Sentence Builder",
-      description: "Compose Russian sentences from structures you encounter in your readings.",
+      description: "Compose Russian sentences from structures you encounter in reading.",
       progressLabel: `${sentenceRemaining} exercise${sentenceRemaining === 1 ? "" : "s"} remaining`,
       href: "/practice?mode=sentence",
-      cta: "Start building →",
+      cta: "Start Building →",
     },
     {
       id: "context",
       title: "Context Translation",
-      description: "Translate meaning in context — not word by word.",
+      description: "Translate meaning in context.",
       progressLabel: `${contextRemaining} exercise${contextRemaining === 1 ? "" : "s"} remaining`,
       href: contextTranslationPath(),
-      cta: "Translate now →",
+      cta: "Translate Now →",
     },
     {
       id: "vocabulary",
       title: "Vocabulary Review",
-      description: "Revisit words from your library before they fade.",
+      description: "Revisit saved words.",
       progressLabel:
         reviewTotal > 0
-          ? `${reviewTotal} word${reviewTotal === 1 ? "" : "s"} waiting for review`
+          ? `${reviewTotal} word${reviewTotal === 1 ? "" : "s"} waiting`
           : "Fresh words ready to explore",
       href: input.journal.reviewHref,
-      cta: "Review words →",
+      cta: "Review Words →",
     },
   ];
 }

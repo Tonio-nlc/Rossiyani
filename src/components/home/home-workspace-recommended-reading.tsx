@@ -1,4 +1,5 @@
-import { PrimaryButton } from "@/components/design-system";
+import Link from "next/link";
+
 import type { RecommendedTextCard } from "@/lib/home/pick-recommended-texts";
 
 import { HomeReadingCover } from "./home-reading-cover";
@@ -16,23 +17,30 @@ export function HomeWorkspaceRecommendedReading({ texts }: HomeWorkspaceRecommen
     <section className="home-ws-section" aria-labelledby="home-ws-reading-heading">
       <div className="home-ws-section__head">
         <h2 id="home-ws-reading-heading" className="home-ws-section__title">
-          Recommended reading
+          Recommended Reading
         </h2>
+        <p className="home-ws-section__subtitle">
+          Based on your current level and activity.
+        </p>
       </div>
 
       <ul className="home-ws-reading-grid">
         {texts.map((text) => (
           <li key={text.id}>
             <article className="home-ws-card home-ws-reading-card">
-              <HomeReadingCover collectionId={text.collectionId} className="home-ws-reading-card__cover" />
+              <div className="home-ws-reading-card__media">
+                <HomeReadingCover collectionId={text.collectionId} className="home-ws-reading-card__cover" />
+                <div className="home-ws-reading-card__badges">
+                  <span className="home-ws-badge">{text.level}</span>
+                  <span className="home-ws-badge home-ws-badge--muted">{text.estimatedMinutes} min</span>
+                </div>
+              </div>
               <div className="home-ws-reading-card__body">
-                <p className="home-ws-reading-card__meta">
-                  {text.collection} · {text.level} · {text.estimatedMinutes} min
-                </p>
                 <h3 className="home-ws-reading-card__title break-russian">{text.title}</h3>
-                <PrimaryButton href={text.href} className="home-ws-reading-card__cta">
-                  Start Reading
-                </PrimaryButton>
+                <p className="home-ws-reading-card__description">{text.description}</p>
+                <Link href={text.href} className="home-ws-btn home-ws-reading-card__cta focus-kb">
+                  Start Reading →
+                </Link>
               </div>
             </article>
           </li>
