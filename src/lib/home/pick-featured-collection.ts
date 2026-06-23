@@ -1,3 +1,4 @@
+import { estimateReadingMinutes } from "@/components/library/library-utils";
 import { getCollectionRecord, type CollectionId } from "@/content/collections";
 import type { TextListItem } from "@/features/texts";
 import { isDisplayableLibraryText } from "@/lib/home/displayable-text";
@@ -11,6 +12,9 @@ export type FeaturedCollectionFeature = {
   textCount: number;
   continueHref: string;
   viewHref: string;
+  wordsDiscovered: number;
+  conceptsExplored: number;
+  averageReadingMinutes: number;
 };
 
 function dominantLevel(texts: TextListItem[]): string | null {
@@ -71,15 +75,40 @@ function continueHrefForCollection(
   return collectionTexts[0] ? `/texts/${collectionTexts[0].id}` : "/library";
 }
 
+function collectionStats(
+  collectionTexts: TextListItem[],
+  readingProgress: Record<string, TextReadingProgress>,
+  conceptsExplored: number,
+): Pick<FeaturedCollectionFeature, "wordsDiscovered" | "conceptsExplored" | "averageReadingMinutes"> {
+  const wordsDiscovered = collectionTexts.reduce((total, text) => {
+    const progress = readingProgress[text.id];
+    return total + (progress?.wordsSeenIds.length ?? 0);
+  }, 0);
+
+  const readingMinutes = collectionTexts.map((text) => estimateReadingMinutes(text.sentenceCount));
+  const averageReadingMinutes =
+    readingMinutes.length > 0
+      ? Math.round(readingMinutes.reduce((sum, minutes) => sum + minutes, 0) / readingMinutes.length)
+      : 5;
+
+  return {
+    wordsDiscovered,
+    conceptsExplored,
+    averageReadingMinutes,
+  };
+}
+
 export function pickFeaturedCollection(
   texts: TextListItem[],
   readingProgress: Record<string, TextReadingProgress>,
   preferredCollectionId: CollectionId | null = null,
+  conceptsExplored = 0,
 ): FeaturedCollectionFeature {
   const displayable = texts.filter(isDisplayableLibraryText);
   const id = pickCollectionId(displayable, preferredCollectionId);
   const collection = getCollectionRecord(id);
   const collectionTexts = displayable.filter((text) => text.collectionId === id);
+  const stats = collectionStats(collectionTexts, readingProgress, conceptsExplored);
 
   return {
     id,
@@ -89,5 +118,6 @@ export function pickFeaturedCollection(
     textCount: collectionTexts.length,
     continueHref: continueHrefForCollection(collectionTexts, readingProgress),
     viewHref: "/library",
+    ...stats,
   };
 }

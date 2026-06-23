@@ -8,6 +8,10 @@ type HomeWorkspaceFeaturedCollectionProps = {
   feature: FeaturedCollectionFeature;
 };
 
+function formatMetric(value: number): string {
+  return value.toLocaleString("en-US");
+}
+
 export function HomeWorkspaceFeaturedCollection({ feature }: HomeWorkspaceFeaturedCollectionProps) {
   return (
     <section className="home-ws-section" aria-label="Featured collection">
@@ -22,6 +26,16 @@ export function HomeWorkspaceFeaturedCollection({ feature }: HomeWorkspaceFeatur
           </div>
           <h2 className="home-ws-featured-collection__title">{feature.name}</h2>
           <p className="home-ws-featured-collection__description">{feature.description}</p>
+
+          <div className="home-ws-featured-collection__stats">
+            <p className="home-ws-featured-collection__stats-label">Collection Progress</p>
+            <ul className="home-ws-featured-collection__stats-list">
+              <li>{formatMetric(feature.wordsDiscovered)} words discovered</li>
+              <li>{formatMetric(feature.conceptsExplored)} concepts explored</li>
+              <li>{feature.averageReadingMinutes} minutes average reading time</li>
+            </ul>
+          </div>
+
           <div className="home-ws-featured-collection__actions">
             <Link href={feature.continueHref} className="home-ws-btn focus-kb">
               Continue Collection

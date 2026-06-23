@@ -26,8 +26,14 @@ import { resolveContinueReading } from "@/lib/home/resolve-continue-reading";
 import { getAllReadingProgress } from "@/lib/reader/reading-progress";
 import { getSavedReaderWords } from "@/lib/reader/saved-words";
 
+import {
+  HomeIconExplore,
+  HomeIconManual,
+  HomeIconPractice,
+  HomeIconRead,
+} from "./home-icons";
 import { HomeWorkspaceContinue } from "./home-workspace-continue";
-import { HomeWorkspaceExploration } from "./home-workspace-exploration";
+import { HomeWorkspaceExploration, type ExplorationCardData } from "./home-workspace-exploration";
 import { HomeWorkspaceFeaturedCollection } from "./home-workspace-featured-collection";
 import { HomeWorkspaceMetrics } from "./home-workspace-metrics";
 import { HomeWorkspaceMotivation } from "./home-workspace-motivation";
@@ -39,6 +45,11 @@ type HomeDashboardProps = {
   texts: TextListItem[];
 };
 
+function countRecentConceptDiscoveries(exploration: ReturnType<typeof getExplorationHistory>): number {
+  const conceptKinds = new Set(["concept", "case", "ending", "expression", "collocation"]);
+  return exploration.filter((entry) => conceptKinds.has(entry.kind)).length;
+}
+
 export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
   const [narrative, setNarrative] = useState<SessionJournal>(() =>
     buildSessionJournalFromServer(journal, texts),
@@ -46,6 +57,7 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
   const [clientReady, setClientReady] = useState(false);
   const [savedWordCount, setSavedWordCount] = useState(0);
   const [explorationCount, setExplorationCount] = useState(0);
+  const [conceptDiscoveryCount, setConceptDiscoveryCount] = useState(0);
 
   useEffect(() => {
     const readingProgress = getAllReadingProgress();
@@ -67,6 +79,7 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
     );
     setSavedWordCount(savedWords.length);
     setExplorationCount(exploration.length);
+    setConceptDiscoveryCount(countRecentConceptDiscoveries(exploration));
     setClientReady(true);
   }, [journal, texts]);
 
@@ -112,8 +125,13 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
 
   const featuredCollection = useMemo(
     () =>
-      pickFeaturedCollection(texts, readingProgress, continueMeta?.collectionId ?? null),
-    [texts, readingProgress, continueMeta?.collectionId],
+      pickFeaturedCollection(
+        texts,
+        readingProgress,
+        continueMeta?.collectionId ?? null,
+        metrics.conceptsExplored,
+      ),
+    [texts, readingProgress, continueMeta?.collectionId, metrics.conceptsExplored],
   );
 
   const recommendedTexts = useMemo(
@@ -137,25 +155,78 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
     });
   }, [clientReady, journal]);
 
+  const explorationCards = useMemo((): ExplorationCardData[] => {
+    const sentenceRemaining = Math.max(1, 5 - (getSavedComposePhrases().length % 5));
+    const contextRemaining = Math.max(1, 4 - (getSavedContextTranslationLessons().length % 4));
+    const practiceAvailable = clientReady ? sentenceRemaining + contextRemaining : 3;
+    const conceptsWaiting = journal.review.words.length + journal.review.moreCount;
+    const discoveries = clientReady ? conceptDiscoveryCount : 0;
+
+    return [
+      {
+        href: "/practice",
+        title: "Practice",
+        metric: `${practiceAvailable} exercise${practiceAvailable === 1 ? "" : "s"} available`,
+        cta: "Continue practicing →",
+        Icon: HomeIconPractice,
+        layout: "large",
+      },
+      {
+        href: "/explorer",
+        title: "Explorer",
+        metric: `${conceptsWaiting} concept${conceptsWaiting === 1 ? "" : "s"} waiting`,
+        cta: "Explore concepts →",
+        Icon: HomeIconExplore,
+        layout: "medium",
+      },
+      {
+        href: "/manual",
+        title: "Manual",
+        metric: "Grammar roadmap",
+        cta: "Continue learning →",
+        Icon: HomeIconManual,
+        layout: "medium",
+      },
+      {
+        href: "/library?section=discoveries",
+        title: "Saved Words",
+        metric: `${savedWordCount} saved word${savedWordCount === 1 ? "" : "s"}`,
+        cta: "Review words →",
+        Icon: HomeIconRead,
+        layout: "small",
+      },
+      {
+        href: "/explorer",
+        title: "Recent Discoveries",
+        metric: `${discoveries || explorationCount} new concept${(discoveries || explorationCount) === 1 ? "" : "s"}`,
+        cta: "View history →",
+        Icon: HomeIconExplore,
+        layout: "small",
+      },
+    ];
+  }, [
+    clientReady,
+    conceptDiscoveryCount,
+    explorationCount,
+    journal.review.moreCount,
+    journal.review.words.length,
+    savedWordCount,
+  ]);
+
   return (
     <div className="home-ws">
       <section className="home-ws__hero" aria-label="Learning journey">
-        {continueMeta ? <HomeWorkspaceContinue meta={continueMeta} /> : null}
+        {continueMeta ? (
+          <HomeWorkspaceContinue meta={continueMeta} wordsDiscovered={metrics.wordsExplored} />
+        ) : null}
         <HomeWorkspaceMetrics metrics={metrics} streak={streak} />
       </section>
 
       <HomeWorkspaceFeaturedCollection feature={featuredCollection} />
       <HomeWorkspaceTodaysPractice cards={todaysPractice} />
-      <HomeWorkspaceExploration
-        savedWordCount={savedWordCount}
-        explorationCount={explorationCount}
-      />
-      <HomeWorkspaceMotivation
-        metrics={metrics}
-        streak={streak}
-        continueHref={continueMeta?.href ?? null}
-      />
       <HomeWorkspaceRecommendedReading texts={recommendedTexts} />
+      <HomeWorkspaceExploration cards={explorationCards} />
+      <HomeWorkspaceMotivation streak={streak} continueHref={continueMeta?.href ?? null} />
     </div>
   );
 }

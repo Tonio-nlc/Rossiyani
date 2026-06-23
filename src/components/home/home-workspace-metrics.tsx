@@ -1,3 +1,4 @@
+import { buildWordsMilestone } from "@/lib/home/build-hero-continue-insights";
 import type { HomeDashboardMetrics } from "@/lib/home/build-home-dashboard-metrics";
 import type { LearningStreakSnapshot } from "@/lib/home/learning-streak";
 
@@ -11,6 +12,8 @@ function formatMetric(value: number): string {
 }
 
 export function HomeWorkspaceMetrics({ metrics, streak }: HomeWorkspaceMetricsProps) {
+  const milestone = buildWordsMilestone(metrics.wordsExplored);
+
   return (
     <div className="home-ws-metrics" aria-label="Learning statistics">
       <article className="home-ws-card home-ws-metric">
@@ -20,6 +23,25 @@ export function HomeWorkspaceMetrics({ metrics, streak }: HomeWorkspaceMetricsPr
           <span className="home-ws-metric__unit">days</span>
         </p>
         <p className="home-ws-metric__hint">Keep your reading rhythm alive.</p>
+      </article>
+
+      <article className="home-ws-card home-ws-metric home-ws-metric--milestone">
+        <p className="home-ws-metric__label">Next Milestone</p>
+        <p className="home-ws-metric__goal-title">100 Words Goal</p>
+        <p className="home-ws-metric__goal-progress">
+          {formatMetric(milestone.current)} / {formatMetric(milestone.goal)}
+        </p>
+        <div className="home-ws-metric__goal-track" aria-hidden>
+          <div
+            className="home-ws-metric__goal-fill"
+            style={{ width: `${milestone.percent}%` }}
+          />
+        </div>
+        <p className="home-ws-metric__hint">
+          {milestone.remaining > 0
+            ? `${formatMetric(milestone.remaining)} words remaining`
+            : "Milestone reached — set your sights higher."}
+        </p>
       </article>
 
       <article className="home-ws-card home-ws-metric">
