@@ -61,7 +61,9 @@ export function HomeWorkspaceContinue({ meta }: HomeWorkspaceContinueProps) {
         </div>
         <p className="home-ws-continue__detail">{meta.detail}</p>
         <div className="home-ws-continue__actions">
-          <PrimaryButton href={meta.href}>Continue Reading →</PrimaryButton>
+          <PrimaryButton href={meta.href} className="home-ws-continue__cta">
+            Continue Reading →
+          </PrimaryButton>
           <Link href="/library" className="home-ws-continue__secondary focus-kb">
             Library
           </Link>

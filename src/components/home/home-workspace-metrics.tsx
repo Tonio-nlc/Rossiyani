@@ -13,38 +13,35 @@ function formatMetric(value: number): string {
 export function HomeWorkspaceMetrics({ metrics, streak }: HomeWorkspaceMetricsProps) {
   return (
     <div className="home-ws-metrics" aria-label="Workspace statistics">
-      <article className="home-ws-card home-ws-card--metric home-ws-card--metric-streak">
+      <article className="home-ws-card home-ws-card--metric home-ws-card--surface-cream home-ws-metric-streak">
         <p className="home-ws-metric__label">Current streak</p>
-        <p className="home-ws-metric__value">
+        <p className="home-ws-metric__value home-ws-metric__value--hero">
           {formatMetric(metrics.currentStreak)}
           <span className="home-ws-metric__unit">days</span>
         </p>
-        <p className="home-ws-metric__hint">Keep your reading rhythm alive.</p>
       </article>
 
-      <article className="home-ws-card home-ws-card--metric home-ws-card--metric-words">
-        <p className="home-ws-metric__label">Words discovered</p>
-        <p className="home-ws-metric__value">{formatMetric(metrics.wordsExplored)}</p>
-        <div className="home-ws-metric__bars" aria-hidden>
-          {[0.35, 0.55, 0.42, 0.7, 0.48, 0.62].map((height, index) => (
-            <span key={index} style={{ height: `${height * 100}%` }} />
-          ))}
-        </div>
+      <article className="home-ws-card home-ws-card--metric home-ws-card--surface-pearl home-ws-metric-progress">
+        <p className="home-ws-metric__label">Learning progress</p>
+        <dl className="home-ws-metric-progress__grid">
+          <div>
+            <dt>Words</dt>
+            <dd>{formatMetric(metrics.wordsExplored)}</dd>
+          </div>
+          <div>
+            <dt>Concepts</dt>
+            <dd>{formatMetric(metrics.conceptsExplored)}</dd>
+          </div>
+          <div>
+            <dt>Texts</dt>
+            <dd>{formatMetric(metrics.textsCompleted)}</dd>
+          </div>
+        </dl>
       </article>
 
-      <article className="home-ws-card home-ws-card--metric">
-        <p className="home-ws-metric__label">Concepts explored</p>
-        <p className="home-ws-metric__value">{formatMetric(metrics.conceptsExplored)}</p>
-      </article>
-
-      <article className="home-ws-card home-ws-card--metric">
-        <p className="home-ws-metric__label">Texts completed</p>
-        <p className="home-ws-metric__value">{formatMetric(metrics.textsCompleted)}</p>
-      </article>
-
-      <article className="home-ws-card home-ws-card--metric home-ws-card--metric-activity">
+      <article className="home-ws-card home-ws-card--metric home-ws-card--surface-beige home-ws-metric-activity">
         <p className="home-ws-metric__label">Daily activity</p>
-        <p className="home-ws-metric__value home-ws-metric__value--small">
+        <p className="home-ws-metric__value home-ws-metric__value--compact">
           {formatMetric(streak.wordsToday)}
           <span className="home-ws-metric__unit">words today</span>
         </p>

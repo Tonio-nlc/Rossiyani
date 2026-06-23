@@ -12,36 +12,44 @@ type HomeWorkspaceExplorationProps = {
   discoveryCount: number;
 };
 
-const BASE_CARDS = [
-  {
-    href: "/practice",
-    title: "Practice",
-    description: "Compose sentences from structures you meet in reading.",
-    Icon: HomeIconPractice,
-    accent: "practice",
-  },
-  {
-    href: "/explorer",
-    title: "Explorer",
-    description: "Follow lemmas, grammar patterns, and expressions.",
-    Icon: HomeIconExplore,
-    accent: "explorer",
-  },
-  {
-    href: "/manual",
-    title: "Manual",
-    description: "Reference lessons and methodology when you need depth.",
-    Icon: HomeIconManual,
-    accent: "manual",
-  },
-] as const;
+type ExploreCard = {
+  href: string;
+  title: string;
+  description: string;
+  Icon: typeof HomeIconPractice;
+  accent: string;
+  layout: "wide" | "tall" | "standard";
+};
 
 export function HomeWorkspaceExploration({
   savedWordCount,
   discoveryCount,
 }: HomeWorkspaceExplorationProps) {
-  const cards = [
-    ...BASE_CARDS,
+  const cards: ExploreCard[] = [
+    {
+      href: "/practice",
+      title: "Practice",
+      description: "Compose sentences from structures you meet in reading.",
+      Icon: HomeIconPractice,
+      accent: "practice",
+      layout: "wide",
+    },
+    {
+      href: "/explorer",
+      title: "Explorer",
+      description: "Follow lemmas, grammar patterns, and expressions.",
+      Icon: HomeIconExplore,
+      accent: "explorer",
+      layout: "tall",
+    },
+    {
+      href: "/manual",
+      title: "Manual",
+      description: "Reference lessons and methodology when you need depth.",
+      Icon: HomeIconManual,
+      accent: "manual",
+      layout: "standard",
+    },
     {
       href: "/library?section=discoveries",
       title: "Saved words",
@@ -51,6 +59,7 @@ export function HomeWorkspaceExploration({
           : "Mark words in the Reader to build your list.",
       Icon: HomeIconRead,
       accent: "saved",
+      layout: "standard",
     },
     {
       href: "/explorer",
@@ -61,11 +70,12 @@ export function HomeWorkspaceExploration({
           : "Exploration history appears as you study.",
       Icon: HomeIconExplore,
       accent: "discoveries",
+      layout: "wide",
     },
   ];
 
   return (
-    <section className="home-ws-section" aria-labelledby="home-ws-explore-heading">
+    <section className="home-ws-section home-ws-section--surface-cream" aria-labelledby="home-ws-explore-heading">
       <div className="home-ws-section__head">
         <h2 id="home-ws-explore-heading" className="home-ws-section__title">
           Continue your exploration
@@ -74,7 +84,14 @@ export function HomeWorkspaceExploration({
 
       <ul className="home-ws-explore-grid">
         {cards.map((card) => (
-          <li key={card.title}>
+          <li
+            key={card.title}
+            className={[
+              "home-ws-explore-grid__item",
+              card.layout === "wide" ? "home-ws-explore-grid__item--wide" : "",
+              card.layout === "tall" ? "home-ws-explore-grid__item--tall" : "",
+            ].join(" ")}
+          >
             <Link
               href={card.href}
               className={[
