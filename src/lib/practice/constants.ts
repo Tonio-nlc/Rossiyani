@@ -6,7 +6,7 @@ export const PRACTICE_SUGGESTIONS = [
   { label: "Use: несмотря на", context: "Use the structure: несмотря на" },
 ] as const;
 
-export type PracticeModeId = "sentence" | "context-translation";
+export type PracticeModeId = "sentence" | "context-translation" | "my-sentences";
 
 export type PracticeModeCard = {
   id: PracticeModeId;
@@ -27,6 +27,12 @@ export const PRACTICE_MODE_CARDS: PracticeModeCard[] = [
     title: "Traduction contextualisée",
     description: "Traduisez le sens, pas des mots isolés.",
     href: "/practice/context-translation",
+  },
+  {
+    id: "my-sentences",
+    title: "Mes phrases",
+    description: "Pratiquez uniquement les phrases enregistrées en lecture.",
+    href: "/practice/my-sentences",
   },
 ];
 

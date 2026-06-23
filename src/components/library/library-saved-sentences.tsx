@@ -1,70 +1,140 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
+import { EditorialSectionHead } from "@/components/editorial/editorial-section-head";
 import { Reference } from "@/components/editorial";
+import { deleteSavedSentence, getSavedSentences } from "@/lib/phrase-mining";
 import { practicePath } from "@/lib/practice/constants";
-import {
-  deleteReaderSentence,
-  getSavedReaderSentences,
-} from "@/lib/practice/saved-sentences";
+import type { SavedSentence } from "@/types/saved-sentence";
+
+function formatSavedDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function SavedSentenceCard({
+  sentence,
+  onRemove,
+}: {
+  sentence: SavedSentence;
+  onRemove: (id: string) => void;
+}) {
+  return (
+    <article className="lib-saved-sentence-card">
+      <p className="lib-saved-sentence-card__text break-russian">{sentence.text}</p>
+      {sentence.translation ? (
+        <p className="lib-saved-sentence-card__translation">{sentence.translation}</p>
+      ) : null}
+
+      <dl className="lib-saved-sentence-card__meta">
+        <div>
+          <dt>Source</dt>
+          <dd>{sentence.sourceTextTitle}</dd>
+        </div>
+        {sentence.collection ? (
+          <div>
+            <dt>Collection</dt>
+            <dd>{sentence.collection}</dd>
+          </div>
+        ) : null}
+        <div>
+          <dt>Enregistrée</dt>
+          <dd>{formatSavedDate(sentence.createdAt)}</dd>
+        </div>
+      </dl>
+
+      <footer className="lib-saved-sentence-card__footer">
+        <Link href={`/texts/${sentence.sourceTextId}`} className="lib-saved-sentence-card__cta focus-kb">
+          Ouvrir le texte →
+        </Link>
+        <Link
+          href={practicePath({
+            savedSentenceId: sentence.id,
+            text: sentence.text,
+            reference: sentence.text,
+            context: `From: ${sentence.sourceTextTitle}`,
+            textId: sentence.sourceTextId,
+            textTitle: sentence.sourceTextTitle,
+            from: "reader",
+          })}
+          className="lib-saved-sentence-card__cta focus-kb"
+        >
+          Pratiquer →
+        </Link>
+        <button
+          type="button"
+          onClick={() => onRemove(sentence.id)}
+          className="lib-saved-sentence-card__remove focus-kb"
+        >
+          Retirer
+        </button>
+      </footer>
+    </article>
+  );
+}
 
 export function LibrarySavedSentences() {
-  const [sentences, setSentences] = useState(() => getSavedReaderSentences());
+  const [sentences, setSentences] = useState<SavedSentence[]>([]);
+
+  const refresh = useCallback(() => {
+    setSentences(getSavedSentences());
+  }, []);
 
   useEffect(() => {
-    setSentences(getSavedReaderSentences());
-  }, []);
+    refresh();
+  }, [refresh]);
 
   if (sentences.length === 0) {
     return (
-      <p className="text-sm text-[var(--ink-muted)]">
-        Saved sentences from Reader will appear here.{" "}
-        <Reference href="/reader">Open Reader →</Reference>
-      </p>
+      <div className="lib-saved-sentences-empty">
+        <EditorialSectionHead
+          icon={
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden className="editorial-section-head__icon">
+              <path d="M4 5.5h12M4 10h8M4 14.5h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
+          }
+          title="Mes phrases"
+          lead="Enregistrez des phrases en lecture pour les retrouver ici et les pratiquer plus tard."
+        />
+        <p className="lib-saved-sentences-empty__hint">
+          Sélectionnez une phrase dans le Reader, puis utilisez « Enregistrer la phrase » dans le
+          panneau latéral.
+        </p>
+        <Reference href="/reader">Ouvrir la lecture →</Reference>
+      </div>
     );
   }
 
   return (
-    <ul className="divide-y divide-[var(--hairline)]">
-      {sentences.map((sentence) => (
-        <li key={sentence.id} className="py-5">
-          <p className="font-reader text-base text-[var(--ink)]">{sentence.russianText}</p>
-          <p className="mt-1 text-metadata text-[var(--ink-muted)]">
-            {sentence.textTitle} ·{" "}
-            {new Date(sentence.savedAt).toLocaleDateString(undefined, {
-              day: "numeric",
-              month: "long",
-            })}
-          </p>
-          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm">
-            <Reference href={`/texts/${sentence.textId}`}>Open in Reader</Reference>
-            <Link
-              href={practicePath({
-                reference: sentence.russianText,
-                context: `From: ${sentence.textTitle}`,
-                textId: sentence.textId,
-                textTitle: sentence.textTitle,
-                from: "reader",
-              })}
-              className="focus-kb text-[var(--ink-secondary)] hover:text-[var(--ink)]"
-            >
-              Practice
-            </Link>
-            <button
-              type="button"
-              onClick={() => {
-                deleteReaderSentence(sentence.id);
-                setSentences(getSavedReaderSentences());
+    <div className="lib-saved-sentences">
+      <EditorialSectionHead
+        icon={
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden className="editorial-section-head__icon">
+            <path d="M4 5.5h12M4 10h8M4 14.5h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          </svg>
+        }
+        title="Mes phrases"
+        lead={`${sentences.length} phrase${sentences.length > 1 ? "s" : ""} extraite${sentences.length > 1 ? "s" : ""} de vos lectures.`}
+      />
+
+      <ul className="lib-saved-sentence-grid">
+        {sentences.map((sentence) => (
+          <li key={sentence.id}>
+            <SavedSentenceCard
+              sentence={sentence}
+              onRemove={(id) => {
+                deleteSavedSentence(id);
+                refresh();
               }}
-              className="focus-kb text-[var(--ink-muted)] hover:text-[var(--ink)]"
-            >
-              Remove
-            </button>
-          </div>
-        </li>
-      ))}
-    </ul>
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

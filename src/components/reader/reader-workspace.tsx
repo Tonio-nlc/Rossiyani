@@ -25,6 +25,7 @@ import { ReaderCompletionCard } from "./reader-completion-card";
 import { ReaderHeader } from "./reader-header";
 import { ReaderInTextSearch } from "./reader-in-text-search";
 import { ReaderMarginPanel } from "./reader-margin-panel";
+import { ReaderSentenceSidebar } from "./reader-sentence-sidebar";
 import { mapSentenceWords, ReaderSentence } from "./reader-sentence";
 import { isSentenceAnalyzing, ReaderSentenceAnalyzing } from "./reader-sentence-analyzing";
 import { toReaderWordSnapshot } from "./reader-word-utils";
@@ -65,6 +66,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   const visibleSentenceIdsRef = useRef<Set<string>>(
     new Set(text.sentences[0] ? [text.sentences[0].id] : []),
   );
+  const [mobileSidebarDismissed, setMobileSidebarDismissed] = useState(false);
   const restoredRef = useRef(false);
   const sentenceRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
@@ -407,9 +409,39 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   const microscopePanel =
     selectedWordSnapshot !== null ? <ReaderMarginPanel {...marginPanelProps} /> : null;
 
-  const closeMicroscope = useCallback(() => {
+  const sentenceSidebar =
+    selectedSentence !== null ? (
+      <ReaderSentenceSidebar
+        sentenceText={selectedSentence.russianText}
+        translation={selectedSentence.naturalTranslation}
+        textId={text.id}
+        textTitle={text.title}
+        collection={getCollectionName(text.collectionId)}
+      />
+    ) : null;
+
+  const desktopSidebar =
+    sentenceSidebar || microscopePanel ? (
+      <Sidebar
+        title={microscopePanel ? "Microscope" : "Phrase"}
+        className="reader-sidebar"
+        aria-label="Panneau de lecture"
+      >
+        <div className="reader-sidebar-stack">
+          {sentenceSidebar}
+          {microscopePanel}
+        </div>
+      </Sidebar>
+    ) : null;
+
+  useEffect(() => {
+    setMobileSidebarDismissed(false);
+  }, [selectedSentenceId, selectedWordSnapshot?.id]);
+
+  const closeSidebar = useCallback(() => {
     setSelectedWordSnapshot(null);
     setHoveredWordSnapshot(null);
+    setMobileSidebarDismissed(true);
   }, []);
 
   return (
@@ -520,17 +552,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
             })}
           </article>
         }
-        sidebar={
-          microscopePanel ? (
-            <Sidebar
-              title="Microscope"
-              className="reader-sidebar"
-              aria-label="Microscope linguistique"
-            >
-              {microscopePanel}
-            </Sidebar>
-          ) : null
-        }
+        sidebar={desktopSidebar}
         footer={
           <>
             <ReaderCompletionCard
@@ -546,13 +568,19 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
 
       <Sidebar
         variant="sheet"
-        open={selectedWordSnapshot !== null}
-        onClose={closeMicroscope}
-        title="Microscope"
+        open={
+          !mobileSidebarDismissed &&
+          (selectedWordSnapshot !== null || selectedSentence !== null)
+        }
+        onClose={closeSidebar}
+        title={microscopePanel ? "Microscope" : "Phrase"}
         className="reader-sidebar"
-        aria-label="Microscope linguistique"
+        aria-label="Panneau de lecture"
       >
-        {microscopePanel}
+        <div className="reader-sidebar-stack">
+          {sentenceSidebar}
+          {microscopePanel}
+        </div>
       </Sidebar>
     </div>
   );

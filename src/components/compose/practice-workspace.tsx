@@ -20,6 +20,7 @@ import type {
 } from "@/lib/compose/types";
 import { COMPOSE_REGISTERS, COMPOSE_THEMES } from "@/lib/compose/types";
 import { saveComposePhrase, getComposePhraseById } from "@/lib/compose/saved-phrases";
+import { getSavedSentenceById, recordSentenceReview } from "@/lib/phrase-mining";
 
 import { PracticeAnalysisView } from "./practice-analysis-view";
 import { PracticeExerciseHeader } from "../practice/practice-exercise-header";
@@ -63,6 +64,7 @@ function hasExerciseEntry(searchParams: URLSearchParams): boolean {
     searchParams.get("mode") === "sentence" ||
     Boolean(searchParams.get("structure")) ||
     Boolean(searchParams.get("phraseId")) ||
+    Boolean(searchParams.get("savedSentenceId")) ||
     Boolean(searchParams.get("text"))
   );
 }
@@ -88,6 +90,20 @@ export function PracticeWorkspace() {
   const [rewriteSavedLocally, setRewriteSavedLocally] = useState(false);
 
   useEffect(() => {
+    const savedSentenceId = searchParams.get("savedSentenceId");
+    if (savedSentenceId) {
+      const savedSentence = getSavedSentenceById(savedSentenceId);
+      if (savedSentence) {
+        setContext(`From: ${savedSentence.sourceTextTitle}`);
+        setRussianText(savedSentence.text);
+        setReferenceSentence(savedSentence.text);
+        setStructureMode(false);
+        setStructureContext(null);
+        recordSentenceReview(savedSentence.id);
+        return;
+      }
+    }
+
     const phraseId = searchParams.get("phraseId");
     if (phraseId) {
       const savedPhrase = getComposePhraseById(phraseId);

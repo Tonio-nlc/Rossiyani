@@ -6,9 +6,7 @@ import { Reference } from "@/components/editorial";
 
 import { LibraryContextTranslationLessons } from "./library-context-translation-lessons";
 import { LibraryMyDiscoveries } from "./library-my-discoveries";
-import { LibraryMyPhrases } from "./library-my-phrases";
 import { LibraryPageIntro } from "./library-page-intro";
-import { LibrarySavedPhrases } from "./library-saved-phrases";
 import { LibrarySavedSentences } from "./library-saved-sentences";
 import { LibrarySectionNav, type LibrarySection } from "./library-section-nav";
 import { LibraryView } from "./library-view";
@@ -50,7 +48,10 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
         <LibraryPageIntro />
         <LibrarySectionNav active="saved" />
         <section className="lib-editorial-section">
-          <LibrarySavedSentences />
+          <p className="lib-saved-sentences-empty__hint">
+            Les phrases enregistrées en lecture se trouvent dans{" "}
+            <Reference href="/library?section=phrases">Mes phrases →</Reference>
+          </p>
         </section>
       </div>
     );
@@ -74,10 +75,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
         <LibraryPageIntro />
         <LibrarySectionNav active="phrases" />
         <section className="lib-editorial-section">
-          <LibrarySavedPhrases />
-        </section>
-        <section className="lib-editorial-section lib-editorial-section--secondary">
-          <LibraryMyPhrases />
+          <LibrarySavedSentences />
         </section>
       </div>
     );
