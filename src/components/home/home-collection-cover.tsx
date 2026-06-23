@@ -19,8 +19,8 @@ export function HomeCollectionCover({ collectionId, className = "" }: HomeCollec
   const accent = COVER_ACCENTS[collectionId] ?? COVER_ACCENTS["everyday-russian"];
 
   return (
-    <div className={["home-dash-collection-cover", className].join(" ")} aria-hidden>
-      <svg viewBox="0 0 320 200" className="home-dash-collection-cover__svg" preserveAspectRatio="xMidYMid slice">
+    <div className={["home-ws-collection-cover", className].join(" ")} aria-hidden>
+      <svg viewBox="0 0 320 200" className="home-ws-collection-cover__svg" preserveAspectRatio="xMidYMid slice">
         <defs>
           <linearGradient id={`cover-grad-${collectionId}`} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor={accent.a} stopOpacity="0.22" />

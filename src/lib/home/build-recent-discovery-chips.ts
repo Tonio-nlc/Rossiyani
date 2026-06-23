@@ -2,16 +2,20 @@ import type { HomeJournalData } from "@/features/home";
 import type { SessionJournalEntry } from "@/lib/home/build-session-journal";
 import { explorationKindLabel, type ExplorationEntry } from "@/lib/explorer/exploration-history";
 
-export type DiscoveryChipKind = "word" | "concept" | "grammar";
+export type DiscoveryCardKind = "word" | "concept" | "grammar";
 
-export type DiscoveryChip = {
+export type DiscoveryCard = {
   label: string;
   href: string;
-  kind: DiscoveryChipKind;
-  detail?: string;
+  kind: DiscoveryCardKind;
+  typeLabel: string;
 };
 
-function kindFromExploration(kind: ExplorationEntry["kind"]): DiscoveryChipKind {
+/** @deprecated Use DiscoveryCard */
+export type DiscoveryChip = DiscoveryCard;
+export type DiscoveryChipKind = DiscoveryCardKind;
+
+function kindFromExploration(kind: ExplorationEntry["kind"]): DiscoveryCardKind {
   if (kind === "lemma") {
     return "word";
   }
@@ -21,7 +25,7 @@ function kindFromExploration(kind: ExplorationEntry["kind"]): DiscoveryChipKind 
   return "grammar";
 }
 
-function kindFromJournalDetail(detail?: string): DiscoveryChipKind {
+function kindFromJournalDetail(detail?: string): DiscoveryCardKind {
   if (!detail) {
     return "concept";
   }
@@ -35,46 +39,96 @@ function kindFromJournalDetail(detail?: string): DiscoveryChipKind {
   return "concept";
 }
 
-export function buildRecentDiscoveryChips(input: {
+function typeLabelFromExploration(kind: ExplorationEntry["kind"]): string {
+  switch (kind) {
+    case "lemma":
+      return "Vocabulary";
+    case "phrase":
+      return "Expression";
+    case "concept":
+      return "Grammar concept";
+    case "case":
+      return "Grammar case";
+    case "ending":
+      return "Morphology";
+    case "text":
+      return "Text";
+    default:
+      return explorationKindLabel(kind);
+  }
+}
+
+function typeLabelFromJournalDetail(detail?: string, kind?: DiscoveryCardKind): string {
+  if (detail?.trim()) {
+    const lower = detail.toLowerCase();
+    if (lower.includes("grammaire")) {
+      return "Grammar";
+    }
+    if (lower.includes("cas")) {
+      return "Grammar case";
+    }
+    if (lower.includes("morphologie")) {
+      return "Morphology";
+    }
+    if (lower.includes("structure")) {
+      return "Structure";
+    }
+    if (lower.includes("mot") || lower.includes("lemme")) {
+      return "Vocabulary";
+    }
+    return detail;
+  }
+  if (kind === "word") {
+    return "Vocabulary";
+  }
+  if (kind === "grammar") {
+    return "Grammar";
+  }
+  return "Concept";
+}
+
+export function buildRecentDiscoveryCards(input: {
   exploration: ExplorationEntry[];
   recentlyLearned: SessionJournalEntry[];
   journal: HomeJournalData;
   limit?: number;
-}): DiscoveryChip[] {
-  const limit = input.limit ?? 12;
-  const chips: DiscoveryChip[] = [];
+}): DiscoveryCard[] {
+  const limit = input.limit ?? 8;
+  const cards: DiscoveryCard[] = [];
   const seen = new Set<string>();
 
-  const push = (chip: DiscoveryChip) => {
-    const key = chip.label.trim().toLowerCase();
+  const push = (card: DiscoveryCard) => {
+    const key = card.label.trim().toLowerCase();
     if (!key || seen.has(key)) {
       return;
     }
     seen.add(key);
-    chips.push(chip);
+    cards.push(card);
   };
 
   for (const entry of input.exploration) {
+    const kind = kindFromExploration(entry.kind);
     push({
       label: entry.label,
       href: entry.href,
-      kind: kindFromExploration(entry.kind),
-      detail: explorationKindLabel(entry.kind),
+      kind,
+      typeLabel: typeLabelFromExploration(entry.kind),
     });
-    if (chips.length >= limit) {
-      return chips;
+    if (cards.length >= limit) {
+      return cards;
     }
   }
 
   for (const entry of input.recentlyLearned) {
+    const kind = kindFromJournalDetail(entry.detail);
     push({
       label: entry.label,
       href: entry.href ?? "/explorer",
-      kind: kindFromJournalDetail(entry.detail),
-      detail: entry.detail,
+      kind,
+      typeLabel: typeLabelFromJournalDetail(entry.detail, kind),
     });
-    if (chips.length >= limit) {
-      return chips;
+    if (cards.length >= limit) {
+      return cards;
     }
   }
 
@@ -83,7 +137,7 @@ export function buildRecentDiscoveryChips(input: {
       label: input.journal.todaysDiscovery.displayLabel,
       href: input.journal.todaysDiscovery.explorerHref,
       kind: "concept",
-      detail: input.journal.todaysDiscovery.typeLabel,
+      typeLabel: input.journal.todaysDiscovery.typeLabel,
     });
   }
 
@@ -92,9 +146,16 @@ export function buildRecentDiscoveryChips(input: {
       label: word.label,
       href: word.href,
       kind: "word",
-      detail: "Vocabulary",
+      typeLabel: "Vocabulary",
     });
   }
 
-  return chips.slice(0, limit);
+  return cards.slice(0, limit);
+}
+
+/** @deprecated Use buildRecentDiscoveryCards */
+export function buildRecentDiscoveryChips(
+  input: Parameters<typeof buildRecentDiscoveryCards>[0],
+): DiscoveryCard[] {
+  return buildRecentDiscoveryCards(input);
 }

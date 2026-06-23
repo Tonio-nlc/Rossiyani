@@ -12,21 +12,22 @@ import {
 } from "@/lib/discovery/saved-discoveries";
 import { getExplorationHistory } from "@/lib/explorer/exploration-history";
 import { buildHomeDashboardMetrics } from "@/lib/home/build-home-dashboard-metrics";
-import { buildRecentDiscoveryChips } from "@/lib/home/build-recent-discovery-chips";
+import { buildRecentDiscoveryCards } from "@/lib/home/build-recent-discovery-chips";
 import {
   buildSessionJournal,
   buildSessionJournalFromServer,
   type SessionJournal,
 } from "@/lib/home/build-session-journal";
 import { getLearningStreakSnapshot } from "@/lib/home/learning-streak";
+import { resolveContinueReading } from "@/lib/home/resolve-continue-reading";
 import { getAllReadingProgress } from "@/lib/reader/reading-progress";
 import { getSavedReaderWords } from "@/lib/reader/saved-words";
 
-import { HomeDashboardActions } from "./home-dashboard-actions";
-import { HomeDashboardCollections } from "./home-dashboard-collections";
-import { HomeDashboardContinue } from "./home-dashboard-continue";
-import { HomeDashboardDiscoveries } from "./home-dashboard-discoveries";
-import { HomeDashboardHero } from "./home-dashboard-hero";
+import { HomeWorkspaceCollections } from "./home-workspace-collections";
+import { HomeWorkspaceContinue } from "./home-workspace-continue";
+import { HomeWorkspaceDiscoveries } from "./home-workspace-discoveries";
+import { HomeWorkspaceExploration } from "./home-workspace-exploration";
+import { HomeWorkspaceMetrics } from "./home-workspace-metrics";
 
 type HomeDashboardProps = {
   journal: HomeJournalData;
@@ -37,8 +38,8 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
   const [narrative, setNarrative] = useState<SessionJournal>(() =>
     buildSessionJournalFromServer(journal, texts),
   );
-
   const [clientReady, setClientReady] = useState(false);
+  const [savedWordCount, setSavedWordCount] = useState(0);
 
   useEffect(() => {
     const readingProgress = getAllReadingProgress();
@@ -58,12 +59,17 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
         readingProgress,
       }),
     );
+    setSavedWordCount(savedWords.length);
     setClientReady(true);
   }, [journal, texts]);
 
   const streak = useMemo(() => {
     if (!clientReady) {
-      return { currentStreak: 0, weeklyActivity: [false, false, false, false, false, false, false], wordsToday: 0 };
+      return {
+        currentStreak: 0,
+        weeklyActivity: [false, false, false, false, false, false, false],
+        wordsToday: 0,
+      };
     }
     return getLearningStreakSnapshot(getExplorationHistory());
   }, [clientReady]);
@@ -89,7 +95,7 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
 
   const discoveries = useMemo(
     () =>
-      buildRecentDiscoveryChips({
+      buildRecentDiscoveryCards({
         exploration: clientReady ? getExplorationHistory() : [],
         recentlyLearned: narrative.recentlyLearned,
         journal,
@@ -97,13 +103,36 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
     [clientReady, journal, narrative.recentlyLearned],
   );
 
+  const continueMeta = useMemo(
+    () => resolveContinueReading(narrative, texts),
+    [narrative, texts],
+  );
+
   return (
-    <div className="home-dash">
-      <HomeDashboardHero metrics={metrics} streak={streak} />
-      <HomeDashboardContinue narrative={narrative} texts={texts} />
-      <HomeDashboardActions />
-      <HomeDashboardDiscoveries chips={discoveries} />
-      <HomeDashboardCollections texts={texts} />
+    <div className="home-ws">
+      <header className="home-ws__bar">
+        <div>
+          <p className="home-ws__eyebrow">Rossiyani</p>
+          <h1 className="home-ws__title">Your workspace</h1>
+        </div>
+        <p className="home-ws__subtitle">
+          {metrics.isReturning
+            ? "Continue where you left off."
+            : "Start reading to populate your dashboard."}
+        </p>
+      </header>
+
+      <div className="home-ws__top">
+        {continueMeta ? <HomeWorkspaceContinue meta={continueMeta} /> : null}
+        <HomeWorkspaceMetrics metrics={metrics} streak={streak} />
+      </div>
+
+      <HomeWorkspaceCollections texts={texts} />
+      <HomeWorkspaceExploration
+        savedWordCount={savedWordCount}
+        discoveryCount={discoveries.length}
+      />
+      <HomeWorkspaceDiscoveries cards={discoveries} />
     </div>
   );
 }
