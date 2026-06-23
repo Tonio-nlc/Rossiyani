@@ -9,7 +9,7 @@ import {
 
 type HomeWorkspaceExplorationProps = {
   savedWordCount: number;
-  discoveryCount: number;
+  explorationCount: number;
 };
 
 type ExploreCard = {
@@ -18,12 +18,12 @@ type ExploreCard = {
   description: string;
   Icon: typeof HomeIconPractice;
   accent: string;
-  layout: "wide" | "tall" | "standard";
+  layout: "large" | "medium" | "small";
 };
 
 export function HomeWorkspaceExploration({
   savedWordCount,
-  discoveryCount,
+  explorationCount,
 }: HomeWorkspaceExplorationProps) {
   const cards: ExploreCard[] = [
     {
@@ -32,7 +32,7 @@ export function HomeWorkspaceExploration({
       description: "Compose sentences from structures you meet in reading.",
       Icon: HomeIconPractice,
       accent: "practice",
-      layout: "wide",
+      layout: "large",
     },
     {
       href: "/explorer",
@@ -40,7 +40,7 @@ export function HomeWorkspaceExploration({
       description: "Follow lemmas, grammar patterns, and expressions.",
       Icon: HomeIconExplore,
       accent: "explorer",
-      layout: "tall",
+      layout: "medium",
     },
     {
       href: "/manual",
@@ -48,7 +48,7 @@ export function HomeWorkspaceExploration({
       description: "Reference lessons and methodology when you need depth.",
       Icon: HomeIconManual,
       accent: "manual",
-      layout: "standard",
+      layout: "medium",
     },
     {
       href: "/library?section=discoveries",
@@ -59,18 +59,18 @@ export function HomeWorkspaceExploration({
           : "Mark words in the Reader to build your list.",
       Icon: HomeIconRead,
       accent: "saved",
-      layout: "standard",
+      layout: "small",
     },
     {
       href: "/explorer",
       title: "Recent discoveries",
       description:
-        discoveryCount > 0
-          ? `${discoveryCount} recent concept${discoveryCount === 1 ? "" : "s"} waiting to revisit.`
+        explorationCount > 0
+          ? `${explorationCount} exploration${explorationCount === 1 ? "" : "s"} in your history.`
           : "Exploration history appears as you study.",
       Icon: HomeIconExplore,
       accent: "discoveries",
-      layout: "wide",
+      layout: "small",
     },
   ];
 
@@ -88,8 +88,7 @@ export function HomeWorkspaceExploration({
             key={card.title}
             className={[
               "home-ws-explore-grid__item",
-              card.layout === "wide" ? "home-ws-explore-grid__item--wide" : "",
-              card.layout === "tall" ? "home-ws-explore-grid__item--tall" : "",
+              `home-ws-explore-grid__item--${card.layout}`,
             ].join(" ")}
           >
             <Link
@@ -98,6 +97,7 @@ export function HomeWorkspaceExploration({
                 "home-ws-card",
                 "home-ws-explore-card",
                 `home-ws-explore-card--${card.accent}`,
+                `home-ws-explore-card--${card.layout}`,
                 "focus-kb",
               ].join(" ")}
             >

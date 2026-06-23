@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { HomeJournalData } from "@/features/home";
 import type { TextListItem } from "@/features/texts";
 import { getSavedComposePhrases } from "@/lib/compose/saved-phrases";
+import { getSavedContextTranslationLessons } from "@/lib/context-translation/saved-lessons";
 import { buildLearningSignals } from "@/lib/discovery/build-learning-signals";
 import {
   getDiscoveryArchive,
@@ -12,22 +13,25 @@ import {
 } from "@/lib/discovery/saved-discoveries";
 import { getExplorationHistory } from "@/lib/explorer/exploration-history";
 import { buildHomeDashboardMetrics } from "@/lib/home/build-home-dashboard-metrics";
-import { buildRecentDiscoveryCards } from "@/lib/home/build-recent-discovery-chips";
+import { buildTodaysPractice } from "@/lib/home/build-todays-practice";
 import {
   buildSessionJournal,
   buildSessionJournalFromServer,
   type SessionJournal,
 } from "@/lib/home/build-session-journal";
 import { getLearningStreakSnapshot } from "@/lib/home/learning-streak";
+import { pickFeaturedCollection } from "@/lib/home/pick-featured-collection";
+import { pickRecommendedTexts } from "@/lib/home/pick-recommended-texts";
 import { resolveContinueReading } from "@/lib/home/resolve-continue-reading";
 import { getAllReadingProgress } from "@/lib/reader/reading-progress";
 import { getSavedReaderWords } from "@/lib/reader/saved-words";
 
-import { HomeWorkspaceCollections } from "./home-workspace-collections";
 import { HomeWorkspaceContinue } from "./home-workspace-continue";
-import { HomeWorkspaceDiscoveries } from "./home-workspace-discoveries";
 import { HomeWorkspaceExploration } from "./home-workspace-exploration";
+import { HomeWorkspaceFeaturedCollection } from "./home-workspace-featured-collection";
 import { HomeWorkspaceMetrics } from "./home-workspace-metrics";
+import { HomeWorkspaceRecommendedReading } from "./home-workspace-recommended-reading";
+import { HomeWorkspaceTodaysPractice } from "./home-workspace-todays-practice";
 
 type HomeDashboardProps = {
   journal: HomeJournalData;
@@ -40,6 +44,7 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
   );
   const [clientReady, setClientReady] = useState(false);
   const [savedWordCount, setSavedWordCount] = useState(0);
+  const [explorationCount, setExplorationCount] = useState(0);
 
   useEffect(() => {
     const readingProgress = getAllReadingProgress();
@@ -60,6 +65,7 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
       }),
     );
     setSavedWordCount(savedWords.length);
+    setExplorationCount(exploration.length);
     setClientReady(true);
   }, [journal, texts]);
 
@@ -93,32 +99,54 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
     });
   }, [clientReady, streak]);
 
-  const discoveries = useMemo(
-    () =>
-      buildRecentDiscoveryCards({
-        exploration: clientReady ? getExplorationHistory() : [],
-        recentlyLearned: narrative.recentlyLearned,
-        journal,
-      }),
-    [clientReady, journal, narrative.recentlyLearned],
-  );
-
   const continueMeta = useMemo(
     () => resolveContinueReading(narrative, texts),
     [narrative, texts],
   );
+
+  const readingProgress = useMemo(
+    () => (clientReady ? getAllReadingProgress() : {}),
+    [clientReady],
+  );
+
+  const featuredCollection = useMemo(
+    () =>
+      pickFeaturedCollection(texts, readingProgress, continueMeta?.collectionId ?? null),
+    [texts, readingProgress, continueMeta?.collectionId],
+  );
+
+  const recommendedTexts = useMemo(
+    () => pickRecommendedTexts(texts, readingProgress, continueMeta?.textId ?? null),
+    [texts, readingProgress, continueMeta?.textId],
+  );
+
+  const todaysPractice = useMemo(() => {
+    if (!clientReady) {
+      return buildTodaysPractice({
+        journal,
+        composePhraseCount: 0,
+        contextLessonCount: 0,
+      });
+    }
+
+    return buildTodaysPractice({
+      journal,
+      composePhraseCount: getSavedComposePhrases().length,
+      contextLessonCount: getSavedContextTranslationLessons().length,
+    });
+  }, [clientReady, journal]);
 
   return (
     <div className="home-ws">
       <header className="home-ws__bar">
         <div>
           <p className="home-ws__eyebrow">Rossiyani</p>
-          <h1 className="home-ws__title">Your workspace</h1>
+          <h1 className="home-ws__title">Your learning journey</h1>
         </div>
         <p className="home-ws__subtitle">
           {metrics.isReturning
-            ? "Continue where you left off."
-            : "Start reading to populate your dashboard."}
+            ? "Pick up where you left off — or start something new."
+            : "Read a text, save a word, and your path will take shape."}
         </p>
       </header>
 
@@ -127,12 +155,13 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
         <HomeWorkspaceMetrics metrics={metrics} streak={streak} />
       </div>
 
-      <HomeWorkspaceCollections texts={texts} />
+      <HomeWorkspaceFeaturedCollection feature={featuredCollection} />
+      <HomeWorkspaceTodaysPractice cards={todaysPractice} />
       <HomeWorkspaceExploration
         savedWordCount={savedWordCount}
-        discoveryCount={discoveries.length}
+        explorationCount={explorationCount}
       />
-      <HomeWorkspaceDiscoveries cards={discoveries} />
+      <HomeWorkspaceRecommendedReading texts={recommendedTexts} />
     </div>
   );
 }
