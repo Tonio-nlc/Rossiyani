@@ -7,7 +7,7 @@ import { listTexts } from "@/features/texts";
 export const metadata: Metadata = {
   title: "Rossiyani — Your Russian learning workspace",
   description:
-    "Continue reading, track your progress, and explore vocabulary from authentic Russian texts.",
+    "Your Russian learning workspace — continue lessons, track progress, and build vocabulary every day.",
 };
 
 export default async function HomePage() {

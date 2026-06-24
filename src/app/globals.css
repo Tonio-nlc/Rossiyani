@@ -6440,10 +6440,14 @@ article:has(.manual-prose) .text-eyebrow {
   gap: 10px;
 }
 
-/* ─── Homepage — scholarly entrance ─── */
-.ds-editorial-container:has(.home-landing),
-.ds-editorial-container:has(.home-dash),
+/* ─── Homepage — learning workspace ─── */
 .ds-editorial-container:has(.home-ws) {
+  max-width: 93.75rem;
+  background: #f7f9fb;
+}
+
+.ds-editorial-container:has(.home-landing),
+.ds-editorial-container:has(.home-dash) {
   max-width: 87.5rem;
 }
 

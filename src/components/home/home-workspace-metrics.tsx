@@ -22,7 +22,7 @@ export function HomeWorkspaceMetrics({ metrics, streak }: HomeWorkspaceMetricsPr
           {formatMetric(metrics.currentStreak)}
           <span className="home-ws-metric__unit">days</span>
         </p>
-        <p className="home-ws-metric__hint">Keep your reading rhythm alive.</p>
+        <p className="home-ws-metric__hint">Keep the momentum going.</p>
       </article>
 
       <article className="home-ws-card home-ws-metric home-ws-metric--milestone">

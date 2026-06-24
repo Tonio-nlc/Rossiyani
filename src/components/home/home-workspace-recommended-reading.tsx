@@ -14,13 +14,13 @@ export function HomeWorkspaceRecommendedReading({ texts }: HomeWorkspaceRecommen
   }
 
   return (
-    <section className="home-ws-section home-ws-section--tone-cool" aria-labelledby="home-ws-reading-heading">
+    <section className="home-ws-section" aria-labelledby="home-ws-reading-heading">
       <div className="home-ws-section__head">
         <h2 id="home-ws-reading-heading" className="home-ws-section__title">
-          Recommended Reading
+          Recommended for you
         </h2>
         <p className="home-ws-section__subtitle">
-          Based on your current level and activity.
+          Matched to your level and recent activity.
         </p>
       </div>
 
@@ -39,7 +39,7 @@ export function HomeWorkspaceRecommendedReading({ texts }: HomeWorkspaceRecommen
                 <h3 className="home-ws-reading-card__title break-russian">{text.title}</h3>
                 <p className="home-ws-reading-card__description">{text.description}</p>
                 <Link href={text.href} className="home-ws-btn home-ws-reading-card__cta focus-kb">
-                  Start Reading →
+                  Start lesson →
                 </Link>
               </div>
             </article>

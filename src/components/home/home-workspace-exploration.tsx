@@ -18,11 +18,14 @@ type HomeWorkspaceExplorationProps = {
 
 export function HomeWorkspaceExploration({ cards }: HomeWorkspaceExplorationProps) {
   return (
-    <section className="home-ws-section home-ws-section--tone-neutral" aria-labelledby="home-ws-explore-heading">
+    <section className="home-ws-section" aria-labelledby="home-ws-explore-heading">
       <div className="home-ws-section__head">
         <h2 id="home-ws-explore-heading" className="home-ws-section__title">
-          Continue Your Exploration
+          Workspace shortcuts
         </h2>
+        <p className="home-ws-section__subtitle">
+          Jump back into practice, grammar, and saved vocabulary.
+        </p>
       </div>
 
       <ul className="home-ws-explore-grid">

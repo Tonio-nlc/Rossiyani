@@ -11,7 +11,7 @@ import {
 import type { ContinueReadingMeta } from "@/lib/home/resolve-continue-reading";
 import { getTextReadingProgress } from "@/lib/reader/reading-progress";
 
-import { HomeCollectionCover } from "./home-collection-cover";
+import { HomeReadingCover } from "./home-reading-cover";
 
 type HomeWorkspaceContinueProps = {
   meta: ContinueReadingMeta;
@@ -43,16 +43,14 @@ export function HomeWorkspaceContinue({ meta, wordsDiscovered }: HomeWorkspaceCo
   return (
     <article className="home-ws-card home-ws-card--hero home-ws-continue">
       <div className="home-ws-continue__visual">
-        {meta.collectionId ? (
-          <HomeCollectionCover collectionId={meta.collectionId} />
-        ) : null}
+        <HomeReadingCover collectionId={meta.collectionId} />
       </div>
       <div className="home-ws-continue__body">
-        <p className="home-ws-eyebrow">Continue Learning</p>
+        <p className="home-ws-eyebrow">Pick up where you left off</p>
         <h2 className="home-ws-continue__title break-russian">{meta.title}</h2>
         <dl className="home-ws-continue__meta">
           <div>
-            <dt>Collection</dt>
+            <dt>Path</dt>
             <dd>{meta.collection}</dd>
           </div>
           <div>
@@ -64,7 +62,7 @@ export function HomeWorkspaceContinue({ meta, wordsDiscovered }: HomeWorkspaceCo
             </dd>
           </div>
           <div>
-            <dt>Reading Time</dt>
+            <dt>Session</dt>
             <dd>{meta.estimatedMinutes} min</dd>
           </div>
         </dl>
@@ -94,10 +92,10 @@ export function HomeWorkspaceContinue({ meta, wordsDiscovered }: HomeWorkspaceCo
         </dl>
         <div className="home-ws-continue__actions">
           <Link href={meta.href} className="home-ws-btn home-ws-btn--large focus-kb">
-            Continue Reading →
+            Continue lesson →
           </Link>
-          <Link href="/library" className="home-ws-link focus-kb">
-            Library
+          <Link href="/practice" className="home-ws-link focus-kb">
+            Today&apos;s practice
           </Link>
         </div>
       </div>

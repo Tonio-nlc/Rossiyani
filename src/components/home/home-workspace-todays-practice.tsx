@@ -8,11 +8,14 @@ type HomeWorkspaceTodaysPracticeProps = {
 
 export function HomeWorkspaceTodaysPractice({ cards }: HomeWorkspaceTodaysPracticeProps) {
   return (
-    <section className="home-ws-section home-ws-section--tone-warm" aria-labelledby="home-ws-practice-heading">
+    <section className="home-ws-section" aria-labelledby="home-ws-practice-heading">
       <div className="home-ws-section__head">
         <h2 id="home-ws-practice-heading" className="home-ws-section__title">
-          Today&apos;s Practice
+          Today&apos;s practice
         </h2>
+        <p className="home-ws-section__subtitle">
+          Quick drills to build momentum today.
+        </p>
       </div>
 
       <ul className="home-ws-practice-grid">
