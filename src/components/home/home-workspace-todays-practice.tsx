@@ -8,7 +8,7 @@ type HomeWorkspaceTodaysPracticeProps = {
 
 export function HomeWorkspaceTodaysPractice({ cards }: HomeWorkspaceTodaysPracticeProps) {
   return (
-    <section className="home-ws-section" aria-labelledby="home-ws-practice-heading">
+    <section className="home-ws-section home-ws-section--tone-warm" aria-labelledby="home-ws-practice-heading">
       <div className="home-ws-section__head">
         <h2 id="home-ws-practice-heading" className="home-ws-section__title">
           Today&apos;s Practice
@@ -20,7 +20,12 @@ export function HomeWorkspaceTodaysPractice({ cards }: HomeWorkspaceTodaysPracti
           <li key={card.id}>
             <Link
               href={card.href}
-              className={["home-ws-card", "home-ws-practice-card", "focus-kb"].join(" ")}
+              className={[
+                "home-ws-card",
+                "home-ws-practice-card",
+                `home-ws-practice-card--${card.id}`,
+                "focus-kb",
+              ].join(" ")}
             >
               <h3 className="home-ws-practice-card__title">{card.title}</h3>
               <p className="home-ws-practice-card__description">{card.description}</p>

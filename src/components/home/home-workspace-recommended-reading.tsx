@@ -14,7 +14,7 @@ export function HomeWorkspaceRecommendedReading({ texts }: HomeWorkspaceRecommen
   }
 
   return (
-    <section className="home-ws-section" aria-labelledby="home-ws-reading-heading">
+    <section className="home-ws-section home-ws-section--tone-cool" aria-labelledby="home-ws-reading-heading">
       <div className="home-ws-section__head">
         <h2 id="home-ws-reading-heading" className="home-ws-section__title">
           Recommended Reading

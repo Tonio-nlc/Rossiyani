@@ -41,7 +41,7 @@ export function HomeWorkspaceContinue({ meta, wordsDiscovered }: HomeWorkspaceCo
   );
 
   return (
-    <article className="home-ws-card home-ws-continue">
+    <article className="home-ws-card home-ws-card--hero home-ws-continue">
       <div className="home-ws-continue__visual">
         {meta.collectionId ? (
           <HomeCollectionCover collectionId={meta.collectionId} />
@@ -96,7 +96,7 @@ export function HomeWorkspaceContinue({ meta, wordsDiscovered }: HomeWorkspaceCo
           <Link href={meta.href} className="home-ws-btn home-ws-btn--large focus-kb">
             Continue Reading →
           </Link>
-          <Link href="/library" className="home-ws-btn--text focus-kb">
+          <Link href="/library" className="home-ws-link focus-kb">
             Library
           </Link>
         </div>

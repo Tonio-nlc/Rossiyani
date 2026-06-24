@@ -14,8 +14,13 @@ function formatMetric(value: number): string {
 
 export function HomeWorkspaceFeaturedCollection({ feature }: HomeWorkspaceFeaturedCollectionProps) {
   return (
-    <section className="home-ws-section" aria-label="Featured collection">
-      <article className="home-ws-card home-ws-featured-collection">
+    <section className="home-ws-section home-ws-section--tone-ivory" aria-labelledby="home-ws-featured-heading">
+      <div className="home-ws-section__head">
+        <h2 id="home-ws-featured-heading" className="home-ws-section__title">
+          Featured Collection
+        </h2>
+      </div>
+      <article className="home-ws-card home-ws-card--featured home-ws-featured-collection">
         <HomeCollectionCover collectionId={feature.id} className="home-ws-featured-collection__cover" />
         <div className="home-ws-featured-collection__body">
           <div className="home-ws-featured-collection__badges">
@@ -44,7 +49,7 @@ export function HomeWorkspaceFeaturedCollection({ feature }: HomeWorkspaceFeatur
               View Collection
             </Link>
           </div>
-          <Link href="/library" className="home-ws-featured-collection__browse focus-kb">
+          <Link href="/library" className="home-ws-link home-ws-featured-collection__browse focus-kb">
             Browse all collections →
           </Link>
         </div>

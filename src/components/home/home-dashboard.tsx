@@ -170,6 +170,7 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
         cta: "Continue practicing →",
         Icon: HomeIconPractice,
         layout: "large",
+        tone: "practice",
       },
       {
         href: "/explorer",
@@ -178,6 +179,7 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
         cta: "Explore concepts →",
         Icon: HomeIconExplore,
         layout: "medium",
+        tone: "explorer",
       },
       {
         href: "/manual",
@@ -186,6 +188,7 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
         cta: "Continue learning →",
         Icon: HomeIconManual,
         layout: "medium",
+        tone: "manual",
       },
       {
         href: "/library?section=discoveries",
@@ -194,6 +197,7 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
         cta: "Review words →",
         Icon: HomeIconRead,
         layout: "small",
+        tone: "saved",
       },
       {
         href: "/explorer",
@@ -202,6 +206,7 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
         cta: "View history →",
         Icon: HomeIconExplore,
         layout: "small",
+        tone: "discoveries",
       },
     ];
   }, [

@@ -9,6 +9,7 @@ export type ExplorationCardData = {
   cta: string;
   Icon: typeof HomeIconPractice;
   layout: "large" | "medium" | "small";
+  tone: "practice" | "explorer" | "manual" | "saved" | "discoveries";
 };
 
 type HomeWorkspaceExplorationProps = {
@@ -17,7 +18,7 @@ type HomeWorkspaceExplorationProps = {
 
 export function HomeWorkspaceExploration({ cards }: HomeWorkspaceExplorationProps) {
   return (
-    <section className="home-ws-section home-ws-section--quiet" aria-labelledby="home-ws-explore-heading">
+    <section className="home-ws-section home-ws-section--tone-neutral" aria-labelledby="home-ws-explore-heading">
       <div className="home-ws-section__head">
         <h2 id="home-ws-explore-heading" className="home-ws-section__title">
           Continue Your Exploration
@@ -39,6 +40,7 @@ export function HomeWorkspaceExploration({ cards }: HomeWorkspaceExplorationProp
                 "home-ws-card",
                 "home-ws-explore-card",
                 `home-ws-explore-card--${card.layout}`,
+                `home-ws-explore-card--tone-${card.tone}`,
                 "focus-kb",
               ].join(" ")}
             >
