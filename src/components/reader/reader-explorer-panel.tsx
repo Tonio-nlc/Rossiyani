@@ -11,7 +11,7 @@ import type { ReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel
 import { isReaderWordSaved, saveReaderWord } from "@/lib/reader/saved-words";
 import type { WordDetailGraph } from "@/types/word-detail-graph";
 
-import { ReaderIconButton, ReaderIconSave, ReaderIconSpeaker } from "./reader-icon-button";
+import { ReaderIconSave, ReaderIconSpeaker } from "./reader-icon-button";
 
 type ReaderExplorerPanelProps = {
   detail: WordDetailGraph | null;
@@ -94,9 +94,9 @@ export function ReaderExplorerPanel({
         {view?.transliteration ? (
           <p className="reader-ws-explorer__translit">{view.transliteration}</p>
         ) : null}
-        <ReaderIconButton label="Pronunciation">
+        <button type="button" className="reader-ws-explorer__speak focus-kb" aria-label="Pronunciation">
           <ReaderIconSpeaker />
-        </ReaderIconButton>
+        </button>
       </article>
 
       <div className="reader-ws-explorer__tabs" role="tablist" aria-label="Word details">
@@ -154,25 +154,35 @@ export function ReaderExplorerPanel({
         ) : null}
 
         {activeTab === "grammar" ? (
-          <div className="reader-ws-explorer__card">
-            {view && view.grammar.tags.length > 0 ? (
-              <div className="reader-ws-explorer__tags">
-                {view.grammar.tags.map((tag) => (
-                  <span key={tag} className="reader-ws-explorer__tag">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            ) : null}
-            {view && view.grammar.rows.length > 0 ? (
-              <dl className="reader-ws-explorer__rows">
-                {view.grammar.rows.map((row) => (
-                  <div key={`${row.label}-${row.value}`}>
-                    <dt>{row.label}</dt>
-                    <dd className="break-russian">{row.value}</dd>
-                  </div>
-                ))}
-              </dl>
+          <div className="reader-ws-explorer__card reader-ws-explorer__card--grammar">
+            {view && view.grammar.sections.length > 0 ? (
+              view.grammar.sections.map((section) => (
+                <section key={section.id} className="reader-ws-explorer__section">
+                  <h3 className="reader-ws-explorer__section-title">{section.title}</h3>
+                  {section.id === "morphology" && view.grammar.tags.length > 0 ? (
+                    <div className="reader-ws-explorer__tags">
+                      {view.grammar.tags.map((tag) => (
+                        <span key={tag} className="reader-ws-explorer__tag">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                  {section.rows.length > 0 ? (
+                    <dl className="reader-ws-explorer__rows">
+                      {section.rows.map((row) => (
+                        <div key={`${section.id}-${row.label}-${row.value}`}>
+                          <dt>{row.label}</dt>
+                          <dd className="break-russian">{row.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
+                  {section.prose ? (
+                    <p className="reader-ws-explorer__prose">{section.prose}</p>
+                  ) : null}
+                </section>
+              ))
             ) : (
               <p className="reader-ws-explorer__muted">No grammar details available yet.</p>
             )}
