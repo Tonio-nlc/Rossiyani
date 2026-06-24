@@ -15,18 +15,17 @@ export function HomeWorkspaceMotivation({ streak, continueHref }: HomeWorkspaceM
   const ctaHref = continueHref ?? "/library";
 
   return (
-    <section className="home-ws-section" aria-labelledby="home-ws-motivation-heading">
+    <section className="home-ws-section home-ws-section--compact" aria-labelledby="home-ws-motivation-heading">
       <article className="home-ws-motivation">
         <div className="home-ws-motivation__copy">
           <h2 id="home-ws-motivation-heading" className="home-ws-motivation__title">
-            {streak.currentStreak}-day streak — keep it going
+            <span aria-hidden>🔥</span> Current streak · {streak.currentStreak} day
+            {streak.currentStreak === 1 ? "" : "s"}
           </h2>
-          <p className="home-ws-motivation__lead">
-            A few minutes today keeps your learning momentum strong.
-          </p>
+          <p className="home-ws-motivation__lead">Keep showing up — momentum compounds.</p>
         </div>
         <Link href={ctaHref} className="home-ws-motivation__cta focus-kb">
-          Continue lesson →
+          Continue learning
         </Link>
       </article>
     </section>

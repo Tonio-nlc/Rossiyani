@@ -51,3 +51,8 @@ export function getRecentManualLessonSlugs(limit = 5): string[] {
     .slice(0, limit)
     .map((visit) => visit.slug);
 }
+
+export function getManualLessonVisitCount(): number {
+  const slugs = new Set(loadVisits().map((visit) => visit.slug));
+  return slugs.size;
+}
