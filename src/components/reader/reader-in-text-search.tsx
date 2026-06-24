@@ -27,7 +27,7 @@ export function ReaderInTextSearch({
   const hasQuery = query.trim().length > 0;
 
   return (
-    <div className="border-y border-[var(--hairline)] py-[var(--space-2)]">
+    <div className="reader-ws-search__inner">
       <input
         ref={inputRef}
         type="search"
@@ -49,15 +49,13 @@ export function ReaderInTextSearch({
             onPrevious();
           }
         }}
-        placeholder="Rechercher dans ce texte…"
-        aria-label="Recherche dans le texte"
-        className="focus-kb w-full bg-transparent font-reader text-lg text-[var(--ink)] outline-none placeholder:text-[var(--ink-muted)]"
+        placeholder="Search in this text…"
+        aria-label="Search in text"
+        className="reader-ws-search__input focus-kb"
       />
       {hasQuery ? (
-        <p className="mt-2 text-metadata text-[var(--ink-muted)]">
-          {resultCount > 0
-            ? `${activeIndex + 1} / ${resultCount}`
-            : "Aucun résultat"}
+        <p className="reader-ws-search__meta">
+          {resultCount > 0 ? `${activeIndex + 1} / ${resultCount}` : "No results"}
         </p>
       ) : null}
     </div>

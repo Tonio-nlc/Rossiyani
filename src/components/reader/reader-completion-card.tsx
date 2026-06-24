@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 
 import type { ReadingSessionContinueAction } from "@/lib/reader/build-reading-session-summary";
 
@@ -9,31 +10,123 @@ type ReaderCompletionCardProps = {
   continueActions: ReadingSessionContinueAction[];
 };
 
-export function ReaderCompletionCard({
-  textTitle,
-  continueActions,
-}: ReaderCompletionCardProps) {
-  return (
-    <section className="reader-end">
-      <p className="reader-end__message">
-        <span className="reader-end__check" aria-hidden>
-          ✓
-        </span>
-        Lecture terminée · {textTitle}
-      </p>
+type CompletionTile = {
+  title: string;
+  description: string;
+  href: string;
+  icon: "continue" | "practice" | "explorer" | "library";
+};
 
-      {continueActions.length > 0 ? (
-        <ul className="reader-end__actions">
-          {continueActions.map((action) => (
-            <li key={`${action.href}-${action.label}`}>
-              <Link href={action.href} className="reader-end__action focus-kb">
-                <span className="reader-end__action-label">{action.label}</span>
-                <span className="reader-end__action-rationale">{action.rationale}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+function CompletionIcon({ kind }: { kind: CompletionTile["icon"] }) {
+  if (kind === "continue") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden className="reader-ws-complete__icon-svg">
+        <path
+          d="M6 5.5h12v13H6a1 1 0 0 1-1-1v-11a1 1 0 0 1 1-1Z"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+        <path d="M9 9h6M9 12h6M9 15h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  if (kind === "practice") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden className="reader-ws-complete__icon-svg">
+        <path
+          d="M8 5.5h8a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-11a1 1 0 0 1 1-1Z"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+        <path d="M10 10h5M10 13.5h5M10 17h3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  if (kind === "explorer") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden className="reader-ws-complete__icon-svg">
+        <circle cx="12" cy="12" r="7" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M12 8.5V12l2.5 1.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden className="reader-ws-complete__icon-svg">
+      <path
+        d="M5 5.5h6v13H5a1 1 0 0 1-1-1v-11a1 1 0 0 1 1-1Zm9 0h5a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-6V5.5Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+function buildTiles(actions: ReadingSessionContinueAction[]): CompletionTile[] {
+  const [continueAction, practiceAction, explorerAction, libraryAction] = actions;
+
+  return [
+    {
+      title: "Continue Reading",
+      description: continueAction?.rationale ?? "Pick another text from your library",
+      href: continueAction?.href ?? "/library",
+      icon: "continue",
+    },
+    {
+      title: "Practice Vocabulary",
+      description: practiceAction?.rationale ?? "Reinforce words from this session",
+      href: practiceAction?.href ?? "/practice",
+      icon: "practice",
+    },
+    {
+      title: "Open Explorer",
+      description: explorerAction?.rationale ?? "Dive deeper into grammar and lemmas",
+      href: explorerAction?.href ?? "/explorer",
+      icon: "explorer",
+    },
+    {
+      title: "Return to Library",
+      description: libraryAction?.rationale ?? "Review your texts and progress",
+      href: libraryAction?.href ?? "/library",
+      icon: "library",
+    },
+  ];
+}
+
+export function ReaderCompletionCard({ textTitle, continueActions }: ReaderCompletionCardProps) {
+  const tiles = useMemo(() => buildTiles(continueActions), [continueActions]);
+
+  return (
+    <section className="reader-ws-complete" aria-labelledby="reader-ws-complete-heading">
+      <div className="reader-ws-complete__head">
+        <p className="reader-ws-complete__badge">
+          <span className="reader-ws-complete__check" aria-hidden>
+            ✓
+          </span>
+          Reading completed
+        </p>
+        <h2 id="reader-ws-complete-heading" className="reader-ws-complete__title break-russian">
+          {textTitle}
+        </h2>
+      </div>
+
+      <ul className="reader-ws-complete__grid">
+        {tiles.map((tile) => (
+          <li key={tile.title}>
+            <Link href={tile.href} className="reader-ws-complete__card focus-kb">
+              <span className="reader-ws-complete__icon" aria-hidden>
+                <CompletionIcon kind={tile.icon} />
+              </span>
+              <span className="reader-ws-complete__card-body">
+                <span className="reader-ws-complete__card-title">{tile.title}</span>
+                <span className="reader-ws-complete__card-copy">{tile.description}</span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

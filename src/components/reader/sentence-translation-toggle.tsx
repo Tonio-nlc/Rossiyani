@@ -22,7 +22,7 @@ export function SentenceTranslationToggle({
         event.stopPropagation();
         onToggle();
       }}
-      className="focus-kb mt-2 text-left text-xs text-[var(--ink-muted)] underline-offset-2 transition hover:text-[var(--ink)] hover:underline"
+      className="reader-ws-translation-toggle focus-kb"
     >
       {expanded ? (
         <>

@@ -22,47 +22,40 @@ export function ReaderAboutText({
   const focusPoints = introduction.focusPoints.slice(0, 3);
 
   return (
-    <section className="max-w-[70ch] border-t border-[var(--hairline)] pt-8">
+    <section className="reader-ws-about">
       <button
         type="button"
         onClick={() => setCollapsed((value) => !value)}
-        className="focus-kb flex w-full items-center gap-2 text-left"
+        className="reader-ws-about__toggle focus-kb"
         aria-expanded={!collapsed}
       >
-        <span className="home-section-label">About this text</span>
-        <span className="text-xs text-[var(--ink-muted)]" aria-hidden>
+        <span className="reader-ws-about__label">About this text</span>
+        <span className="reader-ws-about__chevron" aria-hidden>
           {collapsed ? "▼" : "▲"}
         </span>
       </button>
 
       {!collapsed ? (
-        <div className="mt-4 space-y-4 animate-sentence-translation-fade">
+        <div className="reader-ws-about__body">
           {introduction.summary ? (
             <div>
-              <p className="text-xs text-[var(--ink-muted)]">Theme</p>
-              <p className="mt-1 text-sm leading-relaxed text-[var(--ink-secondary)]">
-                {introduction.summary}
-              </p>
+              <p className="reader-ws-about__meta-label">Theme</p>
+              <p className="reader-ws-about__copy">{introduction.summary}</p>
             </div>
           ) : null}
 
           {focusPoints.length > 0 ? (
             <div>
-              <p className="text-xs text-[var(--ink-muted)]">Focus vocabulary</p>
-              <ul className="mt-1.5 space-y-1 text-sm text-[var(--ink-secondary)]">
+              <p className="reader-ws-about__meta-label">Focus vocabulary</p>
+              <ul className="reader-ws-about__list">
                 {focusPoints.map((point) => (
-                  <li key={point} className="flex gap-2">
-                    <span className="text-[var(--ink-muted)]" aria-hidden>
-                      •
-                    </span>
-                    <span>{point}</span>
-                  </li>
+                  <li key={point}>{point}</li>
                 ))}
               </ul>
             </div>
           ) : null}
 
-          <p className="text-xs text-[var(--ink-muted)]">
+          <p className="reader-ws-about__meta-label">
             Estimated reading time · {introduction.readMinutes} min
           </p>
         </div>

@@ -14,26 +14,20 @@ export function ReaderSentenceAnalyzing({
   onToggleTranslation,
 }: ReaderSentenceAnalyzingProps) {
   return (
-    <div className="space-y-4 border-b border-[var(--hairline)] py-4">
-      <p className="break-russian font-reader text-[clamp(1.125rem,2.5vw,1.375rem)] leading-relaxed text-[var(--ink)]">
-        {russianText}
-      </p>
+    <div className="reader-ws-analyzing">
+      <p className="reader-ws-analyzing__russian break-russian">{russianText}</p>
 
       {showTranslation ? (
-        <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">{naturalTranslation}</p>
+        <p className="reader-ws-analyzing__translation">{naturalTranslation}</p>
       ) : (
-        <button
-          type="button"
-          onClick={onToggleTranslation}
-          className="focus-kb text-xs text-[var(--ink-muted)] underline-offset-2 hover:text-[var(--ink)] hover:underline"
-        >
+        <button type="button" onClick={onToggleTranslation} className="reader-ws-translation-toggle focus-kb">
           Show translation →
         </button>
       )}
 
-      <div className="space-y-2 pt-1">
-        <p className="text-sm text-[var(--ink-muted)]">Analyzing…</p>
-        <ul className="space-y-1 text-xs text-[var(--ink-muted)]">
+      <div className="reader-ws-analyzing__status">
+        <p className="reader-ws-analyzing__status-label">Analyzing…</p>
+        <ul className="reader-ws-analyzing__status-list">
           <li>○ vocabulary</li>
           <li>○ grammar</li>
           <li>○ highlights</li>

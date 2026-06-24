@@ -64,9 +64,16 @@ export function ReaderExplorerPanel({
           <h2 className="reader-ws-explorer__title">Explorer</h2>
         </header>
         <div className="reader-ws-explorer__empty">
+          <span className="reader-ws-explorer__empty-icon" aria-hidden>
+            <svg viewBox="0 0 24 24" fill="none" className="reader-ws-explorer__empty-icon-svg">
+              <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M16.5 16.5 20 20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M8.5 11h5M11 8.5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </span>
           <p className="reader-ws-explorer__empty-title">Select a word</p>
           <p className="reader-ws-explorer__empty-copy">
-            Click any highlighted word in the text to explore its meaning, grammar, and context.
+            Tap any highlighted word in the text to see translation, grammar, and context.
           </p>
         </div>
       </div>
