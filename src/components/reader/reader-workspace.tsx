@@ -4,13 +4,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { getCollectionName } from "@/content/collections";
-import { ReadingLayout, Sidebar } from "@/components/design-system";
 import type { ReaderTextData } from "@/features/texts";
 import { setLastReadTextId } from "@/lib/last-read-text";
 import type { ReaderSearchEntry } from "@/lib/reader/build-reader-search-index";
-import {
-  buildInteractiveWordsBySentence,
-} from "@/lib/reader/build-interactive-words";
+import { buildInteractiveWordsBySentence } from "@/lib/reader/build-interactive-words";
 import { buildTextIntroduction } from "@/lib/reader/build-text-introduction";
 import { buildReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel-data";
 import { buildReadingSessionSummary } from "@/lib/reader/build-reading-session-summary";
@@ -20,11 +17,12 @@ import type { PartOfSpeech } from "@/types";
 import { prefetchWordDetail } from "@/lib/reader/reader-word-detail-store";
 
 import { ReaderAboutText } from "./reader-about-text";
+import { ReaderAudioPlayer } from "./reader-audio-player";
 import { ReaderCompletionCard } from "./reader-completion-card";
+import { ReaderExplorerPanel } from "./reader-explorer-panel";
 import { ReaderHeader } from "./reader-header";
 import { ReaderInTextSearch } from "./reader-in-text-search";
-import { ReaderMarginPanel } from "./reader-margin-panel";
-import { ReaderSentenceSidebar } from "./reader-sentence-sidebar";
+import { ReaderShell } from "./reader-shell";
 import { mapSentenceWords, ReaderSentence } from "./reader-sentence";
 import { isSentenceAnalyzing, ReaderSentenceAnalyzing } from "./reader-sentence-analyzing";
 import { toReaderWordSnapshot } from "./reader-word-utils";
@@ -44,9 +42,41 @@ type ReaderWorkspaceProps = {
 
 export type { ReaderWorkspaceProps };
 
+const BOOKMARK_KEY = "rossiyani:readerBookmarks";
+const FONT_SCALE_KEY = "rossiyani:readerFontScale";
+
 function findWordInText(text: ReaderTextData, wordId: string, sentenceId: string) {
   const sentence = text.sentences.find((item) => item.id === sentenceId);
   return sentence?.words.find((word) => word.id === wordId) ?? null;
+}
+
+function loadBookmarks(): Set<string> {
+  if (typeof localStorage === "undefined") {
+    return new Set();
+  }
+  try {
+    const raw = localStorage.getItem(BOOKMARK_KEY);
+    const parsed = raw ? (JSON.parse(raw) as string[]) : [];
+    return new Set(Array.isArray(parsed) ? parsed : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveBookmarks(ids: Set<string>): void {
+  if (typeof localStorage === "undefined") {
+    return;
+  }
+  localStorage.setItem(BOOKMARK_KEY, JSON.stringify([...ids]));
+}
+
+function loadFontScale(): number {
+  if (typeof localStorage === "undefined") {
+    return 1;
+  }
+  const raw = localStorage.getItem(FONT_SCALE_KEY);
+  const value = raw ? Number(raw) : 1;
+  return [1, 1.125, 1.25].includes(value) ? value : 1;
 }
 
 export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
@@ -54,25 +84,24 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   const [selectedSentenceId, setSelectedSentenceId] = useState<string | null>(
     text.sentences[0]?.id ?? null,
   );
-  const [selectedWordSnapshot, setSelectedWordSnapshot] = useState<ReaderWordSnapshot | null>(
-    null,
-  );
+  const [selectedWordSnapshot, setSelectedWordSnapshot] = useState<ReaderWordSnapshot | null>(null);
   const [hoveredWordSnapshot, setHoveredWordSnapshot] = useState<ReaderWordSnapshot | null>(null);
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
   const [visibleSentenceIds, setVisibleSentenceIds] = useState<string[]>(() =>
     text.sentences[0] ? [text.sentences[0].id] : [],
   );
+  const [explorerOpen, setExplorerOpen] = useState(false);
+  const [fontScale, setFontScale] = useState(1);
+  const [bookmarked, setBookmarked] = useState(false);
   const visibleSentenceIdsRef = useRef<Set<string>>(
     new Set(text.sentences[0] ? [text.sentences[0].id] : []),
   );
-  const [mobileSidebarDismissed, setMobileSidebarDismissed] = useState(false);
   const restoredRef = useRef(false);
   const sentenceRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  const { showTranslations: showAllTranslations, setShowTranslations: setShowAllTranslations } =
-    useShowSentenceTranslations();
+  const { showTranslations: showAllTranslations } = useShowSentenceTranslations();
   const { isExpanded, toggleExpanded } = useSentenceTranslationExpansion();
-  const { focusMode, setFocusMode } = useFocusMode();
+  const { focusMode } = useFocusMode();
 
   const hasPendingAnalysis = useMemo(
     () =>
@@ -86,13 +115,14 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     if (!hasPendingAnalysis) {
       return;
     }
-
-    const timer = window.setInterval(() => {
-      router.refresh();
-    }, 2500);
-
+    const timer = window.setInterval(() => router.refresh(), 2500);
     return () => window.clearInterval(timer);
   }, [hasPendingAnalysis, router]);
+
+  useEffect(() => {
+    setFontScale(loadFontScale());
+    setBookmarked(loadBookmarks().has(text.id));
+  }, [text.id]);
 
   const {
     percent,
@@ -120,14 +150,12 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   }, []);
 
   const textSearch = useReaderTextSearch(text, scrollToSearchResult);
-
   const searchMatchWordIds = useMemo(
     () => new Set(textSearch.results.map((result) => result.wordId)),
     [textSearch.results],
   );
 
   const { prefetch, revision } = useReaderWordDetailStore();
-
   const hoveredWordId = hoveredWordSnapshot?.id ?? null;
   const selectedWordId = selectedWordSnapshot?.id ?? null;
 
@@ -169,7 +197,8 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
 
   const handleHoverWord = useCallback(
     (word: { id: string; sentenceId?: string } & Record<string, unknown>) => {
-      const sentenceId = "sentenceId" in word && word.sentenceId ? String(word.sentenceId) : selectedSentenceId;
+      const sentenceId =
+        "sentenceId" in word && word.sentenceId ? String(word.sentenceId) : selectedSentenceId;
       if (!sentenceId) {
         return;
       }
@@ -190,22 +219,6 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   const readingSessionSummary = useMemo(
     () => buildReadingSessionSummary(text, progress?.wordsSeenIds ?? []),
     [text, progress?.wordsSeenIds],
-  );
-
-  const marginPanelProps = useMemo(
-    () => ({
-      detail,
-      loading,
-      textIndex,
-      showAllTranslations,
-      onToggleAllTranslations: setShowAllTranslations,
-    }),
-    [detail, loading, textIndex, showAllTranslations, setShowAllTranslations],
-  );
-
-  const selectedSentence = useMemo(
-    () => text.sentences.find((sentence) => sentence.id === selectedSentenceId) ?? null,
-    [text.sentences, selectedSentenceId],
   );
 
   useEffect(() => {
@@ -311,6 +324,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
         }),
       );
       setHoveredWordSnapshot(null);
+      setExplorerOpen(true);
       prefetchWordDetail(word.id);
       recordWord(word.id, sentenceId);
     },
@@ -319,7 +333,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
 
   useReaderKeyboard({
     enabled: true,
-    words: selectedSentence?.words ?? [],
+    words: text.sentences.find((s) => s.id === selectedSentenceId)?.words ?? [],
     sentences: text.sentences.map((sentence) => ({ id: sentence.id })),
     selectedWordId,
     selectedSentenceId,
@@ -351,78 +365,104 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     onCloseSearch: textSearch.closeSearch,
   });
 
-  const microscopePanel =
-    selectedWordSnapshot !== null ? <ReaderMarginPanel {...marginPanelProps} /> : null;
-
-  const sentenceSidebar =
-    selectedSentence !== null ? (
-      <ReaderSentenceSidebar
-        sentenceText={selectedSentence.russianText}
-        translation={selectedSentence.naturalTranslation}
-        textId={text.id}
-        textTitle={text.title}
-        collection={getCollectionName(text.collectionId)}
-      />
-    ) : null;
-
-  const desktopSidebar =
-    sentenceSidebar || microscopePanel ? (
-      <Sidebar
-        title={microscopePanel ? "Microscope" : "Actions"}
-        className="reader-sidebar"
-        aria-label="Panneau de lecture"
-      >
-        <div className="reader-sidebar-stack">
-          {sentenceSidebar}
-          {microscopePanel}
-        </div>
-      </Sidebar>
-    ) : null;
-
-  useEffect(() => {
-    setMobileSidebarDismissed(false);
-  }, [selectedSentenceId, selectedWordSnapshot?.id]);
-
-  const closeSidebar = useCallback(() => {
-    setSelectedWordSnapshot(null);
-    setHoveredWordSnapshot(null);
-    setMobileSidebarDismissed(true);
+  const handleFontScaleChange = useCallback((scale: number) => {
+    setFontScale(scale);
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(FONT_SCALE_KEY, String(scale));
+    }
   }, []);
 
-  return (
-    <div className="reader-fullscreen min-w-0 pb-8">
-      <ReaderHeader
-        title={text.title}
-        subtitle={textIntroduction?.summary ?? text.sentences[0]?.naturalTranslation ?? null}
-        collectionName={getCollectionName(text.collectionId)}
-        level={text.level}
-        estimatedMinutes={estimatedMinutes}
-        sentenceCount={totalSentences}
-        currentSentenceIndex={currentSentenceIndex}
-        percent={percent}
-        focusMode={focusMode}
-        onFocusModeChange={setFocusMode}
-      />
+  const handleBookmarkToggle = useCallback(() => {
+    const bookmarks = loadBookmarks();
+    if (bookmarks.has(text.id)) {
+      bookmarks.delete(text.id);
+      setBookmarked(false);
+    } else {
+      bookmarks.add(text.id);
+      setBookmarked(true);
+    }
+    saveBookmarks(bookmarks);
+  }, [text.id]);
 
-      {textSearch.isOpen || textSearch.query.trim().length > 0 ? (
-        <div className="editorial-page-section pb-0 pt-0">
-          <ReaderInTextSearch
-            query={textSearch.query}
-            onQueryChange={textSearch.setQuery}
-            resultCount={textSearch.results.length}
-            activeIndex={textSearch.activeIndex}
-            isOpen={textSearch.isOpen}
-            inputRef={textSearch.inputRef}
-            onClose={textSearch.closeSearch}
-            onNext={textSearch.goToNext}
-            onPrevious={textSearch.goToPrevious}
-          />
-        </div>
+  const scrollToSentenceIndex = useCallback(
+    (index: number) => {
+      const sentence = text.sentences[index];
+      if (!sentence) {
+        return;
+      }
+      setSelectedSentenceId(sentence.id);
+      sentenceRefs.current.get(sentence.id)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    },
+    [text.sentences],
+  );
+
+  return (
+    <ReaderShell
+      explorerOpen={explorerOpen || selectedWordSnapshot !== null}
+      onToggleExplorer={() => setExplorerOpen((value) => !value)}
+      explorer={
+        <ReaderExplorerPanel
+          detail={detail}
+          loading={loading}
+          snapshot={selectedWordSnapshot}
+          textIndex={textIndex}
+        />
+      }
+      footer={
+        <ReaderAudioPlayer
+          sentenceCount={totalSentences}
+          currentSentenceIndex={currentSentenceIndex}
+          onSentenceSeek={scrollToSentenceIndex}
+        />
+      }
+    >
+      {explorerOpen && selectedWordSnapshot ? (
+        <button
+          type="button"
+          className="reader-ws__explorer-backdrop"
+          aria-label="Close explorer"
+          onClick={() => {
+            setExplorerOpen(false);
+            setSelectedWordSnapshot(null);
+          }}
+        />
       ) : null}
 
-      <ReadingLayout
-        main={
-          <article className="reader-article">
+      <div
+        className="reader-ws__content"
+        style={{ ["--rw-font-scale" as string]: String(fontScale) }}
+      >
+        <ReaderHeader
+          collectionName={getCollectionName(text.collectionId)}
+          title={text.title}
+          level={text.level}
+          estimatedMinutes={estimatedMinutes}
+          percent={percent}
+          fontScale={fontScale}
+          bookmarked={bookmarked}
+          onFontScaleChange={handleFontScaleChange}
+          onBookmarkToggle={handleBookmarkToggle}
+          onOpenSearch={textSearch.focusSearch}
+        />
+
+        {textSearch.isOpen || textSearch.query.trim().length > 0 ? (
+          <div className="reader-ws-search">
+            <ReaderInTextSearch
+              query={textSearch.query}
+              onQueryChange={textSearch.setQuery}
+              resultCount={textSearch.results.length}
+              activeIndex={textSearch.activeIndex}
+              isOpen={textSearch.isOpen}
+              inputRef={textSearch.inputRef}
+              onClose={textSearch.closeSearch}
+              onNext={textSearch.goToNext}
+              onPrevious={textSearch.goToPrevious}
+            />
+          </div>
+        ) : null}
+
+        <div className="reader-ws__article-wrap">
+          <article className="reader-ws-article">
             {text.sentences.map((sentence) => {
               const dimmed = focusMode && selectedSentenceId !== sentence.id;
               const analyzing = isSentenceAnalyzing(
@@ -461,9 +501,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
                   russianText={sentence.russianText}
                   naturalTranslation={sentence.naturalTranslation}
                   words={mapSentenceWords(sentence.words)}
-                  interactiveWordKinds={
-                    interactiveBySentence.get(sentence.id) ?? new Map()
-                  }
+                  interactiveWordKinds={interactiveBySentence.get(sentence.id) ?? new Map()}
                   selectedWordId={selectedWordId}
                   hoveredWordId={hoveredWordId}
                   searchMatchWordIds={searchMatchWordIds}
@@ -481,9 +519,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
                       naturalTranslation: sentence.naturalTranslation,
                     })
                   }
-                  onHoverWord={(word) =>
-                    handleHoverWord({ ...word, sentenceId: sentence.id })
-                  }
+                  onHoverWord={(word) => handleHoverWord({ ...word, sentenceId: sentence.id })}
                   onHoverWordLeave={handleHoverWordLeave}
                   registerRef={(node) => {
                     if (node) {
@@ -496,37 +532,16 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
               );
             })}
           </article>
-        }
-        sidebar={desktopSidebar}
-        footer={
-          <>
-            <ReaderCompletionCard
-              textTitle={text.title}
-              continueActions={readingSessionSummary.continueActions}
-            />
-            {textIntroduction ? (
-              <ReaderAboutText introduction={textIntroduction} defaultCollapsed />
-            ) : null}
-          </>
-        }
-      />
 
-      <Sidebar
-        variant="sheet"
-        open={
-          !mobileSidebarDismissed &&
-          (selectedWordSnapshot !== null || selectedSentence !== null)
-        }
-        onClose={closeSidebar}
-        title={microscopePanel ? "Microscope" : "Actions"}
-        className="reader-sidebar"
-        aria-label="Panneau de lecture"
-      >
-        <div className="reader-sidebar-stack">
-          {sentenceSidebar}
-          {microscopePanel}
+          <ReaderCompletionCard
+            textTitle={text.title}
+            continueActions={readingSessionSummary.continueActions}
+          />
+          {textIntroduction ? (
+            <ReaderAboutText introduction={textIntroduction} defaultCollapsed />
+          ) : null}
         </div>
-      </Sidebar>
-    </div>
+      </div>
+    </ReaderShell>
   );
 }

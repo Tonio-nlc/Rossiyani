@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { EditorialContainer, TopNavigation } from "@/components/design-system";
@@ -28,7 +28,9 @@ const NAV_SHORTCUTS = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [searchOpen, setSearchOpen] = useState(false);
+  const isReaderWorkspace = pathname.startsWith("/texts/");
 
   const openSearch = useCallback(() => setSearchOpen(true), []);
   const closeSearch = useCallback(() => setSearchOpen(false), []);
@@ -60,13 +62,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SearchProvider openSearch={openSearch}>
-      <div className="min-h-screen min-w-0 overflow-x-clip bg-[var(--paper)] text-[var(--ink)]">
+      <div
+        className={[
+          "min-h-screen min-w-0 overflow-x-clip",
+          isReaderWorkspace ? "bg-[#F8FAFC] text-[#111827]" : "bg-[var(--paper)] text-[var(--ink)]",
+        ].join(" ")}
+      >
         <OfflineBanner />
-        <TopNavigation onOpenSearch={openSearch} />
+        {!isReaderWorkspace ? <TopNavigation onOpenSearch={openSearch} /> : null}
         <SyncLearningSignals />
-        <EditorialContainer as="main" className="ds-app-main min-w-0">
-          {children}
-        </EditorialContainer>
+        {isReaderWorkspace ? (
+          <main className="ds-app-main min-w-0">{children}</main>
+        ) : (
+          <EditorialContainer as="main" className="ds-app-main min-w-0">
+            {children}
+          </EditorialContainer>
+        )}
         {searchOpen ? <UniversalSearchDialog open={searchOpen} onClose={closeSearch} /> : null}
       </div>
     </SearchProvider>
