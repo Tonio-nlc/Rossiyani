@@ -1,34 +1,23 @@
-Rossiyani is not a language learning app.
+Rossiyani is a productivity-focused language learning platform.
 
-Rossiyani is a premium academic reading environment dedicated to
-deep Russian language acquisition.
+Primary inspiration:
 
-Brand keywords:
+- Duolingo
+- Readwise
+- Linear
+- Notion
 
-- Scholarly
-- Calm
-- Editorial
-- Timeless
-- Structured
-- Serious
-- Cultural
-- Minimal
+Secondary inspiration:
 
-Avoid:
+- Memrise
+- Headway
+- Superhuman
 
-- Gamification
-- Bright colors
-- Floating cards
-- Excessive animations
-- Playful illustrations
-- Large gradients
-- Modern SaaS aesthetics
+The interface should prioritize:
 
-The interface should feel like:
+1. Progress
+2. Momentum
+3. Action
+4. Clarity
 
-- an old university library
-- an academic journal
-- a premium editorial publication
-- a quiet reading room
-
-Every visual decision must reinforce intellectual focus.
+before aesthetics.

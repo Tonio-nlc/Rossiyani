@@ -12,12 +12,6 @@ Progressive disclosure
 
 Secondary information stays hidden until useful.
 
-3
-
-Monotasking
-
-Only one primary action per screen.
-
 4
 
 Editorial rhythm
@@ -37,13 +31,13 @@ Russian first
 Russian typography always receives visual emphasis.
 
 7
+Every screen must have:
 
-Calm interaction
+- a primary action
+- visible progress
+- learning momentum
+- a clear next step
 
-No visual noise.
+Users should never wonder:
 
-No unnecessary badges.
-
-No decorative UI.
-
-No distracting gradients.
+"What should I do now?"

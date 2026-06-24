@@ -47,3 +47,24 @@ If unsure:
 Do less.
 
 Never invent new features.
+
+When redesigning Home, Practice, Vocabulary or Explorer:
+
+home-vision-board.md overrides all other visual references.
+
+Forbidden patterns:
+
+- academic portal layouts
+- archive layouts
+- library-first layouts
+- dense editorial pages
+- university-style navigation
+- textbook aesthetics
+
+Preferred patterns:
+
+- dashboard layouts
+- action-oriented cards
+- progress systems
+- learning goals
+- modern SaaS hierarchy
