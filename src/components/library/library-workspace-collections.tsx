@@ -1,8 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo } from "react";
 
-import { buildLibraryCollections } from "@/lib/library/build-library-collections";
+import {
+  buildLibraryCollections,
+  pickActiveCollection,
+} from "@/lib/library/build-library-collections";
 import { getExplorationHistory } from "@/lib/explorer/exploration-history";
 import { getAllReadingProgress } from "@/lib/reader/reading-progress";
 import type { TextListItem } from "@/features/texts";
@@ -15,58 +19,77 @@ type LibraryWorkspaceCollectionsProps = {
   texts: TextListItem[];
   activeCollection?: CollectionId | null;
   clientReady: boolean;
+  showAllCollections?: boolean;
 };
 
 export function LibraryWorkspaceCollections({
   texts,
   activeCollection = null,
   clientReady,
+  showAllCollections = false,
 }: LibraryWorkspaceCollectionsProps) {
-  const collections = useMemo(() => {
-    if (!clientReady) {
-      return buildLibraryCollections({ texts, readingProgress: {} });
+  const readingProgress = useMemo(
+    () => (clientReady ? getAllReadingProgress() : {}),
+    [clientReady],
+  );
+
+  const exploration = useMemo(
+    () => (clientReady ? getExplorationHistory() : []),
+    [clientReady],
+  );
+
+  const active = useMemo(
+    () => pickActiveCollection(texts, readingProgress, exploration, activeCollection),
+    [texts, readingProgress, exploration, activeCollection],
+  );
+
+  const browseCollections = useMemo(() => {
+    if (!showAllCollections) {
+      return [];
     }
-    return buildLibraryCollections({
-      texts,
-      readingProgress: getAllReadingProgress(),
-      exploration: getExplorationHistory(),
-    });
-  }, [texts, clientReady]);
+    return buildLibraryCollections({ texts, readingProgress, exploration }).filter(
+      (collection) => collection.id !== active?.id,
+    );
+  }, [texts, readingProgress, exploration, showAllCollections, active?.id]);
 
-  const visible = activeCollection
-    ? collections.filter((collection) => collection.id === activeCollection)
-    : collections;
-
-  if (visible.length === 0) {
+  if (!active) {
     return null;
   }
 
   return (
-    <section className="library-ws-section" aria-labelledby="library-ws-collections-heading">
-      <div className="library-ws-section__head">
-        <h2 id="library-ws-collections-heading" className="library-ws-section__title">
-          {activeCollection ? "Collection" : "Collections"}
+    <section
+      className="library-ws-section library-ws-section--featured"
+      aria-labelledby="library-ws-featured-heading"
+    >
+      <div className="library-ws-section__head library-ws-section__head--row">
+        <h2 id="library-ws-featured-heading" className="library-ws-section__title">
+          Current collection
         </h2>
-        <p className="library-ws-section__subtitle">
-          {activeCollection
-            ? "Progress and metadata for this curated path."
-            : "Your curated Russian library — browse by collection and track progress."}
-        </p>
+        {!showAllCollections ? (
+          <Link href="/library?collections=all" className="library-ws-link library-ws-link--subtle focus-kb">
+            View all collections →
+          </Link>
+        ) : (
+          <Link href="/library" className="library-ws-link library-ws-link--subtle focus-kb">
+            Back to library →
+          </Link>
+        )}
       </div>
 
-      <ul className="library-ws-collections">
-        {visible.map((collection) => (
-          <li
-            key={collection.id}
-            className={`library-ws-collections__item--${collection.layout}`}
-          >
-            <LibraryWorkspaceCollectionCard
-              collection={collection}
-              active={activeCollection === collection.id}
-            />
-          </li>
-        ))}
-      </ul>
+      <LibraryWorkspaceCollectionCard collection={active} mode="featured" />
+
+      {showAllCollections && browseCollections.length > 0 ? (
+        <>
+          <hr className="library-ws-separator library-ws-separator--inset" />
+          <ul className="library-ws-collections library-ws-collections--browse">
+            {browseCollections.map((collection) => (
+              <li key={collection.id}>
+                <LibraryWorkspaceCollectionCard collection={collection} mode="browse" />
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
     </section>
   );
 }

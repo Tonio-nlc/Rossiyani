@@ -36,6 +36,7 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const collectionFilter = parseLibraryCollectionParam(searchParams.get("collection"));
+  const showAllCollections = searchParams.get("collections") === "all";
 
   const [texts, setTexts] = useState(initialTexts);
   const [search, setSearch] = useState("");
@@ -138,7 +139,16 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
       <LibraryWorkspaceHero level={level} onLevelChange={setLevel} />
       <LibrarySectionNav active="texts" />
 
-      <section className="library-ws-section">
+      <LibraryWorkspaceCollections
+        texts={texts}
+        activeCollection={collectionFilter}
+        clientReady={clientReady}
+        showAllCollections={showAllCollections}
+      />
+
+      <hr className="library-ws-separator" />
+
+      <section className="library-ws-section library-ws-section--search">
         <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
         {collectionFilter ? (
           <div>
@@ -157,19 +167,16 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
         ) : null}
       </section>
 
-      <LibraryWorkspaceCollections
-        texts={texts}
-        activeCollection={collectionFilter}
-        clientReady={clientReady}
-      />
-
-      <section className="library-ws-section" aria-labelledby="library-texts-heading">
+      <section
+        className="library-ws-section library-ws-section--texts"
+        aria-labelledby="library-texts-heading"
+      >
         <div className="library-ws-section__head">
           <h2 id="library-texts-heading" className="library-ws-section__title">
             Vos textes
           </h2>
           <p className="library-ws-section__subtitle">
-            Lectures importées, prêtes à ouvrir — progrès et métadonnées à portée de main.
+            Lectures importées, prêtes à ouvrir.
           </p>
         </div>
         <LibraryWorkspaceTextGrid

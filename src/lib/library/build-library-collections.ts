@@ -132,6 +132,82 @@ function pickLayout(index: number, textCount: number): LibraryCollectionLayout {
   return LAYOUT_CYCLE[index % LAYOUT_CYCLE.length] ?? "medium";
 }
 
+/** Collection the learner is most likely studying right now. */
+export function pickActiveLibraryCollection(
+  summaries: LibraryCollectionSummary[],
+  preferredId: CollectionId | null = null,
+): LibraryCollectionSummary | null {
+  if (summaries.length === 0) {
+    return null;
+  }
+
+  if (preferredId) {
+    const preferred = summaries.find((summary) => summary.id === preferredId);
+    if (preferred) {
+      return preferred;
+    }
+  }
+
+  const inProgress = summaries
+    .filter((summary) => summary.progressPercent > 0 && summary.progressPercent < 100)
+    .sort((a, b) => b.progressPercent - a.progressPercent);
+  if (inProgress[0]) {
+    return inProgress[0];
+  }
+
+  const withActivity = [...summaries]
+    .filter((summary) => summary.wordsDiscovered > 0)
+    .sort((a, b) => b.wordsDiscovered - a.wordsDiscovered);
+  if (withActivity[0]) {
+    return withActivity[0];
+  }
+
+  const withTexts = [...summaries]
+    .filter((summary) => summary.textCount > 0)
+    .sort((a, b) => b.textCount - a.textCount);
+  if (withTexts[0]) {
+    return withTexts[0];
+  }
+
+  return summaries[0] ?? null;
+}
+
+export function pickActiveCollection(
+  texts: TextListItem[],
+  readingProgress: Record<string, TextReadingProgress>,
+  exploration: ExplorationEntry[] = [],
+  preferredId: CollectionId | null = null,
+): LibraryCollectionSummary | null {
+  const summaries = buildLibraryCollections({ texts, readingProgress, exploration });
+
+  if (preferredId) {
+    return summaries.find((collection) => collection.id === preferredId) ?? null;
+  }
+
+  const displayable = texts.filter(isDisplayableLibraryText);
+  let recentCollectionId: CollectionId | null = null;
+  let recentReadAt = 0;
+
+  for (const text of displayable) {
+    const progress = readingProgress[text.id];
+    if (!progress || progress.wordsSeenIds.length === 0) {
+      continue;
+    }
+    const readAt = new Date(progress.lastReadAt).getTime();
+    if (readAt > recentReadAt) {
+      recentReadAt = readAt;
+      recentCollectionId = text.collectionId;
+    }
+  }
+
+  if (recentCollectionId) {
+    return summaries.find((collection) => collection.id === recentCollectionId) ?? null;
+  }
+
+  const withTexts = [...summaries].sort((a, b) => b.textCount - a.textCount);
+  return withTexts[0] ?? null;
+}
+
 export function buildLibraryCollections(input: {
   texts: TextListItem[];
   readingProgress: Record<string, TextReadingProgress>;
