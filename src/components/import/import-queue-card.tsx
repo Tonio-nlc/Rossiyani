@@ -31,7 +31,7 @@ export function ImportQueueCard({ item }: ImportQueueCardProps) {
   return (
     <article className="home-ws-card home-ws-queue">
       <div>
-        <h3 className="home-ws-card-title">{item.title}</h3>
+        <h3 className="home-ws-card-title break-russian font-reader">{item.title}</h3>
         {item.collectionId ? (
           <p className="home-ws-explore-hub__description">{getCollectionName(item.collectionId)}</p>
         ) : null}

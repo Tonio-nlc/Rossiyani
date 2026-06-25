@@ -590,7 +590,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
 
   return (
     <div className="home-ws home-ws--import">
-      <header className="home-ws-page-hero">
+      <header className="home-ws-page-hero home-ws-import-hero">
         <h1 className="home-ws-page-hero__title">Importer du contenu</h1>
         <p className="home-ws-page-hero__lead">
           Transformez du contenu russe authentique en lecture, vocabulaire, grammaire et pratique.
@@ -621,7 +621,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
         />
         </section>
       ) : (
-        <section className="home-ws-section" aria-labelledby="import-source-heading">
+        <section className="home-ws-section home-ws-import-source" aria-labelledby="import-source-heading">
           <div className="home-ws-section__head">
             <h2 id="import-source-heading" className="home-ws-section__title">
               Source de contenu

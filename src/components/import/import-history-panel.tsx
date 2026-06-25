@@ -149,7 +149,7 @@ function HistoryRow({
       <article className="home-ws-card home-ws-history-item">
         <div className="home-ws-history-item__main">
           <p className="home-ws-metric__label">{collection}</p>
-          <h3 className="home-ws-card-title truncate">{title}</h3>
+          <h3 className="home-ws-card-title truncate break-russian font-reader">{title}</h3>
           <p className="home-ws-history-item__meta">{meta}</p>
         </div>
         <div className="home-ws-history-item__aside">

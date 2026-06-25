@@ -29,7 +29,7 @@ export function ImportExtractionProgress({
     <section className="home-ws-card home-ws-extract animate-fade-up" aria-live="polite" aria-busy={phase !== "done"}>
       <div>
         <p className="home-ws-metric__label">Préparation du fichier</p>
-        <p className="home-ws-card-title">{fileName}</p>
+        <p className="home-ws-card-title break-russian font-reader">{fileName}</p>
         {totalFiles > 1 ? (
           <p className="home-ws-explore-hub__description">
             Fichier {fileIndex} sur {totalFiles}

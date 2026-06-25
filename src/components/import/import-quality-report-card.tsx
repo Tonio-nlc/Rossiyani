@@ -20,7 +20,7 @@ export function ImportQualityReportCard({ quality }: ImportQualityReportCardProp
         <div className="mt-4 space-y-3">
           {quality.suspiciousTokens.map((token) => (
             <div key={token.word} className="home-ws-quality__token">
-              <p className="home-ws-card-title">{token.word}</p>
+              <p className="home-ws-card-title break-russian font-reader">{token.word}</p>
               <p className="home-ws-metric__label mt-1">Mot suspect</p>
               <ul className="home-ws-report__note mt-2 space-y-0.5">
                 {token.reasons.slice(0, 4).map((reason) => (

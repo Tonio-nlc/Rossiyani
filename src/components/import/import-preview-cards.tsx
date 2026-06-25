@@ -39,7 +39,7 @@ export function ImportPreviewCards() {
           <li key={item.id}>
             <article className="home-ws-card home-ws-sample-card">
               <p className="home-ws-sample-card__kind">{item.kind}</p>
-              <h3 className="home-ws-card-title break-russian">{item.title}</h3>
+              <h3 className="home-ws-card-title break-russian font-reader">{item.title}</h3>
               <p className="home-ws-sample-card__subtitle">{item.subtitle}</p>
               <p className="home-ws-sample-card__detail">{item.detail}</p>
             </article>

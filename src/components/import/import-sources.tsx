@@ -51,7 +51,7 @@ export function ImportSources({
   const [tab, setTab] = useState<ImportSourceTab>("text");
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="home-ws-import-source__panel">
       <div className="home-ws-segment" role="tablist" aria-label="Source de contenu">
         {TABS.map((item) => (
           <button
