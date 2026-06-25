@@ -26,22 +26,18 @@ export function ImportExtractionProgress({
   const currentIndex = steps.indexOf(phase);
 
   return (
-    <section
-      className="import-ws-extract animate-fade-up"
-      aria-live="polite"
-      aria-busy={phase !== "done"}
-    >
+    <section className="home-ws-card home-ws-extract animate-fade-up" aria-live="polite" aria-busy={phase !== "done"}>
       <div>
-        <p className="import-ws-extract__label">Préparation du fichier</p>
-        <p className="import-ws-extract__file">{fileName}</p>
+        <p className="home-ws-metric__label">Préparation du fichier</p>
+        <p className="home-ws-card-title">{fileName}</p>
         {totalFiles > 1 ? (
-          <p className="import-ws-extract__meta">
+          <p className="home-ws-explore-hub__description">
             Fichier {fileIndex} sur {totalFiles}
           </p>
         ) : null}
       </div>
 
-      <ol className="import-ws-extract__steps">
+      <ol className="home-ws-extract__steps">
         {steps.slice(0, -1).map((step, index) => {
           const isComplete = index < currentIndex;
           const isCurrent = step === phase;
@@ -49,14 +45,14 @@ export function ImportExtractionProgress({
             <li
               key={step}
               className={[
-                "import-ws-extract__step",
-                isCurrent ? "import-ws-extract__step--current" : "",
-                isComplete ? "import-ws-extract__step--done" : "",
+                "home-ws-extract__step",
+                isCurrent ? "home-ws-extract__step--current" : "",
+                isComplete ? "home-ws-extract__step--done" : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
             >
-              <span className="import-ws-extract__dot" aria-hidden>
+              <span className="home-ws-extract__dot" aria-hidden>
                 {isComplete ? "✓" : index + 1}
               </span>
               {PHASE_LABELS[step]}
@@ -65,7 +61,7 @@ export function ImportExtractionProgress({
         })}
       </ol>
 
-      <p className="import-ws-extract__status">{PHASE_LABELS[phase]}</p>
+      <p className="home-ws-report__note">{PHASE_LABELS[phase]}</p>
     </section>
   );
 }

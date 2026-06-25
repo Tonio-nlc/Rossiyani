@@ -51,8 +51,8 @@ export function ImportSources({
   const [tab, setTab] = useState<ImportSourceTab>("text");
 
   return (
-    <div className="import-ws-source">
-      <div className="import-ws-segment" role="tablist" aria-label="Source de contenu">
+    <div className="flex flex-col gap-6">
+      <div className="home-ws-segment" role="tablist" aria-label="Source de contenu">
         {TABS.map((item) => (
           <button
             key={item.id}
@@ -60,8 +60,8 @@ export function ImportSources({
             role="tab"
             aria-selected={tab === item.id}
             className={[
-              "import-ws-segment__btn focus-kb",
-              tab === item.id ? "import-ws-segment__btn--active" : "",
+              "home-ws-segment__btn focus-kb",
+              tab === item.id ? "home-ws-segment__btn--active" : "",
             ].join(" ")}
             onClick={() => setTab(item.id)}
           >
@@ -95,16 +95,16 @@ export function ImportSources({
         ) : null}
 
         {tab === "url" ? (
-          <div className="import-ws-write">
-            <div className="import-ws-write__panel">
+          <div className="home-ws-editor">
+            <div className="home-ws-card home-ws-card--surface">
               <input
                 type="url"
                 disabled
                 placeholder="https://…"
-                className="import-ws-write__url"
+                className="home-ws-url-input focus-kb"
                 aria-label="URL de l'article"
               />
-              <p className="import-ws-write__helper import-ws-write__helper--soon">
+              <p className="home-ws-editor__hint mt-4">
                 L&apos;import par URL arrive prochainement.
               </p>
             </div>

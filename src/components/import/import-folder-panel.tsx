@@ -22,7 +22,7 @@ export function ImportFolderPanel({ disabled, onFiles }: ImportFolderPanelProps)
   }, []);
 
   return (
-    <div className="import-ws-advanced__body">
+    <div className="home-ws-details__body">
       <input
         ref={folderInputRef}
         id={inputId}
@@ -35,17 +35,19 @@ export function ImportFolderPanel({ disabled, onFiles }: ImportFolderPanelProps)
           e.target.value = "";
         }}
       />
-      <p className="import-ws-advanced__lead">
+      <p className="home-ws-editor__hint">
         Sélectionnez un dossier entier. Tous les fichiers lisibles seront importés.
       </p>
-      <button
-        type="button"
-        className="import-ws-write__choose focus-kb"
-        disabled={disabled}
-        onClick={() => folderInputRef.current?.click()}
-      >
-        Importer un dossier
-      </button>
+      <div className="home-ws-actions mt-4">
+        <button
+          type="button"
+          className="home-ws-btn home-ws-btn--ghost home-ws-btn--pill focus-kb"
+          disabled={disabled}
+          onClick={() => folderInputRef.current?.click()}
+        >
+          Importer un dossier
+        </button>
+      </div>
     </div>
   );
 }

@@ -18,16 +18,23 @@ type ImportHistoryPanelProps = {
   showOnboarding?: boolean;
 };
 
-const STATUS_CLASS: Record<string, string> = {
-  completed: "import-ws-history__status--completed",
-  failed: "import-ws-history__status--failed",
-  skipped: "import-ws-history__status--skipped",
-  COMPLETED: "import-ws-history__status--completed",
-  FAILED: "import-ws-history__status--failed",
-  PROCESSING: "import-ws-history__status--processing",
-  PENDING: "import-ws-history__status--pending",
-  PAUSED: "import-ws-history__status--pending",
-};
+function statusBadgeClass(status: string): string {
+  switch (status) {
+    case "completed":
+    case "COMPLETED":
+      return "home-ws-badge";
+    case "failed":
+    case "FAILED":
+      return "home-ws-badge home-ws-badge--muted";
+    case "PROCESSING":
+      return "home-ws-badge";
+    case "skipped":
+    case "PENDING":
+    case "PAUSED":
+    default:
+      return "home-ws-badge home-ws-badge--muted";
+  }
+}
 
 export function ImportHistoryPanel({
   localHistory,
@@ -42,11 +49,11 @@ export function ImportHistoryPanel({
 
   if (loading) {
     return (
-      <section className="import-ws-section">
-        <h2 className="import-ws-section__title">Historique</h2>
+      <section className="home-ws-section">
+        <h2 className="home-ws-section__title">Historique</h2>
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="skeleton-shimmer h-12" />
+            <div key={i} className="skeleton-shimmer h-20 rounded-2xl" />
           ))}
         </div>
       </section>
@@ -58,45 +65,40 @@ export function ImportHistoryPanel({
   }
 
   return (
-    <section className="import-ws-section" aria-labelledby="import-history-heading">
-      <div className="import-ws-history__head">
-        <h2 id="import-history-heading" className="import-ws-section__title">
+    <section className="home-ws-section" aria-labelledby="import-history-heading">
+      <div className="flex items-baseline justify-between gap-4">
+        <h2 id="import-history-heading" className="home-ws-section__title">
           Historique
         </h2>
         {onViewReport ? (
-          <button
-            type="button"
-            onClick={onViewReport}
-            className="import-ws-history__link focus-kb"
-          >
+          <button type="button" onClick={onViewReport} className="home-ws-link focus-kb">
             Voir le rapport
           </button>
         ) : null}
       </div>
 
-      <ul className="import-ws-history__list">
+      <ul className="home-ws-history-list">
         {localHistory.map((entry) => (
           <HistoryRow
             key={entry.id}
             title={entry.title}
-            collection={
-              entry.collectionId ? getCollectionName(entry.collectionId) : "—"
-            }
-            date={formatDate(entry.completedAt)}
-            words={entry.wordCount ?? 0}
-            sentences={entry.sentenceCount ?? 0}
+            collection={entry.collectionId ? getCollectionName(entry.collectionId) : "—"}
+            meta={`${formatDate(entry.completedAt)} · ${entry.wordCount ?? 0} mots · ${entry.sentenceCount ?? 0} phrases`}
             status={entry.status}
             action={
               entry.status === "failed" && onRetry ? (
                 <button
                   type="button"
                   onClick={() => onRetry(entry)}
-                  className="import-ws-history__link focus-kb"
+                  className="home-ws-btn home-ws-btn--ghost home-ws-btn--pill home-ws-btn--sm focus-kb"
                 >
                   Relancer
                 </button>
               ) : entry.textId ? (
-                <Link href={`/texts/${entry.textId}`} className="import-ws-history__link focus-kb">
+                <Link
+                  href={`/texts/${entry.textId}`}
+                  className="home-ws-btn home-ws-btn--ghost home-ws-btn--pill home-ws-btn--sm focus-kb"
+                >
                   Ouvrir
                 </Link>
               ) : null
@@ -109,16 +111,14 @@ export function ImportHistoryPanel({
             key={job.id}
             title={job.name}
             collection="Import groupé"
-            date="—"
-            words={job.sentencesProcessed}
-            sentences={job.totalFiles}
+            meta={`${job.sentencesProcessed} mots traités · ${job.totalFiles} fichiers`}
             status={job.status}
             action={
               job.status === "FAILED" || job.status === "PAUSED" ? (
                 <button
                   type="button"
                   onClick={() => onResumeJob?.(job.id)}
-                  className="import-ws-history__link focus-kb"
+                  className="home-ws-btn home-ws-btn--ghost home-ws-btn--pill home-ws-btn--sm focus-kb"
                 >
                   Reprendre
                 </button>
@@ -134,33 +134,29 @@ export function ImportHistoryPanel({
 function HistoryRow({
   title,
   collection,
-  date,
-  words,
-  sentences,
+  meta,
   status,
   action,
 }: {
   title: string;
   collection: string;
-  date: string;
-  words: number;
-  sentences: number;
+  meta: string;
   status: string;
   action?: React.ReactNode;
 }) {
   return (
-    <li className="import-ws-history__row">
-      <p className="import-ws-history__title truncate">{title}</p>
-      <p className="import-ws-history__cell import-ws-history__cell--collection truncate">
-        {collection}
-      </p>
-      <p className="import-ws-history__cell">{date}</p>
-      <p className="import-ws-history__cell">{words}</p>
-      <p className="import-ws-history__cell">{sentences}</p>
-      <span className={`import-ws-history__status ${STATUS_CLASS[status] ?? ""}`}>
-        {statusLabel(status)}
-      </span>
-      <div className="import-ws-history__actions">{action}</div>
+    <li>
+      <article className="home-ws-card home-ws-history-item">
+        <div className="home-ws-history-item__main">
+          <p className="home-ws-metric__label">{collection}</p>
+          <h3 className="home-ws-card-title truncate">{title}</h3>
+          <p className="home-ws-history-item__meta">{meta}</p>
+        </div>
+        <div className="home-ws-history-item__aside">
+          <span className={statusBadgeClass(status)}>{statusLabel(status)}</span>
+          {action}
+        </div>
+      </article>
     </li>
   );
 }

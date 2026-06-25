@@ -6,14 +6,14 @@ type ImportErrorDetailsProps = {
 
 export function ImportErrorDetails({ details }: ImportErrorDetailsProps) {
   return (
-    <div className="import-ws-error">
-      <p className="import-ws-error__headline">{details.headline}</p>
+    <div className="home-ws-error">
+      <p className="home-ws-error__headline">{details.headline}</p>
 
-      <ul className="import-ws-error__checks">
+      <ul className="home-ws-error__checks">
         {details.checks.map((check) => (
           <li
             key={check.label}
-            className={check.ok ? "import-ws-error__check--ok" : "import-ws-error__check--fail"}
+            className={check.ok ? "" : "home-ws-error__check--fail"}
           >
             <span aria-hidden>{check.ok ? "✓ " : "✗ "}</span>
             {check.label}
@@ -21,15 +21,17 @@ export function ImportErrorDetails({ details }: ImportErrorDetailsProps) {
         ))}
       </ul>
 
-      <div className="import-ws-error__divider">
-        <p className="import-ws-error__step">Étape ayant échoué : {details.failedStep}</p>
-        <p className="import-ws-error__technical">{details.technicalMessage}</p>
+      <div className="mt-4 border-t border-[var(--border)] pt-4">
+        <p className="home-ws-metric__label">Étape ayant échoué : {details.failedStep}</p>
+        <p className="home-ws-report__note mt-1 font-mono text-xs leading-relaxed">
+          {details.technicalMessage}
+        </p>
       </div>
 
       {details.suggestions.length > 0 ? (
-        <div>
-          <p className="import-ws-error__suggest-label">Essayez de :</p>
-          <ul className="import-ws-error__suggest-list">
+        <div className="mt-4">
+          <p className="home-ws-metric__label">Essayez de :</p>
+          <ul className="home-ws-report__note mt-2 space-y-1">
             {details.suggestions.map((suggestion) => (
               <li key={suggestion}>· {suggestion}</li>
             ))}

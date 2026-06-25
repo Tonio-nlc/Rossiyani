@@ -72,24 +72,24 @@ export function ImportPastePanel({
   const showMetadata = hasImportText(text);
 
   return (
-    <div className="import-ws-write">
+    <div className="home-ws-editor">
       <textarea
         value={text}
         onChange={(e) => onTextChange(e.target.value)}
         disabled={disabled}
         placeholder="Collez votre texte russe ici…"
         rows={10}
-        className="import-ws-write__area focus-kb"
+        className="home-ws-editor__area focus-kb"
         aria-label="Texte russe à importer"
       />
 
-      <p className="import-ws-write__helper">
+      <p className="home-ws-editor__hint">
         Rossiyani détecte automatiquement les phrases, le vocabulaire, la grammaire et les
         expressions.
       </p>
 
       {showMetadata ? (
-        <dl className="import-ws-stats">
+        <dl className="home-ws-stat-grid">
           <div>
             <dt>Caractères</dt>
             <dd>{stats.characters.toLocaleString("fr-FR")}</dd>
@@ -110,31 +110,29 @@ export function ImportPastePanel({
       ) : null}
 
       {showMetadata ? (
-        <div className="import-ws-metadata">
-          <ImportMetadataFields
-            title={title}
-            collectionId={collectionId}
-            categoryId={categoryId}
-            level={level}
-            onTitleChange={(value) => {
-              setTitleTouched(true);
-              setTitleError(null);
-              onTitleChange(value);
-            }}
-            onCollectionChange={onCollectionChange}
-            onCategoryChange={onCategoryChange}
-            onLevelChange={onLevelChange}
-            disabled={disabled}
-            titleError={titleError}
-          />
-        </div>
+        <ImportMetadataFields
+          title={title}
+          collectionId={collectionId}
+          categoryId={categoryId}
+          level={level}
+          onTitleChange={(value) => {
+            setTitleTouched(true);
+            setTitleError(null);
+            onTitleChange(value);
+          }}
+          onCollectionChange={onCollectionChange}
+          onCategoryChange={onCategoryChange}
+          onLevelChange={onLevelChange}
+          disabled={disabled}
+          titleError={titleError}
+        />
       ) : null}
 
       {showMetadata ? (
-        <div className="import-ws-actions">
+        <div className="home-ws-actions">
           <button
             type="button"
-            className="import-ws-btn focus-kb"
+            className="home-ws-btn home-ws-btn--pill focus-kb"
             onClick={handleAnalyze}
             disabled={disabled || !canAnalyze}
           >

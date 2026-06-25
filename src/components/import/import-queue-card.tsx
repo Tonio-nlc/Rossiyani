@@ -29,36 +29,34 @@ export function ImportQueueCard({ item }: ImportQueueCardProps) {
   const wordLabel = `${wordCount} mot${wordCount === 1 ? "" : "s"}`;
 
   return (
-    <article className="import-ws-queue">
+    <article className="home-ws-card home-ws-queue">
       <div>
-        <h3 className="import-ws-queue__title">{item.title}</h3>
+        <h3 className="home-ws-card-title">{item.title}</h3>
         {item.collectionId ? (
-          <p className="import-ws-queue__meta">{getCollectionName(item.collectionId)}</p>
+          <p className="home-ws-explore-hub__description">{getCollectionName(item.collectionId)}</p>
         ) : null}
-        <p className="import-ws-queue__status">{STATUS_LABELS[item.status]}</p>
+        <p className="home-ws-queue__status">{STATUS_LABELS[item.status]}</p>
       </div>
 
       {isActive ? (
-        <div className="mt-4 space-y-2">
+        <div className="space-y-2">
           <ProgressBar value={item.progress} />
-          <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm text-[var(--ink-secondary)]">
-            <span>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <span className="home-ws-explore-hub__description">
               {phraseLabel} · {wordLabel}
             </span>
             {item.enrichmentPending ? (
-              <span className="text-xs text-[var(--ink-muted)]">Analyse en cours…</span>
+              <span className="home-ws-report__note">Analyse en cours…</span>
             ) : null}
           </div>
           {item.etaSeconds !== null && isActive && !item.enrichmentPending ? (
-            <p className="text-xs text-[var(--ink-muted)]">~{item.etaSeconds} s restantes</p>
+            <p className="home-ws-report__note">~{item.etaSeconds} s restantes</p>
           ) : null}
         </div>
       ) : null}
 
       {item.status === "failed" && item.errorDetails ? (
-        <div className="mt-4">
-          <ImportErrorDetails details={item.errorDetails} />
-        </div>
+        <ImportErrorDetails details={item.errorDetails} />
       ) : null}
     </article>
   );

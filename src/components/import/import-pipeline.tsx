@@ -10,36 +10,36 @@ const PIPELINE_STEPS = [
 
 export function ImportPipeline() {
   return (
-    <section className="import-ws-section" aria-labelledby="import-pipeline-heading">
-      <div className="import-ws-section__head">
-        <h2 id="import-pipeline-heading" className="import-ws-section__title">
+    <section className="home-ws-section" aria-labelledby="import-pipeline-heading">
+      <div className="home-ws-section__head">
+        <h2 id="import-pipeline-heading" className="home-ws-section__title">
           Parcours d&apos;apprentissage
         </h2>
-        <p className="import-ws-section__lead">
+        <p className="home-ws-section__subtitle">
           Chaque texte importé alimente lecture, exploration et pratique.
         </p>
       </div>
 
-      <ol className="import-ws-pipeline__track">
+      <ol className="home-ws-journey">
         {PIPELINE_STEPS.map((step, index) => (
-          <li key={step.id} className="import-ws-pipeline__step">
+          <li key={step.id} className="home-ws-journey__step">
             {step.id === "import" ? (
-              <span className="import-ws-pipeline__node import-ws-pipeline__node--current">
-                <span className="import-ws-pipeline__icon" aria-hidden>
+              <span className="home-ws-journey__node home-ws-journey__node--current">
+                <span className="home-ws-journey__icon" aria-hidden>
                   {step.glyph}
                 </span>
-                <span className="import-ws-pipeline__label">{step.label}</span>
+                <span className="home-ws-journey__label">{step.label}</span>
               </span>
             ) : (
-              <Link href={step.href} className="import-ws-pipeline__node focus-kb">
-                <span className="import-ws-pipeline__icon" aria-hidden>
+              <Link href={step.href} className="home-ws-journey__node focus-kb">
+                <span className="home-ws-journey__icon" aria-hidden>
                   {step.glyph}
                 </span>
-                <span className="import-ws-pipeline__label">{step.label}</span>
+                <span className="home-ws-journey__label">{step.label}</span>
               </Link>
             )}
             {index < PIPELINE_STEPS.length - 1 ? (
-              <span className="import-ws-pipeline__connector" aria-hidden />
+              <span className="home-ws-journey__connector" aria-hidden />
             ) : null}
           </li>
         ))}

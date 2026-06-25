@@ -589,10 +589,10 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
     !report && !processing && staged.length === 0 && !activeItem && queue.length === 0;
 
   return (
-    <div className="import-ws">
-      <header className="import-ws-hero">
-        <h1 className="import-ws-hero__title">Importer du contenu</h1>
-        <p className="import-ws-hero__subtitle">
+    <div className="home-ws home-ws--import">
+      <header className="home-ws-page-hero">
+        <h1 className="home-ws-page-hero__title">Importer du contenu</h1>
+        <p className="home-ws-page-hero__lead">
           Transformez du contenu russe authentique en lecture, vocabulaire, grammaire et pratique.
         </p>
       </header>
@@ -607,7 +607,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
       ) : null}
 
       {staged.length > 0 ? (
-        <section className="import-ws-section">
+        <section className="home-ws-section">
           <ImportFilePreview
           files={staged}
           disabled={processing || staging}
@@ -621,9 +621,9 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
         />
         </section>
       ) : (
-        <section className="import-ws-section" aria-labelledby="import-source-heading">
-          <div className="import-ws-section__head">
-            <h2 id="import-source-heading" className="import-ws-section__title">
+        <section className="home-ws-section" aria-labelledby="import-source-heading">
+          <div className="home-ws-section__head">
+            <h2 id="import-source-heading" className="home-ws-section__title">
               Source de contenu
             </h2>
           </div>
@@ -643,7 +643,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
           onFiles={(files) => void handleFilesSelected(files)}
         />
 
-        <details className="import-ws-advanced">
+        <details className="home-ws-details">
           <summary>Options avancées</summary>
           <ImportFolderPanel
             disabled={processing || staging}
@@ -659,15 +659,15 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
       {showIdlePreview ? <ImportPreviewCards /> : null}
 
       {activeItem ? (
-        <section className="import-ws-section">
-          <h2 className="import-ws-section__title">Transformation en cours</h2>
+        <section className="home-ws-section">
+          <h2 className="home-ws-section__title">Transformation en cours</h2>
           <ImportQueueCard item={activeItem} />
         </section>
       ) : null}
 
       {!activeItem && failedItems.length > 0 ? (
-        <section className="import-ws-section">
-          <h2 className="import-ws-section__title">Échec de transformation</h2>
+        <section className="home-ws-section">
+          <h2 className="home-ws-section__title">Échec de transformation</h2>
           {failedItems.map((item) => (
             <ImportQueueCard key={item.id} item={item} />
           ))}
@@ -675,7 +675,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
       ) : null}
 
       {report ? (
-        <section className="import-ws-section">
+        <section className="home-ws-section">
           <ImportReportCard report={report} completedTextId={completedTextId} />
         </section>
       ) : null}

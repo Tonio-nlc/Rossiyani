@@ -24,24 +24,24 @@ const PREVIEW_ITEMS = [
 
 export function ImportPreviewCards() {
   return (
-    <section className="import-ws-section" aria-labelledby="import-preview-heading">
-      <div className="import-ws-section__head">
-        <h2 id="import-preview-heading" className="import-ws-section__title">
+    <section className="home-ws-section" aria-labelledby="import-preview-heading">
+      <div className="home-ws-section__head">
+        <h2 id="import-preview-heading" className="home-ws-section__title">
           Exemple d&apos;analyse
         </h2>
-        <p className="import-ws-section__lead">
+        <p className="home-ws-section__subtitle">
           Voici le type de découvertes que Rossiyani génère à partir d&apos;un texte.
         </p>
       </div>
 
-      <ul className="import-ws-preview">
+      <ul className="home-ws-sample-grid">
         {PREVIEW_ITEMS.map((item) => (
           <li key={item.id}>
-            <article className="import-ws-preview-card">
-              <p className="import-ws-preview-card__kind">{item.kind}</p>
-              <h3 className="import-ws-preview-card__title break-russian">{item.title}</h3>
-              <p className="import-ws-preview-card__subtitle">{item.subtitle}</p>
-              <p className="import-ws-preview-card__detail">{item.detail}</p>
+            <article className="home-ws-card home-ws-sample-card">
+              <p className="home-ws-sample-card__kind">{item.kind}</p>
+              <h3 className="home-ws-card-title break-russian">{item.title}</h3>
+              <p className="home-ws-sample-card__subtitle">{item.subtitle}</p>
+              <p className="home-ws-sample-card__detail">{item.detail}</p>
             </article>
           </li>
         ))}

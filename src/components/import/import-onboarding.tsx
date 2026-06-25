@@ -7,21 +7,21 @@ export function ImportOnboarding() {
   ] as const;
 
   return (
-    <section className="import-ws-section" aria-labelledby="import-onboarding-heading">
-      <div className="import-ws-section__head">
-        <h2 id="import-onboarding-heading" className="import-ws-section__title">
+    <section className="home-ws-section" aria-labelledby="import-onboarding-heading">
+      <div className="home-ws-section__head">
+        <h2 id="import-onboarding-heading" className="home-ws-section__title">
           Commencer
         </h2>
-        <p className="import-ws-section__lead">
+        <p className="home-ws-section__subtitle">
           Commencez par un court texte en russe — un article, un dialogue, un extrait de livre.
         </p>
       </div>
 
-      <div className="import-ws-onboarding-card">
-        <p className="import-ws-onboarding-card__lead">
+      <div className="home-ws-card home-ws-onboarding-card">
+        <p className="home-ws-section__subtitle">
           Chaque texte importé devient&nbsp;:
         </p>
-        <ul className="import-onboarding__list">
+        <ul className="home-ws-onboarding-card__list">
           {OUTCOMES.map((outcome) => (
             <li key={outcome}>{outcome}</li>
           ))}

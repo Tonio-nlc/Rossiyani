@@ -25,7 +25,7 @@ export function ImportFilePanel({ disabled, onFiles }: ImportFilePanelProps) {
   );
 
   return (
-    <div className="import-ws-write">
+    <div className="home-ws-editor">
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -38,8 +38,8 @@ export function ImportFilePanel({ disabled, onFiles }: ImportFilePanelProps) {
           handleFiles(e.dataTransfer.files);
         }}
         className={[
-          "import-ws-write__panel",
-          dragOver ? "import-ws-write--drag" : "",
+          "home-ws-dropzone",
+          dragOver ? "home-ws-dropzone--active" : "",
           disabled ? "pointer-events-none opacity-50" : "",
         ].join(" ")}
       >
@@ -56,21 +56,21 @@ export function ImportFilePanel({ disabled, onFiles }: ImportFilePanelProps) {
           }}
         />
 
-        <p className="import-ws-write__hint">
+        <p className="home-ws-dropzone__hint">
           Choisissez un fichier texte ou PDF à transformer en expérience de lecture.
         </p>
         <button
           type="button"
-          className="import-ws-write__choose focus-kb"
+          className="home-ws-btn home-ws-btn--pill focus-kb"
           disabled={disabled}
           onClick={() => fileInputRef.current?.click()}
         >
           Choisir un fichier
         </button>
-        <p className="import-ws-write__formats">.txt · .md · .pdf</p>
+        <p className="home-ws-dropzone__formats">.txt · .md · .pdf</p>
       </div>
 
-      <p className="import-ws-write__helper">
+      <p className="home-ws-editor__hint">
         Rossiyani détecte automatiquement les phrases, le vocabulaire, la grammaire et les
         expressions.
       </p>

@@ -36,16 +36,10 @@ export function ImportMetadataFields({
   disabled,
   titleError,
   fileNameHint,
-  compact = false,
 }: ImportMetadataFieldsProps) {
   return (
-    <div
-      className={[
-        "import-ws-metadata__grid",
-        compact ? "import-ws-metadata__grid--compact" : "",
-      ].join(" ")}
-    >
-      <div className="import-ws-field import-ws-field--full">
+    <div className="home-ws-form-grid">
+      <div className="home-ws-field home-ws-field--full">
         <label htmlFor="import-title">
           Nom du texte <span aria-hidden>*</span>
         </label>
@@ -56,16 +50,16 @@ export function ImportMetadataFields({
           onChange={(e) => onTitleChange(e.target.value)}
           disabled={disabled}
           placeholder="Ex. : В метро"
-          className="import-ws-field__title focus-kb"
+          className="focus-kb"
         />
         {titleError ? (
-          <p className="import-ws-field__error">{titleError}</p>
+          <p className="home-ws-field__error">{titleError}</p>
         ) : fileNameHint ? (
-          <p className="import-ws-field__hint">Fichier : {fileNameHint}</p>
+          <p className="home-ws-field__hint">Fichier : {fileNameHint}</p>
         ) : null}
       </div>
 
-      <div className="import-ws-field">
+      <div className="home-ws-field">
         <label htmlFor="import-collection">Collection</label>
         <select
           id="import-collection"
@@ -82,7 +76,7 @@ export function ImportMetadataFields({
         </select>
       </div>
 
-      <div className="import-ws-field">
+      <div className="home-ws-field">
         <label htmlFor="import-category">Catégorie</label>
         <select
           id="import-category"
@@ -100,7 +94,7 @@ export function ImportMetadataFields({
         </select>
       </div>
 
-      <div className="import-ws-field import-ws-field--full">
+      <div className="home-ws-field home-ws-field--full">
         <label htmlFor="import-level">Niveau CEFR</label>
         <select
           id="import-level"
