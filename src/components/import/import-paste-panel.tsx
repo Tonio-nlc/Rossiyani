@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { PrimaryButton } from "@/components/design-system/primary-button";
 import type { CategoryId } from "@/content/categories";
 import type { CollectionId } from "@/content/collections";
 import {
@@ -73,32 +72,37 @@ export function ImportPastePanel({
   const showMetadata = hasImportText(text);
 
   return (
-    <>
+    <div className="import-ws-write">
       <textarea
         value={text}
         onChange={(e) => onTextChange(e.target.value)}
         disabled={disabled}
-        placeholder="Collez ici votre texte russe…"
+        placeholder="Collez votre texte russe ici…"
         rows={10}
-        className="import-dropzone__textarea focus-kb"
+        className="import-ws-write__area focus-kb"
         aria-label="Texte russe à importer"
       />
 
+      <p className="import-ws-write__helper">
+        Rossiyani détecte automatiquement les phrases, le vocabulaire, la grammaire et les
+        expressions.
+      </p>
+
       {showMetadata ? (
-        <dl className="import-dropzone__stats">
-          <div className="import-dropzone__stat">
+        <dl className="import-ws-stats">
+          <div>
             <dt>Caractères</dt>
             <dd>{stats.characters.toLocaleString("fr-FR")}</dd>
           </div>
-          <div className="import-dropzone__stat">
+          <div>
             <dt>Mots</dt>
             <dd>{stats.words.toLocaleString("fr-FR")}</dd>
           </div>
-          <div className="import-dropzone__stat">
+          <div>
             <dt>Phrases estimées</dt>
             <dd>{stats.estimatedSentences}</dd>
           </div>
-          <div className="import-dropzone__stat">
+          <div>
             <dt>Lecture estimée</dt>
             <dd>~{stats.estimatedReadingMinutes} min</dd>
           </div>
@@ -106,7 +110,7 @@ export function ImportPastePanel({
       ) : null}
 
       {showMetadata ? (
-        <div className="import-dropzone__metadata">
+        <div className="import-ws-metadata">
           <ImportMetadataFields
             title={title}
             collectionId={collectionId}
@@ -127,12 +131,17 @@ export function ImportPastePanel({
       ) : null}
 
       {showMetadata ? (
-        <div className="import-dropzone__actions">
-          <PrimaryButton variant="gold" onClick={handleAnalyze} disabled={disabled || !canAnalyze}>
-            Transformer en matériel d&apos;apprentissage
-          </PrimaryButton>
+        <div className="import-ws-actions">
+          <button
+            type="button"
+            className="import-ws-btn focus-kb"
+            onClick={handleAnalyze}
+            disabled={disabled || !canAnalyze}
+          >
+            Analyser le texte
+          </button>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }

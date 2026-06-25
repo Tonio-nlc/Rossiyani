@@ -24,9 +24,6 @@ type ImportMetadataFieldsProps = {
   compact?: boolean;
 };
 
-const fieldClass =
-  "focus-kb mt-1.5 w-full rounded-sm border border-[color-mix(in_srgb,var(--hairline)_88%,transparent)] bg-[var(--paper)] px-3 py-2.5 text-sm text-[var(--ink)] focus:border-[color-mix(in_srgb,var(--accent-gold,#b08d57)_45%,transparent)]";
-
 export function ImportMetadataFields({
   title,
   collectionId,
@@ -44,43 +41,38 @@ export function ImportMetadataFields({
   return (
     <div
       className={[
-        "grid gap-4",
-        compact ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 lg:grid-cols-2",
+        "import-ws-metadata__grid",
+        compact ? "import-ws-metadata__grid--compact" : "",
       ].join(" ")}
     >
-      <div className={compact ? "sm:col-span-2" : "lg:col-span-2"}>
-        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
-          Nom du texte <span className="text-red-300">*</span>
+      <div className="import-ws-field import-ws-field--full">
+        <label htmlFor="import-title">
+          Nom du texte <span aria-hidden>*</span>
         </label>
         <input
+          id="import-title"
           type="text"
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
           disabled={disabled}
           placeholder="Ex. : В метро"
-          className={[
-            "focus-kb mt-1.5 w-full rounded-sm border bg-[var(--paper)] px-3 py-2.5 font-reader text-base text-[var(--ink)] placeholder:text-[var(--ink-muted)]/60",
-            titleError
-              ? "border-red-500/40 focus:border-red-500/50"
-              : "border-[color-mix(in_srgb,var(--hairline)_88%,transparent)] focus:border-[color-mix(in_srgb,var(--accent-gold,#b08d57)_45%,transparent)]",
-          ].join(" ")}
+          className="import-ws-field__title focus-kb"
         />
         {titleError ? (
-          <p className="mt-1 text-xs text-red-300">{titleError}</p>
+          <p className="import-ws-field__error">{titleError}</p>
         ) : fileNameHint ? (
-          <p className="mt-1 text-xs text-[var(--ink-muted)]">Fichier : {fileNameHint}</p>
+          <p className="import-ws-field__hint">Fichier : {fileNameHint}</p>
         ) : null}
       </div>
 
-      <div>
-        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
-          Collection
-        </label>
+      <div className="import-ws-field">
+        <label htmlFor="import-collection">Collection</label>
         <select
+          id="import-collection"
           value={collectionId}
           onChange={(e) => onCollectionChange(e.target.value as CollectionId)}
           disabled={disabled}
-          className={fieldClass}
+          className="focus-kb"
         >
           {COLLECTIONS.map((collection) => (
             <option key={collection.id} value={collection.id}>
@@ -90,15 +82,14 @@ export function ImportMetadataFields({
         </select>
       </div>
 
-      <div>
-        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
-          Catégorie
-        </label>
+      <div className="import-ws-field">
+        <label htmlFor="import-category">Catégorie</label>
         <select
+          id="import-category"
           value={categoryId}
           onChange={(e) => onCategoryChange(e.target.value as CategoryId | "")}
           disabled={disabled}
-          className={fieldClass}
+          className="focus-kb"
         >
           <option value="">Aucune</option>
           {CATEGORIES.map((category) => (
@@ -109,15 +100,14 @@ export function ImportMetadataFields({
         </select>
       </div>
 
-      <div className={compact ? "sm:col-span-2" : "lg:col-span-2"}>
-        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
-          Niveau CEFR
-        </label>
+      <div className="import-ws-field import-ws-field--full">
+        <label htmlFor="import-level">Niveau CEFR</label>
         <select
+          id="import-level"
           value={level}
           onChange={(e) => onLevelChange(e.target.value as CefrLevel)}
           disabled={disabled}
-          className={fieldClass}
+          className="focus-kb"
         >
           {LEVELS.map((l) => (
             <option key={l} value={l}>

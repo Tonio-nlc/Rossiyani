@@ -1,6 +1,5 @@
 "use client";
 
-import { PrimaryButton } from "@/components/design-system/primary-button";
 import type { CategoryId } from "@/content/categories";
 import type { CollectionId } from "@/content/collections";
 import { countWords, formatFileSize, isImportTitleValid } from "@/lib/import-client";
@@ -42,10 +41,10 @@ export function ImportFilePreview({
   return (
     <section className="import-staged animate-fade-up">
       <div>
-        <h2 className="import-section-label">
+        <h2 className="import-ws-section__title">
           Préparer {files.length > 1 ? "les textes" : "le texte"}
         </h2>
-        <p className="import-preview__lead">
+        <p className="import-ws-section__lead">
           Vérifiez le nom, la collection, la catégorie et le niveau avant la transformation.
         </p>
       </div>
@@ -150,16 +149,21 @@ export function ImportFilePreview({
         </p>
       ) : null}
 
-      <div className="import-dropzone__actions">
-        <PrimaryButton variant="gold" onClick={onImport} disabled={disabled || !allTitlesValid}>
-          Transformer en matériel d&apos;apprentissage
+      <div className="import-ws-actions">
+        <button
+          type="button"
+          className="import-ws-btn focus-kb"
+          onClick={onImport}
+          disabled={disabled || !allTitlesValid}
+        >
+          Analyser le texte
           {files.length > 1 ? ` (${files.length})` : ""}
-        </PrimaryButton>
+        </button>
         <button
           type="button"
           onClick={onCancel}
           disabled={disabled}
-          className="import-report__link focus-kb border-none bg-transparent p-2"
+          className="import-ws-history__link focus-kb"
         >
           Annuler
         </button>

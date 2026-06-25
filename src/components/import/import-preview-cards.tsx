@@ -1,7 +1,3 @@
-import { EditorialSectionHead } from "@/components/editorial/editorial-section-head";
-
-import { ImportIconPreview } from "./import-extraction-icons";
-
 const PREVIEW_ITEMS = [
   {
     id: "word",
@@ -28,25 +24,24 @@ const PREVIEW_ITEMS = [
 
 export function ImportPreviewCards() {
   return (
-    <section
-      className="import-editorial-section import-editorial-section--secondary"
-      aria-labelledby="import-preview-heading"
-    >
-      <EditorialSectionHead
-        id="import-preview-heading"
-        icon={<ImportIconPreview className="editorial-section-head__icon" />}
-        title="Aperçu de l'analyse"
-        lead="Voici le type de découvertes que Rossiyani génère à partir d'un texte."
-      />
+    <section className="import-ws-section" aria-labelledby="import-preview-heading">
+      <div className="import-ws-section__head">
+        <h2 id="import-preview-heading" className="import-ws-section__title">
+          Exemple d&apos;analyse
+        </h2>
+        <p className="import-ws-section__lead">
+          Voici le type de découvertes que Rossiyani génère à partir d&apos;un texte.
+        </p>
+      </div>
 
-      <ul className="import-preview-grid">
+      <ul className="import-ws-preview">
         {PREVIEW_ITEMS.map((item) => (
           <li key={item.id}>
-            <article className="import-preview-card">
-              <p className="import-preview-card__kind">{item.kind}</p>
-              <h3 className="import-preview-card__title">{item.title}</h3>
-              <p className="import-preview-card__subtitle">{item.subtitle}</p>
-              <p className="import-preview-card__detail">{item.detail}</p>
+            <article className="import-ws-preview-card">
+              <p className="import-ws-preview-card__kind">{item.kind}</p>
+              <h3 className="import-ws-preview-card__title break-russian">{item.title}</h3>
+              <p className="import-ws-preview-card__subtitle">{item.subtitle}</p>
+              <p className="import-ws-preview-card__detail">{item.detail}</p>
             </article>
           </li>
         ))}

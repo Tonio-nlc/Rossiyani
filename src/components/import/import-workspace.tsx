@@ -39,6 +39,7 @@ import { ImportQueueCard } from "./import-queue-card";
 import { ImportReportCard } from "./import-report-card";
 import { DEFAULT_COLLECTION_ID, type CollectionId } from "@/content/collections";
 import type { CategoryId } from "@/content/categories";
+import { ImportFolderPanel } from "./import-folder-panel";
 import { ImportSources } from "./import-sources";
 
 const ADMIN_SECRET_KEY = "rossiyani_admin_secret";
@@ -588,13 +589,12 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
     !report && !processing && staged.length === 0 && !activeItem && queue.length === 0;
 
   return (
-    <div className="import-shell">
-      <header className="import-hub__intro import-editorial-section import-editorial-section--flat">
-        <h1 className="import-hub__title">Importer du contenu</h1>
-        <p className="import-hub__mission">
-          Transformez du contenu russe authentique en lecture, exploration et matériel de pratique.
+    <div className="import-ws">
+      <header className="import-ws-hero">
+        <h1 className="import-ws-hero__title">Importer du contenu</h1>
+        <p className="import-ws-hero__subtitle">
+          Transformez du contenu russe authentique en lecture, vocabulaire, grammaire et pratique.
         </p>
-        <div className="import-hub__rule" aria-hidden />
       </header>
 
       {extractionProgress ? (
@@ -607,7 +607,7 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
       ) : null}
 
       {staged.length > 0 ? (
-        <section className="import-editorial-section import-editorial-section--primary">
+        <section className="import-ws-section">
           <ImportFilePreview
           files={staged}
           disabled={processing || staging}
@@ -621,7 +621,12 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
         />
         </section>
       ) : (
-        <section className="import-editorial-section import-editorial-section--primary">
+        <section className="import-ws-section" aria-labelledby="import-source-heading">
+          <div className="import-ws-section__head">
+            <h2 id="import-source-heading" className="import-ws-section__title">
+              Source de contenu
+            </h2>
+          </div>
         <ImportSources
           pastedText={pastedText}
           pasteTitle={pasteTitle}
@@ -637,6 +642,14 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
           onPasteAnalyze={() => void handlePasteAnalyze()}
           onFiles={(files) => void handleFilesSelected(files)}
         />
+
+        <details className="import-ws-advanced">
+          <summary>Options avancées</summary>
+          <ImportFolderPanel
+            disabled={processing || staging}
+            onFiles={(files) => void handleFilesSelected(files)}
+          />
+        </details>
         </section>
       )}
 
@@ -646,15 +659,15 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
       {showIdlePreview ? <ImportPreviewCards /> : null}
 
       {activeItem ? (
-        <section className="import-editorial-section import-queue-section">
-          <h2 className="import-section-label">Transformation en cours</h2>
+        <section className="import-ws-section">
+          <h2 className="import-ws-section__title">Transformation en cours</h2>
           <ImportQueueCard item={activeItem} />
         </section>
       ) : null}
 
       {!activeItem && failedItems.length > 0 ? (
-        <section className="import-editorial-section import-queue-section">
-          <h2 className="import-section-label">Échec de transformation</h2>
+        <section className="import-ws-section">
+          <h2 className="import-ws-section__title">Échec de transformation</h2>
           {failedItems.map((item) => (
             <ImportQueueCard key={item.id} item={item} />
           ))}
@@ -662,12 +675,12 @@ export function ImportWorkspace({ initialJobs }: ImportWorkspaceProps) {
       ) : null}
 
       {report ? (
-        <section className="import-editorial-section import-queue-section">
+        <section className="import-ws-section">
           <ImportReportCard report={report} completedTextId={completedTextId} />
         </section>
       ) : null}
 
-      <div id="import-history" className="import-editorial-section scroll-mt-24">
+      <div id="import-history" className="scroll-mt-24">
         <ImportHistoryPanel
           localHistory={history}
           serverJobs={serverJobs}

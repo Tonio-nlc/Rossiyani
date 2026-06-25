@@ -19,14 +19,14 @@ type ImportHistoryPanelProps = {
 };
 
 const STATUS_CLASS: Record<string, string> = {
-  completed: "import-history__status--completed",
-  failed: "import-history__status--failed",
-  skipped: "import-history__status--skipped",
-  COMPLETED: "import-history__status--completed",
-  FAILED: "import-history__status--failed",
-  PROCESSING: "import-history__status--processing",
-  PENDING: "import-history__status--pending",
-  PAUSED: "import-history__status--pending",
+  completed: "import-ws-history__status--completed",
+  failed: "import-ws-history__status--failed",
+  skipped: "import-ws-history__status--skipped",
+  COMPLETED: "import-ws-history__status--completed",
+  FAILED: "import-ws-history__status--failed",
+  PROCESSING: "import-ws-history__status--processing",
+  PENDING: "import-ws-history__status--pending",
+  PAUSED: "import-ws-history__status--pending",
 };
 
 export function ImportHistoryPanel({
@@ -42,11 +42,11 @@ export function ImportHistoryPanel({
 
   if (loading) {
     return (
-      <section className="import-history">
-        <h2 className="import-section-label">Historique</h2>
+      <section className="import-ws-section">
+        <h2 className="import-ws-section__title">Historique</h2>
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="skeleton-shimmer h-16 rounded-xl" />
+            <div key={i} className="skeleton-shimmer h-12" />
           ))}
         </div>
       </section>
@@ -58,39 +58,46 @@ export function ImportHistoryPanel({
   }
 
   return (
-    <section className="import-history">
-      <div className="flex items-center justify-between">
-        <h2 className="import-section-label">Historique</h2>
+    <section className="import-ws-section" aria-labelledby="import-history-heading">
+      <div className="import-ws-history__head">
+        <h2 id="import-history-heading" className="import-ws-section__title">
+          Historique
+        </h2>
         {onViewReport ? (
           <button
             type="button"
             onClick={onViewReport}
-            className="import-report__link focus-kb border-none bg-transparent p-0"
+            className="import-ws-history__link focus-kb"
           >
             Voir le rapport
           </button>
         ) : null}
       </div>
 
-      <ul className="import-history__list">
+      <ul className="import-ws-history__list">
         {localHistory.map((entry) => (
           <HistoryRow
             key={entry.id}
             title={entry.title}
-            meta={formatLocalMeta(entry)}
+            collection={
+              entry.collectionId ? getCollectionName(entry.collectionId) : "—"
+            }
+            date={formatDate(entry.completedAt)}
+            words={entry.wordCount ?? 0}
+            sentences={entry.sentenceCount ?? 0}
             status={entry.status}
             action={
               entry.status === "failed" && onRetry ? (
                 <button
                   type="button"
                   onClick={() => onRetry(entry)}
-                  className="import-report__link focus-kb border-none bg-transparent p-0"
+                  className="import-ws-history__link focus-kb"
                 >
                   Relancer
                 </button>
               ) : entry.textId ? (
-                <Link href={`/texts/${entry.textId}`} className="import-report__link focus-kb">
-                  Lire
+                <Link href={`/texts/${entry.textId}`} className="import-ws-history__link focus-kb">
+                  Ouvrir
                 </Link>
               ) : null
             }
@@ -101,14 +108,17 @@ export function ImportHistoryPanel({
           <HistoryRow
             key={job.id}
             title={job.name}
-            meta={`${job.processedFiles}/${job.totalFiles} fichiers · ${job.sentencesProcessed} phrases`}
+            collection="Import groupé"
+            date="—"
+            words={job.sentencesProcessed}
+            sentences={job.totalFiles}
             status={job.status}
             action={
               job.status === "FAILED" || job.status === "PAUSED" ? (
                 <button
                   type="button"
                   onClick={() => onResumeJob?.(job.id)}
-                  className="import-report__link focus-kb border-none bg-transparent p-0"
+                  className="import-ws-history__link focus-kb"
                 >
                   Reprendre
                 </button>
@@ -123,57 +133,44 @@ export function ImportHistoryPanel({
 
 function HistoryRow({
   title,
-  meta,
+  collection,
+  date,
+  words,
+  sentences,
   status,
   action,
 }: {
   title: string;
-  meta: string;
+  collection: string;
+  date: string;
+  words: number;
+  sentences: number;
   status: string;
   action?: React.ReactNode;
 }) {
   return (
-    <li className="import-history__row">
-      <div className="min-w-0">
-        <p className="import-history__title truncate">{title}</p>
-        <p className="import-history__meta truncate">{meta}</p>
-      </div>
-      <div className="flex shrink-0 items-center gap-3">
-        <span className={`import-history__status ${STATUS_CLASS[status] ?? ""}`}>
-          {statusLabel(status)}
-        </span>
-        {action}
-      </div>
+    <li className="import-ws-history__row">
+      <p className="import-ws-history__title truncate">{title}</p>
+      <p className="import-ws-history__cell import-ws-history__cell--collection truncate">
+        {collection}
+      </p>
+      <p className="import-ws-history__cell">{date}</p>
+      <p className="import-ws-history__cell">{words}</p>
+      <p className="import-ws-history__cell">{sentences}</p>
+      <span className={`import-ws-history__status ${STATUS_CLASS[status] ?? ""}`}>
+        {statusLabel(status)}
+      </span>
+      <div className="import-ws-history__actions">{action}</div>
     </li>
   );
 }
 
-function formatLocalMeta(entry: ImportHistoryEntry): string {
-  const collectionLabel = entry.collectionId ? getCollectionName(entry.collectionId) : null;
-  const date = new Date(entry.completedAt).toLocaleDateString("fr-FR", {
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("fr-FR", {
     day: "numeric",
     month: "short",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
   });
-
-  if (entry.status === "skipped") {
-    return [collectionLabel, date, "Doublon ignoré"].filter(Boolean).join(" · ");
-  }
-
-  if (entry.status === "failed") {
-    return [collectionLabel, date, entry.error ?? "Échec"].filter(Boolean).join(" · ");
-  }
-
-  const parts = [
-    collectionLabel,
-    date,
-    `${entry.sentenceCount ?? 0} phrase${(entry.sentenceCount ?? 0) > 1 ? "s" : ""}`,
-    `${entry.wordCount ?? 0} mot${(entry.wordCount ?? 0) > 1 ? "s" : ""}`,
-  ].filter(Boolean);
-
-  return parts.join(" · ");
 }
 
 function statusLabel(status: string): string {
