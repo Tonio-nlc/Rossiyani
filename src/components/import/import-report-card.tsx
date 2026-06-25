@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { PrimaryButton } from "@/components/design-system/primary-button";
 import type { ImportSessionReport } from "@/lib/import-client";
 
 import { ImportQualityReportCard } from "./import-quality-report-card";
@@ -89,14 +88,14 @@ export function ImportReportCard({
 
       <div className="import-report__actions">
         {completedTextId ? (
-          <PrimaryButton href={`/texts/${completedTextId}`} variant="gold">
+          <Link href={`/texts/${completedTextId}`} className="import-ws-btn focus-kb">
             Lire maintenant
-          </PrimaryButton>
+          </Link>
         ) : null}
-        <Link href="/library" className="import-report__link focus-kb">
+        <Link href="/library" className="import-ws-link focus-kb">
           Ouvrir dans la bibliothèque →
         </Link>
-        <Link href="/explorer" className="import-report__link focus-kb">
+        <Link href="/explorer" className="import-ws-link focus-kb">
           Explorer les découvertes →
         </Link>
       </div>

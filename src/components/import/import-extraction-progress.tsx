@@ -27,23 +27,21 @@ export function ImportExtractionProgress({
 
   return (
     <section
-      className="surface-elevated animate-fade-up space-y-4 rounded-2xl border border-[var(--border)] p-6"
+      className="import-ws-extract animate-fade-up"
       aria-live="polite"
       aria-busy={phase !== "done"}
     >
       <div>
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-          Préparation du fichier
-        </h2>
-        <p className="mt-1 font-medium text-[var(--foreground)]">{fileName}</p>
+        <p className="import-ws-extract__label">Préparation du fichier</p>
+        <p className="import-ws-extract__file">{fileName}</p>
         {totalFiles > 1 ? (
-          <p className="mt-0.5 text-xs text-[var(--muted)]">
+          <p className="import-ws-extract__meta">
             Fichier {fileIndex} sur {totalFiles}
           </p>
         ) : null}
       </div>
 
-      <ol className="space-y-2">
+      <ol className="import-ws-extract__steps">
         {steps.slice(0, -1).map((step, index) => {
           const isComplete = index < currentIndex;
           const isCurrent = step === phase;
@@ -51,25 +49,14 @@ export function ImportExtractionProgress({
             <li
               key={step}
               className={[
-                "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors",
-                isCurrent
-                  ? "bg-[var(--accent-violet)]/10 text-[var(--foreground)]"
-                  : isComplete
-                    ? "text-[var(--muted)]"
-                    : "text-[var(--muted)]/60",
-              ].join(" ")}
+                "import-ws-extract__step",
+                isCurrent ? "import-ws-extract__step--current" : "",
+                isComplete ? "import-ws-extract__step--done" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
             >
-              <span
-                className={[
-                  "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold",
-                  isComplete
-                    ? "bg-[var(--accent-violet)] text-white"
-                    : isCurrent
-                      ? "border-2 border-[var(--accent-violet-bright)] text-[var(--accent-violet-bright)]"
-                      : "border border-[var(--border)]",
-                ].join(" ")}
-                aria-hidden
-              >
+              <span className="import-ws-extract__dot" aria-hidden>
                 {isComplete ? "✓" : index + 1}
               </span>
               {PHASE_LABELS[step]}
@@ -78,7 +65,7 @@ export function ImportExtractionProgress({
         })}
       </ol>
 
-      <p className="text-xs text-[var(--muted)]">{PHASE_LABELS[phase]}</p>
+      <p className="import-ws-extract__status">{PHASE_LABELS[phase]}</p>
     </section>
   );
 }

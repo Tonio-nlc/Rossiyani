@@ -73,52 +73,43 @@ export function ImportFilePreview({
                   compact
                 />
 
-                <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-4">
+                <dl className="import-ws-stats">
                   <div>
-                    <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Taille</dt>
-                    <dd className="mt-0.5 font-medium">{formatFileSize(file.fileSizeBytes)}</dd>
+                    <dt>Taille</dt>
+                    <dd>{formatFileSize(file.fileSizeBytes)}</dd>
                   </div>
                   <div>
-                    <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">
-                      Phrases estimées
-                    </dt>
-                    <dd className="mt-0.5 font-medium">{file.estimatedSentences}</dd>
+                    <dt>Phrases estimées</dt>
+                    <dd>{file.estimatedSentences}</dd>
                   </div>
                   <div>
-                    <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Mots</dt>
-                    <dd className="mt-0.5 font-medium">{countWords(file.rawText)}</dd>
+                    <dt>Mots</dt>
+                    <dd>{countWords(file.rawText)}</dd>
                   </div>
                   <div>
-                    <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Niveau détecté</dt>
-                    <dd className="mt-0.5 font-medium">{file.detectedLevel ?? "—"}</dd>
+                    <dt>Niveau détecté</dt>
+                    <dd>{file.detectedLevel ?? "—"}</dd>
                   </div>
                   {file.estimatedReadingMinutes ? (
                     <div>
-                      <dt className="text-[10px] uppercase tracking-wider text-[var(--muted)]">
-                        Lecture estimée
-                      </dt>
-                      <dd className="mt-0.5 font-medium">{file.estimatedReadingMinutes} min</dd>
+                      <dt>Lecture estimée</dt>
+                      <dd>{file.estimatedReadingMinutes} min</dd>
                     </div>
                   ) : null}
                 </dl>
 
                 {file.sourceType === "pdf" && (file.summary || file.category || file.focusPoints?.length) ? (
-                  <div className="space-y-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm">
+                  <div className="import-staged__pdf">
                     {file.category ? (
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--accent-violet-bright)]">
-                        {file.category}
-                      </p>
+                      <p className="import-staged__pdf-category">{file.category}</p>
                     ) : null}
                     {file.summary ? (
-                      <p className="leading-relaxed text-[var(--muted)]">{file.summary}</p>
+                      <p className="import-staged__pdf-summary">{file.summary}</p>
                     ) : null}
                     {file.focusPoints && file.focusPoints.length > 0 ? (
-                      <ul className="flex flex-wrap gap-2">
+                      <ul className="import-staged__tags">
                         {file.focusPoints.map((point) => (
-                          <li
-                            key={point}
-                            className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-[11px] text-[var(--muted)]"
-                          >
+                          <li key={point} className="import-staged__tag">
                             {point}
                           </li>
                         ))}
@@ -163,7 +154,7 @@ export function ImportFilePreview({
           type="button"
           onClick={onCancel}
           disabled={disabled}
-          className="import-ws-history__link focus-kb"
+          className="import-ws-btn import-ws-btn--ghost focus-kb"
         >
           Annuler
         </button>

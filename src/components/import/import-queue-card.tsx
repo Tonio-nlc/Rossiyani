@@ -29,20 +29,13 @@ export function ImportQueueCard({ item }: ImportQueueCardProps) {
   const wordLabel = `${wordCount} mot${wordCount === 1 ? "" : "s"}`;
 
   return (
-    <article
-      className={[
-        "rounded-xl border px-5 py-4 transition-all duration-300",
-        isActive ? "border-[var(--ink-muted)]/30" : "border-[var(--hairline)]",
-      ].join(" ")}
-    >
-      <div className="space-y-1">
-        <h3 className="font-reader text-lg text-[var(--ink)]">{item.title}</h3>
+    <article className="import-ws-queue">
+      <div>
+        <h3 className="import-ws-queue__title">{item.title}</h3>
         {item.collectionId ? (
-          <p className="truncate text-xs text-[var(--ink-muted)]">
-            {getCollectionName(item.collectionId)}
-          </p>
+          <p className="import-ws-queue__meta">{getCollectionName(item.collectionId)}</p>
         ) : null}
-        <p className="text-xs text-[var(--ink-secondary)]">{STATUS_LABELS[item.status]}</p>
+        <p className="import-ws-queue__status">{STATUS_LABELS[item.status]}</p>
       </div>
 
       {isActive ? (
@@ -58,20 +51,14 @@ export function ImportQueueCard({ item }: ImportQueueCardProps) {
           </div>
           {item.etaSeconds !== null && isActive && !item.enrichmentPending ? (
             <p className="text-xs text-[var(--ink-muted)]">~{item.etaSeconds} s restantes</p>
-          ) : item.enrichmentPending && item.etaSeconds !== null ? (
-            <p className="text-xs text-[var(--ink-muted)]">~{item.etaSeconds} s restantes</p>
           ) : null}
         </div>
-      ) : item.status === "completed" ? (
-        <p className="mt-4 text-sm text-[var(--ink-secondary)]">
-          {phraseLabel} · {wordLabel}
-        </p>
       ) : null}
 
-      {item.errorDetails ? (
-        <ImportErrorDetails details={item.errorDetails} />
-      ) : item.error ? (
-        <p className="mt-3 text-xs text-[var(--ink-secondary)]">{item.error}</p>
+      {item.status === "failed" && item.errorDetails ? (
+        <div className="mt-4">
+          <ImportErrorDetails details={item.errorDetails} />
+        </div>
       ) : null}
     </article>
   );

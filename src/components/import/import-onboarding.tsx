@@ -17,7 +17,7 @@ export function ImportOnboarding() {
         </p>
       </div>
 
-      <div className="import-onboarding__card import-ws-onboarding-card">
+      <div className="import-ws-onboarding-card">
         <p className="import-ws-onboarding-card__lead">
           Chaque texte importé devient&nbsp;:
         </p>
