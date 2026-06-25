@@ -18,18 +18,15 @@ const SECTIONS: Array<{ id: LibrarySection; label: string; href: string }> = [
 
 export function LibrarySectionNav({ active }: LibrarySectionNavProps) {
   return (
-    <nav
-      aria-label="Sections de la bibliothèque"
-      className="library-catalog-nav"
-    >
+    <nav aria-label="Sections de la bibliothèque" className="library-ws-nav">
       {SECTIONS.map((section) => (
         <Link
           key={section.id}
           href={section.href}
           aria-current={active === section.id ? "page" : undefined}
           className={[
-            "library-catalog-nav-link focus-kb",
-            active === section.id ? "library-catalog-nav-link-active" : "",
+            "library-ws-nav__link focus-kb",
+            active === section.id ? "library-ws-nav__link--active" : "",
           ].join(" ")}
         >
           {section.label}

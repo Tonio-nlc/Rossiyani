@@ -4,68 +4,32 @@ import Link from "next/link";
 import { memo } from "react";
 
 import { getCategoryLabel } from "@/content/categories";
+import { getCollectionName } from "@/content/collections";
 import type { TextListItem } from "@/features/texts";
 
 import { LibraryCardActions } from "./library-card-actions";
+import { LibraryCardProgress } from "./library-card-progress";
 import {
   estimateReadingMinutes,
   estimateWordCount,
   formatStat,
-  getCefrLevelLabel,
   getTextCategoryIds,
-  getTextDescription,
   splitLibraryTitle,
 } from "./library-utils";
 
+export type LibraryTextCardVariant = "featured" | "standard" | "compact";
+
 type LibraryTextCardProps = {
   text: TextListItem;
-  featured?: boolean;
+  variant?: LibraryTextCardVariant;
   disabled?: boolean;
   onRename: (text: TextListItem) => void;
   onDelete: (text: TextListItem) => void;
 };
 
-function BookIcon() {
-  return (
-    <svg
-      className="lib-text-card__meta-icon"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden
-    >
-      <path
-        d="M2.5 2.75h4.25a1.25 1.25 0 0 1 1.25 1.25V13L5.125 11.375 2.5 13V2.75Z"
-        stroke="currentColor"
-        strokeWidth="1.1"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M13.5 2.75H9.25a1.25 1.25 0 0 0-1.25 1.25V13l2.625-1.625L13.5 13V2.75Z"
-        stroke="currentColor"
-        strokeWidth="1.1"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function ClockIcon() {
-  return (
-    <svg
-      className="lib-text-card__meta-icon"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden
-    >
-      <circle cx="8" cy="8" r="5.25" stroke="currentColor" strokeWidth="1.1" />
-      <path d="M8 5.25V8l2 1.25" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 export const LibraryTextCard = memo(function LibraryTextCard({
   text,
-  featured = false,
+  variant = "standard",
   disabled = false,
   onRename,
   onDelete,
@@ -76,61 +40,54 @@ export const LibraryTextCard = memo(function LibraryTextCard({
   const categories = getTextCategoryIds(text);
   const translation =
     french ?? (categories[0] ? getCategoryLabel(categories[0]) : "Texte en russe");
-  const description = getTextDescription(text.collectionId);
-  const levelLabel = getCefrLevelLabel(text.level);
+  const collectionName = getCollectionName(text.collectionId);
 
   return (
     <article
-      className="lib-text-card"
-      data-featured={featured ? "true" : undefined}
+      className={[
+        "library-ws-card library-ws-text-card",
+        variant === "featured" ? "library-ws-text-card--featured" : "",
+      ].join(" ")}
     >
-      <div className="lib-text-card__head">
-        <span className="lib-text-card__badge">
-          {text.level} &bull; {levelLabel}
-        </span>
+      <div className="library-ws-text-card__head">
+        <div className="library-ws-text-card__badges">
+          <span className="library-ws-badge">{text.level}</span>
+          <span className="library-ws-badge library-ws-badge--muted">{minutes} min</span>
+        </div>
         <LibraryCardActions
           disabled={disabled}
-          editorial
+          workspace
           onRename={() => onRename(text)}
           onDelete={() => onDelete(text)}
         />
       </div>
 
-      <div className="lib-text-card__body">
-        <h2 className="lib-text-card__title font-reader break-russian">
-          <Link href={`/texts/${text.id}`} prefetch className="lib-text-card__title-link focus-kb">
-            {russian}
-          </Link>
-        </h2>
+      <p className="library-ws-text-card__collection">{collectionName}</p>
 
-        <p className="lib-text-card__translation">
-          <em>{translation}</em>
-        </p>
+      <h2 className="library-ws-text-card__title break-russian">
+        <Link href={`/texts/${text.id}`} prefetch className="library-ws-text-card__title-link focus-kb">
+          {russian}
+        </Link>
+      </h2>
 
-        <p className="lib-text-card__description">{description}</p>
+      <p className="library-ws-text-card__translation">
+        <em>{translation}</em>
+      </p>
+
+      <div className="library-ws-text-card__meta">
+        <span>{words} mots</span>
+        <span className="library-ws-text-card__meta-sep" aria-hidden>
+          &bull;
+        </span>
+        <span>
+          {text.sentenceCount} phrase{text.sentenceCount > 1 ? "s" : ""}
+        </span>
       </div>
 
-      <footer className="lib-text-card__footer">
-        <div className="lib-text-card__meta">
-          <span className="lib-text-card__meta-item">
-            <BookIcon />
-            {words} mots
-          </span>
-          <span className="lib-text-card__meta-sep" aria-hidden>
-            &bull;
-          </span>
-          <span className="lib-text-card__meta-item">
-            <ClockIcon />
-            {minutes} min
-          </span>
-          <span className="lib-text-card__meta-sep" aria-hidden>
-            &bull;
-          </span>
-          <span className="lib-text-card__meta-item">
-            {text.sentenceCount} phrase{text.sentenceCount > 1 ? "s" : ""}
-          </span>
-        </div>
-        <Link href={`/texts/${text.id}`} prefetch className="lib-text-card__cta focus-kb">
+      <LibraryCardProgress textId={text.id} workspace />
+
+      <footer className="library-ws-text-card__footer">
+        <Link href={`/texts/${text.id}`} prefetch className="library-ws-text-card__cta focus-kb">
           Lire →
         </Link>
       </footer>

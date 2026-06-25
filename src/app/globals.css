@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./home-workspace.css";
 @import "./reader-workspace.css";
+@import "./library-workspace.css";
 
 /* ─── Rossiyani Design System v2 — Editorial Foundations ───
    Source of truth: design/design-system.md

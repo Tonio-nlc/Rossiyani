@@ -1,11 +1,10 @@
 export function LibraryPageIntro() {
   return (
-    <header className="lib-editorial-hero lib-editorial-hero--static">
-      <h1 className="lib-editorial-hero__title">Bibliothèque</h1>
-      <p className="lib-editorial-hero__mission">
-        Vos textes russes, organisés pour la lecture, l&apos;exploration et la pratique.
+    <header className="library-ws-hero">
+      <h1 className="library-ws-hero__title">Bibliothèque</h1>
+      <p className="library-ws-hero__lead">
+        Votre bibliothèque russe curatée — textes, collections et progrès de lecture.
       </p>
-      <div className="lib-editorial-hero__rule" aria-hidden />
     </header>
   );
 }

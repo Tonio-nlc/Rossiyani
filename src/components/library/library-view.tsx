@@ -1,20 +1,24 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { DeleteTextDialog } from "@/components/library/delete-text-dialog";
 import { RenameTextDialog } from "@/components/library/rename-text-dialog";
 import { useToast } from "@/components/ui/toast-provider";
+import { getCollectionName } from "@/content/collections";
 import type { CefrLevel } from "@/types";
 import type { TextListItem } from "@/features/texts";
 import { clearLastReadTextIfMatches } from "@/lib/last-read-text";
 import { deleteTextRequest, renameTextRequest } from "@/lib/library/text-library-api";
 import { clearTextReadingProgress } from "@/lib/reader/reading-progress";
 
-import { EditorialSectionHead } from "@/components/editorial/editorial-section-head";
-
-import { LibraryEditorialGrid } from "./library-editorial-grid";
-import { LibraryEditorialHero } from "./library-editorial-hero";
+import {
+  LibraryWorkspaceCollections,
+  parseLibraryCollectionParam,
+} from "./library-workspace-collections";
+import { LibraryWorkspaceHero } from "./library-workspace-hero";
+import { LibraryWorkspaceTextGrid } from "./library-workspace-text-grid";
 import { LibrarySearch } from "./library-search";
 import { LibrarySectionNav } from "./library-section-nav";
 import { filterLibraryTexts } from "./library-utils";
@@ -29,6 +33,10 @@ type DialogTarget = TextListItem | null;
 
 export function LibraryView({ initialTexts }: LibraryViewProps) {
   const { toast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const collectionFilter = parseLibraryCollectionParam(searchParams.get("collection"));
+
   const [texts, setTexts] = useState(initialTexts);
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState<CefrLevel | "all">("all");
@@ -36,11 +44,30 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
   const [deleteTarget, setDeleteTarget] = useState<DialogTarget>(null);
   const [busyTextId, setBusyTextId] = useState<string | null>(null);
   const [removingTextId, setRemovingTextId] = useState<string | null>(null);
+  const [clientReady, setClientReady] = useState(false);
+
+  useEffect(() => {
+    setClientReady(true);
+  }, []);
 
   const filtered = useMemo(
-    () => filterLibraryTexts(texts, search, level, "all", "all"),
-    [texts, search, level],
+    () =>
+      filterLibraryTexts(
+        texts,
+        search,
+        level,
+        collectionFilter ?? "all",
+        "all",
+      ),
+    [texts, search, level, collectionFilter],
   );
+
+  const clearCollectionFilter = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("collection");
+    const query = params.toString();
+    router.push(query ? `/library?${query}` : "/library");
+  }, [router, searchParams]);
 
   const handleRenameConfirm = useCallback(
     async (title: string) => {
@@ -107,27 +134,45 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
   }, [deleteTarget, toast]);
 
   return (
-    <div className="lib-editorial-page">
-      <LibraryEditorialHero level={level} onLevelChange={setLevel} />
+    <>
+      <LibraryWorkspaceHero level={level} onLevelChange={setLevel} />
       <LibrarySectionNav active="texts" />
 
-      <section className="lib-editorial-section lib-editorial-section--secondary">
+      <section className="library-ws-section">
         <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
+        {collectionFilter ? (
+          <div>
+            <span className="library-ws-filter-chip">
+              {getCollectionName(collectionFilter)}
+              <button
+                type="button"
+                className="library-ws-filter-chip__clear focus-kb"
+                aria-label="Retirer le filtre collection"
+                onClick={clearCollectionFilter}
+              >
+                ×
+              </button>
+            </span>
+          </div>
+        ) : null}
       </section>
 
-      <section className="lib-editorial-section" aria-labelledby="library-texts-heading">
-        <EditorialSectionHead
-          id="library-texts-heading"
-          icon={
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden className="editorial-section-head__icon">
-              <path d="M4 4.5h12v11H4z" stroke="currentColor" strokeWidth="1.2" />
-              <path d="M7 8h6M7 11h6M7 14h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-            </svg>
-          }
-          title="Vos textes"
-          lead="Sélection curatée de lectures importées, prêtes à ouvrir."
-        />
-        <LibraryEditorialGrid
+      <LibraryWorkspaceCollections
+        texts={texts}
+        activeCollection={collectionFilter}
+        clientReady={clientReady}
+      />
+
+      <section className="library-ws-section" aria-labelledby="library-texts-heading">
+        <div className="library-ws-section__head">
+          <h2 id="library-texts-heading" className="library-ws-section__title">
+            Vos textes
+          </h2>
+          <p className="library-ws-section__subtitle">
+            Lectures importées, prêtes à ouvrir — progrès et métadonnées à portée de main.
+          </p>
+        </div>
+        <LibraryWorkspaceTextGrid
           texts={filtered}
           hasAnyTexts={texts.length > 0}
           busyTextId={busyTextId}
@@ -160,6 +205,6 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
         }}
         onConfirm={handleDeleteConfirm}
       />
-    </div>
+    </>
   );
 }

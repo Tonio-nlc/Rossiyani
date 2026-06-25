@@ -10,9 +10,14 @@ import {
 type LibraryCardProgressProps = {
   textId: string;
   compact?: boolean;
+  workspace?: boolean;
 };
 
-export function LibraryCardProgress({ textId, compact = false }: LibraryCardProgressProps) {
+export function LibraryCardProgress({
+  textId,
+  compact = false,
+  workspace = false,
+}: LibraryCardProgressProps) {
   const [progress, setProgress] = useState(() => getTextReadingProgress(textId));
 
   useEffect(() => {
@@ -21,6 +26,22 @@ export function LibraryCardProgress({ textId, compact = false }: LibraryCardProg
 
   if (!progress || progress.wordsSeenIds.length === 0) {
     return null;
+  }
+
+  if (workspace) {
+    return (
+      <div className="library-ws-text-card__progress">
+        <span className="library-ws-text-card__progress-label">
+          {progress.percent}% · {formatLastReadLabel(progress.lastReadAt)}
+        </span>
+        <div className="library-ws-text-card__progress-bar" aria-hidden>
+          <div
+            className="library-ws-text-card__progress-fill"
+            style={{ width: `${progress.percent}%` }}
+          />
+        </div>
+      </div>
+    );
   }
 
   if (compact) {

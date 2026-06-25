@@ -29,13 +29,13 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "lessons") {
     return (
-      <div className="library-catalog pb-6">
+      <div className="library-ws">
         <LibraryPageIntro />
         <LibrarySectionNav active="lessons" />
-        <section className="lib-editorial-section">
+        <section className="library-ws-section">
           <LibraryContextTranslationLessons />
         </section>
-        <p className="text-metadata px-0 pb-4">
+        <p className="library-ws-section__subtitle">
           <Reference href="/manual">Leçons de grammaire →</Reference>
         </p>
       </div>
@@ -44,10 +44,10 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "saved") {
     return (
-      <div className="library-catalog pb-6">
+      <div className="library-ws">
         <LibraryPageIntro />
         <LibrarySectionNav active="saved" />
-        <section className="lib-editorial-section">
+        <section className="library-ws-section">
           <p className="lib-saved-sentences-empty__hint">
             Les phrases enregistrées en lecture se trouvent dans{" "}
             <Reference href="/library?section=phrases">Mes phrases →</Reference>
@@ -59,10 +59,10 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "discoveries") {
     return (
-      <div className="library-catalog pb-6">
+      <div className="library-ws">
         <LibraryPageIntro />
         <LibrarySectionNav active="discoveries" />
-        <section className="lib-editorial-section">
+        <section className="library-ws-section">
           <LibraryMyDiscoveries />
         </section>
       </div>
@@ -71,10 +71,10 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
 
   if (section === "phrases") {
     return (
-      <div className="library-catalog pb-6">
+      <div className="library-ws">
         <LibraryPageIntro />
         <LibrarySectionNav active="phrases" />
-        <section className="lib-editorial-section">
+        <section className="library-ws-section">
           <LibrarySavedSentences />
         </section>
       </div>
@@ -82,7 +82,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
   }
 
   return (
-    <div className="library-catalog">
+    <div className="library-ws">
       <LibraryView initialTexts={initialTexts} />
     </div>
   );

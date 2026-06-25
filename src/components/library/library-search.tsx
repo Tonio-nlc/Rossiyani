@@ -8,16 +8,16 @@ type LibrarySearchProps = {
 
 export function LibrarySearch({ value, onChange, resultCount }: LibrarySearchProps) {
   return (
-    <label className="lib-search">
+    <label className="library-ws-search">
       <span className="sr-only">Rechercher dans la bibliothèque</span>
       <input
         type="search"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="Rechercher un titre…"
-        className="lib-search__input focus-kb"
+        className="library-ws-search__input focus-kb"
       />
-      <span className="lib-search__count" aria-live="polite">
+      <span className="library-ws-search__count" aria-live="polite">
         {resultCount} résultat{resultCount !== 1 ? "s" : ""}
       </span>
     </label>

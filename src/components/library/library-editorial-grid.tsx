@@ -54,7 +54,7 @@ export function LibraryEditorialGrid({
       >
         <LibraryTextCard
           text={featured}
-          featured
+          variant="featured"
           disabled={busyTextId === featured.id}
           onRename={onRename}
           onDelete={onDelete}

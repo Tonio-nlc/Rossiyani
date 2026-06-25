@@ -7,6 +7,7 @@ type LibraryCardActionsProps = {
   onDelete: () => void;
   disabled?: boolean;
   editorial?: boolean;
+  workspace?: boolean;
 };
 
 function BookmarkIcon() {
@@ -27,6 +28,7 @@ export function LibraryCardActions({
   onDelete,
   disabled = false,
   editorial = false,
+  workspace = false,
 }: LibraryCardActionsProps) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -55,6 +57,48 @@ export function LibraryCardActions({
       window.removeEventListener("keydown", onKey);
     };
   }, [open]);
+
+  if (workspace) {
+    return (
+      <div ref={menuRef} className="library-ws-text-card__actions">
+        <button
+          type="button"
+          aria-label="Actions du texte"
+          aria-expanded={open}
+          aria-haspopup="menu"
+          disabled={disabled}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setOpen((value) => !value);
+          }}
+          className="library-ws-text-card__menu-btn focus-kb"
+        >
+          ⋮
+        </button>
+
+        {open ? (
+          <div role="menu" className="library-ws-text-card__menu">
+            <WorkspaceMenuItem
+              label="Renommer"
+              onClick={() => {
+                setOpen(false);
+                onRename();
+              }}
+            />
+            <WorkspaceMenuItem
+              label="Supprimer"
+              danger
+              onClick={() => {
+                setOpen(false);
+                onDelete();
+              }}
+            />
+          </div>
+        ) : null}
+      </div>
+    );
+  }
 
   if (!editorial) {
     return (
@@ -125,6 +169,34 @@ export function LibraryCardActions({
         </div>
       ) : null}
     </div>
+  );
+}
+
+function WorkspaceMenuItem({
+  label,
+  danger,
+  onClick,
+}: {
+  label: string;
+  danger?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="menuitem"
+      className={[
+        "library-ws-text-card__menu-item",
+        danger ? "library-ws-text-card__menu-item--danger" : "",
+      ].join(" ")}
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onClick();
+      }}
+    >
+      {label}
+    </button>
   );
 }
 
