@@ -7,6 +7,7 @@ import {
   type ExplorerGrammarSection,
   type ReaderExplorerTab,
 } from "@/lib/reader/build-reader-explorer-view";
+import type { ReaderTextData } from "@/features/texts";
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
 import type { ReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel-data";
 import { isReaderWordSaved, saveReaderWord } from "@/lib/reader/saved-words";
@@ -19,6 +20,7 @@ type ReaderExplorerPanelProps = {
   loading?: boolean;
   snapshot: ReaderWordSnapshot | null;
   textIndex: ReaderTextPhraseIndex;
+  sentence?: ReaderTextData["sentences"][number] | null;
 };
 
 const TABS: Array<{ id: ReaderExplorerTab; label: string }> = [
@@ -87,6 +89,7 @@ export function ReaderExplorerPanel({
   loading = false,
   snapshot,
   textIndex,
+  sentence = null,
 }: ReaderExplorerPanelProps) {
   const [activeTab, setActiveTab] = useState<ReaderExplorerTab>("dictionary");
   const [saved, setSaved] = useState(false);
@@ -97,8 +100,9 @@ export function ReaderExplorerPanel({
         detail,
         snapshot,
         textIndex,
+        sentence,
       }),
-    [detail, snapshot, textIndex],
+    [detail, snapshot, textIndex, sentence],
   );
 
   const handleSave = () => {
@@ -245,33 +249,64 @@ export function ReaderExplorerPanel({
 
         {activeTab === "context" ? (
           <div className="reader-ws-explorer__stack">
-            {view?.context.sentenceRussian ? (
+            {view?.context.available ? (
+              <>
+                <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
+                  <p className="reader-ws-explorer__card-label">Context</p>
+                  <p className="reader-ws-explorer__context-word break-russian">
+                    {view.context.selectedWord}
+                  </p>
+                  {view.context.roleBullets.length > 0 ? (
+                    <div className="reader-ws-explorer__context-block">
+                      <p className="reader-ws-explorer__context-subhead">Used in this sentence as</p>
+                      <ul className="reader-ws-explorer__context-bullets">
+                        {view.context.roleBullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                </article>
+
+                {view.context.naturalMeaning ? (
+                  <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
+                    <p className="reader-ws-explorer__card-label">Natural meaning in this sentence</p>
+                    <p className="reader-ws-explorer__prose">{view.context.naturalMeaning}</p>
+                  </article>
+                ) : null}
+
+                {view.context.sentenceFunction ? (
+                  <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
+                    <p className="reader-ws-explorer__card-label">Function in the sentence</p>
+                    <p className="reader-ws-explorer__card-value">{view.context.sentenceFunction}</p>
+                  </article>
+                ) : null}
+
+                {view.context.relationships.length > 0 ? (
+                  <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
+                    <p className="reader-ws-explorer__card-label">Relationship with nearby words</p>
+                    <ul className="reader-ws-explorer__context-relations">
+                      {view.context.relationships.map((relationship) => (
+                        <li key={`${relationship.term}-${relationship.description}`}>
+                          <span className="reader-ws-explorer__relation-term break-russian">
+                            {relationship.term}
+                          </span>
+                          <span className="reader-ws-explorer__relation-desc">
+                            {relationship.description}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </article>
+                ) : null}
+              </>
+            ) : (
               <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
-                <p className="reader-ws-explorer__card-label">Sentence</p>
-                <p className="reader-ws-explorer__card-value break-russian">
-                  {view.context.sentenceRussian}
+                <p className="reader-ws-explorer__muted">
+                  Context analysis is not available for this word yet.
                 </p>
               </article>
-            ) : null}
-            {view?.context.sentenceMeaning ? (
-              <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
-                <p className="reader-ws-explorer__card-label">Meaning</p>
-                <p className="reader-ws-explorer__card-value">{view.context.sentenceMeaning}</p>
-              </article>
-            ) : null}
-            {view?.context.usage ? (
-              <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
-                <p className="reader-ws-explorer__card-label">Usage</p>
-                <p className="reader-ws-explorer__prose">{view.context.usage}</p>
-              </article>
-            ) : null}
-            {!view?.context.sentenceRussian &&
-            !view?.context.sentenceMeaning &&
-            !view?.context.usage ? (
-              <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
-                <p className="reader-ws-explorer__muted">No context available for this word yet.</p>
-              </article>
-            ) : null}
+            )}
           </div>
         ) : null}
       </div>

@@ -1,10 +1,16 @@
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
 import {
+  buildReaderExplorerContext,
+  isDuplicateExplorerText,
+  type ExplorerContextView,
+} from "@/lib/reader/build-reader-explorer-context";
+import {
   buildReaderMicroscopeView,
   type MicroscopeRow,
   type ReaderMicroscopeView,
 } from "@/lib/reader/build-reader-microscope-view";
 import type { ReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel-data";
+import type { ReaderTextData } from "@/features/texts";
 import { formatCaseLabelFr } from "@/features/grammar";
 import { resolveWordSemanticData } from "@/lib/formatting/resolve-word-semantic-data";
 import {
@@ -37,29 +43,12 @@ export type ReaderExplorerView = {
     tags: string[];
     sections: ExplorerGrammarSection[];
   };
-  context: {
-    sentenceRussian: string | null;
-    sentenceMeaning: string | null;
-    usage: string | null;
-  };
+  context: ExplorerContextView;
 };
 
 const MORPHOLOGY_LABEL =
   /cas|genre|nombre|aspect|temps|conjugaison|terminaison|forme|animé|irrégulier|motion|reflexive|personne|mood|voix/i;
 const DEFINITION_LABEL = /lemme|traduction|sens|meaning|définition|definition|fréquence/i;
-
-function normalizeExplorerText(value: string): string {
-  return value.trim().replace(/\s+/g, " ").toLowerCase();
-}
-
-function isDuplicateExplorerText(a: string, b: string): boolean {
-  const left = normalizeExplorerText(a);
-  const right = normalizeExplorerText(b);
-  if (!left || !right) {
-    return false;
-  }
-  return left === right || left.includes(right) || right.includes(left);
-}
 
 function dedupeExplorerTexts(values: string[]): string[] {
   const unique: string[] = [];
@@ -209,8 +198,9 @@ export function buildReaderExplorerView(input: {
   detail: WordDetailGraph | null;
   snapshot: ReaderWordSnapshot | null;
   textIndex: ReaderTextPhraseIndex;
+  sentence?: ReaderTextData["sentences"][number] | null;
 }): ReaderExplorerView | null {
-  const { detail, snapshot, textIndex } = input;
+  const { detail, snapshot, textIndex, sentence = null } = input;
   if (!detail || !snapshot) {
     return null;
   }
@@ -250,16 +240,6 @@ export function buildReaderExplorerView(input: {
 
   const grammarSections = buildGrammarSections(view, detail, snapshot);
   const grammarProse = grammarSections.find((section) => section.id === "explanation")?.prose ?? null;
-  const contextUsageCandidate =
-    detail.phraseOccurrence?.explanation?.trim() ||
-    detail.canonicalExplanation?.trim() ||
-    snapshot.explanation?.trim() ||
-    null;
-  const contextUsage =
-    contextUsageCandidate &&
-    (!grammarProse || !isDuplicateExplorerText(contextUsageCandidate, grammarProse))
-      ? contextUsageCandidate
-      : null;
 
   return {
     headline: view.headline,
@@ -275,10 +255,11 @@ export function buildReaderExplorerView(input: {
       tags: [...new Set(tags.filter(Boolean))],
       sections: grammarSections,
     },
-    context: {
-      sentenceRussian: snapshot.original,
-      sentenceMeaning: snapshot.naturalTranslation || snapshot.literalTranslation || null,
-      usage: contextUsage,
-    },
+    context: buildReaderExplorerContext({
+      detail,
+      snapshot,
+      sentence,
+      grammarProse,
+    }),
   };
 }

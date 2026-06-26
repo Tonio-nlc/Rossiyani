@@ -396,6 +396,13 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     [text.sentences],
   );
 
+  const selectedWordSentence = useMemo(() => {
+    if (!selectedWordSnapshot) {
+      return null;
+    }
+    return text.sentences.find((sentence) => sentence.id === selectedWordSnapshot.sentenceId) ?? null;
+  }, [selectedWordSnapshot, text.sentences]);
+
   return (
     <ReaderShell
       explorerOpen={explorerOpen || selectedWordSnapshot !== null}
@@ -406,6 +413,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
           loading={loading}
           snapshot={selectedWordSnapshot}
           textIndex={textIndex}
+          sentence={selectedWordSentence}
         />
       }
       footer={
