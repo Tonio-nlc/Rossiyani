@@ -1,52 +1,7 @@
-import Link from "next/link";
-
-import { practicePath } from "@/lib/practice/constants";
 import type { VocabularySentence } from "@/lib/vocabulary";
 
 import { VocabularyEmptyState } from "./vocabulary-empty-state";
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function VocabularySentenceCard({ sentence }: { sentence: VocabularySentence }) {
-  return (
-    <article className="vocabulary-card">
-      <p className="vocabulary-card__russian break-russian">{sentence.russian}</p>
-      {sentence.translation ? (
-        <p className="vocabulary-card__translation">{sentence.translation}</p>
-      ) : null}
-      <div className="vocabulary-card__meta">
-        {sentence.collection ? <span className="vocabulary-tag">{sentence.collection}</span> : null}
-        <span className="vocabulary-tag">Phrase</span>
-      </div>
-      <footer className="vocabulary-card__footer">
-        <Link href={`/texts/${sentence.sourceTextId}`} className="vocabulary-link focus-kb">
-          {sentence.sourceTextTitle} →
-        </Link>
-        <Link
-          href={practicePath({
-            savedSentenceId: sentence.id,
-            text: sentence.russian,
-            reference: sentence.russian,
-            context: `From: ${sentence.sourceTextTitle}`,
-            textId: sentence.sourceTextId,
-            textTitle: sentence.sourceTextTitle,
-            from: "reader",
-          })}
-          className="vocabulary-link vocabulary-link--subtle focus-kb"
-        >
-          Pratiquer
-        </Link>
-        <p className="vocabulary-card__date">Enregistrée le {formatDate(sentence.savedAt)}</p>
-      </footer>
-    </article>
-  );
-}
+import { VocabularySentenceFiche } from "./vocabulary-sentence-fiche";
 
 type VocabularySentencesPanelProps = {
   sentences: VocabularySentence[];
@@ -67,16 +22,15 @@ export function VocabularySentencesPanel({ sentences }: VocabularySentencesPanel
       {sentences.length === 0 ? (
         <VocabularyEmptyState
           title="Aucune phrase sauvegardée"
-          lead="Sélectionnez une phrase dans le Reader et utilisez « Enregistrer la phrase » dans le panneau latéral."
+          lead="Sélectionnez une phrase dans le Reader et utilisez « Enregistrer la phrase »."
           ctaHref="/reader"
           ctaLabel="Ouvrir la lecture →"
+          tone="sentences"
         />
       ) : (
         <ul className="vocabulary-grid vocabulary-grid--sentences">
           {sentences.map((sentence) => (
-            <li key={sentence.id}>
-              <VocabularySentenceCard sentence={sentence} />
-            </li>
+            <VocabularySentenceFiche key={sentence.id} sentence={sentence} />
           ))}
         </ul>
       )}

@@ -34,7 +34,12 @@ export function VocabularyNav({ active, stats, onChange }: VocabularyNavProps) {
           <button
             key={tab.id}
             type="button"
-            className={["vocabulary-nav__tab focus-kb", isActive ? "vocabulary-nav__tab--active" : ""]
+            className={[
+              "vocabulary-nav__tab",
+              `vocabulary-nav__tab--${tab.id}`,
+              isActive ? "vocabulary-nav__tab--active" : "",
+              "focus-kb",
+            ]
               .filter(Boolean)
               .join(" ")}
             aria-current={isActive ? "page" : undefined}

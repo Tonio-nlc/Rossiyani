@@ -2,6 +2,7 @@ import type { FeaturedCandidateType } from "@prisma/client";
 
 import { getSavedDiscoveries } from "@/lib/discovery/saved-discoveries";
 
+import { createBadge, vocabularyExpressionPath } from "./card-utils";
 import type { VocabularyExpression } from "./types";
 
 const EXPRESSION_TYPES = new Set<FeaturedCandidateType>([
@@ -29,6 +30,13 @@ export function loadVocabularyExpressions(): VocabularyExpression[] {
     }
     seen.add(key);
 
+    const badges = [
+      createBadge("type-expression", "Expression", "violet"),
+      ...(discovery.difficulty
+        ? [createBadge(`cefr-${discovery.difficulty}`, discovery.difficulty, "gold")]
+        : []),
+    ];
+
     expressions.push({
       id: discovery.id,
       russian: discovery.displayLabel,
@@ -39,6 +47,8 @@ export function loadVocabularyExpressions(): VocabularyExpression[] {
       level: discovery.difficulty,
       savedAt: discovery.savedAt,
       source: "discovery",
+      detailHref: vocabularyExpressionPath(discovery.id),
+      badges,
     });
   }
 

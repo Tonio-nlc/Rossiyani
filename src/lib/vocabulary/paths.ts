@@ -15,3 +15,11 @@ export function parseVocabularyTab(value: string | null): VocabularyTab {
   }
   return "words";
 }
+
+export {
+  formatRelativeEncounter,
+  formatVocabularyDate,
+  vocabularyExpressionPath,
+  vocabularySentencePath,
+  vocabularyWordPath,
+} from "./card-utils";
