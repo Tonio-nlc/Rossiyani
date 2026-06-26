@@ -164,10 +164,18 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
         <HomeWorkspaceMetrics metrics={metrics} streak={streak} />
       </section>
 
-      <HomeWorkspaceFeaturedCollection feature={featuredCollection} />
-      <HomeWorkspaceTodaysPractice cards={todaysPractice} />
-      <HomeWorkspaceRecommendedReading texts={recommendedTexts} />
-      <HomeWorkspaceMotivation streak={streak} continueHref={continueMeta?.href ?? null} />
+      <div className="home-ws__main">
+        <div className="home-ws__stream">
+          <HomeWorkspaceTodaysPractice cards={todaysPractice} />
+          <HomeWorkspaceFeaturedCollection feature={featuredCollection} />
+        </div>
+
+        <section className="home-ws__activity" aria-label="Recent activity">
+          <HomeWorkspaceRecommendedReading texts={recommendedTexts} />
+          <HomeWorkspaceMotivation streak={streak} continueHref={continueMeta?.href ?? null} />
+        </section>
+      </div>
+
       <HomeWorkspaceExploration hub={explorationHub} />
     </div>
   );

@@ -16,10 +16,10 @@ export function HomeWorkspaceRecommendedReading({ texts }: HomeWorkspaceRecommen
     <section className="home-ws-section" aria-labelledby="home-ws-reading-heading">
       <div className="home-ws-section__head">
         <h2 id="home-ws-reading-heading" className="r3-title home-ws-section__title">
-          Recommended for you
+          Recent activity
         </h2>
         <p className="r3-lead home-ws-section__subtitle">
-          Matched to your level and recent activity.
+          Picked for your level and reading history.
         </p>
       </div>
 

@@ -268,11 +268,11 @@ a.r3-card:hover,
 
 @media (max-width: 767px) {
   :root {
-    --r3-gap-major: 3.5rem;
-    --r3-gap-section: 2rem;
+    --r3-gap-major: 2rem;
+    --r3-gap-section: 1.5rem;
   }
 
-  .r3-hero-card,
+  .r3-hero-card:not(.r3-hero-card--split),
   .r3-page-root .home-ws-card--hero {
     padding: var(--r3-gap-md);
   }

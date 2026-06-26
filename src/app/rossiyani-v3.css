@@ -21,12 +21,12 @@
 
   /* Spacing grid (8px base) */
   --r3-gap-xs: 0.5rem;
-  --r3-gap-sm: 1rem;
-  --r3-gap-md: 1.5rem;
-  --r3-gap-lg: 2rem;
-  --r3-gap-xl: 3rem;
-  --r3-gap-section: 2.5rem;
-  --r3-gap-major: 5rem;
+  --r3-gap-sm: 0.75rem;
+  --r3-gap-md: 1.125rem;
+  --r3-gap-lg: 1.5rem;
+  --r3-gap-xl: 2rem;
+  --r3-gap-section: 1.75rem;
+  --r3-gap-major: 2.5rem;
   --r3-shell-max: 72rem;
 
   /* Radii — generous, Stitch-inspired */
@@ -205,7 +205,11 @@ button.r3-card:hover,
 
 .r3-hero-card {
   border-radius: var(--r3-radius-hero);
-  padding: var(--r3-gap-lg);
+  padding: var(--r3-gap-md);
+}
+
+.r3-hero-card.r3-hero-card--split {
+  padding: 0;
 }
 
 .r3-card__visual {
@@ -411,10 +415,14 @@ button.ds-tag-active,
 }
 
 .r3-illustration--hero {
-  width: 4.5rem;
-  height: 4.5rem;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 11rem;
+  aspect-ratio: 4 / 3;
   border-radius: var(--r3-radius-md);
   background: linear-gradient(145deg, rgba(0, 88, 190, 0.08) 0%, rgba(59, 130, 246, 0.06) 100%);
+  overflow: hidden;
 }
 
 .r3-illustration--violet {

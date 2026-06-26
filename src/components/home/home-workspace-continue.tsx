@@ -33,21 +33,27 @@ export function HomeWorkspaceContinue({ meta, wordsDiscovered }: HomeWorkspaceCo
   const insightRows = useMemo(
     () => [
       { label: "Last session", value: insights.lastSession },
-      { label: "Estimated remaining", value: `${insights.estimatedRemainingMinutes} min` },
+      { label: "Est. remaining", value: `${insights.estimatedRemainingMinutes} min` },
       { label: "Next milestone", value: insights.nextMilestone },
-      { label: "Current vocabulary", value: `${insights.wordsDiscovered} words discovered` },
+      { label: "Vocabulary", value: `${insights.wordsDiscovered} words` },
     ],
     [insights],
   );
 
   return (
-    <Card as="article" hero className="home-ws-continue">
-      <div className="home-ws-continue__visual">
+    <Card
+      as="article"
+      hero
+      className="home-ws-continue r3-editorial-split r3-hero-card--split"
+    >
+      <div className="r3-editorial-split__visual home-ws-continue__visual">
         <HomeReadingCover collectionId={meta.collectionId} />
       </div>
-      <div className="home-ws-continue__body">
+
+      <div className="r3-editorial-split__body home-ws-continue__body">
         <p className="r3-eyebrow home-ws-eyebrow">Pick up where you left off</p>
         <h2 className="r3-hero-title home-ws-continue__title break-russian">{meta.title}</h2>
+
         <dl className="home-ws-continue__meta">
           <div>
             <dt>Path</dt>
@@ -66,10 +72,11 @@ export function HomeWorkspaceContinue({ meta, wordsDiscovered }: HomeWorkspaceCo
             <dd>{meta.estimatedMinutes} min</dd>
           </div>
         </dl>
+
         <div className="home-ws-continue__progress">
           <div className="home-ws-continue__progress-head">
             <span>Progress</span>
-            <span className="home-ws-continue__progress-value">{percent}% complete</span>
+            <span className="home-ws-continue__progress-value">{percent}%</span>
           </div>
           <div
             className="home-ws-continue__progress-track"
@@ -82,6 +89,7 @@ export function HomeWorkspaceContinue({ meta, wordsDiscovered }: HomeWorkspaceCo
             <div className="home-ws-continue__progress-fill" style={{ width: `${percent}%` }} />
           </div>
         </div>
+
         <dl className="home-ws-continue__insights">
           {insightRows.map((row) => (
             <div key={row.label}>
@@ -90,6 +98,7 @@ export function HomeWorkspaceContinue({ meta, wordsDiscovered }: HomeWorkspaceCo
             </div>
           ))}
         </dl>
+
         <div className="home-ws-continue__actions">
           <PrimaryButton href={meta.href} large>
             Continue lesson →

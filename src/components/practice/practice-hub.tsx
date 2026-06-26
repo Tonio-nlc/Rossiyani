@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { Card } from "@/components/design-system";
 import { PRACTICE_MODE_CARDS } from "@/lib/practice/constants";
 
