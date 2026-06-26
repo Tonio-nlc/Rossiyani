@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { Badge } from "@/components/design-system";
 import { DeleteTextDialog } from "@/components/library/delete-text-dialog";
 import { RenameTextDialog } from "@/components/library/rename-text-dialog";
 import { useToast } from "@/components/ui/toast-provider";
@@ -17,11 +18,9 @@ import {
   LibraryWorkspaceCollections,
   parseLibraryCollectionParam,
 } from "./library-workspace-collections";
-import { LibraryWorkspaceHero } from "./library-workspace-hero";
 import { LibraryWorkspaceTextGrid } from "./library-workspace-text-grid";
 import { LibrarySearch } from "./library-search";
-import { LibrarySectionNav } from "./library-section-nav";
-import { filterLibraryTexts } from "./library-utils";
+import { filterLibraryTexts, LIBRARY_LEVELS } from "./library-utils";
 
 const REMOVE_ANIMATION_MS = 280;
 
@@ -36,7 +35,6 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const collectionFilter = parseLibraryCollectionParam(searchParams.get("collection"));
-  const showAllCollections = searchParams.get("collections") === "all";
 
   const [texts, setTexts] = useState(initialTexts);
   const [search, setSearch] = useState("");
@@ -52,14 +50,7 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
   }, []);
 
   const filtered = useMemo(
-    () =>
-      filterLibraryTexts(
-        texts,
-        search,
-        level,
-        collectionFilter ?? "all",
-        "all",
-      ),
+    () => filterLibraryTexts(texts, search, level, collectionFilter ?? "all", "all"),
     [texts, search, level, collectionFilter],
   );
 
@@ -136,49 +127,83 @@ export function LibraryView({ initialTexts }: LibraryViewProps) {
 
   return (
     <>
-      <LibraryWorkspaceHero level={level} onLevelChange={setLevel} />
-      <LibrarySectionNav active="texts" />
+      <header className="lessons-hero library-ws-hero">
+        <p className="r3-eyebrow lessons-hero__eyebrow">Vos lectures</p>
+        <h1 className="r3-hero-title lessons-hero__title">Bibliothèque</h1>
+        <p className="r3-lead lessons-hero__lead">
+          Collections curatées et textes importés — lisez, progressez, retrouvez vos lectures.
+        </p>
+        <div className="lessons-hero__metrics">
+          <Badge tone="neutral">
+            {texts.length} texte{texts.length === 1 ? "" : "s"}
+          </Badge>
+          {collectionFilter ? (
+            <Badge tone="amber">{getCollectionName(collectionFilter)}</Badge>
+          ) : null}
+        </div>
+      </header>
 
       <LibraryWorkspaceCollections
         texts={texts}
         activeCollection={collectionFilter}
         clientReady={clientReady}
-        showAllCollections={showAllCollections}
       />
 
-      <hr className="library-ws-separator" />
-
-      <section className="library-ws-section library-ws-section--search">
-        <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
-        {collectionFilter ? (
+      <section className="lessons-section" aria-labelledby="library-texts-heading">
+        <div className="lessons-section__head">
           <div>
-            <span className="library-ws-filter-chip">
-              {getCollectionName(collectionFilter)}
-              <button
-                type="button"
-                className="library-ws-filter-chip__clear focus-kb"
-                aria-label="Retirer le filtre collection"
-                onClick={clearCollectionFilter}
-              >
-                ×
-              </button>
-            </span>
+            <h2 id="library-texts-heading" className="r3-title lessons-section__title">
+              Vos textes
+            </h2>
+            <p className="r3-lead lessons-section__subtitle">
+              {collectionFilter
+                ? `Textes de la collection « ${getCollectionName(collectionFilter)} ».`
+                : "Toutes vos lectures importées, prêtes à ouvrir."}
+            </p>
           </div>
-        ) : null}
-      </section>
-
-      <section
-        className="library-ws-section library-ws-section--texts"
-        aria-labelledby="library-texts-heading"
-      >
-        <div className="library-ws-section__head">
-          <h2 id="library-texts-heading" className="library-ws-section__title">
-            Vos textes
-          </h2>
-          <p className="library-ws-section__subtitle">
-            Lectures importées, prêtes à ouvrir.
-          </p>
         </div>
+
+        <nav className="lessons-level-nav library-ws-levels" aria-label="Niveau">
+          <button
+            type="button"
+            aria-pressed={level === "all"}
+            onClick={() => setLevel("all")}
+            className={[
+              "library-ws-level-pill focus-kb",
+              level === "all" ? "library-ws-level-pill--active" : "",
+            ].join(" ")}
+          >
+            Tous
+          </button>
+          {LIBRARY_LEVELS.map((value) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={level === value}
+              onClick={() => setLevel(value)}
+              className={[
+                "library-ws-level-pill focus-kb",
+                level === value ? "library-ws-level-pill--active" : "",
+              ].join(" ")}
+            >
+              {value}
+            </button>
+          ))}
+        </nav>
+
+        <div className="library-ws-filters">
+          <LibrarySearch value={search} onChange={setSearch} resultCount={filtered.length} />
+          {collectionFilter ? (
+            <button
+              type="button"
+              className="lessons-level-pill focus-kb"
+              onClick={clearCollectionFilter}
+            >
+              Retirer le filtre · {getCollectionName(collectionFilter)}
+            </button>
+          ) : null}
+        </div>
+
         <LibraryWorkspaceTextGrid
           texts={filtered}
           hasAnyTexts={texts.length > 0}

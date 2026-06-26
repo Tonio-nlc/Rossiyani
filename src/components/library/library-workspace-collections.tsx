@@ -1,8 +1,9 @@
 "use client";
 
-import { TextButton } from "@/components/design-system";
 import { useMemo } from "react";
 
+import { Card, PrimaryButton } from "@/components/design-system";
+import { EditorialCollectionCard } from "@/components/shared/editorial-collection-card";
 import {
   buildLibraryCollections,
   pickActiveCollection,
@@ -13,20 +14,16 @@ import type { TextListItem } from "@/features/texts";
 import type { CollectionId } from "@/content/collections";
 import { isCollectionId } from "@/content/collections";
 
-import { LibraryWorkspaceCollectionCard } from "./library-workspace-collection-card";
-
 type LibraryWorkspaceCollectionsProps = {
   texts: TextListItem[];
   activeCollection?: CollectionId | null;
   clientReady: boolean;
-  showAllCollections?: boolean;
 };
 
 export function LibraryWorkspaceCollections({
   texts,
   activeCollection = null,
   clientReady,
-  showAllCollections = false,
 }: LibraryWorkspaceCollectionsProps) {
   const readingProgress = useMemo(
     () => (clientReady ? getAllReadingProgress() : {}),
@@ -38,59 +35,73 @@ export function LibraryWorkspaceCollections({
     [clientReady],
   );
 
+  const collections = useMemo(
+    () => buildLibraryCollections({ texts, readingProgress, exploration }),
+    [texts, readingProgress, exploration],
+  );
+
   const active = useMemo(
     () => pickActiveCollection(texts, readingProgress, exploration, activeCollection),
     [texts, readingProgress, exploration, activeCollection],
   );
 
-  const browseCollections = useMemo(() => {
-    if (!showAllCollections) {
-      return [];
-    }
-    return buildLibraryCollections({ texts, readingProgress, exploration }).filter(
-      (collection) => collection.id !== active?.id,
-    );
-  }, [texts, readingProgress, exploration, showAllCollections, active?.id]);
-
-  if (!active) {
+  if (collections.length === 0) {
     return null;
   }
 
   return (
-    <section
-      className="library-ws-section library-ws-section--featured"
-      aria-labelledby="library-ws-featured-heading"
-    >
-      <div className="library-ws-section__head library-ws-section__head--row">
-        <h2 id="library-ws-featured-heading" className="library-ws-section__title">
-          Current collection
-        </h2>
-        {!showAllCollections ? (
-          <TextButton href="/library?collections=all" className="library-ws-section__action">
-            View all collections →
-          </TextButton>
-        ) : (
-          <TextButton href="/library" className="library-ws-section__action">
-            Back to library →
-          </TextButton>
-        )}
-      </div>
-
-      <LibraryWorkspaceCollectionCard collection={active} mode="featured" />
-
-      {showAllCollections && browseCollections.length > 0 ? (
-        <>
-          <hr className="library-ws-separator library-ws-separator--inset" />
-          <ul className="library-ws-collections library-ws-collections--browse">
-            {browseCollections.map((collection) => (
-              <li key={collection.id}>
-                <LibraryWorkspaceCollectionCard collection={collection} mode="browse" />
-              </li>
-            ))}
-          </ul>
-        </>
+    <>
+      {active && active.progressPercent > 0 ? (
+        <section className="lessons-section" aria-labelledby="library-continue-heading">
+          <div className="lessons-section__head">
+            <h2 id="library-continue-heading" className="r3-title lessons-section__title">
+              Continuer
+            </h2>
+          </div>
+          <Card as="article" interactive className="lessons-continue">
+            <div>
+              <p className="lessons-continue__label">Collection en cours</p>
+              <p className="r3-title lessons-continue__title break-russian">{active.russianTitle}</p>
+              <p className="lessons-continue__meta">
+                {active.name} · {active.textCount} texte{active.textCount === 1 ? "" : "s"} ·{" "}
+                {active.progressPercent}% lu
+              </p>
+            </div>
+            <PrimaryButton href={active.continueHref} className="lessons-continue__cta">
+              Reprendre →
+            </PrimaryButton>
+          </Card>
+        </section>
       ) : null}
-    </section>
+
+      <section className="lessons-section" aria-labelledby="library-collections-heading">
+        <div className="lessons-section__head">
+          <div>
+            <h2 id="library-collections-heading" className="r3-title lessons-section__title">
+              Collections
+            </h2>
+            <p className="r3-lead lessons-section__subtitle">
+              Parcours thématiques — le cœur de votre bibliothèque.
+            </p>
+          </div>
+        </div>
+
+        <div className="lessons-grid lessons-grid--collections">
+          {collections.map((collection) => (
+            <EditorialCollectionCard
+              key={collection.id}
+              id={collection.id}
+              title={collection.name}
+              description={collection.description}
+              href={`/library?collection=${collection.id}`}
+              level={collection.level}
+              textCount={collection.textCount}
+              progressPercent={collection.progressPercent}
+            />
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
 

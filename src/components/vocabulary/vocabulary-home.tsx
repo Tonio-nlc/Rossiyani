@@ -66,8 +66,12 @@ export function VocabularyHome() {
   return (
     <>
       <VocabularyHero />
-      <VocabularyStatsRow stats={data.stats} />
-      <VocabularyNav active={activeTab} stats={data.stats} onChange={handleTabChange} />
+      <section className="lessons-section lessons-section--compact">
+        <VocabularyStatsRow stats={data.stats} />
+      </section>
+      <section className="lessons-section lessons-section--compact">
+        <VocabularyNav active={activeTab} stats={data.stats} onChange={handleTabChange} />
+      </section>
 
       {activeTab === "words" ? (
         <VocabularyWordsPanel words={data.words} loading={enriching} />

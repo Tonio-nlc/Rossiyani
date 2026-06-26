@@ -1,0 +1,290 @@
+/* ─── Editorial shell — Lessons is the visual reference ───
+   Shared rhythm, sections, cards, and interactions for all workspaces.
+*/
+
+/* ─── Editorial shell — Lessons is the visual reference ───
+   Shared rhythm, sections, cards, and interactions for all workspaces.
+*/
+
+.home-ws,
+.library-ws,
+.vocabulary-shell,
+.practice-shell,
+.practice-my-sentences {
+  --ws-gap-major: 4rem;
+  --ws-gap-card: 2rem;
+  --ws-gap-inner: 1.5rem;
+  --ws-gap-control: 1rem;
+  --ws-border: rgba(100, 116, 139, 0.14);
+  --ws-border-hover: rgba(100, 116, 139, 0.28);
+  --ws-font: var(--font-workspace), var(--font-ui), system-ui, sans-serif;
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: 2rem 1.25rem 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-gap-major);
+  font-family: var(--ws-font);
+  color: var(--r3-heading, #111827);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (min-width: 768px) {
+  .home-ws,
+  .library-ws,
+  .vocabulary-shell,
+  .practice-shell,
+  .practice-my-sentences {
+    padding: 2.5rem 2rem 5.5rem;
+  }
+}
+
+/* Sections — alias lessons-section on home/library */
+.home-ws-section,
+.library-ws-section,
+.lessons-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-gap-card, var(--lessons-gap-card, 2rem));
+}
+
+.home-ws-section__head,
+.library-ws-section__head,
+.lessons-section__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+
+.home-ws-section__title,
+.library-ws-section__title,
+.lessons-section__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--r3-heading, #111827);
+}
+
+.home-ws-section__subtitle,
+.library-ws-section__subtitle,
+.lessons-section__subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--r3-body, #64748b);
+}
+
+/* Hero — text only, no widget grid */
+.home-ws-hero,
+.library-ws-hero,
+.lessons-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-gap-control, 1rem);
+}
+
+.home-ws-hero__metrics,
+.library-ws-hero__metrics,
+.lessons-hero__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.25rem;
+}
+
+/* Unified editorial card family (Lessons reference) */
+.lessons-collection-card,
+.lessons-lesson-card,
+.lessons-continue,
+.lessons-card,
+.lessons-block,
+.ws-editorial-card {
+  padding: var(--ws-gap-inner, 1.5rem);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--r3-radius-card, 28px);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: var(--r3-shadow-card);
+  transition:
+    transform var(--r3-duration, 240ms) var(--r3-ease),
+    box-shadow var(--r3-duration, 240ms) ease,
+    border-color var(--r3-duration, 240ms) ease;
+}
+
+a.lessons-collection-card,
+a.lessons-lesson-card,
+a.ws-editorial-card,
+.lessons-collection-card[href],
+.lessons-lesson-card[href] {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.lessons-collection-card:hover,
+.lessons-lesson-card:hover,
+.lessons-continue:hover,
+.ws-editorial-card:hover,
+a.r3-card.lessons-collection-card:hover,
+a.r3-card.lessons-lesson-card:hover {
+  border-color: var(--ws-border-hover);
+  box-shadow: var(--r3-shadow-card-hover);
+  transform: translateY(-3px);
+}
+
+/* Area accents on continue strips only — white remains dominant */
+.home-ws .lessons-continue {
+  border-color: rgba(0, 88, 190, 0.2);
+  background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 100%);
+  box-shadow: 0 8px 28px rgba(0, 88, 190, 0.08), var(--r3-shadow-card);
+}
+
+.library-ws .lessons-continue {
+  border-color: rgba(180, 140, 90, 0.28);
+  background: linear-gradient(135deg, #ffffff 0%, #faf7f2 100%);
+  box-shadow: 0 8px 28px rgba(180, 140, 90, 0.1), var(--r3-shadow-card);
+}
+
+.home-ws .lessons-continue__label {
+  color: #0058be;
+}
+
+.library-ws .lessons-continue__label {
+  color: #a8844a;
+}
+
+/* Grids */
+.lessons-grid,
+.home-ws-grid,
+.library-ws-grid {
+  display: grid;
+  gap: var(--ws-gap-card, 2rem);
+}
+
+.lessons-grid--collections,
+.home-ws-grid--collections,
+.library-ws-grid--collections {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+}
+
+.lessons-grid--lessons,
+.home-ws-grid--lessons,
+.library-ws-grid--texts {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18.5rem), 1fr));
+}
+
+/* Level / filter pills */
+.lessons-level-nav,
+.library-ws-levels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.lessons-level-pill,
+.library-ws-level-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0 1.1rem;
+  border: 1px solid var(--ws-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--r3-heading);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--r3-shadow-card);
+  transition:
+    transform var(--r3-duration) var(--r3-ease),
+    border-color var(--r3-duration) ease,
+    color var(--r3-duration) ease;
+}
+
+.lessons-level-pill:hover,
+.library-ws-level-pill:hover {
+  border-color: var(--ws-border-hover);
+  transform: translateY(-1px);
+}
+
+.library-ws-level-pill--active {
+  border-color: rgba(168, 132, 74, 0.35);
+  background: rgba(250, 247, 242, 0.95);
+  color: #8b6914;
+}
+
+.home-ws-level-pill--active {
+  border-color: rgba(0, 88, 190, 0.28);
+  background: rgba(0, 88, 190, 0.08);
+  color: #0058be;
+}
+
+/* Library text cards inherit lesson card shell */
+.library-ws-text-card.lessons-lesson-card {
+  gap: 0.65rem;
+}
+
+.library-ws-text-card__cta {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--r3-primary);
+  margin-top: auto;
+}
+
+/* Search — minimal, editorial */
+.library-ws-search {
+  max-width: 24rem;
+}
+
+.library-ws-search__input {
+  border-radius: var(--r3-radius-pill);
+  border: 1px solid var(--ws-border);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--r3-shadow-card);
+}
+
+.library-ws-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.home-ws .home-ws-vocabulary-strip {
+  border-color: rgba(109, 40, 217, 0.22);
+  background: linear-gradient(135deg, #ffffff 0%, #f8f5ff 100%);
+  box-shadow: 0 8px 28px rgba(109, 40, 217, 0.08), var(--r3-shadow-card);
+}
+
+.home-ws .home-ws-vocabulary-strip .lessons-continue__label {
+  color: #6d28d9;
+}
+
+.practice-mode-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #059669, #047857cc) !important;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
+
+.practice-mode-card__icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Legacy dashboard layout — disabled */
+.home-ws-metrics {
+  display: none !important;
+}

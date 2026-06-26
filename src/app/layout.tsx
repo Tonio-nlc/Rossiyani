@@ -10,6 +10,7 @@ import "./rossiyani-header.css";
 import "./rossiyani-primitives.css";
 import "./rossiyani-v3-canvas.css";
 import "./rossiyani-v3-layouts.css";
+import "./editorial-shell.css";
 import "./workspace-v2-areas.css";
 import "./practice-workspace.css";
 import "./lessons-workspace.css";

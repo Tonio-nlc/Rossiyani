@@ -1,16 +1,13 @@
-import { Badge, Card } from "@/components/design-system";
 import { getCollectionRecord, type CollectionId } from "@/content/collections";
+import { EditorialCollectionCard } from "@/components/shared/editorial-collection-card";
 import type { CefrLevel } from "@/types";
 import type { TextListItem } from "@/features/texts";
-
-import { HomeCollectionCover } from "./home-collection-cover";
 
 const FEATURED_COLLECTIONS: Array<{
   id: CollectionId;
   displayName: string;
-  featured?: boolean;
 }> = [
-  { id: "everyday-russian", displayName: "Everyday Russian", featured: true },
+  { id: "everyday-russian", displayName: "Everyday Russian" },
   { id: "stories", displayName: "Russian Stories" },
   { id: "dialogues", displayName: "Dialogues" },
   { id: "slow-news", displayName: "News Russian" },
@@ -43,41 +40,37 @@ function dominantLevel(texts: TextListItem[]): CefrLevel | null {
 
 export function HomeWorkspaceCollections({ texts }: HomeWorkspaceCollectionsProps) {
   return (
-    <section className="home-ws-section" aria-labelledby="home-ws-collections-heading">
-      <div className="home-ws-section__head">
-        <h2 id="home-ws-collections-heading" className="r3-title home-ws-section__title">
-          Featured collections
-        </h2>
+    <section className="lessons-section" aria-labelledby="home-ws-collections-heading">
+      <div className="lessons-section__head">
+        <div>
+          <h2 id="home-ws-collections-heading" className="r3-title lessons-section__title">
+            Collections
+          </h2>
+          <p className="r3-lead lessons-section__subtitle">
+            Parcours thématiques pour structurer vos lectures.
+          </p>
+        </div>
       </div>
 
-      <ul className="home-ws-collection-grid">
+      <div className="lessons-grid lessons-grid--collections">
         {FEATURED_COLLECTIONS.map((item) => {
           const collection = getCollectionRecord(item.id);
           const collectionTexts = texts.filter((text) => text.collectionId === item.id);
           const level = dominantLevel(collectionTexts);
 
           return (
-            <li
+            <EditorialCollectionCard
               key={item.id}
-              className={item.featured ? "home-ws-collection-grid__featured" : undefined}
-            >
-              <Card href="/library" className="home-ws-collection">
-                <HomeCollectionCover collectionId={item.id} />
-                <div className="home-ws-collection__body">
-                  <div className="home-ws-collection__badges">
-                    {level ? <Badge tone="blue">{level}</Badge> : null}
-                    <Badge tone="slate">
-                      {collectionTexts.length} text{collectionTexts.length === 1 ? "" : "s"}
-                    </Badge>
-                  </div>
-                  <h3 className="r3-title home-ws-collection__title">{item.displayName}</h3>
-                  <p className="r3-lead home-ws-collection__description">{collection.description}</p>
-                </div>
-              </Card>
-            </li>
+              id={item.id}
+              title={item.displayName}
+              description={collection.description}
+              href={`/library?collection=${item.id}`}
+              level={level}
+              textCount={collectionTexts.length}
+            />
           );
         })}
-      </ul>
+      </div>
     </section>
   );
 }

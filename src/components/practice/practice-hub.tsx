@@ -43,31 +43,30 @@ function PracticeModeIcon({ id }: { id: (typeof PRACTICE_MODE_CARDS)[number]["id
 export function PracticeHub() {
   return (
     <div className="practice-hub">
-      <header className="practice-hub__intro">
-        <h1 className="r3-hero-title practice-hub__title">Pratique</h1>
-        <p className="r3-lead practice-hub__mission">
+      <header className="lessons-hero practice-hub__intro">
+        <p className="r3-eyebrow lessons-hero__eyebrow">Exercices guidés</p>
+        <h1 className="r3-hero-title lessons-hero__title">Pratique</h1>
+        <p className="r3-lead lessons-hero__lead">
           Renforcez le vocabulaire, la grammaire et les structures découverts en lecture.
         </p>
       </header>
 
-      <section className="practice-hub__modes" aria-label="Modes d'exercice">
-        <h2 className="r3-title practice-hub__modes-label">Modes disponibles</h2>
-        <ul className="practice-mode-grid">
+      <section className="lessons-section" aria-label="Modes d'exercice">
+        <div className="lessons-section__head">
+          <h2 className="r3-title lessons-section__title">Modes disponibles</h2>
+        </div>
+        <div className="lessons-grid lessons-grid--lessons">
           {PRACTICE_MODE_CARDS.map((mode) => (
-            <li key={mode.id}>
-              <Card href={mode.href} className="practice-mode-card">
-                <span className="practice-mode-card__icon" aria-hidden>
-                  <PracticeModeIcon id={mode.id} />
-                </span>
-                <div className="practice-mode-card__body">
-                  <p className="r3-title practice-mode-card__title">{mode.title}</p>
-                  <p className="r3-lead practice-mode-card__description">{mode.description}</p>
-                </div>
-                <span className="practice-mode-card__cta">Ouvrir →</span>
-              </Card>
-            </li>
+            <Card key={mode.id} href={mode.href} className="lessons-lesson-card practice-mode-card">
+              <span className="practice-mode-card__icon lessons-collection-card__cover" aria-hidden>
+                <PracticeModeIcon id={mode.id} />
+              </span>
+              <h3 className="r3-title lessons-lesson-card__title">{mode.title}</h3>
+              <p className="r3-lead lessons-lesson-card__desc">{mode.description}</p>
+              <span className="lessons-lesson-card__cta">Ouvrir →</span>
+            </Card>
           ))}
-        </ul>
+        </div>
       </section>
     </div>
   );

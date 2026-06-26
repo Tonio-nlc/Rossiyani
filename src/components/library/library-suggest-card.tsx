@@ -11,7 +11,7 @@ function PlusIcon() {
 
 export function LibrarySuggestCard() {
   return (
-    <Card href="/import" className="library-ws-suggest">
+    <Card href="/import" className="lessons-lesson-card library-ws-suggest">
       <PlusIcon />
       <h3 className="r3-title library-ws-suggest__title">Suggérer un texte</h3>
       <p className="r3-lead library-ws-suggest__lead">

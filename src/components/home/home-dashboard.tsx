@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { Badge } from "@/components/design-system";
 import type { HomeJournalData } from "@/features/home";
 import type { TextListItem } from "@/features/texts";
 import { getSavedComposePhrases } from "@/lib/compose/saved-phrases";
@@ -21,19 +22,16 @@ import {
   type SessionJournal,
 } from "@/lib/home/build-session-journal";
 import { getLearningStreakSnapshot } from "@/lib/home/learning-streak";
-import { pickFeaturedCollection } from "@/lib/home/pick-featured-collection";
 import { pickRecommendedTexts } from "@/lib/home/pick-recommended-texts";
 import { resolveContinueReading } from "@/lib/home/resolve-continue-reading";
 import { getAllReadingProgress } from "@/lib/reader/reading-progress";
 import { getSavedReaderWords } from "@/lib/reader/saved-words";
 
+import { HomeWorkspaceCollections } from "./home-workspace-collections";
 import { HomeWorkspaceContinue } from "./home-workspace-continue";
-import { HomeWorkspaceExploration } from "./home-workspace-exploration";
-import { HomeWorkspaceFeaturedCollection } from "./home-workspace-featured-collection";
-import { HomeWorkspaceMetrics } from "./home-workspace-metrics";
-import { HomeWorkspaceMotivation } from "./home-workspace-motivation";
 import { HomeWorkspaceRecommendedReading } from "./home-workspace-recommended-reading";
 import { HomeWorkspaceTodaysPractice } from "./home-workspace-todays-practice";
+import { HomeWorkspaceVocabulary } from "./home-workspace-vocabulary";
 
 type HomeDashboardProps = {
   journal: HomeJournalData;
@@ -71,33 +69,22 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
 
   const streak = useMemo(() => {
     if (!clientReady) {
-      return {
-        currentStreak: 0,
-        weeklyActivity: [false, false, false, false, false, false, false],
-        wordsToday: 0,
-      };
+      return { currentStreak: 0, wordsToday: 0 };
     }
     return getLearningStreakSnapshot(getExplorationHistory());
   }, [clientReady]);
 
   const metrics = useMemo(() => {
     if (!clientReady) {
-      return {
-        wordsExplored: 0,
-        textsCompleted: 0,
-        conceptsExplored: 0,
-        currentStreak: 0,
-        isReturning: false,
-      };
+      return { wordsExplored: 0, textsCompleted: 0, conceptsExplored: 0 };
     }
-
     return buildHomeDashboardMetrics({
       readingProgress: getAllReadingProgress(),
       exploration: getExplorationHistory(),
       savedWords: getSavedReaderWords(),
-      streak,
+      streak: getLearningStreakSnapshot(getExplorationHistory()),
     });
-  }, [clientReady, streak]);
+  }, [clientReady]);
 
   const continueMeta = useMemo(
     () => resolveContinueReading(narrative, texts),
@@ -107,17 +94,6 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
   const readingProgress = useMemo(
     () => (clientReady ? getAllReadingProgress() : {}),
     [clientReady],
-  );
-
-  const featuredCollection = useMemo(
-    () =>
-      pickFeaturedCollection(
-        texts,
-        readingProgress,
-        continueMeta?.collectionId ?? null,
-        metrics.conceptsExplored,
-      ),
-    [texts, readingProgress, continueMeta?.collectionId, metrics.conceptsExplored],
   );
 
   const recommendedTexts = useMemo(
@@ -133,7 +109,6 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
         contextLessonCount: 0,
       });
     }
-
     return buildTodaysPractice({
       journal,
       composePhraseCount: getSavedComposePhrases().length,
@@ -143,12 +118,8 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
 
   const explorationHub = useMemo(() => {
     if (!clientReady) {
-      return buildExplorationHubData({
-        savedWordCount: 0,
-        exploration: [],
-      });
+      return buildExplorationHubData({ savedWordCount: 0, exploration: [] });
     }
-
     return buildExplorationHubData({
       savedWordCount,
       exploration: getExplorationHistory(),
@@ -157,26 +128,36 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
 
   return (
     <div className="home-ws">
-      <section className="home-ws__hero" aria-label="Learning journey">
-        {continueMeta ? (
-          <HomeWorkspaceContinue meta={continueMeta} wordsDiscovered={metrics.wordsExplored} />
-        ) : null}
-        <HomeWorkspaceMetrics metrics={metrics} streak={streak} />
-      </section>
-
-      <div className="home-ws__main">
-        <div className="home-ws__stream">
-          <HomeWorkspaceTodaysPractice cards={todaysPractice} />
-          <HomeWorkspaceFeaturedCollection feature={featuredCollection} />
+      <header className="lessons-hero home-ws-hero">
+        <p className="r3-eyebrow lessons-hero__eyebrow">Espace d&apos;apprentissage</p>
+        <h1 className="r3-hero-title lessons-hero__title">Rossiyani</h1>
+        <p className="r3-lead lessons-hero__lead">
+          Reprenez votre lecture, pratiquez un peu, explorez vos collections — sans tableau de bord,
+          juste votre progression.
+        </p>
+        <div className="lessons-hero__metrics">
+          {streak.currentStreak > 0 ? (
+            <Badge tone="blue">
+              {streak.currentStreak} jour{streak.currentStreak === 1 ? "" : "s"} de suite
+            </Badge>
+          ) : null}
+          {metrics.wordsExplored > 0 ? (
+            <Badge tone="neutral">{metrics.wordsExplored} mots explorés</Badge>
+          ) : null}
+          {metrics.textsCompleted > 0 ? (
+            <Badge tone="green">{metrics.textsCompleted} textes terminés</Badge>
+          ) : null}
+          {streak.wordsToday > 0 ? (
+            <Badge tone="violet">{streak.wordsToday} mots aujourd&apos;hui</Badge>
+          ) : null}
         </div>
+      </header>
 
-        <section className="home-ws__activity" aria-label="Recent activity">
-          <HomeWorkspaceRecommendedReading texts={recommendedTexts} />
-          <HomeWorkspaceMotivation streak={streak} continueHref={continueMeta?.href ?? null} />
-        </section>
-      </div>
-
-      <HomeWorkspaceExploration hub={explorationHub} />
+      {continueMeta ? <HomeWorkspaceContinue meta={continueMeta} /> : null}
+      <HomeWorkspaceTodaysPractice cards={todaysPractice} />
+      <HomeWorkspaceCollections texts={texts} />
+      <HomeWorkspaceRecommendedReading texts={recommendedTexts} />
+      <HomeWorkspaceVocabulary hub={explorationHub} />
     </div>
   );
 }

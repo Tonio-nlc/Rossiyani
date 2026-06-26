@@ -47,6 +47,7 @@ export const LibraryTextCard = memo(function LibraryTextCard({
     <Card
       as="article"
       className={[
+        "lessons-lesson-card",
         "library-ws-text-card",
         variant === "featured" ? "library-ws-text-card--featured" : "",
       ].join(" ")}
@@ -89,7 +90,7 @@ export const LibraryTextCard = memo(function LibraryTextCard({
       <LibraryCardProgress textId={text.id} workspace />
 
       <footer className="library-ws-text-card__footer">
-        <TextButton href={`/texts/${text.id}`} className="library-ws-text-card__cta">
+        <TextButton href={`/texts/${text.id}`} className="lessons-lesson-card__cta library-ws-text-card__cta">
           Lire →
         </TextButton>
       </footer>

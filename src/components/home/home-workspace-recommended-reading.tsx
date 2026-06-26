@@ -1,7 +1,5 @@
-import { Badge, Card, PrimaryButton } from "@/components/design-system";
+import { Badge, Card } from "@/components/design-system";
 import type { RecommendedTextCard } from "@/lib/home/pick-recommended-texts";
-
-import { HomeReadingCover } from "./home-reading-cover";
 
 type HomeWorkspaceRecommendedReadingProps = {
   texts: RecommendedTextCard[];
@@ -13,38 +11,31 @@ export function HomeWorkspaceRecommendedReading({ texts }: HomeWorkspaceRecommen
   }
 
   return (
-    <section className="home-ws-section" aria-labelledby="home-ws-reading-heading">
-      <div className="home-ws-section__head">
-        <h2 id="home-ws-reading-heading" className="r3-title home-ws-section__title">
-          Recent activity
-        </h2>
-        <p className="r3-lead home-ws-section__subtitle">
-          Picked for your level and reading history.
-        </p>
+    <section className="lessons-section" aria-labelledby="home-ws-reading-heading">
+      <div className="lessons-section__head">
+        <div>
+          <h2 id="home-ws-reading-heading" className="r3-title lessons-section__title">
+            Activité récente
+          </h2>
+          <p className="r3-lead lessons-section__subtitle">
+            Lectures suggérées selon votre niveau et votre historique.
+          </p>
+        </div>
       </div>
 
-      <ul className="home-ws-reading-grid">
+      <div className="lessons-grid lessons-grid--lessons">
         {texts.map((text) => (
-          <li key={text.id}>
-            <Card as="article" interactive className="home-ws-reading-card">
-              <div className="home-ws-reading-card__media">
-                <HomeReadingCover collectionId={text.collectionId} className="home-ws-reading-card__cover" />
-                <div className="home-ws-reading-card__badges">
-                  <Badge tone="blue">{text.level}</Badge>
-                  <Badge tone="neutral">{text.estimatedMinutes} min</Badge>
-                </div>
-              </div>
-              <div className="home-ws-reading-card__body">
-                <h3 className="r3-title home-ws-reading-card__title break-russian">{text.title}</h3>
-                <p className="r3-lead home-ws-reading-card__description">{text.description}</p>
-                <PrimaryButton href={text.href} className="home-ws-reading-card__cta">
-                  Start lesson →
-                </PrimaryButton>
-              </div>
-            </Card>
-          </li>
+          <Card key={text.id} href={text.href} className="lessons-lesson-card">
+            <h3 className="r3-title lessons-lesson-card__title break-russian">{text.title}</h3>
+            <p className="r3-lead lessons-lesson-card__desc">{text.description}</p>
+            <div className="lessons-lesson-card__meta">
+              <Badge tone="blue">{text.level}</Badge>
+              <Badge tone="neutral">{text.estimatedMinutes} min</Badge>
+            </div>
+            <span className="lessons-lesson-card__cta">Ouvrir →</span>
+          </Card>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }
