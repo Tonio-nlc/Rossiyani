@@ -1,24 +1,24 @@
 /* ─── Library Workspace — same language as Home / Reader ─── */
 .ds-editorial-container:has(.library-ws) {
   max-width: 93.75rem;
-  background: #f7f9fb;
+  background: #faf7f2;
 }
 
 .library-ws {
   --primary: #0058be;
   --primary-hover: #004799;
   --primary-soft: #e8f2ff;
-  --ink: #0f172a;
-  --ink-secondary: #475569;
-  --ink-muted: #64748b;
-  --border: #eceae6;
-  --border-strong: #e0ddd6;
-  --surface: #ffffff;
-  --page: #f7f9fb;
-  --tag-bg: #f3f4f6;
+  --ink: #111827;
+  --ink-secondary: #64748b;
+  --ink-muted: #94a3b8;
+  --border: rgba(59, 130, 246, 0.08);
+  --border-strong: rgba(180, 162, 130, 0.28);
+  --surface: #fffefb;
+  --page: #faf7f2;
+  --tag-bg: #f5efe6;
   --tag-text: #94a3b8;
-  --radius-sm: 12px;
-  --radius-md: 18px;
+  --radius-sm: 16px;
+  --radius-md: 20px;
   --radius-lg: 24px;
   --font-sans: var(--font-workspace), var(--font-ui), system-ui, sans-serif;
   box-sizing: border-box;
@@ -31,7 +31,10 @@
   gap: 3.25rem;
   font-family: var(--font-sans);
   color: var(--ink);
-  background: var(--page);
+  background:
+    radial-gradient(ellipse 75% 55% at 0% 0%, var(--v2-area-library-glow, rgba(232, 213, 183, 0.22)), transparent),
+    radial-gradient(ellipse 50% 40% at 100% 10%, rgba(251, 245, 235, 0.8), transparent),
+    var(--page);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -50,15 +53,22 @@
 
 /* ─── Shared primitives ─── */
 .library-ws-card {
-  border: 1px solid var(--border);
+  border: 1px solid rgba(59, 130, 246, 0.08);
   border-radius: var(--radius-lg);
-  background: var(--surface);
-  box-shadow: none;
-  transition: border-color 200ms ease-out;
+  background: linear-gradient(180deg, #fffefb 0%, #faf5ee 100%);
+  box-shadow: var(--v2-shadow, 0 1px 2px rgba(15, 23, 42, 0.04));
+  transition:
+    transform var(--v2-duration, 220ms) var(--v2-ease, ease),
+    box-shadow var(--v2-duration, 220ms) var(--v2-ease, ease),
+    border-color var(--v2-duration, 220ms) ease,
+    background var(--v2-duration, 220ms) ease;
 }
 
 .library-ws-card:hover {
-  border-color: var(--border-strong);
+  border-color: rgba(180, 162, 130, 0.35);
+  background: linear-gradient(180deg, #ffffff 0%, #f8f4ed 100%);
+  box-shadow: var(--v2-shadow-hover, 0 8px 28px rgba(15, 23, 42, 0.08));
+  transform: translateY(-3px) scale(1.01);
 }
 
 .library-ws-badge {

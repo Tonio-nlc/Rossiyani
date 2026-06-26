@@ -14,8 +14,8 @@ type EmptyStateProps = {
 export function EmptyState({ title, description, action, children, icon: _icon }: EmptyStateProps) {
   return (
     <div className="ds-empty-state animate-fade-up">
-      <h3 className="font-reader text-lg text-[var(--ink)]">{title}</h3>
-      <p className="mt-2 max-w-md text-sm leading-relaxed text-[var(--ink-muted)]">{description}</p>
+      <h3 className="text-lg font-bold text-[var(--v2-heading,#111827)]">{title}</h3>
+      <p className="mt-2 max-w-md text-sm leading-relaxed text-[var(--v2-body,#64748b)]">{description}</p>
       {children}
       {action ? (
         <div className="mt-6">

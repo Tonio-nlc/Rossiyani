@@ -122,8 +122,8 @@ export const SentenceBlock = memo(function SentenceBlock({
       {hasTranslation ? (
         <div
           className={[
-            "grid transition-[grid-template-rows] duration-300 ease-out",
-            showTranslation ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+            "grid transition-[grid-template-rows,opacity] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
+            showTranslation ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
           ].join(" ")}
           aria-hidden={!showTranslation}
         >

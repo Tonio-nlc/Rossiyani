@@ -463,8 +463,10 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
 
         <div className="reader-ws__article-wrap">
           <article className="reader-ws-article">
-            {text.sentences.map((sentence) => {
-              const dimmed = focusMode && selectedSentenceId !== sentence.id;
+            {text.sentences.map((sentence, index) => {
+              const dimmed = focusMode
+                ? selectedSentenceId !== sentence.id
+                : index !== currentSentenceIndex;
               const analyzing = isSentenceAnalyzing(
                 sentence.analysisState,
                 sentence.words.length,
@@ -482,7 +484,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
                       }
                     }}
                     data-sentence-id={sentence.id}
-                    className={dimmed ? "opacity-35 transition-opacity duration-150" : undefined}
+                    className={dimmed ? "reader-ws-sentence-wrap--muted" : "reader-ws-sentence-wrap--current"}
                   >
                     <ReaderSentenceAnalyzing
                       russianText={sentence.russianText}

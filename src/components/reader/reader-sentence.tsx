@@ -57,8 +57,8 @@ export const ReaderSentence = memo(function ReaderSentence({
         onSelectSentence();
       }}
       className={[
-        "reader-paragraph min-w-0 transition-opacity duration-150",
-        dimmed ? "opacity-35" : "opacity-100",
+        "reader-paragraph reader-ws-sentence-wrap min-w-0",
+        dimmed ? "reader-ws-sentence-wrap--muted" : "reader-ws-sentence-wrap--current",
       ].join(" ")}
     >
       <SentenceBlock

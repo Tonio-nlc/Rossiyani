@@ -7,6 +7,7 @@ import { OnboardingGate } from "@/components/onboarding";
 import { ToastProvider } from "@/components/design-system";
 
 import "./globals.css";
+import "./workspace-v2-areas.css";
 
 const fontEditorial = EB_Garamond({
   subsets: ["latin", "cyrillic"],
