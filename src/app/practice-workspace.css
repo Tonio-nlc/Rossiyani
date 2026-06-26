@@ -15,11 +15,6 @@
   color: var(--v2-heading, #111827);
 }
 
-.practice-page-root .ds-top-nav {
-  background: rgba(240, 253, 246, 0.78);
-  backdrop-filter: blur(18px) saturate(1.15);
-  border-bottom-color: rgba(16, 185, 129, 0.12);
-}
 
 .practice-page-root .ds-editorial-container:has(.practice-shell),
 .practice-page-root .ds-editorial-container:has(.practice-my-sentences) {

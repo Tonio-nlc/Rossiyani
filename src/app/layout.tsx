@@ -6,6 +6,7 @@ import { AppShell } from "@/components/layout";
 import { OnboardingGate } from "@/components/onboarding";
 
 import "./globals.css";
+import "./rossiyani-header.css";
 import "./workspace-v2-areas.css";
 import "./practice-workspace.css";
 import "./lessons-workspace.css";

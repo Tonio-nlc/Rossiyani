@@ -18,13 +18,7 @@ const UniversalSearchDialog = dynamic(
   { ssr: false },
 );
 
-const NAV_SHORTCUTS = [
-  { href: "/library", shortcut: "1" },
-  { href: "/reader", shortcut: "2" },
-  { href: "/vocabulary", shortcut: "3" },
-  { href: "/practice", shortcut: "4" },
-  { href: "/lessons", shortcut: "5" },
-] as const;
+import { NAV_KEYBOARD_SHORTCUTS } from "@/lib/navigation/main-nav";
 
 function resolvePageRootClass(pathname: string | null): string {
   if (pathname?.startsWith("/practice")) {
@@ -60,7 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       }
 
       if (e.altKey && !e.metaKey && !e.ctrlKey) {
-        const item = NAV_SHORTCUTS.find((entry) => entry.shortcut === e.key);
+        const item = NAV_KEYBOARD_SHORTCUTS.find((entry) => entry.shortcut === e.key);
         if (item) {
           e.preventDefault();
           router.push(item.href);

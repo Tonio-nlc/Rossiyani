@@ -4,33 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const MAIN_NAV = [
-  {
-    href: "/library",
-    label: "Bibliothèque",
-    match: (path: string) => path === "/library" || path.startsWith("/library/"),
-  },
-  {
-    href: "/reader",
-    label: "Lecture",
-    match: (path: string) => path === "/reader" || path.startsWith("/texts/"),
-  },
-  {
-    href: "/vocabulary",
-    label: "Vocabulary",
-    match: (path: string) => path === "/vocabulary" || path.startsWith("/vocabulary/"),
-  },
-  {
-    href: "/practice",
-    label: "Pratique",
-    match: (path: string) => path === "/practice" || path.startsWith("/practice/"),
-  },
-  {
-    href: "/lessons",
-    label: "Leçons",
-    match: (path: string) => path === "/lessons" || path.startsWith("/lessons/"),
-  },
-] as const;
+import { MAIN_NAV } from "@/lib/navigation/main-nav";
 
 function SearchIcon() {
   return (
@@ -51,6 +25,22 @@ function ProfileIcon() {
         strokeWidth="1.2"
         strokeLinecap="round"
       />
+    </svg>
+  );
+}
+
+function MenuIcon({ open }: { open: boolean }) {
+  if (open) {
+    return (
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden className="ds-top-nav__menu-icon">
+        <path d="M4 4 12 12M12 4 4 12" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden className="ds-top-nav__menu-icon">
+      <path d="M3 4.5h10M3 8h10M3 11.5h10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
     </svg>
   );
 }
@@ -88,9 +78,12 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
 
   return (
     <header className="ds-top-nav">
-      <div className="ds-top-nav__inner ds-editorial-container">
-        <Link href="/" className="ds-top-nav__brand focus-kb">
-          Rossiyani
+      <div className="ds-top-nav__inner">
+        <Link href="/" className="ds-top-nav__brand focus-kb" aria-label="Rossiyani — Home">
+          <span className="ds-top-nav__brand-mark" aria-hidden>
+            <span className="ds-top-nav__brand-mark-inner" />
+          </span>
+          <span className="ds-top-nav__brand-text">Rossiyani</span>
         </Link>
 
         <nav aria-label="Navigation principale" className="ds-top-nav__nav">
@@ -115,10 +108,10 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
               type="button"
               onClick={onOpenSearch}
               className="ds-top-nav__search focus-kb"
-              aria-label="Rechercher"
+              aria-label="Rechercher dans Rossiyani"
             >
               <SearchIcon />
-              <span className="ds-top-nav__search-label">Rechercher</span>
+              <span className="ds-top-nav__search-label">Search</span>
               <kbd className="ds-top-nav__search-kbd" aria-hidden>
                 /
               </kbd>
@@ -134,7 +127,9 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
             ].join(" ")}
             aria-label="Profil et préférences"
           >
-            <ProfileIcon />
+            <span className="ds-top-nav__profile-avatar" aria-hidden>
+              <ProfileIcon />
+            </span>
             <span className="ds-top-nav__profile-label">Profil</span>
           </Link>
 
@@ -146,20 +141,14 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
             aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
             onClick={() => setMobileOpen((open) => !open)}
           >
-            <span className="ds-top-nav__menu-icon" aria-hidden>
-              {mobileOpen ? "✕" : "☰"}
-            </span>
+            <MenuIcon open={mobileOpen} />
           </button>
         </div>
       </div>
 
       {mobileOpen ? (
-        <nav
-          id="mobile-main-nav"
-          aria-label="Navigation mobile"
-          className="ds-top-nav__mobile"
-        >
-          <ul className="ds-top-nav__mobile-list ds-editorial-container">
+        <nav id="mobile-main-nav" aria-label="Navigation mobile" className="ds-top-nav__mobile">
+          <ul className="ds-top-nav__mobile-list">
             {MAIN_NAV.map((item) => {
               const active = item.match(pathname);
               return (
@@ -174,6 +163,9 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
                 </li>
               );
             })}
+            <li aria-hidden>
+              <hr className="ds-top-nav__mobile-divider" />
+            </li>
             {onOpenSearch ? (
               <li>
                 <button
@@ -185,7 +177,7 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
                   className="ds-top-nav__search ds-top-nav__search--mobile focus-kb"
                 >
                   <SearchIcon />
-                  <span>Rechercher</span>
+                  <span className="ds-top-nav__search-label">Search</span>
                 </button>
               </li>
             ) : null}
@@ -198,8 +190,10 @@ export function TopNavigation({ onOpenSearch }: TopNavigationProps) {
                   profileActive ? "ds-top-nav__profile--active" : "",
                 ].join(" ")}
               >
-                <ProfileIcon />
-                <span>Profil</span>
+                <span className="ds-top-nav__profile-avatar" aria-hidden>
+                  <ProfileIcon />
+                </span>
+                <span className="ds-top-nav__profile-label">Profil</span>
               </Link>
             </li>
           </ul>

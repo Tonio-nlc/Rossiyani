@@ -82,6 +82,44 @@ All major areas share V2 tokens (`workspace-v2.css`): motion, depth, large radii
 
 ---
 
+## Header & Navigation (V2)
+
+The header is the product signature — frosted glass, pill navigation, refined tools. Implementation: `rossiyani-header.css`, `top-navigation.tsx`, `lib/navigation/main-nav.ts`.
+
+### Primary navigation (official)
+
+| Label | Route | Shortcut |
+|-------|-------|----------|
+| Home | `/` | Alt+0 |
+| Library | `/library` | Alt+1 |
+| Reader | `/reader`, `/texts/*` | Alt+2 |
+| Vocabulary | `/vocabulary` | Alt+3 |
+| Lessons | `/lessons` | Alt+4 |
+| Practice | `/practice` | Alt+5 |
+
+No other main nav entries. Profile lives at `/settings` (secondary). Search opens via header button or `/` key.
+
+### Header tokens
+
+| Token | Value |
+|-------|-------|
+| `--header-height` | `4rem` |
+| Background | `rgba(248, 250, 252, 0.82)` + blur |
+| Nav ink / muted | `#111827` / `#64748b` |
+| Accent | `#0058be` |
+| Practice tint | `rgba(240, 253, 246, 0.84)` |
+
+### Responsive
+
+| Breakpoint | Behavior |
+|------------|----------|
+| &lt; 900px | Logo + search icon + hamburger; full nav in mobile sheet |
+| ≥ 900px | Inline pill nav + profile avatar |
+| ≥ 1100px | Search label + `/` kbd hint; wider nav links |
+| ≥ 1280px | Profile label visible |
+
+---
+
 # Interface Architecture (legacy notes)
 
 ## Workspace System

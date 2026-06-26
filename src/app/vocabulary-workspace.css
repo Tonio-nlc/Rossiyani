@@ -25,12 +25,6 @@
   color: var(--v2-heading, #111827);
 }
 
-.vocabulary-page-root .ds-top-nav {
-  background: rgba(248, 250, 252, 0.82);
-  backdrop-filter: blur(18px) saturate(1.12);
-  border-bottom-color: rgba(100, 116, 139, 0.14);
-}
-
 .vocabulary-page-root .ds-editorial-container:has(.vocabulary-shell) {
   max-width: none;
   width: 100%;
