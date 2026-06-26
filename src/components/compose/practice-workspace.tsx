@@ -362,7 +362,7 @@ export function PracticeWorkspace() {
               readerTitle: searchParams.get("textTitle"),
               readerCollectionId: null,
               readerCollectionName: null,
-              explorerHref: `/explorer?q=${encodeURIComponent(searchParams.get("structure") ?? "")}`,
+              explorerHref: `/vocabulary`,
             }}
             referenceSentence={referenceSentence}
           />
@@ -497,7 +497,7 @@ function StructureContextPanel({ context, referenceSentence }: StructureContextP
 
       <div className="practice-context-card__links">
         {context.readerHref ? <Reference href={context.readerHref}>Lire →</Reference> : null}
-        <Reference href={context.explorerHref}>Explorer →</Reference>
+        <Reference href={context.explorerHref}>Vocabulary →</Reference>
       </div>
     </div>
   );

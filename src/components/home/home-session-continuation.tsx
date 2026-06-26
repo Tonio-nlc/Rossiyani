@@ -124,7 +124,7 @@ export function HomeSessionContinuation({ journal, texts }: HomeSessionContinuat
                 {journal.todaysDiscovery.displayLabel}
               </p>
             </div>
-            <GhostButton href={journal.todaysDiscovery.explorerHref}>Explore →</GhostButton>
+            <GhostButton href={journal.todaysDiscovery.explorerHref}>Vocabulary →</GhostButton>
           </div>
         ) : null}
       </div>

@@ -16,9 +16,9 @@ const MAIN_NAV = [
     match: (path: string) => path === "/reader" || path.startsWith("/texts/"),
   },
   {
-    href: "/explorer",
-    label: "Explorer",
-    match: (path: string) => path === "/explorer" || path.startsWith("/explorer/"),
+    href: "/vocabulary",
+    label: "Vocabulary",
+    match: (path: string) => path === "/vocabulary" || path.startsWith("/vocabulary/"),
   },
   {
     href: "/practice",

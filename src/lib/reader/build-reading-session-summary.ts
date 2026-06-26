@@ -109,7 +109,7 @@ export function buildReadingSessionSummary(
       : {
           label: "Ouvrir l'Explorer",
           rationale: "Parcourir le lexique et les observations",
-          href: "/explorer",
+          href: "/vocabulary",
         };
 
   const continueActions: ReadingSessionContinueAction[] = [

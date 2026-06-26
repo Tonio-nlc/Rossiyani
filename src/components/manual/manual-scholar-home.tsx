@@ -113,7 +113,7 @@ export function ManualScholarHome() {
           <Link href="/library" className="manual-scholar-footer__link focus-kb">
             Library
           </Link>
-          <Link href="/explorer" className="manual-scholar-footer__link focus-kb">
+          <Link href="/vocabulary" className="manual-scholar-footer__link focus-kb">
             Explorer
           </Link>
           <Link href="/practice" className="manual-scholar-footer__link focus-kb">

@@ -58,7 +58,7 @@ function DailyDiscoverySection({ discovery }: { discovery: TodaysDiscovery }) {
         <p className="break-russian font-reader text-xl text-[var(--ink)]">
           {discovery.displayLabel}
         </p>
-        <GhostButton href={discovery.explorerHref}>Explorer →</GhostButton>
+        <GhostButton href={discovery.explorerHref}>Vocabulary →</GhostButton>
       </div>
       {discovery.subtitle && discovery.subtitle !== "—" ? (
         <p className="text-metadata italic">&ldquo;{discovery.subtitle}&rdquo;</p>
@@ -139,7 +139,7 @@ function QuickLinksSection({ narrative }: { narrative: SessionJournal }) {
           <GhostButton href={continueHref}>Lire →</GhostButton>
         </li>
         <li>
-          <GhostButton href="/explorer">Explorer →</GhostButton>
+          <GhostButton href="/vocabulary">Vocabulary →</GhostButton>
         </li>
         <li>
           <GhostButton href={reviewHref}>Réviser →</GhostButton>

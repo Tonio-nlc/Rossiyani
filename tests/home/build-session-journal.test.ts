@@ -5,7 +5,7 @@ import { buildSessionJournal } from "@/lib/home/build-session-journal";
 const baseJournal = {
   todaysDiscovery: null,
   review: {
-    words: [{ label: "МЕТРО", href: "/explorer/lemmas/metro/noun", count: 2 }],
+    words: [{ label: "МЕТРО", href: "/vocabulary", count: 2 }],
     moreCount: 3,
   },
   featuredLesson: {
@@ -24,7 +24,7 @@ const baseJournal = {
     href: "/practice?structure=несмотря%20на",
     source: "related" as const,
   },
-  reviewHref: "/explorer/lemmas",
+  reviewHref: "/vocabulary",
 };
 
 describe("buildSessionJournal", () => {
@@ -68,7 +68,7 @@ describe("buildSessionJournal", () => {
         {
           id: "e1",
           label: "станция",
-          href: "/explorer/lemmas/station/noun",
+          href: "/vocabulary",
           kind: "lemma",
           visitedAt: "2026-06-15T11:00:00.000Z",
         },

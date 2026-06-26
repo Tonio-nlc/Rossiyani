@@ -21,16 +21,28 @@ const UniversalSearchDialog = dynamic(
 const NAV_SHORTCUTS = [
   { href: "/library", shortcut: "1" },
   { href: "/reader", shortcut: "2" },
-  { href: "/explorer", shortcut: "3" },
+  { href: "/vocabulary", shortcut: "3" },
   { href: "/practice", shortcut: "4" },
   { href: "/lessons", shortcut: "5" },
 ] as const;
 
+function resolvePageRootClass(pathname: string | null): string {
+  if (pathname?.startsWith("/practice")) {
+    return "practice-page-root";
+  }
+  if (pathname?.startsWith("/lessons")) {
+    return "lessons-page-root";
+  }
+  if (pathname?.startsWith("/vocabulary")) {
+    return "vocabulary-page-root";
+  }
+  return "v2-page-root";
+}
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const isPracticeRoute = pathname?.startsWith("/practice") ?? false;
-  const isLessonsRoute = pathname?.startsWith("/lessons") ?? false;
+  const pageRootClass = resolvePageRootClass(pathname);
   const [searchOpen, setSearchOpen] = useState(false);
   const openSearch = useCallback(() => setSearchOpen(true), []);
   const closeSearch = useCallback(() => setSearchOpen(false), []);
@@ -62,16 +74,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SearchProvider openSearch={openSearch}>
-      <div
-        className={[
-          "min-h-screen min-w-0 overflow-x-clip",
-          isPracticeRoute
-            ? "practice-page-root"
-            : isLessonsRoute
-              ? "lessons-page-root"
-              : "bg-[var(--paper)] text-[var(--ink)]",
-        ].join(" ")}
-      >
+      <div className={["min-h-screen min-w-0 overflow-x-clip", pageRootClass].join(" ")}>
         <OfflineBanner />
         <TopNavigation onOpenSearch={openSearch} />
         <SyncLearningSignals />

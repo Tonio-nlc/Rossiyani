@@ -1,13 +1,8 @@
 import type { KnowledgeSearchResult } from "@/features/search";
 
-import {
-  collocationPath,
-  conceptPath,
-  endingPath,
-  expressionPath,
-  lemmaPath,
-  textPath,
-} from "./explorer-routes";
+import { VOCABULARY_HOME } from "@/lib/vocabulary/paths";
+
+import { textPath } from "./explorer-routes";
 
 export type SearchNavItem = {
   id: string;
@@ -16,6 +11,10 @@ export type SearchNavItem = {
   sublabel?: string;
   href: string;
 };
+
+function vocabularyTabHref(tab: "words" | "expressions"): string {
+  return tab === "words" ? VOCABULARY_HOME : `${VOCABULARY_HOME}?tab=${tab}`;
+}
 
 export function buildSearchNavItems(results: KnowledgeSearchResult): SearchNavItem[] {
   const items: SearchNavItem[] = [];
@@ -26,7 +25,7 @@ export function buildSearchNavItems(results: KnowledgeSearchResult): SearchNavIt
       category: "Concepts",
       label: c.title,
       sublabel: c.category,
-      href: conceptPath(c.conceptKey),
+      href: vocabularyTabHref("words"),
     });
   }
 
@@ -36,7 +35,7 @@ export function buildSearchNavItems(results: KnowledgeSearchResult): SearchNavIt
       category: "Lemmes",
       label: l.lemma,
       sublabel: `${l.partOfSpeech} · ${l.occurrenceCount}×`,
-      href: lemmaPath(l.lemma, l.partOfSpeech),
+      href: vocabularyTabHref("words"),
     });
   }
 
@@ -46,7 +45,7 @@ export function buildSearchNavItems(results: KnowledgeSearchResult): SearchNavIt
       category: "Formes",
       label: f.original,
       sublabel: `${f.lemma}${f.ending ? ` · -${f.ending}` : ""}`,
-      href: lemmaPath(f.lemma, "noun"),
+      href: vocabularyTabHref("words"),
     });
   }
 
@@ -56,7 +55,7 @@ export function buildSearchNavItems(results: KnowledgeSearchResult): SearchNavIt
       category: "Terminaisons",
       label: `-${e.ending}`,
       sublabel: e.caseKey,
-      href: endingPath(e.ending, e.caseKey),
+      href: vocabularyTabHref("words"),
     });
   }
 
@@ -67,7 +66,7 @@ export function buildSearchNavItems(results: KnowledgeSearchResult): SearchNavIt
       category: isCollocation ? "Collocations" : "Expressions",
       label: p.label,
       sublabel: `${p.type} · ${p.occurrenceCount}×`,
-      href: isCollocation ? collocationPath(p.label) : expressionPath(p.label),
+      href: vocabularyTabHref("expressions"),
     });
   }
 

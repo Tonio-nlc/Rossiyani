@@ -83,7 +83,7 @@ function buildTiles(actions: ReadingSessionContinueAction[]): CompletionTile[] {
     {
       title: "Open Explorer",
       description: explorerAction?.rationale ?? "Dive deeper into grammar and lemmas",
-      href: explorerAction?.href ?? "/explorer",
+      href: explorerAction?.href ?? "/vocabulary",
       icon: "explorer",
     },
     {

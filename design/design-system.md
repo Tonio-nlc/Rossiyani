@@ -27,8 +27,7 @@ Inspiration mix: Busuu, Linear, Arc, Apple, Raycast, Airbnb — without copying 
 | Library | Warm sand `#faf7f2` |
 | Reader | Blue `#f0f5ff` |
 | Practice | Green `#f0fdf6` |
-| Explorer | Violet `#f5f3ff` |
-| Vocabulary | Amber `#fffbeb` |
+| Vocabulary | Slate `#f8fafc` (canvas + floating cards) |
 | Lessons | Neutral slate `#f8fafc` |
 
 Primary identity blue: `#0058BE`
@@ -78,7 +77,7 @@ All major areas share V2 tokens (`workspace-v2.css`): motion, depth, large radii
 | Library | `library-ws` | Warm sand |
 | Reader | `reader-ws` | Blue immersive |
 | Practice | `practice-shell` | Green |
-| Explorer | `explorer-study-root` | Violet |
+| Vocabulary | `vocabulary-shell` | Slate |
 | Lessons | `lessons-shell` | Slate |
 
 ---
@@ -90,9 +89,8 @@ All major areas share V2 tokens (`workspace-v2.css`): motion, depth, large radii
 Used for:
 
 * Home
-* Explorer
-* Practice
 * Vocabulary
+* Practice
 * Profile
 * Future analytics
 

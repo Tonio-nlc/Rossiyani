@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./workspace-v2.css";
+@import "./workspace-canvas.css";
 @import "./home-workspace.css";
 @import "./reader-workspace.css";
 @import "./library-workspace.css";
@@ -6445,8 +6446,8 @@ article:has(.manual-prose) .text-eyebrow {
 
 /* ─── Homepage — learning workspace ─── */
 .ds-editorial-container:has(.home-ws) {
-  max-width: 93.75rem;
-  background: #f7f9fb;
+  max-width: none;
+  background: transparent;
 }
 
 .ds-editorial-container:has(.home-landing),

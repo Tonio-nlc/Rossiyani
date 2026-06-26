@@ -1,10 +1,5 @@
-import {
-  collocationPath,
-  conceptPath,
-  expressionPath,
-  lemmaPath,
-} from "@/components/explorer/explorer-routes";
 import { practicePath } from "@/lib/practice/constants";
+import { vocabularyPath } from "@/lib/vocabulary";
 import { prisma } from "@/lib/prisma";
 
 import { getDateKey, discoverySeed, hashString, seededIndex } from "./discovery-seed";
@@ -21,25 +16,24 @@ import { DISCOVERY_TYPE_LABELS, DISCOVERY_TYPE_WEIGHTS } from "./types";
 
 function defaultExplorerHref(candidate: FeaturedCandidateRow): string {
   if (candidate.explorerHref) {
-    return candidate.explorerHref;
+    return candidate.explorerHref.replace(/^\/explorer(?:\/.*)?$/, vocabularyPath());
   }
 
   switch (candidate.type) {
     case "WORD":
-      return lemmaPath(candidate.lemma, candidate.partOfSpeech ?? "noun");
+      return vocabularyPath("words");
     case "COLLOCATION":
-      return collocationPath(candidate.lemma);
-    case "GRAMMAR":
-      return conceptPath(candidate.lemma);
     case "EXPRESSION":
     case "CONSTRUCTION":
     case "CONVERSATION":
     case "NATIVE_PHRASE":
     case "SLANG":
     case "REGIONAL":
-      return expressionPath(candidate.lemma);
+      return vocabularyPath("expressions");
+    case "GRAMMAR":
+      return vocabularyPath("words");
     default:
-      return `/explorer?q=${encodeURIComponent(candidate.lemma)}`;
+      return vocabularyPath("words");
   }
 }
 
@@ -61,7 +55,7 @@ function defaultReadExamplesHref(candidate: FeaturedCandidateRow): string {
     return candidate.readExamplesHref;
   }
 
-  return `/explorer?q=${encodeURIComponent(candidate.lemma)}`;
+  return vocabularyPath("words");
 }
 
 function toDiscoveryView(

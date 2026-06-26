@@ -95,7 +95,7 @@ export function ImportReportCard({
         <Link href="/library" className="home-ws-link focus-kb">
           Ouvrir dans la bibliothèque →
         </Link>
-        <Link href="/explorer" className="home-ws-link focus-kb">
+        <Link href="/vocabulary" className="home-ws-link focus-kb">
           Explorer les découvertes →
         </Link>
       </div>

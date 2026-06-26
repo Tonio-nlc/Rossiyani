@@ -3,9 +3,9 @@ import Link from "next/link";
 const PIPELINE_STEPS = [
   { id: "import", label: "Import", href: "/import", glyph: "↑" },
   { id: "reading", label: "Lecture", href: "/library", glyph: "◫" },
-  { id: "explorer", label: "Explorer", href: "/explorer", glyph: "◎" },
+  { id: "vocabulary", label: "Vocabulary", href: "/vocabulary", glyph: "◎" },
   { id: "practice", label: "Pratique", href: "/practice", glyph: "◇" },
-  { id: "vocabulary", label: "Vocabulaire", href: "/explorer/lemmas", glyph: "Aa" },
+  { id: "words", label: "Mots", href: "/vocabulary?tab=words", glyph: "Aa" },
 ] as const;
 
 export function ImportPipeline() {

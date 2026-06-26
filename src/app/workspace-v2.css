@@ -37,6 +37,9 @@
   --v2-area-vocabulary-glow: rgba(245, 158, 11, 0.12);
   --v2-area-manual: #f8fafc;
   --v2-area-manual-glow: rgba(100, 116, 139, 0.1);
+
+  /* Canvas aliases (see workspace-canvas.css) */
+  --v2-canvas-bg: #f8fafc;
 }
 
 /* Premium skeleton */

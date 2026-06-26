@@ -169,8 +169,8 @@ function SpacesPreview() {
   const spaces = [
     { icon: "📚", label: "Bibliothèque", desc: "Vos textes russes", href: "/library" },
     { icon: "🔬", label: "Reader", desc: "Lecture + microscope", href: "/library" },
-    { icon: "🧭", label: "Explorer", desc: "Graphe linguistique", href: "/explorer" },
-    { icon: "🔎", label: "Recherche", desc: "Trouver instantanément", href: "/explorer" },
+    { icon: "📚", label: "Vocabulary", desc: "Mémoire linguistique", href: "/vocabulary" },
+    { icon: "🔎", label: "Recherche", desc: "Trouver instantanément", href: "/vocabulary" },
   ];
 
   return (

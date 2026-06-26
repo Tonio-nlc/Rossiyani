@@ -22,7 +22,7 @@ const PRODUCTS = [
   {
     id: "explorer",
     title: "Explorer",
-    href: "/explorer",
+    href: "/vocabulary",
     description: "Navigate lemmas, cases, collocations and concepts as a network.",
     Icon: HomeIconExplore,
     preview: (

@@ -1,13 +1,9 @@
 import { getPhraseKnowledge } from "@/features/knowledge/get-phrase-knowledge";
 import { getTextEditorialMeta } from "@/features/texts/lookup-text-editorial-meta";
 import { prisma } from "@/lib/prisma";
-import {
-  collocationPath,
-  conceptPath,
-  expressionPath,
-  lemmaPath,
-  textPath,
-} from "@/components/explorer/explorer-routes";
+import { vocabularyPath } from "@/lib/vocabulary";
+
+import { textPath } from "@/components/explorer/explorer-routes";
 
 export type StructureContext = {
   label: string;
@@ -42,8 +38,8 @@ export async function getStructureContext(label: string): Promise<StructureConte
       readerCollectionName: editorial?.collectionName ?? null,
       explorerHref:
         phraseKnowledge.type === "COLLOCATION"
-          ? collocationPath(phraseKnowledge.label)
-          : expressionPath(phraseKnowledge.label),
+          ? vocabularyPath("expressions")
+          : vocabularyPath("expressions"),
     };
   }
 
@@ -70,7 +66,7 @@ export async function getStructureContext(label: string): Promise<StructureConte
       readerTitle: null,
       readerCollectionId: null,
       readerCollectionName: null,
-      explorerHref: lemmaPath(lemma.lemma, lemma.partOfSpeech),
+      explorerHref: vocabularyPath("words"),
     };
   }
 
@@ -84,7 +80,7 @@ export async function getStructureContext(label: string): Promise<StructureConte
       readerTitle: null,
       readerCollectionId: null,
       readerCollectionName: null,
-      explorerHref: conceptPath(concept.conceptKey),
+      explorerHref: vocabularyPath("words"),
     };
   }
 
@@ -97,6 +93,6 @@ export async function getStructureContext(label: string): Promise<StructureConte
     readerTitle: null,
     readerCollectionId: null,
     readerCollectionName: null,
-    explorerHref: `/explorer?q=${encodeURIComponent(trimmed)}`,
+    explorerHref: vocabularyPath("words"),
   };
 }

@@ -44,7 +44,7 @@ function dominantLevel(texts: TextListItem[]): CefrLevel | null {
 
 export function HomeWorkspaceCollections({ texts }: HomeWorkspaceCollectionsProps) {
   return (
-    <section className="home-ws-section home-ws-section--surface-pearl" aria-labelledby="home-ws-collections-heading">
+    <section className="home-ws-section" aria-labelledby="home-ws-collections-heading">
       <div className="home-ws-section__head">
         <h2 id="home-ws-collections-heading" className="home-ws-section__title">
           Featured collections

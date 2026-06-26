@@ -59,9 +59,9 @@ function loadArchive(): DiscoveryArchiveEntry[] {
           difficulty: "B1" as const,
           register: "neutral" as const,
           topics: [],
-          explorerHref: "/explorer",
+          explorerHref: "/vocabulary",
           practiceHref: "/practice",
-          readExamplesHref: "/explorer",
+          readExamplesHref: "/vocabulary",
           partOfSpeech: null,
         }))
       : [];

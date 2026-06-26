@@ -123,7 +123,7 @@ export function buildRecentDiscoveryCards(input: {
     const kind = kindFromJournalDetail(entry.detail);
     push({
       label: entry.label,
-      href: entry.href ?? "/explorer",
+      href: entry.href ?? "/vocabulary",
       kind,
       typeLabel: typeLabelFromJournalDetail(entry.detail, kind),
     });

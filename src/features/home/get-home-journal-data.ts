@@ -76,6 +76,6 @@ export async function getHomeJournalData(): Promise<HomeJournalData> {
     },
     featuredLesson,
     featuredPractice,
-    reviewHref: "/explorer/lemmas",
+    reviewHref: "/vocabulary",
   };
 }

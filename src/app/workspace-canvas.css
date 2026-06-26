@@ -1,0 +1,256 @@
+/* ─── Rossiyani V2 — universal canvas + floating cards ─── */
+
+:root {
+  --v2-canvas-bg: #f8fafc;
+  --v2-canvas-glow-a: rgba(100, 116, 139, 0.08);
+  --v2-canvas-glow-b: rgba(226, 232, 240, 0.55);
+  --v2-canvas-glow-c: rgba(148, 163, 184, 0.12);
+  --v2-card-border: rgba(100, 116, 139, 0.14);
+  --v2-card-border-hover: rgba(100, 116, 139, 0.28);
+  --v2-card-gradient: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  --v2-card-gradient-hover: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  --v2-gap-major: 4rem;
+  --v2-gap-section: 2rem;
+  --v2-gap-inner: 1.5rem;
+  --v2-gap-control: 1rem;
+  --v2-shell-max: 72rem;
+}
+
+/* ─── Page canvas (Home, Library, default) ─── */
+.v2-page-root {
+  --paper: var(--v2-canvas-bg);
+  --warm-ivory: #f1f5f9;
+  --surface-primary: #ffffff;
+  --background: var(--v2-canvas-bg);
+  background:
+    radial-gradient(ellipse 80% 55% at 0% 0%, var(--v2-canvas-glow-a), transparent),
+    radial-gradient(ellipse 60% 45% at 100% 5%, var(--v2-canvas-glow-b), transparent),
+    radial-gradient(ellipse 50% 40% at 50% 100%, var(--v2-canvas-glow-c), transparent),
+    var(--v2-canvas-bg);
+  color: var(--v2-heading, #111827);
+}
+
+.v2-page-root .ds-top-nav {
+  background: rgba(248, 250, 252, 0.82);
+  backdrop-filter: blur(18px) saturate(1.12);
+  border-bottom-color: rgba(100, 116, 139, 0.14);
+}
+
+.v2-page-root .ds-editorial-container:has(.home-ws),
+.v2-page-root .ds-editorial-container:has(.library-ws) {
+  max-width: none;
+  width: 100%;
+  padding-inline: 0;
+  background: transparent;
+  min-height: calc(100dvh - var(--header-height));
+}
+
+.v2-page-root .ds-app-main:has(.home-ws),
+.v2-page-root .ds-app-main:has(.library-ws) {
+  padding-block: 0;
+  background: transparent;
+}
+
+/* ─── Workspace shells — canvas visible, no secondary panels ─── */
+.v2-page-root .home-ws,
+.v2-page-root .library-ws {
+  max-width: var(--v2-shell-max);
+  gap: var(--v2-gap-major);
+  background: transparent;
+  color: var(--v2-heading, #111827);
+  --border: var(--v2-card-border);
+  --border-strong: var(--v2-card-border-hover);
+  --surface: #ffffff;
+  --page: transparent;
+  --shadow-sm: var(--v2-shadow);
+  --shadow-md: var(--v2-shadow);
+  --shadow-lg: var(--v2-shadow-hover);
+  --radius-md: var(--v2-radius-md);
+  --radius-lg: var(--v2-radius-lg);
+  --radius-hero: var(--v2-radius-xl);
+  --ink: var(--v2-heading);
+  --ink-secondary: var(--v2-body);
+  --ink-muted: var(--v2-label);
+}
+
+.v2-page-root .home-ws-section,
+.v2-page-root .library-ws-section {
+  gap: var(--v2-gap-section);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.v2-page-root .home-ws-section--secondary,
+.v2-page-root .library-ws-section--panel {
+  background: transparent;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.v2-page-root .home-ws__hero {
+  gap: var(--v2-gap-section);
+  background: transparent;
+}
+
+/* ─── Universal floating card ─── */
+.v2-card,
+.v2-page-root .home-ws-card,
+.v2-page-root .library-ws-card,
+.v2-page-root .home-ws-metric,
+.v2-page-root .home-ws-continue,
+.v2-page-root .home-ws-motivation,
+.v2-page-root .home-ws-explore-hub__explorer,
+.v2-page-root .home-ws-explore-hub__side-card,
+.v2-page-root .home-ws-explore-hub__recent,
+.v2-page-root .home-ws-practice-card,
+.v2-page-root .home-ws-reading-card,
+.v2-page-root .home-ws-featured-collection,
+.v2-page-root .home-ws-collection-card,
+.v2-page-root .home-ws-featured-lesson,
+.v2-page-root .library-ws-collection-card,
+.v2-page-root .library-ws-text-card,
+.v2-page-root .library-ws-discoveries-card {
+  border: 1px solid var(--v2-card-border);
+  border-radius: var(--v2-radius-lg);
+  background: var(--v2-card-gradient);
+  box-shadow: var(--v2-shadow);
+  transition:
+    transform var(--v2-duration) var(--v2-ease),
+    box-shadow var(--v2-duration) var(--v2-ease),
+    border-color var(--v2-duration) ease,
+    background var(--v2-duration) ease;
+}
+
+.v2-page-root .home-ws-card--hero,
+.v2-page-root .library-ws-collection-card--hero {
+  border-radius: var(--v2-radius-xl);
+}
+
+.v2-page-root .home-ws-card:hover,
+.v2-page-root .library-ws-card:hover,
+.v2-page-root .home-ws-metric:hover,
+.v2-page-root .home-ws-explore-hub__explorer:hover,
+.v2-page-root .home-ws-explore-hub__side-card:hover,
+.v2-page-root .home-ws-practice-card:hover,
+.v2-page-root .home-ws-reading-card:hover,
+.v2-page-root .home-ws-collection-card:hover,
+.v2-page-root .library-ws-collection-card:hover,
+.v2-page-root .library-ws-text-card:hover {
+  border-color: var(--v2-card-border-hover);
+  background: var(--v2-card-gradient-hover);
+  box-shadow: var(--v2-shadow-hover);
+  transform: translateY(-3px) scale(1.01);
+}
+
+/* Remove colored panel fills inside cards */
+.v2-page-root .home-ws-continue__visual,
+.v2-page-root .library-ws-collection-cover {
+  background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%);
+}
+
+.v2-page-root .home-ws-motivation {
+  border: 1px solid var(--v2-card-border);
+  background: var(--v2-card-gradient);
+  box-shadow: var(--v2-shadow);
+}
+
+.v2-page-root .home-ws-motivation:hover {
+  transform: none;
+}
+
+.v2-page-root .home-ws-metric--milestone,
+.v2-page-root .home-ws-practice-card--compose,
+.v2-page-root .home-ws-practice-card--context,
+.v2-page-root .home-ws-practice-card--saved {
+  background: var(--v2-card-gradient);
+}
+
+.v2-page-root .home-ws-explore-hub__recent {
+  border: 1px solid var(--v2-card-border);
+  background: var(--v2-card-gradient);
+  box-shadow: var(--v2-shadow);
+}
+
+.v2-page-root .home-ws-explore-hub__recent:hover {
+  border-color: var(--v2-card-border-hover);
+  box-shadow: var(--v2-shadow-hover);
+}
+
+/* Filters & nav chips float on canvas */
+.v2-page-root .library-ws-level-pill,
+.v2-page-root .library-ws-nav__link,
+.v2-page-root .library-ws-filter-chip {
+  border: 1px solid var(--v2-card-border);
+  border-radius: var(--v2-radius-pill);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--v2-shadow);
+}
+
+.v2-page-root .library-ws-level-pill--active,
+.v2-page-root .library-ws-nav__link--active {
+  border-color: rgba(0, 88, 190, 0.22);
+  background: #ffffff;
+  color: var(--v2-primary);
+}
+
+.v2-page-root .library-ws-search {
+  padding: var(--v2-gap-inner);
+  border: 1px solid var(--v2-card-border);
+  border-radius: var(--v2-radius-lg);
+  background: var(--v2-card-gradient);
+  box-shadow: var(--v2-shadow);
+}
+
+.v2-page-root .library-ws-nav {
+  padding-bottom: 0;
+  border-bottom: none;
+  gap: 0.5rem;
+}
+
+.v2-page-root .library-ws-separator {
+  display: none;
+}
+
+/* Unified buttons */
+.v2-page-root .home-ws-btn,
+.v2-page-root .library-ws-btn {
+  min-height: 2.875rem;
+  border-radius: var(--v2-radius-md);
+  box-shadow: 0 8px 24px rgba(0, 88, 190, 0.22);
+}
+
+.v2-page-root .home-ws-btn--ghost,
+.v2-page-root .library-ws-btn--ghost {
+  border: 1px solid var(--v2-card-border);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--v2-shadow);
+}
+
+.v2-page-root .home-ws-badge,
+.v2-page-root .library-ws-badge {
+  background: #f1f5f9;
+  color: var(--v2-body);
+}
+
+.v2-page-root .home-ws-badge--muted,
+.v2-page-root .library-ws-badge--muted {
+  background: #f1f5f9;
+  color: var(--v2-label);
+}
+
+.v2-page-root .library-ws .lib-saved-sentence-card {
+  border: 1px solid var(--v2-card-border);
+  border-radius: var(--v2-radius-lg);
+  background: var(--v2-card-gradient);
+  box-shadow: var(--v2-shadow);
+}
+
+.v2-page-root .ds-app-main {
+  background: transparent;
+}
+
+.v2-page-root .ds-editorial-container {
+  background: transparent;
+}

@@ -74,7 +74,7 @@ function isSuccessVerdict(verdict: ComposeVerdict): boolean {
 export function PracticeAnalysisView(props: PracticeAnalysisViewProps) {
   const { analysis, originalSentence, structureContext } = props;
   const primaryStructure = analysis.structures[0];
-  const structureHref = primaryStructure?.href ?? "/explorer";
+  const structureHref = primaryStructure?.href ?? "/vocabulary";
   const success = isSuccessVerdict(analysis.verdict);
 
   return (
@@ -241,7 +241,7 @@ export function PracticeAnalysisView(props: PracticeAnalysisViewProps) {
                     <Reference
                       href={
                         primaryStructure?.href ??
-                        `/explorer?q=${encodeURIComponent(props.rewriteResult.text)}`
+                        `/vocabulary`
                       }
                     >
                       Explorer →

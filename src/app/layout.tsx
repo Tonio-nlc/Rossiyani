@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import { EB_Garamond, Hanken_Grotesk, Inter } from "next/font/google";
 
-import { ExplorerPathTracker } from "@/components/explorer/explorer-path-tracker";
+import { ToastProvider } from "@/components/design-system";
 import { AppShell } from "@/components/layout";
 import { OnboardingGate } from "@/components/onboarding";
-import { ToastProvider } from "@/components/design-system";
 
 import "./globals.css";
 import "./workspace-v2-areas.css";
 import "./practice-workspace.css";
 import "./lessons-workspace.css";
+import "./vocabulary-workspace.css";
 
 const fontEditorial = EB_Garamond({
   subsets: ["latin", "cyrillic"],
@@ -46,7 +46,6 @@ export default function RootLayout({
     >
       <body>
         <ToastProvider>
-          <ExplorerPathTracker />
           <OnboardingGate>
             <AppShell>{children}</AppShell>
           </OnboardingGate>

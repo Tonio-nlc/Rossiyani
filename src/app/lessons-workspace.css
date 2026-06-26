@@ -1,15 +1,15 @@
 /* ─── Lessons Workspace — V2 premium learning environment (slate) ─── */
 
 .lessons-page-root {
-  --lessons-page-bg: var(--v2-area-manual, #f8fafc);
+  --lessons-page-bg: var(--v2-canvas-bg, var(--v2-area-manual, #f8fafc));
   --paper: var(--lessons-page-bg);
   --warm-ivory: #f1f5f9;
   --surface-primary: #ffffff;
   --background: var(--lessons-page-bg);
   background:
-    radial-gradient(ellipse 80% 55% at 0% 0%, var(--v2-area-manual-glow, rgba(100, 116, 139, 0.12)), transparent),
-    radial-gradient(ellipse 60% 45% at 100% 5%, rgba(226, 232, 240, 0.65), transparent),
-    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(148, 163, 184, 0.15), transparent),
+    radial-gradient(ellipse 80% 55% at 0% 0%, var(--v2-canvas-glow-a, var(--v2-area-manual-glow, rgba(100, 116, 139, 0.08))), transparent),
+    radial-gradient(ellipse 60% 45% at 100% 5%, var(--v2-canvas-glow-b, rgba(226, 232, 240, 0.55)), transparent),
+    radial-gradient(ellipse 50% 40% at 50% 100%, var(--v2-canvas-glow-c, rgba(148, 163, 184, 0.12)), transparent),
     var(--lessons-page-bg);
   color: var(--v2-heading, #111827);
 }

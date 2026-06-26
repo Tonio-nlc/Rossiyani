@@ -84,7 +84,7 @@ export function ReaderSentenceSidebar({
           Pratiquer →
         </Link>
         <Link
-          href={`/explorer?q=${encodeURIComponent(sentenceText)}`}
+          href="/vocabulary"
           className="reader-sentence-sidebar__link focus-kb"
         >
           Explorer →
