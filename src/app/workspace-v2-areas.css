@@ -73,12 +73,7 @@
   background: rgba(255, 255, 255, 0.92);
 }
 
-/* Practice — green accent (see practice-workspace.css for full V2) */
-.ds-editorial-container:has(.practice-shell),
-.ds-editorial-container:has(.practice-my-sentences) {
-  background: var(--v2-area-practice);
-}
-
+/* Practice — green accent (full canvas in practice-workspace.css) */
 /* Explorer — violet accent */
 .ds-editorial-container:has(.explorer-study-root) {
   background: var(--v2-area-explorer);

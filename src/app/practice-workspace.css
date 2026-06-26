@@ -1,17 +1,85 @@
 /* ─── Practice Workspace — V2 premium learning environment ─── */
 
+/* Full-page mint canvas — no ivory bleed from parent shell */
+.practice-page-root {
+  --practice-page-bg: var(--v2-area-practice, #f0fdf6);
+  --paper: var(--practice-page-bg);
+  --warm-ivory: #ecfdf5;
+  --surface-primary: #ffffff;
+  --background: var(--practice-page-bg);
+  background:
+    radial-gradient(ellipse 80% 55% at 0% 0%, var(--v2-area-practice-glow, rgba(16, 185, 129, 0.14)), transparent),
+    radial-gradient(ellipse 60% 45% at 100% 5%, rgba(209, 250, 229, 0.55), transparent),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(167, 243, 208, 0.2), transparent),
+    var(--practice-page-bg);
+  color: var(--v2-heading, #111827);
+}
+
+.practice-page-root .ds-top-nav {
+  background: rgba(240, 253, 246, 0.78);
+  backdrop-filter: blur(18px) saturate(1.15);
+  border-bottom-color: rgba(16, 185, 129, 0.12);
+}
+
+.practice-page-root .ds-editorial-container:has(.practice-shell),
+.practice-page-root .ds-editorial-container:has(.practice-my-sentences) {
+  max-width: none;
+  width: 100%;
+  padding-inline: 0;
+  background: transparent;
+  min-height: calc(100dvh - var(--header-height));
+}
+
 .ds-editorial-container:has(.practice-shell),
 .ds-editorial-container:has(.practice-my-sentences) {
-  max-width: 93.75rem;
-  background:
-    radial-gradient(ellipse 70% 50% at 0% 0%, var(--v2-area-practice-glow, rgba(16, 185, 129, 0.12)), transparent),
-    radial-gradient(ellipse 50% 40% at 100% 8%, rgba(209, 250, 229, 0.45), transparent),
-    var(--v2-area-practice, #f0fdf6);
+  max-width: none;
+  width: 100%;
+  padding-inline: 0;
+  background: transparent;
 }
 
 .ds-app-main:has(.practice-shell),
 .ds-app-main:has(.practice-my-sentences) {
   padding-block: 0;
+  background: transparent;
+}
+
+/* Override legacy ivory surfaces from globals.css inside Practice */
+.practice-shell :is(
+    .practice-main-card,
+    .practice-context-card,
+    .practice-result-card,
+    .practice-learning-card,
+    .practice-history__item,
+    .practice-microscope,
+    .practice-advanced,
+    .practice-progress-steps,
+    .practice-exercise-header__source,
+    .practice-main-card__actions,
+    .practice-my-sentences__card,
+    .ds-exercise-card
+  ) {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fffc 100%);
+}
+
+.practice-shell .practice-mode-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf6 100%);
+}
+
+.practice-shell .practice-mode-card:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #ecfdf5 100%);
+}
+
+.practice-shell .practice-result-card--success {
+  background: linear-gradient(180deg, #ffffff 0%, #ecfdf5 100%);
+}
+
+.practice-shell .practice-context-card--prompt {
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf6 100%);
+}
+
+.practice-shell .ds-exercise-card-active {
+  background: linear-gradient(180deg, #ffffff 0%, #ecfdf5 100%);
 }
 
 .practice-shell,

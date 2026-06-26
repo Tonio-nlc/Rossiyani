@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { EditorialContainer, TopNavigation } from "@/components/design-system";
@@ -28,6 +28,8 @@ const NAV_SHORTCUTS = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const isPracticeRoute = pathname?.startsWith("/practice") ?? false;
   const [searchOpen, setSearchOpen] = useState(false);
   const openSearch = useCallback(() => setSearchOpen(true), []);
   const closeSearch = useCallback(() => setSearchOpen(false), []);
@@ -59,7 +61,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SearchProvider openSearch={openSearch}>
-      <div className="min-h-screen min-w-0 overflow-x-clip bg-[var(--paper)] text-[var(--ink)]">
+      <div
+        className={[
+          "min-h-screen min-w-0 overflow-x-clip",
+          isPracticeRoute ? "practice-page-root" : "bg-[var(--paper)] text-[var(--ink)]",
+        ].join(" ")}
+      >
         <OfflineBanner />
         <TopNavigation onOpenSearch={openSearch} />
         <SyncLearningSignals />
