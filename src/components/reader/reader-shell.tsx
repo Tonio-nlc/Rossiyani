@@ -2,8 +2,6 @@
 
 import type { ReactNode } from "react";
 
-import { WorkspaceAppSidebar } from "@/components/layout/workspace-app-sidebar";
-
 type ReaderShellProps = {
   children: ReactNode;
   explorer: ReactNode;
@@ -21,7 +19,6 @@ export function ReaderShell({
 }: ReaderShellProps) {
   return (
     <div className="reader-ws">
-      <WorkspaceAppSidebar />
       <div className="reader-ws__body">
         <div className="reader-ws__main">{children}</div>
         <aside
