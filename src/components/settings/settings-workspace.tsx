@@ -49,12 +49,11 @@ export function SettingsWorkspace() {
 
       <div className="settings-workspace__main">
         <header className="settings-workspace__hero">
-          <p className="settings-workspace__eyebrow">Settings</p>
-          <h1 className="settings-workspace__title">Workspace &amp; Preferences</h1>
+          <p className="settings-workspace__eyebrow">Préférences</p>
+          <h1 className="settings-workspace__title">Paramètres</h1>
           <p className="settings-workspace__lead">
-            Configure your reading, exploration and practice environment.
+            Un espace calme pour affiner votre lecture, votre pratique et votre identité d&apos;apprenant.
           </p>
-          <div className="settings-workspace__rule" aria-hidden />
         </header>
 
         <SettingsSectionPanel section={section} />

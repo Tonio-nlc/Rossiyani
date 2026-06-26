@@ -13,8 +13,8 @@ export function SettingsSidebar({ activeSection, onSelect }: SettingsSidebarProp
   return (
     <aside className="settings-workspace__sidebar" aria-label="Settings navigation">
       <div className="settings-workspace__sidebar-head">
-        <p className="settings-workspace__sidebar-title">Settings</p>
-        <p className="settings-workspace__sidebar-subtitle">Workspace &amp; Preferences</p>
+        <p className="settings-workspace__sidebar-title">Navigation</p>
+        <p className="settings-workspace__sidebar-subtitle">Paramètres</p>
       </div>
 
       <nav className="settings-workspace-nav">

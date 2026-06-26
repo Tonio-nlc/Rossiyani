@@ -52,7 +52,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={t.id}
             className={[
-              "animate-toast-in pointer-events-auto ds-toast",
+              "animate-v2-in pointer-events-auto ds-toast",
               t.variant === "error" ? "ds-toast-error" : "",
               t.variant === "success" ? "ds-toast-success" : "",
             ].join(" ")}

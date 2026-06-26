@@ -14,6 +14,15 @@ type UniversalSearchDialogProps = {
   onClose: () => void;
 };
 
+function SpotlightIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden className="v2-spotlight__icon">
+      <circle cx="7" cy="7" r="4.25" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M10.25 10.25 13 13" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function UniversalSearchDialog({ open, onClose }: UniversalSearchDialogProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -138,90 +147,78 @@ export function UniversalSearchDialog({ open, onClose }: UniversalSearchDialogPr
 
   let flatIndex = -1;
   const hasResults = navItems.length > 0;
+  const trimmed = query.trim();
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[8vh] sm:pt-[10vh]"
+      className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[10vh] sm:pt-[12vh]"
       onClick={onClose}
       role="presentation"
     >
-      <button type="button" aria-label="Fermer" className="ds-dialog-backdrop absolute inset-0" onClick={onClose} />
+      <button type="button" aria-label="Fermer" className="v2-overlay-backdrop absolute inset-0" onClick={onClose} />
       <div
         ref={dialogRef}
-        className="animate-search-in ds-dialog relative w-full max-w-xl overflow-hidden p-0"
+        className="v2-spotlight animate-v2-in relative w-full"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-label="Recherche universelle"
+        aria-label="Recherche"
       >
-        <div className="flex items-start gap-2 border-b border-[var(--hairline)] px-4 py-3">
-          <div className="min-w-0 flex-1">
-            <input
-              ref={inputRef}
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={onInputKeyDown}
-              placeholder="Lemme, terminaison, concept, collocation, texte…"
-              aria-label="Rechercher"
-              className="focus-kb ds-search-input w-full bg-transparent text-base outline-none"
-            />
-            <p className="mt-1 text-[10px] text-[var(--ink-muted)]">
-              ↑↓ naviguer · Entrée ouvrir · Échap fermer
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Fermer"
-            className="focus-kb shrink-0 text-sm text-[var(--ink-muted)] hover:text-[var(--ink)]"
-          >
-            ✕
-          </button>
+        <div className="v2-spotlight__input-row">
+          <SpotlightIcon />
+          <input
+            ref={inputRef}
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={onInputKeyDown}
+            placeholder="Mots, textes, leçons…"
+            aria-label="Rechercher dans Rossiyani"
+            className="v2-spotlight__input focus-kb"
+            autoComplete="off"
+            spellCheck={false}
+          />
+          <kbd className="v2-spotlight__kbd" aria-hidden>
+            esc
+          </kbd>
         </div>
 
-        <div ref={listRef} className="max-h-[min(50vh,420px)] overflow-y-auto overscroll-contain p-3">
+        <div ref={listRef} className="v2-spotlight__body">
           {loading ? (
-            <div className="space-y-2 px-2 py-2">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-3/4" />
+            <div aria-hidden>
+              <Skeleton className="v2-spotlight__skeleton-row w-full" />
+              <Skeleton className="v2-spotlight__skeleton-row w-full" />
+              <Skeleton className="v2-spotlight__skeleton-row w-4/5" />
             </div>
           ) : fetchError ? (
-            <p className="px-2 py-4 text-sm text-[var(--error)]">
-              Recherche indisponible. Vérifiez votre connexion.
+            <p className="v2-spotlight__error">
+              Connexion indisponible. Vérifiez votre réseau et réessayez.
             </p>
-          ) : !hasResults && query.trim() ? (
-            <p className="px-2 py-4 text-sm text-[var(--muted)]">Aucun résultat pour « {query} ».</p>
           ) : hasResults ? (
-            <div className="space-y-4">
+            <div>
               {[...grouped.entries()].map(([category, items]) => (
                 <section key={category}>
-                  <h3 className="px-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
-                    {category}
-                  </h3>
-                  <ul className="mt-1 space-y-0.5">
+                  <h3 className="v2-spotlight__group-label">{category}</h3>
+                  <ul>
                     {items.map((item) => {
                       flatIndex += 1;
                       const index = flatIndex;
                       const active = index === activeIndex;
                       return (
-                        <li key={item.id} className="animate-search-in">
+                        <li key={item.id}>
                           <Link
                             href={item.href}
                             data-search-index={index}
                             onClick={onClose}
                             onMouseEnter={() => setActiveIndex(index)}
                             className={[
-                              "focus-kb block px-3 py-2 transition",
-                              active
-                                ? "border-l-2 border-[var(--color-primary)] bg-[var(--surface-primary)]"
-                                : "hover:bg-[var(--surface-primary)]",
+                              "v2-spotlight__result focus-kb",
+                              active ? "v2-spotlight__result--active" : "",
                             ].join(" ")}
                           >
-                            <span className="font-reader font-medium">{item.label}</span>
+                            <span>{item.label}</span>
                             {item.sublabel ? (
-                              <span className="ml-2 text-xs text-[var(--muted)]">{item.sublabel}</span>
+                              <span className="v2-spotlight__result-sublabel">{item.sublabel}</span>
                             ) : null}
                           </Link>
                         </li>
@@ -231,12 +228,29 @@ export function UniversalSearchDialog({ open, onClose }: UniversalSearchDialogPr
                 </section>
               ))}
             </div>
+          ) : trimmed ? (
+            <p className="v2-spotlight__hint">
+              Aucun résultat pour <strong>« {trimmed} »</strong>. Essayez un mot russe ou un titre de texte.
+            </p>
           ) : (
-            <p className="px-2 py-4 text-sm text-[var(--muted)]">
-              Tapez pour explorer le graphe de connaissances.
+            <p className="v2-spotlight__hint">
+              Recherchez un mot, une expression, un texte ou une leçon — partout dans Rossiyani.
             </p>
           )}
         </div>
+
+        <footer className="v2-spotlight__footer" aria-hidden={!hasResults && !trimmed}>
+          <span>
+            <kbd>↑</kbd>
+            <kbd>↓</kbd> naviguer
+          </span>
+          <span>
+            <kbd>↵</kbd> ouvrir
+          </span>
+          <span>
+            <kbd>esc</kbd> fermer
+          </span>
+        </footer>
       </div>
     </div>
   );

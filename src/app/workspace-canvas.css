@@ -39,7 +39,8 @@
 }
 
 .v2-page-root .ds-app-main:has(.home-ws),
-.v2-page-root .ds-app-main:has(.library-ws) {
+.v2-page-root .ds-app-main:has(.library-ws),
+.v2-page-root .ds-app-main:has(.settings-workspace) {
   padding-block: 0;
   background: transparent;
 }

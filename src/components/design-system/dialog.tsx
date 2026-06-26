@@ -71,13 +71,13 @@ export function Dialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="ds-dialog-title"
-        className={["ds-dialog animate-search-in relative w-full", sizeClass].join(" ")}
+        className={["ds-dialog animate-v2-in relative w-full", sizeClass].join(" ")}
       >
-        <h2 id="ds-dialog-title" className="font-reader text-lg text-[var(--ink)]">
+        <h2 id="ds-dialog-title" className="v2-dialog__title">
           {title}
         </h2>
         {description ? (
-          <div className="mt-3 text-sm leading-relaxed text-[var(--ink-muted)]">{description}</div>
+          <div className="v2-dialog__description">{description}</div>
         ) : null}
         {children ? <div className="mt-4">{children}</div> : null}
       </div>

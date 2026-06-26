@@ -3,14 +3,15 @@ import { EB_Garamond, Hanken_Grotesk, Inter } from "next/font/google";
 
 import { ToastProvider } from "@/components/design-system";
 import { AppShell } from "@/components/layout";
-import { OnboardingGate } from "@/components/onboarding";
 
 import "./globals.css";
 import "./rossiyani-header.css";
+import "./rossiyani-primitives.css";
 import "./workspace-v2-areas.css";
 import "./practice-workspace.css";
 import "./lessons-workspace.css";
 import "./vocabulary-workspace.css";
+import "./settings-workspace.css";
 
 const fontEditorial = EB_Garamond({
   subsets: ["latin", "cyrillic"],
@@ -47,9 +48,7 @@ export default function RootLayout({
     >
       <body>
         <ToastProvider>
-          <OnboardingGate>
-            <AppShell>{children}</AppShell>
-          </OnboardingGate>
+          <AppShell>{children}</AppShell>
         </ToastProvider>
       </body>
     </html>

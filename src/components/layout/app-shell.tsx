@@ -21,6 +21,9 @@ const UniversalSearchDialog = dynamic(
 import { NAV_KEYBOARD_SHORTCUTS } from "@/lib/navigation/main-nav";
 
 function resolvePageRootClass(pathname: string | null): string {
+  if (pathname?.startsWith("/settings")) {
+    return "settings-page-root v2-page-root";
+  }
   if (pathname?.startsWith("/practice")) {
     return "practice-page-root";
   }

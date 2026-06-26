@@ -1969,6 +1969,46 @@
   animation: ws-v2-fade-up var(--v2-duration-slow, 380ms) var(--v2-ease, ease);
 }
 
+/* Explorer loading skeleton */
+.reader-ws-explorer__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.35rem 0.25rem 0.5rem;
+}
+
+.reader-ws-explorer__skeleton-word {
+  height: 3.25rem;
+  border-radius: var(--v2-radius-lg, 24px);
+}
+
+.reader-ws-explorer__skeleton-tabs {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.reader-ws-explorer__skeleton-tab {
+  flex: 1;
+  height: 2rem;
+  border-radius: var(--v2-radius-pill, 9999px);
+}
+
+.reader-ws-explorer__skeleton-card {
+  height: 5.5rem;
+  border-radius: var(--v2-radius-lg, 24px);
+}
+
+.reader-ws-explorer__skeleton-card--short {
+  height: 3.75rem;
+}
+
+.reader-microscope__definition-skeleton {
+  height: 1.125rem;
+  width: 72%;
+  margin-top: 0.35rem;
+  border-radius: var(--v2-radius-pill, 9999px);
+}
+
 /* Context tab */
 .reader-ws-explorer__context-word {
   margin: 0;

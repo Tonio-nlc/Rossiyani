@@ -2,6 +2,8 @@
 
 import { useMemo } from "react";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 import { buildReaderMicroscopeView } from "@/lib/reader/build-reader-microscope-view";
 import type { ReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel-data";
 import type { WordDetailGraph } from "@/types/word-detail-graph";
@@ -46,7 +48,7 @@ export function ReaderMarginPanel({
         {view.translation ? (
           <p className="reader-microscope__definition">{view.translation}</p>
         ) : loading ? (
-          <p className="reader-microscope__definition reader-microscope__definition--loading">…</p>
+          <Skeleton className="reader-microscope__definition-skeleton" />
         ) : null}
         {view.frequencyLabel ? (
           <p className="reader-microscope__frequency">{view.frequencyLabel}</p>

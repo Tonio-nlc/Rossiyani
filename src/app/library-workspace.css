@@ -774,32 +774,36 @@
 .library-ws-text-card__menu {
   position: absolute;
   right: 0;
-  top: calc(100% + 0.25rem);
+  top: calc(100% + 0.35rem);
   z-index: 20;
-  min-width: 9.5rem;
-  padding: 0.25rem;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-  box-shadow: none;
+  min-width: 10rem;
+  padding: 0.35rem;
+  border: 1px solid rgba(100, 116, 139, 0.14);
+  border-radius: var(--v2-radius-md, 20px);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: var(--v2-shadow-hover);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .library-ws-text-card__menu-item {
   display: block;
   width: 100%;
-  padding: 0.45rem 0.65rem;
+  padding: 0.55rem 0.75rem;
   border: none;
-  border-radius: 8px;
+  border-radius: calc(var(--v2-radius-md, 20px) - 6px);
   background: transparent;
-  font-family: var(--font-sans);
-  font-size: 0.8125rem;
+  font-family: var(--font-workspace), var(--font-ui), system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
   text-align: left;
-  color: var(--ink);
+  color: var(--v2-heading, #111827);
   cursor: pointer;
+  transition: background var(--v2-duration, 220ms) var(--v2-ease);
 }
 
 .library-ws-text-card__menu-item:hover {
-  background: var(--tag-bg);
+  background: rgba(0, 88, 190, 0.07);
 }
 
 .library-ws-text-card__menu-item--danger {

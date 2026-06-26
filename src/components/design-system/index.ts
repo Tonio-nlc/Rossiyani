@@ -1,5 +1,6 @@
 export { CollectionCard } from "./collection-card";
 export { ConfirmDialog, Dialog } from "./dialog";
+export { ErrorPage } from "./error-page";
 export { Divider } from "./divider";
 export { EditorialCard } from "./editorial-card";
 export { EditorialContainer } from "./editorial-container";

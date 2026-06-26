@@ -107,6 +107,32 @@
   color: var(--v2-body);
 }
 
+.ds-empty-state__visual {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+  border-radius: var(--v2-radius-md, 20px);
+  background: rgba(0, 88, 190, 0.08);
+  color: var(--v2-primary, #0058be);
+}
+
+.ds-empty-state__eyebrow {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-workspace), var(--font-ui), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--v2-label, #94a3b8);
+}
+
+.ds-empty-state__action {
+  margin-top: 1.5rem;
+}
+
 /* Fade-up entrance */
 .animate-fade-up {
   animation: ws-v2-fade-up var(--v2-duration-slow) var(--v2-ease) both;

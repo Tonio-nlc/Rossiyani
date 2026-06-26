@@ -118,6 +118,23 @@ No other main nav entries. Profile lives at `/settings` (secondary). Search open
 | ≥ 1100px | Search label + `/` kbd hint; wider nav links |
 | ≥ 1280px | Profile label visible |
 
+### Shared primitives (`rossiyani-primitives.css`)
+
+Spotlight search, dialogs, toasts, buttons, error pages, menus — unified V2 motion (`220ms` / `380ms`, `cubic-bezier(0.22, 1, 0.36, 1)`).
+
+| Primitive | Class prefix |
+|-----------|----------------|
+| Search overlay | `v2-spotlight` |
+| Modal / dialog | `ds-dialog` (V2 overrides) |
+| Toast | `ds-toast` |
+| Error page | `v2-error-page` |
+| Dropdown menu | `v2-menu` |
+| Skeleton | `ws-v2-skeleton` / `skeleton-shimmer` |
+
+Settings: `settings-workspace.css` + profile hero on `#account`.
+
+Onboarding first-run flow: **removed** — users land directly in the product.
+
 ---
 
 # Interface Architecture (legacy notes)

@@ -13,6 +13,7 @@ import type { ReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel
 import { isReaderWordSaved, saveReaderWord } from "@/lib/reader/saved-words";
 import type { WordDetailGraph } from "@/types/word-detail-graph";
 
+import { ReaderExplorerSkeleton } from "./reader-explorer-skeleton";
 import { ReaderIconSave, ReaderIconSpeaker } from "./reader-icon-button";
 
 type ReaderExplorerPanelProps = {
@@ -191,9 +192,7 @@ export function ReaderExplorerPanel({
       </div>
 
       <div className="reader-ws-explorer__panel" role="tabpanel">
-        {loading && !view ? (
-          <p className="reader-ws-explorer__loading">Loading word details…</p>
-        ) : null}
+        {loading && !view ? <ReaderExplorerSkeleton /> : null}
 
         {activeTab === "dictionary" ? (
           <div className="reader-ws-explorer__stack">
