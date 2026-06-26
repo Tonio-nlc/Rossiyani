@@ -22,11 +22,11 @@ export type LessonsCollection = {
   difficulty?: string;
 };
 
-const FEATURED_COLLECTIONS: LessonsCollection[] = [
+const HOMEPAGE_COLLECTIONS: LessonsCollection[] = [
   {
     id: "foundations",
     title: "Fondations du russe",
-    description: "Alphabet, prononciation et premières structures pour démarrer sereinement.",
+    description: "Alphabet, prononciation et premières structures — idéal pour démarrer.",
     href: lessonsLevelPath("a1"),
     kind: "featured",
     accent: "#0ea5e9",
@@ -37,8 +37,8 @@ const FEATURED_COLLECTIONS: LessonsCollection[] = [
   {
     id: "cases",
     title: "Les six cas",
-    description: "Comprendre la logique des déclinaisons — le cœur de la grammaire russe.",
-    href: lessonsCurriculumPath("nominative"),
+    description: "La logique des déclinaisons, pilier de la grammaire russe.",
+    href: lessonsThemePath("declensions"),
     kind: "curriculum",
     accent: "#6366f1",
     glow: "rgba(99, 102, 241, 0.14)",
@@ -48,7 +48,7 @@ const FEATURED_COLLECTIONS: LessonsCollection[] = [
   {
     id: "verbs",
     title: "Verbes & aspect",
-    description: "Conjugaisons, paires d'aspect et verbes de mouvement en contexte.",
+    description: "Conjugaisons, aspect et verbes de mouvement en contexte.",
     href: lessonsThemePath("verbs"),
     kind: "theme",
     accent: "#059669",
@@ -57,20 +57,9 @@ const FEATURED_COLLECTIONS: LessonsCollection[] = [
     difficulty: "A2–B2",
   },
   {
-    id: "motion",
-    title: "Verbes de mouvement",
-    description: "Идти, ехать, ходить — maîtriser l'espace et le déplacement en russe.",
-    href: lessonsThemePath("motion-verbs"),
-    kind: "theme",
-    accent: "#0891b2",
-    glow: "rgba(8, 145, 178, 0.14)",
-    icon: "travel",
-    difficulty: "A2–B1",
-  },
-  {
     id: "everyday",
     title: "Russe du quotidien",
-    description: "Expressions, communication et registre pour parler naturellement.",
+    description: "Expressions et communication pour parler naturellement.",
     href: lessonsThemePath("expressions"),
     kind: "theme",
     accent: "#d97706",
@@ -81,13 +70,33 @@ const FEATURED_COLLECTIONS: LessonsCollection[] = [
   {
     id: "culture",
     title: "Culture & civilisation",
-    description: "Contexte culturel, traditions et nuances qui donnent vie à la langue.",
+    description: "Contexte culturel et nuances qui donnent vie à la langue.",
     href: lessonsThemePath("culture"),
     kind: "theme",
     accent: "#db2777",
     glow: "rgba(219, 39, 119, 0.12)",
     icon: "culture",
     difficulty: "Tous niveaux",
+  },
+];
+
+/** Curated entry points — homepage only, no overlap with lesson grids below. */
+export function getHomepageCollections(): LessonsCollection[] {
+  return HOMEPAGE_COLLECTIONS;
+}
+
+const FEATURED_COLLECTIONS: LessonsCollection[] = [
+  ...HOMEPAGE_COLLECTIONS,
+  {
+    id: "motion",
+    title: "Verbes de mouvement",
+    description: "Идти, ехать, ходить — maîtriser l'espace et le déplacement en russe.",
+    href: lessonsThemePath("motion-verbs"),
+    kind: "theme",
+    accent: "#0891b2",
+    glow: "rgba(8, 145, 178, 0.14)",
+    icon: "travel",
+    difficulty: "A2–B1",
   },
   {
     id: "pronunciation",

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { MANUAL_CATEGORY_LABELS, MANUAL_LEVEL_LABELS } from "@/features/manual";
+import { MANUAL_CATEGORY_LABELS, MANUAL_LEVEL_LABELS } from "@/features/manual/constants";
 import type { ManualLessonSummary } from "@/features/manual/types";
 import { formatManualCardTitle } from "@/lib/manual/manual-card-layout";
 import { lessonPath } from "@/lib/lessons/paths";

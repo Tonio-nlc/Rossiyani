@@ -70,6 +70,41 @@
   }
 }
 
+.lessons-section--compact {
+  gap: var(--lessons-gap-control);
+}
+
+.lessons-level-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.lessons-level-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0 1.1rem;
+  border: 1px solid var(--lessons-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--v2-heading, #111827);
+  text-decoration: none;
+  box-shadow: var(--v2-shadow);
+  transition:
+    transform var(--v2-duration, 220ms) ease,
+    border-color var(--v2-duration, 220ms) ease,
+    color var(--v2-duration, 220ms) ease;
+}
+
+.lessons-level-pill:hover {
+  border-color: var(--lessons-border-hover);
+  color: var(--lessons-accent);
+  transform: translateY(-1px);
+}
+
 /* ─── Hub hero ─── */
 .lessons-hero {
   display: flex;

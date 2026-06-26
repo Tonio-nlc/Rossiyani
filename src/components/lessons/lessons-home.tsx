@@ -6,6 +6,7 @@ import { LESSONS_HOME } from "@/lib/lessons/paths";
 
 import { LessonsCollectionCard } from "./lessons-collection-card";
 import { LessonsContinuePanel } from "./lessons-continue-panel";
+import { LessonsDiscoverSection } from "./lessons-discover-section";
 import { LessonsLessonGrid } from "./lessons-lesson-card";
 
 export function LessonsHome() {
@@ -17,99 +18,57 @@ export function LessonsHome() {
         <p className="lessons-hero__eyebrow">Apprentissage structuré</p>
         <h1 className="lessons-hero__title">Leçons</h1>
         <p className="lessons-hero__lead">
-          Grammaire, vocabulaire et culture — un parcours premium pour progresser en russe avec
-          clarté et rythme.
+          Choisissez un parcours, reprenez votre lecture, ou explorez une leçon — sans vous perdre
+          dans le catalogue.
         </p>
         <div className="lessons-hero__metrics">
           <span className="lessons-metric">{hub.stats.totalLessons} leçons</span>
           {hub.stats.visitedCount > 0 ? (
-            <span className="lessons-metric">{hub.stats.visitedCount} explorées</span>
+            <span className="lessons-metric">{hub.stats.visitedCount} déjà lues</span>
           ) : null}
         </div>
       </header>
 
       <LessonsContinuePanel />
 
-      <section className="lessons-section" aria-labelledby="collections-heading">
+      <section className="lessons-section" aria-labelledby="paths-heading">
         <div className="lessons-section__head">
           <div>
-            <h2 id="collections-heading" className="lessons-section__title">
-              Collections
+            <h2 id="paths-heading" className="lessons-section__title">
+              Parcours
             </h2>
             <p className="lessons-section__subtitle">
-              Parcours thématiques pour explorer le russe par objectif.
+              Cinq entrées thématiques — chacune mène à un ensemble cohérent de leçons.
             </p>
           </div>
         </div>
         <div className="lessons-grid lessons-grid--collections">
-          {hub.featuredCollections.map((collection) => (
+          {hub.collections.map((collection) => (
             <LessonsCollectionCard key={collection.id} collection={collection} />
           ))}
         </div>
       </section>
 
-      <section className="lessons-section" aria-labelledby="foundations-heading">
-        <div className="lessons-section__head">
-          <h2 id="foundations-heading" className="lessons-section__title">
-            Fondations
-          </h2>
-          <Link href="/lessons/niveau/a1" className="lessons-section__link focus-kb">
-            Voir le niveau A1 →
-          </Link>
-        </div>
-        <LessonsLessonGrid
-          lessons={hub.foundations}
-          emptyDescription="Les leçons de fondation arrivent bientôt."
-        />
-      </section>
+      <LessonsDiscoverSection lessons={hub.discoverLessons} />
 
-      <section className="lessons-section" aria-labelledby="grammar-heading">
+      <section className="lessons-section lessons-section--compact" aria-labelledby="levels-heading">
         <div className="lessons-section__head">
           <div>
-            <h2 id="grammar-heading" className="lessons-section__title">
-              Grammaire — les six cas
+            <h2 id="levels-heading" className="lessons-section__title">
+              Par niveau CECR
             </h2>
             <p className="lessons-section__subtitle">
-              Chaque cas répond à une question précise dans la phrase russe.
+              Progression du A1 au C2 — une seule entrée par niveau.
             </p>
           </div>
         </div>
-        <div className="lessons-grid lessons-grid--collections">
-          {hub.grammarCollections.map((collection) => (
-            <LessonsCollectionCard key={collection.id} collection={collection} />
+        <nav className="lessons-level-nav" aria-label="Niveaux CECR">
+          {hub.levelCollections.map((level) => (
+            <Link key={level.id} href={level.href} className="lessons-level-pill focus-kb">
+              {level.difficulty}
+            </Link>
           ))}
-        </div>
-      </section>
-
-      <section className="lessons-section" aria-labelledby="recommended-heading">
-        <div className="lessons-section__head">
-          <h2 id="recommended-heading" className="lessons-section__title">
-            Recommandées
-          </h2>
-        </div>
-        <LessonsLessonGrid lessons={hub.recommended} />
-      </section>
-
-      <section className="lessons-section" aria-labelledby="popular-heading">
-        <div className="lessons-section__head">
-          <h2 id="popular-heading" className="lessons-section__title">
-            Populaires
-          </h2>
-        </div>
-        <LessonsLessonGrid lessons={hub.popular} />
-      </section>
-
-      <section className="lessons-section" aria-labelledby="levels-heading">
-        <div className="lessons-section__head">
-          <h2 id="levels-heading" className="lessons-section__title">
-            Par niveau
-          </h2>
-        </div>
-        <div className="lessons-grid lessons-grid--compact">
-          {hub.levelCollections.map((collection) => (
-            <LessonsCollectionCard key={collection.id} collection={collection} />
-          ))}
-        </div>
+        </nav>
       </section>
     </>
   );

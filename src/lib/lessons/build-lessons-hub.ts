@@ -6,48 +6,63 @@ import {
 } from "@/features/manual";
 import { getManualLessonVisitCount } from "@/lib/manual/manual-lesson-history";
 
-import { getFeaturedCollections, getGrammarCollections, getLevelCollections } from "./collections";
+import { getHomepageCollections, getLevelCollections } from "./collections";
+
+/** Diverse starters — one per learning angle, never duplicated on the homepage. */
+const DISCOVER_SLUGS = [
+  "alphabet-cyrillique",
+  "accent-tonique",
+  "verbes-essentiels",
+  "prepositions-v-na",
+] as const;
 
 export type LessonsHubData = {
   stats: {
     totalLessons: number;
     visitedCount: number;
   };
-  continueLesson: ManualLessonSummary | null;
-  recommended: ManualLessonSummary[];
-  popular: ManualLessonSummary[];
-  foundations: ManualLessonSummary[];
-  featuredCollections: ReturnType<typeof getFeaturedCollections>;
+  collections: ReturnType<typeof getHomepageCollections>;
   levelCollections: ReturnType<typeof getLevelCollections>;
-  grammarCollections: ReturnType<typeof getGrammarCollections>;
+  /** Max 4 curated lessons — only section that lists individual lessons besides Reprendre. */
+  discoverLessons: ManualLessonSummary[];
 };
 
-export function buildLessonsHubData(): LessonsHubData {
+function toSummaryList(slugs: readonly string[]): ManualLessonSummary[] {
   const summaries = listLessonSummaries();
+  const seen = new Set<string>();
+
+  return slugs
+    .map((slug) => summaries.find((lesson) => lesson.slug === slug) ?? getLessonBySlug(slug))
+    .filter((lesson): lesson is NonNullable<typeof lesson> => lesson !== null)
+    .map((lesson) => ({
+      title: lesson.title,
+      slug: lesson.slug,
+      level: lesson.level,
+      category: lesson.category,
+      difficulty: lesson.difficulty,
+      estimatedReadingTime: lesson.estimatedReadingTime,
+      keywords: lesson.keywords,
+    }))
+    .filter((lesson) => {
+      if (seen.has(lesson.slug)) {
+        return false;
+      }
+      seen.add(lesson.slug);
+      return true;
+    });
+}
+
+export function buildLessonsHubData(): LessonsHubData {
   const stats = getManualStats();
-
-  const recommended = summaries
-    .filter((lesson) => lesson.level === "a1" || lesson.level === "a2")
-    .slice(0, 6);
-
-  const popular = [...summaries]
-    .sort((left, right) => right.difficulty - left.difficulty || left.title.localeCompare(right.title))
-    .slice(0, 8);
-
-  const foundations = summaries.filter((lesson) => lesson.level === "a1").slice(0, 6);
 
   return {
     stats: {
       totalLessons: stats.totalLessons,
       visitedCount: getManualLessonVisitCount(),
     },
-    continueLesson: null,
-    recommended,
-    popular,
-    foundations,
-    featuredCollections: getFeaturedCollections(),
+    collections: getHomepageCollections(),
     levelCollections: getLevelCollections(),
-    grammarCollections: getGrammarCollections(),
+    discoverLessons: toSummaryList(DISCOVER_SLUGS).slice(0, 4),
   };
 }
 
