@@ -108,13 +108,13 @@ export function CaseDetailView({ graph }: CaseDetailViewProps) {
 
         <section className="explorer-manual-bridge">
           <p className="explorer-manual-bridge__text">
-            For structured teaching on this case, use the Manual.
+            Pour un enseignement structuré sur ce cas, explorez les leçons.
           </p>
           <Link
-            href={`/manual/curriculum/${graph.caseNode.caseKey}`}
+            href={`/lessons/curriculum/${graph.caseNode.caseKey}`}
             className="explorer-manual-bridge__link focus-kb"
           >
-            Open in Manual →
+            Ouvrir dans les leçons →
           </Link>
         </section>
       </article>

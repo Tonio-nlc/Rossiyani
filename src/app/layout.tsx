@@ -9,6 +9,7 @@ import { ToastProvider } from "@/components/design-system";
 import "./globals.css";
 import "./workspace-v2-areas.css";
 import "./practice-workspace.css";
+import "./lessons-workspace.css";
 
 const fontEditorial = EB_Garamond({
   subsets: ["latin", "cyrillic"],

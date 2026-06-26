@@ -36,7 +36,7 @@ export function LibraryPageContent({ initialTexts }: LibraryPageContentProps) {
           <LibraryContextTranslationLessons />
         </section>
         <p className="library-ws-section__subtitle">
-          <Reference href="/manual">Leçons de grammaire →</Reference>
+          <Reference href="/lessons">Leçons de grammaire →</Reference>
         </p>
       </div>
     );

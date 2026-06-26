@@ -259,9 +259,9 @@ export function PracticeAnalysisView(props: PracticeAnalysisViewProps) {
             ) : null}
           </PracticeSection>
 
-          <div className="practice-footer-actions">
+          <div className="practice-actions">
             <GhostButton href={structureHref}>Explorer la structure →</GhostButton>
-            <GhostButton href="/manual">Manuel →</GhostButton>
+            <GhostButton href="/lessons">Leçons →</GhostButton>
             <GhostButton disabled={props.saved} onClick={props.onSave}>
               {props.saved ? "Enregistré" : "Enregistrer la phrase →"}
             </GhostButton>

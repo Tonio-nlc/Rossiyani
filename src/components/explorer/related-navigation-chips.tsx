@@ -43,5 +43,5 @@ export function textChip(textId: string, title: string): RelatedChip {
 }
 
 export function lessonChip(slug: string, title: string): RelatedChip {
-  return { label: title, href: `/manual/lecons/${slug}` };
+  return { label: title, href: `/lessons/lecons/${slug}` };
 }

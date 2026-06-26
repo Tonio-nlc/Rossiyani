@@ -33,10 +33,10 @@ const NAV_ITEMS = [
     icon: VocabularyIcon,
   },
   {
-    href: "/manual",
-    label: "Manual",
-    shortLabel: "Manual",
-    match: (path: string) => path === "/manual" || path.startsWith("/manual/"),
+    href: "/lessons",
+    label: "Lessons",
+    shortLabel: "Lessons",
+    match: (path: string) => path === "/lessons" || path.startsWith("/lessons/"),
     icon: ManualIcon,
   },
 ] as const;

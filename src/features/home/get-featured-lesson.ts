@@ -59,13 +59,13 @@ const DISCOVERY_TOPIC_CATEGORIES: Record<string, ManualCategory[]> = {
   motion: ["motion-verbs", "verbs"],
 };
 
-const STATIC_MANUAL_FALLBACK: HomeFeaturedLesson = {
-  slug: "manual",
-  title: "Manuel Rossiyani",
+const STATIC_LESSONS_FALLBACK: HomeFeaturedLesson = {
+  slug: "lessons",
+  title: "Leçons Rossiyani",
   description: "Parcours structuré de leçons de russe, du A1 au C1.",
   readingMinutes: 10,
   levelLabel: "A1",
-  href: "/manual",
+  href: "/lessons",
   dateKey: getDateKey(),
 };
 
@@ -124,7 +124,7 @@ function toFeaturedLesson(summary: ManualLessonSummary, dateKey: string): HomeFe
       : categoryLabel,
     readingMinutes: summary.estimatedReadingTime,
     levelLabel: summary.level.toUpperCase(),
-    href: `/manual/lecons/${summary.slug}`,
+    href: `/lessons/lecons/${summary.slug}`,
     dateKey,
   };
 }
@@ -347,7 +347,7 @@ export async function getFeaturedLesson(input: GetFeaturedLessonInput): Promise<
   const summaries = listLessonSummaries();
 
   if (summaries.length === 0) {
-    return { ...STATIC_MANUAL_FALLBACK, dateKey };
+    return { ...STATIC_LESSONS_FALLBACK, dateKey };
   }
 
   const cachedSlug = await readCachedFeaturedLesson(dateKey, learnerId);
@@ -363,7 +363,7 @@ export async function getFeaturedLesson(input: GetFeaturedLessonInput): Promise<
     pickGlobalFallback(summaries);
 
   if (!selected) {
-    return { ...STATIC_MANUAL_FALLBACK, dateKey };
+    return { ...STATIC_LESSONS_FALLBACK, dateKey };
   }
 
   return toFeaturedLesson(selected, dateKey);

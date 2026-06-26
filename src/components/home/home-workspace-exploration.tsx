@@ -62,13 +62,13 @@ export function HomeWorkspaceExploration({ hub }: HomeWorkspaceExplorationProps)
                 <span className="home-ws-explore-hub__icon home-ws-explore-hub__icon--small" aria-hidden>
                   <HomeIconManual className="home-ws-explore-hub__icon-svg" />
                 </span>
-                <h3 className="home-ws-explore-hub__card-title">Manual</h3>
+                <h3 className="home-ws-explore-hub__card-title">Leçons</h3>
               </div>
               <p className="home-ws-explore-hub__metric">
                 {formatCount(hub.manualProgress.completed)} / {formatCount(hub.manualProgress.total)} lessons
                 <span className="home-ws-explore-hub__metric-muted"> · {hub.manualProgress.percent}% roadmap</span>
               </p>
-              <Link href="/manual" className="home-ws-explore-hub__link focus-kb">
+              <Link href="/lessons" className="home-ws-explore-hub__link focus-kb">
                 Continue learning →
               </Link>
             </article>

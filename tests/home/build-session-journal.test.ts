@@ -14,7 +14,7 @@ const baseJournal = {
     description: "Les règles de l'accent en russe.",
     readingMinutes: 8,
     levelLabel: "A1",
-    href: "/manual/lecons/accent-tonique",
+    href: "/lessons/lecons/accent-tonique",
     dateKey: "2026-06-15",
   },
   featuredPractice: {

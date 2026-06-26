@@ -23,13 +23,14 @@ const NAV_SHORTCUTS = [
   { href: "/reader", shortcut: "2" },
   { href: "/explorer", shortcut: "3" },
   { href: "/practice", shortcut: "4" },
-  { href: "/manual", shortcut: "5" },
+  { href: "/lessons", shortcut: "5" },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const isPracticeRoute = pathname?.startsWith("/practice") ?? false;
+  const isLessonsRoute = pathname?.startsWith("/lessons") ?? false;
   const [searchOpen, setSearchOpen] = useState(false);
   const openSearch = useCallback(() => setSearchOpen(true), []);
   const closeSearch = useCallback(() => setSearchOpen(false), []);
@@ -64,7 +65,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div
         className={[
           "min-h-screen min-w-0 overflow-x-clip",
-          isPracticeRoute ? "practice-page-root" : "bg-[var(--paper)] text-[var(--ink)]",
+          isPracticeRoute
+            ? "practice-page-root"
+            : isLessonsRoute
+              ? "lessons-page-root"
+              : "bg-[var(--paper)] text-[var(--ink)]",
         ].join(" ")}
       >
         <OfflineBanner />

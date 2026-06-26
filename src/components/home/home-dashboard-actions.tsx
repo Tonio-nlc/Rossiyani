@@ -27,9 +27,9 @@ const ACTIONS = [
     Icon: HomeIconPractice,
   },
   {
-    href: "/manual",
-    title: "Manual",
-    description: "Grammar reference and structured lessons.",
+    href: "/lessons",
+    title: "Leçons",
+    description: "Grammaire structurée et leçons thématiques.",
     Icon: HomeIconManual,
   },
 ] as const;

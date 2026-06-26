@@ -342,116 +342,114 @@ export function PracticeWorkspace() {
       />
 
       <div className="practice-exercise-layout">
-        <div className="practice-main-card">
-          {structureMode && structureContext ? (
-            <StructureContextPanel
-              context={structureContext}
-              referenceSentence={referenceSentence}
-            />
-          ) : null}
+        {structureMode && structureContext ? (
+          <StructureContextPanel
+            context={structureContext}
+            referenceSentence={referenceSentence}
+          />
+        ) : null}
 
-          {structureMode && !structureContext && searchParams.get("structure") ? (
-            <StructureContextPanel
-              context={{
-                label: searchParams.get("structure") ?? "",
-                meaning: null,
-                explanation: null,
-                exampleSentence: referenceSentence,
-                readerHref: searchParams.get("textId")
-                  ? `/texts/${searchParams.get("textId")}`
-                  : null,
-                readerTitle: searchParams.get("textTitle"),
-                readerCollectionId: null,
-                readerCollectionName: null,
-                explorerHref: `/explorer?q=${encodeURIComponent(searchParams.get("structure") ?? "")}`,
-              }}
-              referenceSentence={referenceSentence}
-            />
-          ) : null}
+        {structureMode && !structureContext && searchParams.get("structure") ? (
+          <StructureContextPanel
+            context={{
+              label: searchParams.get("structure") ?? "",
+              meaning: null,
+              explanation: null,
+              exampleSentence: referenceSentence,
+              readerHref: searchParams.get("textId")
+                ? `/texts/${searchParams.get("textId")}`
+                : null,
+              readerTitle: searchParams.get("textTitle"),
+              readerCollectionId: null,
+              readerCollectionName: null,
+              explorerHref: `/explorer?q=${encodeURIComponent(searchParams.get("structure") ?? "")}`,
+            }}
+            referenceSentence={referenceSentence}
+          />
+        ) : null}
 
-          {!structureMode ? (
-            <div className="practice-field">
-              <InputField
-                id="practice-context"
-                label="Votre idée"
-                type="text"
-                value={context}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => setContext(event.target.value)}
-                placeholder="En français ou en russe"
-              />
-            </div>
-          ) : null}
-
+        {!structureMode ? (
           <div className="practice-field">
-            <PracticeInput
-              id="practice-russian"
-              label={structureMode ? "Votre phrase" : "Votre phrase en russe"}
-              value={russianText}
-              onChange={(event) => setRussianText(event.target.value)}
-              rows={5}
-              required
-              placeholder="Ваше предложение…"
+            <InputField
+              id="practice-context"
+              label="Votre idée"
+              type="text"
+              value={context}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => setContext(event.target.value)}
+              placeholder="En français ou en russe"
             />
           </div>
+        ) : null}
 
-          <div className="practice-main-card__actions">
-            <PrimaryButton
-              type="submit"
-              variant="gold"
-              disabled={loading || !russianText.trim()}
-            >
-              {loading ? "Analyse…" : "Valider →"}
-            </PrimaryButton>
-            <GhostButton onClick={() => setAdvancedOpen((open) => !open)}>
-              {advancedOpen ? "Masquer les options" : "Options →"}
-            </GhostButton>
-          </div>
+        <div className="practice-field practice-field--writing">
+          <PracticeInput
+            id="practice-russian"
+            label={structureMode ? "Votre phrase" : "Votre phrase en russe"}
+            value={russianText}
+            onChange={(event) => setRussianText(event.target.value)}
+            rows={5}
+            required
+            placeholder="Ваше предложение…"
+          />
+        </div>
 
-          {advancedOpen ? (
-            <div className="practice-advanced">
-              <div className="practice-advanced__grid">
-                <fieldset>
-                  <legend className="practice-advanced__legend">Thème</legend>
-                  <ul className="practice-advanced__options">
-                    {COMPOSE_THEMES.map((item) => (
-                      <li key={item.id}>
-                        <label className="practice-advanced__option">
-                          <input
-                            type="radio"
-                            name="theme"
-                            value={item.id}
-                            checked={theme === item.id}
-                            onChange={() => setTheme(item.id)}
-                          />
-                          {THEME_LABELS[item.id]}
-                        </label>
-                      </li>
-                    ))}
-                  </ul>
-                </fieldset>
+        {advancedOpen ? (
+          <div className="practice-advanced">
+            <div className="practice-advanced__grid">
+              <fieldset>
+                <legend className="practice-advanced__legend">Thème</legend>
+                <ul className="practice-advanced__options">
+                  {COMPOSE_THEMES.map((item) => (
+                    <li key={item.id}>
+                      <label className="practice-advanced__option">
+                        <input
+                          type="radio"
+                          name="theme"
+                          value={item.id}
+                          checked={theme === item.id}
+                          onChange={() => setTheme(item.id)}
+                        />
+                        {THEME_LABELS[item.id]}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </fieldset>
 
-                <fieldset>
-                  <legend className="practice-advanced__legend">Registre</legend>
-                  <ul className="practice-advanced__options">
-                    {COMPOSE_REGISTERS.map((item) => (
-                      <li key={item.id}>
-                        <label className="practice-advanced__option">
-                          <input
-                            type="radio"
-                            name="register"
-                            value={item.id}
-                            checked={register === item.id}
-                            onChange={() => setRegister(item.id)}
-                          />
-                          {REGISTER_LABELS[item.id]}
-                        </label>
-                      </li>
-                    ))}
-                  </ul>
-                </fieldset>
-              </div>
+              <fieldset>
+                <legend className="practice-advanced__legend">Registre</legend>
+                <ul className="practice-advanced__options">
+                  {COMPOSE_REGISTERS.map((item) => (
+                    <li key={item.id}>
+                      <label className="practice-advanced__option">
+                        <input
+                          type="radio"
+                          name="register"
+                          value={item.id}
+                          checked={register === item.id}
+                          onChange={() => setRegister(item.id)}
+                        />
+                        {REGISTER_LABELS[item.id]}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </fieldset>
             </div>
-          ) : null}
+          </div>
+        ) : null}
+
+        <div className="practice-actions">
+          <PrimaryButton
+            type="submit"
+            variant="gold"
+            disabled={loading || !russianText.trim()}
+          >
+            {loading ? "Analyse…" : "Valider →"}
+          </PrimaryButton>
+          <GhostButton onClick={() => setAdvancedOpen((open) => !open)}>
+            {advancedOpen ? "Masquer les options" : "Options →"}
+          </GhostButton>
         </div>
       </div>
     </form>

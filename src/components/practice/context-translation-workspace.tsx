@@ -342,60 +342,58 @@ export function ContextTranslationWorkspace({
       />
 
       <div className="practice-exercise-layout">
-        <div className="practice-main-card">
-          <div className="practice-context-card practice-context-card--prompt">
-            <p className="practice-context-card__label">Phrase à traduire</p>
-            <PracticeInput
-              compact
-              value={sourceText}
-              onChange={(event) => setSourceText(event.target.value)}
-              rows={4}
-              placeholder="Traduire une idée, pas des mots…"
-            />
-          </div>
+        <div className="practice-field practice-field--writing">
+          <PracticeInput
+            compact
+            label="Phrase à traduire"
+            value={sourceText}
+            onChange={(event) => setSourceText(event.target.value)}
+            rows={4}
+            placeholder="Traduire une idée, pas des mots…"
+          />
+        </div>
 
-          {loading && progressPhase ? (
-            <ul className="practice-progress-steps" aria-label="Progression de l'analyse">
-              {PROGRESS_STEPS.map((step) => {
-                const stepIndex = PROGRESS_STEPS.findIndex((item) => item.phase === step.phase);
-                const currentIndex = PROGRESS_STEPS.findIndex(
-                  (item) => item.phase === progressPhase,
-                );
-                const isDone = currentIndex > stepIndex || progressPhase === "complete";
-                const isCurrent = step.phase === progressPhase;
-                return (
-                  <li
-                    key={step.phase}
-                    className={[
-                      "practice-progress-steps__item",
-                      isDone ? "practice-progress-steps__item--done" : "",
-                      isCurrent ? "practice-progress-steps__item--current" : "",
-                    ].join(" ")}
-                  >
-                    {step.label}
-                    {isCurrent ? "…" : ""}
-                  </li>
-                );
-              })}
-            </ul>
-          ) : null}
+        {loading && progressPhase ? (
+          <ul className="practice-progress-steps" aria-label="Progression de l'analyse">
+            {PROGRESS_STEPS.map((step) => {
+              const stepIndex = PROGRESS_STEPS.findIndex((item) => item.phase === step.phase);
+              const currentIndex = PROGRESS_STEPS.findIndex(
+                (item) => item.phase === progressPhase,
+              );
+              const isDone = currentIndex > stepIndex || progressPhase === "complete";
+              const isCurrent = step.phase === progressPhase;
+              return (
+                <li
+                  key={step.phase}
+                  className={[
+                    "practice-progress-steps__item",
+                    isDone ? "practice-progress-steps__item--done" : "",
+                    isCurrent ? "practice-progress-steps__item--current" : "",
+                  ].join(" ")}
+                >
+                  {step.label}
+                  {isCurrent ? "…" : ""}
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
 
-          <div className="practice-main-card__actions">
-            <PrimaryButton
-              type="submit"
-              variant="gold"
-              disabled={!sourceText.trim() || loading}
-            >
-              {loading ? (
-                <>
-                  Analyse… <AnalyzingDots />
-                </>
-              ) : (
-                "Valider →"
-              )}
-            </PrimaryButton>
-            <GhostButton href="/practice">← Modes de pratique</GhostButton>
-          </div>
+        <div className="practice-actions">
+          <PrimaryButton
+            type="submit"
+            variant="gold"
+            disabled={!sourceText.trim() || loading}
+          >
+            {loading ? (
+              <>
+                Analyse… <AnalyzingDots />
+              </>
+            ) : (
+              "Valider →"
+            )}
+          </PrimaryButton>
+          <GhostButton href="/practice">← Modes de pratique</GhostButton>
         </div>
 
         <ContextTranslationHistory entries={history} />

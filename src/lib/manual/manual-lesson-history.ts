@@ -2,6 +2,7 @@ const STORAGE_KEY = "rossiyani:manualLessonHistory";
 
 export type ManualLessonVisit = {
   slug: string;
+  title?: string;
   visitedAt: string;
 };
 
@@ -33,16 +34,22 @@ function saveVisits(visits: ManualLessonVisit[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(visits.slice(0, 40)));
 }
 
-/** Records a manual lesson page visit (most recent first). */
-export function recordManualLessonVisit(slug: string): void {
+/** Records a lesson page visit (most recent first). */
+export function recordManualLessonVisit(slug: string, title?: string): void {
   if (!isBrowser() || slug.trim().length === 0) {
     return;
   }
 
   const now = new Date().toISOString();
   const visits = loadVisits().filter((visit) => visit.slug !== slug);
-  visits.unshift({ slug, visitedAt: now });
+  visits.unshift({ slug, title, visitedAt: now });
   saveVisits(visits);
+}
+
+export function getRecentManualLessonVisits(limit = 5): ManualLessonVisit[] {
+  return loadVisits()
+    .sort((left, right) => new Date(right.visitedAt).getTime() - new Date(left.visitedAt).getTime())
+    .slice(0, limit);
 }
 
 export function getRecentManualLessonSlugs(limit = 5): string[] {

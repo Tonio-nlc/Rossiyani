@@ -275,7 +275,7 @@ function buildRelations(detail: WordDetailGraph): AnnotationRelation[] {
 function buildLessons(detail: WordDetailGraph): AnnotationLesson[] {
   return (detail.lemmaKnowledge?.relatedLessons ?? []).slice(0, 4).map((lesson) => ({
     title: lesson.title,
-    href: `/manual/lecons/${lesson.slug}`,
+    href: `/lessons/lecons/${lesson.slug}`,
   }));
 }
 

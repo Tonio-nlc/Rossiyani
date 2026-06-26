@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { ManualLessonView } from "@/components/manual";
+import { LessonsLessonView } from "@/components/lessons";
 import { getLessonBySlug, listLessonSummaries } from "@/features/manual";
 
 type PageProps = {
@@ -19,17 +19,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: "Leçon introuvable — Rossiyani" };
   }
   return {
-    title: `${lesson.title} — Manuel Rossiyani`,
+    title: `${lesson.title} — Leçons · Rossiyani`,
     description: lesson.keywords.join(", "),
   };
 }
 
-export default async function ManualLessonPage({ params }: PageProps) {
+export default async function LessonDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const lesson = getLessonBySlug(slug);
   if (!lesson) {
     notFound();
   }
 
-  return <ManualLessonView lesson={lesson} />;
+  return <LessonsLessonView lesson={lesson} />;
 }

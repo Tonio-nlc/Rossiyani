@@ -257,36 +257,38 @@ function FollowUpPanel({
     <section className="practice-section animate-fade-up-subtle">
       <h2 className="practice-section__label">Poser une question</h2>
 
-      {messages.length > 0 ? (
-        <ul className="practice-followup-messages">
-          {messages.map((message, index) => (
-            <li
-              key={`${message.role}-${index}`}
-              className={[
-                "practice-followup-messages__item",
-                message.role === "user"
-                  ? "practice-followup-messages__item--user"
-                  : "practice-followup-messages__item--assistant",
-              ].join(" ")}
-            >
-              {message.content}
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      <div className="practice-field">
+        {messages.length > 0 ? (
+          <ul className="practice-followup-messages">
+            {messages.map((message, index) => (
+              <li
+                key={`${message.role}-${index}`}
+                className={[
+                  "practice-followup-messages__item",
+                  message.role === "user"
+                    ? "practice-followup-messages__item--user"
+                    : "practice-followup-messages__item--assistant",
+                ].join(" ")}
+              >
+                {message.content}
+              </li>
+            ))}
+          </ul>
+        ) : null}
 
-      <form className="practice-followup-form" onSubmit={handleSubmit}>
-        <InputField
-          type="text"
-          value={question}
-          onChange={(event: ChangeEvent<HTMLInputElement>) => setQuestion(event.target.value)}
-          disabled={loading}
-          placeholder="Puis-je dire cela à mon patron ?"
-        />
-        <PrimaryButton type="submit" disabled={loading || !question.trim()}>
-          {loading ? "Réflexion…" : "Demander →"}
-        </PrimaryButton>
-      </form>
+        <form className="practice-followup-form" onSubmit={handleSubmit}>
+          <InputField
+            type="text"
+            value={question}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setQuestion(event.target.value)}
+            disabled={loading}
+            placeholder="Puis-je dire cela à mon patron ?"
+          />
+          <PrimaryButton type="submit" disabled={loading || !question.trim()}>
+            {loading ? "Réflexion…" : "Demander →"}
+          </PrimaryButton>
+        </form>
+      </div>
     </section>
   );
 }
@@ -343,7 +345,7 @@ export function ContextTranslationResult({
                 </p>
 
                 {analysis.naturalness ? (
-                  <div className="practice-learning-card">
+                  <div className="practice-result-card__detail">
                     <p className="practice-learning-card__text">
                       {naturalnessLabel(analysis.naturalness.score)}
                     </p>
@@ -361,16 +363,16 @@ export function ContextTranslationResult({
                 ) : (
                   <p className="practice-learning-card__text">Formulation native</p>
                 )}
+              </div>
 
-                <div className="practice-footer-actions">
-                  <CopyButton text={analysis.bestTranslation} />
-                  <GhostButton disabled={phraseSaved} onClick={handleSavePhrase}>
-                    {phraseSaved ? "Enregistré" : "Enregistrer la phrase"}
-                  </GhostButton>
-                  <GhostButton disabled={savedLesson || enrichmentLoading} onClick={onSaveLesson}>
-                    {savedLesson ? "Leçon enregistrée" : "Enregistrer la leçon"}
-                  </GhostButton>
-                </div>
+              <div className="practice-actions">
+                <CopyButton text={analysis.bestTranslation} />
+                <GhostButton disabled={phraseSaved} onClick={handleSavePhrase}>
+                  {phraseSaved ? "Enregistré" : "Enregistrer la phrase"}
+                </GhostButton>
+                <GhostButton disabled={savedLesson || enrichmentLoading} onClick={onSaveLesson}>
+                  {savedLesson ? "Leçon enregistrée" : "Enregistrer la leçon"}
+                </GhostButton>
               </div>
             </section>
           ) : null}
@@ -446,7 +448,9 @@ export function ContextTranslationResult({
 
           <LessonSection visible={show("alternatives")} label="Expressions alternatives">
             {enrichmentLoading && analysis.alternatives.length === 0 ? (
-              <p className="practice-learning-card__text">Recherche d&apos;alternatives…</p>
+              <div className="practice-learning-card">
+                <p className="practice-learning-card__text">Recherche d&apos;alternatives…</p>
+              </div>
             ) : alternativesByRegister.length > 0 ? (
               <ul className="practice-alt-groups">
                 {alternativesByRegister.map((group) => (
@@ -456,22 +460,24 @@ export function ContextTranslationResult({
                     </p>
                     <ul className="practice-card-list">
                       {group.items.map((alt) => (
-                        <li key={alt.text} className="practice-alt-row">
-                          <div className="practice-alt-row__body">
-                            <p className="practice-result-card__sentence break-russian font-reader">
-                              {alt.text}
-                            </p>
-                            <p className="practice-learning-card__text">{alt.nuance}</p>
-                            <p className="practice-alt-row__meta">
-                              {alt.frequency} · {alt.whenToUse}
-                            </p>
+                        <li key={alt.text}>
+                          <div className="practice-alt-row">
+                            <div className="practice-alt-row__body">
+                              <p className="practice-result-card__sentence break-russian font-reader">
+                                {alt.text}
+                              </p>
+                              <p className="practice-learning-card__text">{alt.nuance}</p>
+                              <p className="practice-alt-row__meta">
+                                {alt.frequency} · {alt.whenToUse}
+                              </p>
+                            </div>
+                            <SavePhraseButton
+                              sourceSentence={analysis.sourceText}
+                              russianPhrase={alt.text}
+                              register={alt.register}
+                              nuance={alt.nuance}
+                            />
                           </div>
-                          <SavePhraseButton
-                            sourceSentence={analysis.sourceText}
-                            russianPhrase={alt.text}
-                            register={alt.register}
-                            nuance={alt.nuance}
-                          />
                         </li>
                       ))}
                     </ul>
@@ -485,9 +491,11 @@ export function ContextTranslationResult({
             <LessonSection visible={show("cultural")} label="Notes culturelles">
               <ul className="practice-card-list">
                 {analysis.culturalNotes.map((note) => (
-                  <li key={note} className="practice-note-row">
-                    <div className="practice-learning-card">{note}</div>
-                    <SaveNoteButton note={note} sourceSentence={analysis.sourceText} />
+                  <li key={note}>
+                    <div className="practice-note-row">
+                      <p className="practice-learning-card__text">{note}</p>
+                      <SaveNoteButton note={note} sourceSentence={analysis.sourceText} />
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -508,7 +516,9 @@ export function ContextTranslationResult({
             </LessonSection>
           ) : enrichmentLoading ? (
             <LessonSection visible={show("grammar")} label="Grammaire et concepts">
-              <p className="practice-learning-card__text">Analyse grammaticale…</p>
+              <div className="practice-learning-card">
+                <p className="practice-learning-card__text">Analyse grammaticale…</p>
+              </div>
             </LessonSection>
           ) : null}
 

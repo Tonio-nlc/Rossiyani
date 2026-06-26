@@ -224,7 +224,7 @@ function buildFoundInLinks(detail: WordDetailGraph): ReaderFoundInLink[] {
     links.push({
       label: "Grammar",
       detail: lesson.title,
-      href: `/manual/lecons/${lesson.slug}`,
+      href: `/lessons/lecons/${lesson.slug}`,
     });
   }
 

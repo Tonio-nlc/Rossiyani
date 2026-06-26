@@ -26,9 +26,9 @@ const MAIN_NAV = [
     match: (path: string) => path === "/practice" || path.startsWith("/practice/"),
   },
   {
-    href: "/manual",
-    label: "Manuel",
-    match: (path: string) => path === "/manual" || path.startsWith("/manual/"),
+    href: "/lessons",
+    label: "Leçons",
+    match: (path: string) => path === "/lessons" || path.startsWith("/lessons/"),
   },
 ] as const;
 

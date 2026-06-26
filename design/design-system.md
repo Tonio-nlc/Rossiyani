@@ -29,7 +29,7 @@ Inspiration mix: Busuu, Linear, Arc, Apple, Raycast, Airbnb — without copying 
 | Practice | Green `#f0fdf6` |
 | Explorer | Violet `#f5f3ff` |
 | Vocabulary | Amber `#fffbeb` |
-| Manual | Neutral slate `#f8fafc` |
+| Lessons | Neutral slate `#f8fafc` |
 
 Primary identity blue: `#0058BE`
 
@@ -79,7 +79,7 @@ All major areas share V2 tokens (`workspace-v2.css`): motion, depth, large radii
 | Reader | `reader-ws` | Blue immersive |
 | Practice | `practice-shell` | Green |
 | Explorer | `explorer-study-root` | Violet |
-| Manual | `manual-scholar` | Slate |
+| Lessons | `lessons-shell` | Slate |
 
 ---
 
@@ -109,7 +109,7 @@ Characteristics:
 
 ## Editorial System (deprecated for new work)
 
-Long-form Reader content uses `reader-ws`. Manual and grammar pages are migrating to V2 slate accent.
+Long-form Reader content uses `reader-ws`. Lessons use the V2 slate accent via `lessons-workspace.css`.
 
 ---
 
