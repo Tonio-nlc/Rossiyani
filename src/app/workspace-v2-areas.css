@@ -307,14 +307,3 @@
 }
 
 /* Reader explorer — grammar tags use chip styling */
-.reader-ws-explorer__tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--v2-radius-pill);
-  background: var(--rw-primary-soft, #e8f2ff);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--rw-primary, #0058be);
-  transition: opacity var(--v2-duration) var(--v2-ease);
-}

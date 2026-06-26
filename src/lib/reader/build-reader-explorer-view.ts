@@ -48,6 +48,66 @@ const MORPHOLOGY_LABEL =
   /cas|genre|nombre|aspect|temps|conjugaison|terminaison|forme|animé|irrégulier|motion|reflexive|personne|mood|voix/i;
 const DEFINITION_LABEL = /lemme|traduction|sens|meaning|définition|definition|fréquence/i;
 
+function normalizeExplorerText(value: string): string {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function isDuplicateExplorerText(a: string, b: string): boolean {
+  const left = normalizeExplorerText(a);
+  const right = normalizeExplorerText(b);
+  if (!left || !right) {
+    return false;
+  }
+  return left === right || left.includes(right) || right.includes(left);
+}
+
+function dedupeExplorerTexts(values: string[]): string[] {
+  const unique: string[] = [];
+  for (const value of values) {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      continue;
+    }
+    if (unique.some((existing) => isDuplicateExplorerText(existing, trimmed))) {
+      continue;
+    }
+    unique.push(trimmed);
+  }
+  return unique;
+}
+
+function collectUniqueSectionNotes(view: ReaderMicroscopeView): string[] {
+  const grammarSectionIds = new Set([
+    "verb",
+    "noun",
+    "adjective",
+    "case",
+    "ending",
+    "generic",
+    "collocation",
+    "expression",
+  ]);
+
+  const notes: string[] = [];
+
+  for (const section of view.sections) {
+    if (!grammarSectionIds.has(section.id)) {
+      continue;
+    }
+    const note = section.note?.trim();
+    if (!note) {
+      continue;
+    }
+    const duplicatesRow = section.rows.some((row) => isDuplicateExplorerText(row.value, note));
+    if (duplicatesRow) {
+      continue;
+    }
+    notes.push(note);
+  }
+
+  return dedupeExplorerTexts(notes);
+}
+
 function collectGrammarRows(view: ReaderMicroscopeView): MicroscopeRow[] {
   const grammarSectionIds = new Set([
     "verb",
@@ -98,18 +158,30 @@ function buildGrammarSections(
     definition.unshift({ label: "Lemma", value: view.lemma });
   }
 
-  const sectionNotes = view.sections
-    .filter((section) =>
-      ["verb", "noun", "adjective", "case", "ending", "generic"].includes(section.id),
-    )
-    .map((section) => section.note?.trim())
-    .filter((note): note is string => Boolean(note));
+  const sectionNotes = collectUniqueSectionNotes(view);
+  const canonicalProse =
+    detail.canonicalExplanation?.trim() || snapshot.explanation?.trim() || null;
+  const proseCandidates = dedupeExplorerTexts([
+    ...sectionNotes,
+    ...(canonicalProse &&
+    !sectionNotes.some((note) => isDuplicateExplorerText(note, canonicalProse))
+      ? [canonicalProse]
+      : []),
+  ]);
+  const prose = proseCandidates.length > 0 ? proseCandidates.join(" ") : null;
 
-  const prose =
-    sectionNotes.join(" ") ||
-    detail.canonicalExplanation?.trim() ||
-    snapshot.explanation?.trim() ||
-    null;
+  const filteredExplanationRows = explanationRows.filter((row) => {
+    if (/^note$/i.test(row.label.trim()) && prose && isDuplicateExplorerText(row.value, prose)) {
+      return false;
+    }
+    if (
+      sectionNotes.some((note) => isDuplicateExplorerText(note, row.value)) ||
+      (prose && isDuplicateExplorerText(prose, row.value))
+    ) {
+      return false;
+    }
+    return true;
+  });
 
   const sections: ExplorerGrammarSection[] = [];
 
@@ -121,11 +193,11 @@ function buildGrammarSections(
     sections.push({ id: "morphology", title: "Morphology", rows: morphology, prose: null });
   }
 
-  if (prose || explanationRows.length > 0) {
+  if (prose || filteredExplanationRows.length > 0) {
     sections.push({
       id: "explanation",
       title: "Grammar explanation",
-      rows: explanationRows,
+      rows: filteredExplanationRows,
       prose,
     });
   }
@@ -176,6 +248,19 @@ export function buildReaderExplorerView(input: {
     tags.push(aspectLabel);
   }
 
+  const grammarSections = buildGrammarSections(view, detail, snapshot);
+  const grammarProse = grammarSections.find((section) => section.id === "explanation")?.prose ?? null;
+  const contextUsageCandidate =
+    detail.phraseOccurrence?.explanation?.trim() ||
+    detail.canonicalExplanation?.trim() ||
+    snapshot.explanation?.trim() ||
+    null;
+  const contextUsage =
+    contextUsageCandidate &&
+    (!grammarProse || !isDuplicateExplorerText(contextUsageCandidate, grammarProse))
+      ? contextUsageCandidate
+      : null;
+
   return {
     headline: view.headline,
     lemma: view.lemma,
@@ -188,12 +273,12 @@ export function buildReaderExplorerView(input: {
     },
     grammar: {
       tags: [...new Set(tags.filter(Boolean))],
-      sections: buildGrammarSections(view, detail, snapshot),
+      sections: grammarSections,
     },
     context: {
       sentenceRussian: snapshot.original,
       sentenceMeaning: snapshot.naturalTranslation || snapshot.literalTranslation || null,
-      usage: detail.canonicalExplanation || snapshot.explanation || null,
+      usage: contextUsage,
     },
   };
 }

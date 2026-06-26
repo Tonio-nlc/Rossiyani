@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import {
   buildReaderExplorerView,
+  type ExplorerGrammarSection,
   type ReaderExplorerTab,
 } from "@/lib/reader/build-reader-explorer-view";
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
@@ -25,6 +26,61 @@ const TABS: Array<{ id: ReaderExplorerTab; label: string }> = [
   { id: "grammar", label: "Grammar" },
   { id: "context", label: "Context" },
 ];
+
+function GrammarSectionCard({
+  section,
+  morphologyTags = [],
+}: {
+  section: ExplorerGrammarSection;
+  morphologyTags?: string[];
+}) {
+  const chipLabels =
+    section.id === "morphology" && morphologyTags.length > 0
+      ? morphologyTags
+      : section.id === "morphology"
+        ? section.rows.map((row) => row.value)
+        : [];
+
+  return (
+    <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
+      <h3 className="reader-ws-explorer__section-title">{section.title}</h3>
+
+      {section.id === "morphology" && chipLabels.length > 0 ? (
+        <div className="reader-ws-explorer__tags" aria-label="Morphology">
+          {chipLabels.map((tag) => (
+            <span key={tag} className="reader-ws-explorer__tag">
+              {tag}
+            </span>
+          ))}
+        </div>
+      ) : null}
+
+      {section.id === "morphology" && section.rows.length > 0 ? (
+        <dl className="reader-ws-explorer__rows">
+          {section.rows.map((row) => (
+            <div key={`${section.id}-${row.label}-${row.value}`} className="reader-ws-explorer__row">
+              <dt>{row.label}</dt>
+              <dd className="break-russian">{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+
+      {section.id !== "morphology" && section.rows.length > 0 ? (
+        <dl className="reader-ws-explorer__rows">
+          {section.rows.map((row) => (
+            <div key={`${section.id}-${row.label}-${row.value}`} className="reader-ws-explorer__row">
+              <dt>{row.label}</dt>
+              <dd className="break-russian">{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+
+      {section.prose ? <p className="reader-ws-explorer__prose">{section.prose}</p> : null}
+    </article>
+  );
+}
 
 export function ReaderExplorerPanel({
   detail,
@@ -90,13 +146,26 @@ export function ReaderExplorerPanel({
       </header>
 
       <article className="reader-ws-explorer__word-card">
-        <p className="reader-ws-explorer__word break-russian">{view?.headline ?? snapshot.stressMarked}</p>
-        {view?.transliteration ? (
-          <p className="reader-ws-explorer__translit">{view.transliteration}</p>
+        <div className="reader-ws-explorer__word-head">
+          <div className="reader-ws-explorer__word-copy">
+            <p className="reader-ws-explorer__word break-russian">
+              {view?.headline ?? snapshot.stressMarked}
+            </p>
+            {view?.transliteration ? (
+              <p className="reader-ws-explorer__translit">{view.transliteration}</p>
+            ) : null}
+          </div>
+          <button type="button" className="reader-ws-explorer__speak focus-kb" aria-label="Pronunciation">
+            <ReaderIconSpeaker />
+          </button>
+        </div>
+        {view?.partOfSpeech ? (
+          <div className="reader-ws-explorer__word-meta">
+            <span className="reader-ws-explorer__tag reader-ws-explorer__tag--meta">
+              {view.partOfSpeech}
+            </span>
+          </div>
         ) : null}
-        <button type="button" className="reader-ws-explorer__speak focus-kb" aria-label="Pronunciation">
-          <ReaderIconSpeaker />
-        </button>
       </article>
 
       <div className="reader-ws-explorer__tabs" role="tablist" aria-label="Word details">
@@ -123,23 +192,26 @@ export function ReaderExplorerPanel({
         ) : null}
 
         {activeTab === "dictionary" ? (
-          <div className="reader-ws-explorer__card">
-            <p className="reader-ws-explorer__card-label">Translation</p>
-            <p className="reader-ws-explorer__card-value">
-              {view?.dictionary.translation ?? "—"}
-            </p>
-            {view && view.dictionary.meanings.length > 1 ? (
-              <>
-                <p className="reader-ws-explorer__card-label">Meanings</p>
-                <ul className="reader-ws-explorer__list">
-                  {view.dictionary.meanings.map((meaning) => (
-                    <li key={meaning}>{meaning}</li>
-                  ))}
-                </ul>
-              </>
-            ) : null}
+          <div className="reader-ws-explorer__stack">
+            <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
+              <p className="reader-ws-explorer__card-label">Translation</p>
+              <p className="reader-ws-explorer__card-value reader-ws-explorer__card-value--lead">
+                {view?.dictionary.translation ?? "—"}
+              </p>
+              {view && view.dictionary.meanings.length > 1 ? (
+                <div className="reader-ws-explorer__field">
+                  <p className="reader-ws-explorer__card-label">Meanings</p>
+                  <ul className="reader-ws-explorer__list">
+                    {view.dictionary.meanings.map((meaning) => (
+                      <li key={meaning}>{meaning}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </article>
+
             {view && view.dictionary.examples.length > 0 ? (
-              <>
+              <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
                 <p className="reader-ws-explorer__card-label">Examples</p>
                 <ul className="reader-ws-explorer__list reader-ws-explorer__list--examples">
                   {view.dictionary.examples.map((example) => (
@@ -148,68 +220,57 @@ export function ReaderExplorerPanel({
                     </li>
                   ))}
                 </ul>
-              </>
+              </article>
             ) : null}
           </div>
         ) : null}
 
         {activeTab === "grammar" ? (
-          <div className="reader-ws-explorer__card reader-ws-explorer__card--grammar">
+          <div className="reader-ws-explorer__stack">
             {view && view.grammar.sections.length > 0 ? (
               view.grammar.sections.map((section) => (
-                <section key={section.id} className="reader-ws-explorer__section">
-                  <h3 className="reader-ws-explorer__section-title">{section.title}</h3>
-                  {section.id === "morphology" && view.grammar.tags.length > 0 ? (
-                    <div className="reader-ws-explorer__tags">
-                      {view.grammar.tags.map((tag) => (
-                        <span key={tag} className="reader-ws-explorer__tag">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                  {section.rows.length > 0 ? (
-                    <dl className="reader-ws-explorer__rows">
-                      {section.rows.map((row) => (
-                        <div key={`${section.id}-${row.label}-${row.value}`}>
-                          <dt>{row.label}</dt>
-                          <dd className="break-russian">{row.value}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  ) : null}
-                  {section.prose ? (
-                    <p className="reader-ws-explorer__prose">{section.prose}</p>
-                  ) : null}
-                </section>
+                <GrammarSectionCard
+                  key={section.id}
+                  section={section}
+                  morphologyTags={section.id === "morphology" ? view.grammar.tags : undefined}
+                />
               ))
             ) : (
-              <p className="reader-ws-explorer__muted">No grammar details available yet.</p>
+              <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
+                <p className="reader-ws-explorer__muted">No grammar details available yet.</p>
+              </article>
             )}
           </div>
         ) : null}
 
         {activeTab === "context" ? (
-          <div className="reader-ws-explorer__card">
+          <div className="reader-ws-explorer__stack">
             {view?.context.sentenceRussian ? (
-              <>
+              <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
                 <p className="reader-ws-explorer__card-label">Sentence</p>
                 <p className="reader-ws-explorer__card-value break-russian">
                   {view.context.sentenceRussian}
                 </p>
-              </>
+              </article>
             ) : null}
             {view?.context.sentenceMeaning ? (
-              <>
+              <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
                 <p className="reader-ws-explorer__card-label">Meaning</p>
                 <p className="reader-ws-explorer__card-value">{view.context.sentenceMeaning}</p>
-              </>
+              </article>
             ) : null}
             {view?.context.usage ? (
-              <>
+              <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
                 <p className="reader-ws-explorer__card-label">Usage</p>
-                <p className="reader-ws-explorer__card-value">{view.context.usage}</p>
-              </>
+                <p className="reader-ws-explorer__prose">{view.context.usage}</p>
+              </article>
+            ) : null}
+            {!view?.context.sentenceRussian &&
+            !view?.context.sentenceMeaning &&
+            !view?.context.usage ? (
+              <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
+                <p className="reader-ws-explorer__muted">No context available for this word yet.</p>
+              </article>
             ) : null}
           </div>
         ) : null}
