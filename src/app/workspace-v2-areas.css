@@ -73,64 +73,10 @@
   background: rgba(255, 255, 255, 0.92);
 }
 
-/* Practice — green accent */
-.ds-editorial-container:has(.practice-shell) {
+/* Practice — green accent (see practice-workspace.css for full V2) */
+.ds-editorial-container:has(.practice-shell),
+.ds-editorial-container:has(.practice-my-sentences) {
   background: var(--v2-area-practice);
-}
-
-.practice-hub__title,
-.practice-exercise-header__title {
-  font-family: var(--font-workspace), var(--font-ui), system-ui, sans-serif;
-  font-weight: 700;
-  color: var(--v2-heading);
-}
-
-.practice-hub__mission,
-.practice-exercise-header__subtitle {
-  color: var(--v2-body);
-}
-
-.practice-hub__modes-label,
-.practice-exercise-header__type {
-  color: var(--v2-label);
-  letter-spacing: 0.08em;
-}
-
-.practice-mode-card {
-  min-height: 9rem;
-  padding: 1.15rem 1.25rem;
-  border: 1px solid rgba(16, 185, 129, 0.14);
-  border-radius: var(--v2-radius-lg);
-  background: linear-gradient(180deg, #ffffff 0%, #f0fdf6 100%);
-  box-shadow: var(--v2-shadow);
-  transition:
-    transform var(--v2-duration) var(--v2-ease),
-    box-shadow var(--v2-duration) var(--v2-ease),
-    border-color var(--v2-duration) ease,
-    background var(--v2-duration) ease;
-}
-
-.practice-mode-card:hover {
-  border-color: rgba(16, 185, 129, 0.28);
-  background: linear-gradient(180deg, #ffffff 0%, #ecfdf5 100%);
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.1), var(--v2-shadow-hover);
-  transform: translateY(-3px) scale(1.01);
-}
-
-.practice-mode-card__title {
-  font-family: var(--font-workspace), var(--font-ui), system-ui, sans-serif;
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--v2-heading);
-}
-
-.practice-mode-card__description {
-  color: var(--v2-body);
-}
-
-.practice-mode-card__cta {
-  font-weight: 600;
-  color: #059669;
 }
 
 /* Explorer — violet accent */

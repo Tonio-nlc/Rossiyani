@@ -23,13 +23,15 @@ export function PracticeInput({
         id={id}
         {...textareaProps}
         className={[
-          "focus-kb ds-practice-input break-russian",
-          compact ? "ds-practice-input-compact" : "",
+          "focus-kb practice-ws-input break-russian",
+          compact ? "practice-ws-input--compact" : "",
         ]
           .filter(Boolean)
           .join(" ")}
       />
-      {hint ? <span className="mt-2 block text-xs text-[var(--ink-muted)]">{hint}</span> : null}
+      {hint ? (
+        <span className="mt-2 block text-xs font-medium text-[var(--v2-label,#94a3b8)]">{hint}</span>
+      ) : null}
     </label>
   );
 }

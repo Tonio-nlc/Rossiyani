@@ -6,7 +6,12 @@ type ContextTranslationHistoryProps = {
 
 export function ContextTranslationHistory({ entries }: ContextTranslationHistoryProps) {
   if (entries.length === 0) {
-    return null;
+    return (
+      <section className="practice-history practice-history--empty" aria-label="Traductions récentes">
+        <h2 className="practice-history__label">Traductions récentes</h2>
+        <p>Vos traductions apparaîtront ici après la première analyse.</p>
+      </section>
+    );
   }
 
   return (
