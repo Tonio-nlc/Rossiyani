@@ -11,12 +11,19 @@ function PlusIcon() {
 
 export function LibrarySuggestCard() {
   return (
-    <Card href="/import" className="lessons-lesson-card library-ws-suggest">
-      <PlusIcon />
-      <h3 className="r3-title library-ws-suggest__title">Suggérer un texte</h3>
-      <p className="r3-lead library-ws-suggest__lead">
-        Vous cherchez un sujet spécifique&nbsp;? Faites-le nous savoir.
-      </p>
+    <Card href="/import" className="lessons-lesson-card ws-card library-ws-suggest">
+      <header className="ws-card__header">
+        <PlusIcon />
+      </header>
+      <div className="ws-card__body">
+        <h3 className="r3-title ws-card__title library-ws-suggest__title">Suggérer un texte</h3>
+        <p className="r3-lead ws-card__desc library-ws-suggest__lead">
+          Vous cherchez un sujet spécifique&nbsp;? Faites-le nous savoir.
+        </p>
+      </div>
+      <footer className="ws-card__footer">
+        <span className="lessons-lesson-card__cta">Importer →</span>
+      </footer>
     </Card>
   );
 }

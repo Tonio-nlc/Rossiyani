@@ -2,10 +2,6 @@
    Shared rhythm, sections, cards, and interactions for all workspaces.
 */
 
-/* ─── Editorial shell — Lessons is the visual reference ───
-   Shared rhythm, sections, cards, and interactions for all workspaces.
-*/
-
 .home-ws,
 .library-ws,
 .vocabulary-shell,
@@ -121,8 +117,9 @@ a.ws-editorial-card,
 .lessons-lesson-card[href] {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  min-height: 100%;
+  gap: var(--ws-card-gap, 0.75rem);
+  min-height: 0;
+  height: auto;
   text-decoration: none;
   color: inherit;
 }
@@ -135,7 +132,7 @@ a.r3-card.lessons-collection-card:hover,
 a.r3-card.lessons-lesson-card:hover {
   border-color: var(--ws-border-hover);
   box-shadow: var(--r3-shadow-card-hover);
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 
 /* Area accents on continue strips only — white remains dominant */

@@ -61,7 +61,7 @@ export function ExerciseCard({
   className = "",
 }: ExerciseCardProps) {
   const shellClass = [
-    "ds-exercise-card",
+    "ds-exercise-card ws-card",
     active ? "ds-exercise-card-active" : "",
     className,
   ]
@@ -70,12 +70,20 @@ export function ExerciseCard({
 
   const content = (
     <>
-      {eyebrow ? <p className="text-eyebrow mb-2">{eyebrow}</p> : null}
-      {title ? (
-        <p className="break-russian font-reader text-lg leading-snug text-[var(--ink)]">{title}</p>
+      {eyebrow || title ? (
+        <header className="ws-card__header">
+          {eyebrow ? <p className="text-eyebrow ws-card__eyebrow">{eyebrow}</p> : null}
+          {title ? (
+            <p className="break-russian font-reader text-lg leading-snug text-[var(--ink)] ws-card__title">
+              {title}
+            </p>
+          ) : null}
+        </header>
       ) : null}
-      {children ? <div className={title || eyebrow ? "mt-3" : ""}>{children}</div> : null}
-      {footer ? <div className="mt-4 border-t border-[var(--hairline)] pt-3">{footer}</div> : null}
+      {children ? <div className="ws-card__body">{children}</div> : null}
+      {footer ? (
+        <footer className="ws-card__footer border-t border-[var(--hairline)] pt-3">{footer}</footer>
+      ) : null}
     </>
   );
 

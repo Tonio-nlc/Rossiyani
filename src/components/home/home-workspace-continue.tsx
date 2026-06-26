@@ -36,15 +36,17 @@ export function HomeWorkspaceContinue({ meta }: HomeWorkspaceContinueProps) {
         </h2>
       </div>
 
-      <Card as="article" interactive className="lessons-continue">
-        <div>
-          <p className="lessons-continue__label">En cours</p>
-          <p className="r3-title lessons-continue__title break-russian">{meta.title}</p>
-          <p className="lessons-continue__meta">{metaLine}</p>
+      <Card as="article" interactive className="lessons-continue ws-card">
+        <div className="ws-card__body">
+          <p className="lessons-continue__label ws-card__eyebrow">En cours</p>
+          <p className="r3-title lessons-continue__title ws-card__title break-russian">{meta.title}</p>
+          <p className="lessons-continue__meta ws-card__desc">{metaLine}</p>
         </div>
-        <PrimaryButton href={meta.href} className="lessons-continue__cta">
-          Reprendre →
-        </PrimaryButton>
+        <footer className="ws-card__footer">
+          <PrimaryButton href={meta.href} className="lessons-continue__cta">
+            Reprendre →
+          </PrimaryButton>
+        </footer>
       </Card>
     </section>
   );

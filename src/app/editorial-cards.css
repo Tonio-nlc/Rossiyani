@@ -1,0 +1,466 @@
+/* ─── Editorial card layout — structural system (Lessons-aligned) ───
+   Fixes overflow, grid overlap, and inconsistent card heights.
+   Loaded after workspace + editorial-shell CSS.
+*/
+
+:root {
+  --ws-card-padding: 1.5rem;
+  --ws-card-gap: 0.75rem;
+  --ws-card-grid-gap: 2rem;
+  --ws-card-grid-min: 17.5rem;
+  --ws-card-grid-min-wide: 18.5rem;
+}
+
+/* ─── Grid: stretch rows, no overlap ─── */
+.ws-card-grid,
+.lessons-grid,
+.home-ws .lessons-grid,
+.library-ws .lessons-grid,
+.practice-shell .lessons-grid {
+  display: grid;
+  gap: var(--ws-card-grid-gap);
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
+.ws-card-grid--collections,
+.lessons-grid--collections {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--ws-card-grid-min)), 1fr));
+}
+
+.ws-card-grid--items,
+.lessons-grid--lessons,
+.library-ws-texts {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--ws-card-grid-min-wide)), 1fr));
+}
+
+.ws-card-grid__cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.ws-card-grid__cell > .r3-card,
+.ws-card-grid__cell > a.r3-card,
+.ws-card-grid__cell > article.r3-card,
+.ws-card-grid__cell > button.r3-card {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  align-self: stretch;
+}
+
+/* ─── Card shell: flex column, content-driven height ─── */
+.r3-card.ws-card,
+a.r3-card.ws-card,
+article.r3-card.ws-card,
+.home-ws .r3-card.ws-card,
+.library-ws .r3-card.ws-card,
+.practice-shell .r3-card.ws-card,
+.practice-my-sentences .r3-card.ws-card,
+.lessons-shell .r3-card.ws-card,
+.home-ws a.r3-card.lessons-lesson-card,
+.home-ws a.r3-card.lessons-collection-card,
+.home-ws .r3-card.lessons-lesson-card,
+.home-ws .r3-card.lessons-collection-card,
+.home-ws .r3-card.lessons-continue,
+.library-ws a.r3-card.lessons-lesson-card,
+.library-ws a.r3-card.lessons-collection-card,
+.library-ws .r3-card.lessons-lesson-card,
+.library-ws .r3-card.lessons-collection-card,
+.library-ws .r3-card.lessons-continue,
+.practice-shell a.r3-card.lessons-lesson-card,
+.practice-shell .r3-card.lessons-lesson-card,
+.practice-my-sentences .r3-card.lessons-lesson-card,
+.practice-my-sentences .r3-card.ws-card,
+.lessons-shell a.r3-card.lessons-lesson-card,
+.lessons-shell a.r3-card.lessons-collection-card,
+.lessons-shell .r3-card.lessons-lesson-card,
+.lessons-shell .r3-card.lessons-collection-card,
+.lessons-shell .r3-card.lessons-continue {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-card-gap);
+  padding: var(--ws-card-padding);
+  min-height: 0;
+  height: auto;
+  max-height: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* ─── Card regions ─── */
+.ws-card__header,
+.ws-card__body,
+.ws-card__meta,
+.ws-card__footer {
+  min-width: 0;
+}
+
+.ws-card__header {
+  flex-shrink: 0;
+}
+
+.ws-card__body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 0;
+}
+
+.ws-card__meta {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.ws-card__footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: auto;
+}
+
+/* Meta stays in flow when a footer exists; only footer pins to bottom */
+.ws-card:has(.ws-card__footer) .lessons-lesson-card__meta {
+  margin-top: 0;
+}
+
+/* Collection cards without footer: meta is the bottom region */
+.lessons-collection-card.ws-card .ws-card__meta,
+.ws-card.lessons-collection-card .ws-card__meta {
+  margin-top: auto;
+}
+
+/* Map legacy Lessons BEM to layout regions */
+.lessons-collection-card__cover,
+.practice-mode-card__icon {
+  flex-shrink: 0;
+}
+
+.lessons-collection-card__meta,
+.lessons-lesson-card__meta {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.lessons-lesson-card__cta,
+.lessons-collection-card__cta,
+.library-ws-text-card__cta {
+  margin-top: 0;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+/* When CTA follows meta without footer wrapper, push CTA block down */
+.lessons-lesson-card__meta + .lessons-lesson-card__cta,
+.lessons-lesson-card__meta + .library-ws-text-card__cta {
+  margin-top: 0.35rem;
+}
+
+.lessons-lesson-card__desc:empty,
+.lessons-lesson-card__desc:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Text clamping ─── */
+.ws-card__title,
+.lessons-lesson-card__title,
+.lessons-collection-card__title,
+.lessons-continue__title,
+.library-ws-text-card__title,
+.practice-my-sentences__text {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+}
+
+.ws-card__desc,
+.lessons-lesson-card__desc,
+.lessons-collection-card__desc,
+.lessons-continue__meta,
+.library-ws-text-card__translation,
+.practice-my-sentences__translation,
+.practice-mode-card .lessons-lesson-card__desc {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.ws-card__eyebrow,
+.lessons-continue__label,
+.library-ws-text-card__collection {
+  margin: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Continue strip (horizontal, no fixed height) ─── */
+.home-ws .lessons-continue,
+.library-ws .lessons-continue,
+.lessons-shell .lessons-continue {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--ws-card-gap);
+}
+
+@media (min-width: 640px) {
+  .home-ws .lessons-continue,
+  .library-ws .lessons-continue,
+  .lessons-shell .lessons-continue {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .home-ws .lessons-continue > div,
+  .library-ws .lessons-continue > div,
+  .lessons-shell .lessons-continue > div {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .home-ws .lessons-continue__cta,
+  .library-ws .lessons-continue__cta,
+  .lessons-shell .lessons-continue__cta {
+    flex-shrink: 0;
+    margin-top: 0;
+  }
+
+  .home-ws .lessons-continue .ws-card__footer,
+  .library-ws .lessons-continue .ws-card__footer,
+  .lessons-shell .lessons-continue .ws-card__footer {
+    margin-top: 0;
+  }
+}
+
+/* ─── Library text card internals ─── */
+.library-ws .library-ws-text-card.ws-card {
+  height: auto;
+  min-height: 0;
+  padding: var(--ws-card-padding);
+  gap: var(--ws-card-gap);
+}
+
+.library-ws-text-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.library-ws-text-card__footer {
+  margin-top: auto;
+}
+
+.library-ws-text-card__meta {
+  font-size: 0.8125rem;
+  color: var(--r3-body);
+  margin-top: 0;
+}
+
+.library-ws-text-card__progress {
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+/* ─── Practice sentence cards ─── */
+.practice-my-sentences__list {
+  display: grid;
+  gap: var(--ws-card-grid-gap);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--ws-card-grid-min-wide)), 1fr));
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.practice-my-sentences__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-card-gap);
+  min-height: 0;
+  height: auto;
+  overflow: hidden;
+}
+
+.practice-my-sentences__source {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--r3-body);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-my-sentences__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+/* ─── Neutralize legacy fixed heights / overflow bugs ─── */
+.home-ws .home-ws-card,
+.home-ws .home-ws-continue,
+.home-ws .home-ws-featured-collection,
+.home-ws .home-ws-practice-card,
+.home-ws .home-ws-reading-card,
+.home-ws .home-ws-collection,
+.library-ws .library-ws-collection-card,
+.library-ws .library-ws-text-card,
+.library-ws .library-ws-text-card--featured,
+.practice-shell .practice-mode-card,
+.lessons-lesson-card,
+.lessons-collection-card {
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: hidden;
+}
+
+/* Practice legacy grid/card rules */
+.practice-shell .practice-mode-grid {
+  display: contents;
+}
+
+.practice-shell .practice-mode-card {
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Hover: lift only, no scale (prevents overlap) */
+a.r3-card.ws-card:hover,
+.home-ws a.r3-card.lessons-lesson-card:hover,
+.home-ws a.r3-card.lessons-collection-card:hover,
+.library-ws a.r3-card.lessons-lesson-card:hover,
+.library-ws a.r3-card.lessons-collection-card:hover,
+.practice-shell a.r3-card.lessons-lesson-card:hover,
+.lessons-shell a.r3-card.lessons-lesson-card:hover,
+.lessons-shell a.r3-card.lessons-collection-card:hover,
+.home-ws .r3-card.lessons-continue:hover,
+.library-ws .r3-card.lessons-continue:hover,
+.lessons-shell .r3-card.lessons-continue:hover {
+  transform: translateY(-2px) !important;
+}
+
+.home-ws .lessons-collection-card:hover,
+.home-ws .lessons-lesson-card:hover,
+.library-ws .lessons-collection-card:hover,
+.library-ws .lessons-lesson-card:hover,
+.lessons-shell .lessons-collection-card:hover,
+.lessons-shell .lessons-lesson-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Search row */
+.library-ws-filters {
+  align-items: flex-start;
+}
+
+.library-ws-search {
+  flex: 1 1 16rem;
+  min-width: min(100%, 14rem);
+  max-width: 28rem;
+}
+
+/* ─── Practice exercise surfaces (builder, translation, results) ─── */
+.practice-shell .practice-field,
+.practice-shell .practice-context-card,
+.practice-shell .practice-result-card,
+.practice-shell .practice-learning-card,
+.practice-shell .practice-history__item,
+.practice-shell .ds-exercise-card.ws-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.practice-context-card__target {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  word-break: break-word;
+}
+
+.practice-result-card__title,
+.practice-learning-card__title {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+}
+
+/* ─── Library saved sentence cards ─── */
+.lib-saved-sentence-grid {
+  display: grid;
+  gap: var(--ws-card-grid-gap);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--ws-card-grid-min-wide)), 1fr));
+  align-items: stretch;
+}
+
+.lib-saved-sentence-grid > li {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.lib-saved-sentence-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+}
+
+.lib-saved-sentence-card__text {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+}
+
+.lib-saved-sentence-card__translation {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.lib-saved-sentence-card__footer {
+  margin-top: auto;
+  flex-shrink: 0;
+}

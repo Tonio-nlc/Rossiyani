@@ -13,15 +13,21 @@ export function LessonsLessonCard({ lesson }: LessonsLessonCardProps) {
   const href = lessonPath(lesson.slug);
 
   return (
-    <Card href={href} className="lessons-lesson-card">
-      <h3 className="r3-title lessons-lesson-card__title">{primary}</h3>
-      {secondary ? <p className="r3-lead lessons-lesson-card__desc">{secondary}</p> : null}
-      <div className="lessons-lesson-card__meta">
+    <Card href={href} className="lessons-lesson-card ws-card">
+      <div className="ws-card__body">
+        <h3 className="r3-title ws-card__title lessons-lesson-card__title">{primary}</h3>
+        {secondary ? (
+          <p className="r3-lead ws-card__desc lessons-lesson-card__desc">{secondary}</p>
+        ) : null}
+      </div>
+      <div className="ws-card__meta lessons-lesson-card__meta">
         <Badge tone="blue">{MANUAL_LEVEL_LABELS[lesson.level]}</Badge>
         <Badge tone="violet">{MANUAL_CATEGORY_LABELS[lesson.category]}</Badge>
         <Badge tone="neutral">{lesson.estimatedReadingTime} min</Badge>
       </div>
-      <span className="lessons-lesson-card__cta">Ouvrir la leçon →</span>
+      <footer className="ws-card__footer">
+        <span className="lessons-lesson-card__cta">Ouvrir la leçon →</span>
+      </footer>
     </Card>
   );
 }
@@ -50,9 +56,11 @@ export function LessonsLessonGrid({
   }
 
   return (
-    <div className="lessons-grid lessons-grid--lessons">
+    <div className="lessons-grid lessons-grid--lessons ws-card-grid ws-card-grid--items">
       {lessons.map((lesson) => (
-        <LessonsLessonCard key={lesson.slug} lesson={lesson} />
+        <div key={lesson.slug} className="ws-card-grid__cell">
+          <LessonsLessonCard lesson={lesson} />
+        </div>
       ))}
     </div>
   );

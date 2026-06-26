@@ -42,32 +42,14 @@ export function LibraryEditorialGrid({
     );
   }
 
-  const [featured, ...rest] = texts;
-
   return (
-    <div className="lib-editorial-grid">
-      <div
-        className={[
-          "lib-editorial-grid__cell lib-editorial-grid__cell-featured",
-          removingTextId === featured.id ? "animate-fade-out" : "",
-        ].join(" ")}
-      >
-        <LibraryTextCard
-          text={featured}
-          variant="featured"
-          disabled={busyTextId === featured.id}
-          onRename={onRename}
-          onDelete={onDelete}
-        />
-      </div>
-
-      {rest.map((text) => (
+    <div className="lessons-grid lessons-grid--lessons ws-card-grid ws-card-grid--items library-ws-texts">
+      {texts.map((text) => (
         <div
           key={text.id}
-          className={[
-            "lib-editorial-grid__cell",
-            removingTextId === text.id ? "animate-fade-out" : "",
-          ].join(" ")}
+          className={["ws-card-grid__cell", removingTextId === text.id ? "animate-fade-out" : ""]
+            .filter(Boolean)
+            .join(" ")}
         >
           <LibraryTextCard
             text={text}
@@ -77,8 +59,7 @@ export function LibraryEditorialGrid({
           />
         </div>
       ))}
-
-      <div className="lib-editorial-grid__cell">
+      <div className="ws-card-grid__cell">
         <LibrarySuggestCard />
       </div>
     </div>

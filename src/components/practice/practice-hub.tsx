@@ -55,16 +55,24 @@ export function PracticeHub() {
         <div className="lessons-section__head">
           <h2 className="r3-title lessons-section__title">Modes disponibles</h2>
         </div>
-        <div className="lessons-grid lessons-grid--lessons">
+        <div className="lessons-grid lessons-grid--lessons ws-card-grid ws-card-grid--items">
           {PRACTICE_MODE_CARDS.map((mode) => (
-            <Card key={mode.id} href={mode.href} className="lessons-lesson-card practice-mode-card">
-              <span className="practice-mode-card__icon lessons-collection-card__cover" aria-hidden>
-                <PracticeModeIcon id={mode.id} />
-              </span>
-              <h3 className="r3-title lessons-lesson-card__title">{mode.title}</h3>
-              <p className="r3-lead lessons-lesson-card__desc">{mode.description}</p>
-              <span className="lessons-lesson-card__cta">Ouvrir →</span>
-            </Card>
+            <div key={mode.id} className="ws-card-grid__cell">
+              <Card href={mode.href} className="lessons-lesson-card ws-card practice-mode-card">
+                <header className="ws-card__header">
+                  <span className="practice-mode-card__icon lessons-collection-card__cover" aria-hidden>
+                    <PracticeModeIcon id={mode.id} />
+                  </span>
+                </header>
+                <div className="ws-card__body">
+                  <h3 className="r3-title ws-card__title lessons-lesson-card__title">{mode.title}</h3>
+                  <p className="r3-lead ws-card__desc lessons-lesson-card__desc">{mode.description}</p>
+                </div>
+                <footer className="ws-card__footer">
+                  <span className="lessons-lesson-card__cta">Ouvrir →</span>
+                </footer>
+              </Card>
+            </div>
           ))}
         </div>
       </section>

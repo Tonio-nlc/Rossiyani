@@ -19,16 +19,22 @@ export function HomeWorkspaceTodaysPractice({ cards }: HomeWorkspaceTodaysPracti
         </div>
       </div>
 
-      <div className="lessons-grid lessons-grid--lessons">
+      <div className="lessons-grid lessons-grid--lessons ws-card-grid ws-card-grid--items">
         {cards.map((card) => (
-          <Card key={card.id} href={card.href} className="lessons-lesson-card">
-            <h3 className="r3-title lessons-lesson-card__title">{card.title}</h3>
-            <p className="r3-lead lessons-lesson-card__desc">{card.description}</p>
-            <div className="lessons-lesson-card__meta">
-              <Badge tone="neutral">{card.progressLabel}</Badge>
-            </div>
-            <span className="lessons-lesson-card__cta">{card.cta}</span>
-          </Card>
+          <div key={card.id} className="ws-card-grid__cell">
+            <Card href={card.href} className="lessons-lesson-card ws-card">
+              <div className="ws-card__body">
+                <h3 className="r3-title ws-card__title lessons-lesson-card__title">{card.title}</h3>
+                <p className="r3-lead ws-card__desc lessons-lesson-card__desc">{card.description}</p>
+              </div>
+              <div className="ws-card__meta lessons-lesson-card__meta">
+                <Badge tone="neutral">{card.progressLabel}</Badge>
+              </div>
+              <footer className="ws-card__footer">
+                <span className="lessons-lesson-card__cta">{card.cta}</span>
+              </footer>
+            </Card>
+          </div>
         ))}
       </div>
     </section>

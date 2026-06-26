@@ -23,23 +23,27 @@ export function LessonsCollectionCard({ collection, lessonCount }: LessonsCollec
   return (
     <Card
       href={collection.href}
-      className="lessons-collection-card"
+      className="lessons-collection-card ws-card"
       style={
         {
           "--collection-accent": collection.accent,
         } as CSSProperties
       }
     >
-      <span
-        className="lessons-collection-card__cover"
-        style={{ background: `linear-gradient(135deg, ${collection.accent}, ${collection.accent}cc)` }}
-        aria-hidden
-      >
-        {ICON_LABELS[collection.icon]}
-      </span>
-      <h3 className="r3-title lessons-collection-card__title">{collection.title}</h3>
-      <p className="r3-lead lessons-collection-card__desc">{collection.description}</p>
-      <div className="lessons-collection-card__meta">
+      <header className="ws-card__header">
+        <span
+          className="lessons-collection-card__cover"
+          style={{ background: `linear-gradient(135deg, ${collection.accent}, ${collection.accent}cc)` }}
+          aria-hidden
+        >
+          {ICON_LABELS[collection.icon]}
+        </span>
+      </header>
+      <div className="ws-card__body">
+        <h3 className="r3-title ws-card__title lessons-collection-card__title">{collection.title}</h3>
+        <p className="r3-lead ws-card__desc lessons-collection-card__desc">{collection.description}</p>
+      </div>
+      <div className="ws-card__meta lessons-collection-card__meta">
         {collection.difficulty ? <Badge tone="violet">{collection.difficulty}</Badge> : null}
         {typeof lessonCount === "number" ? (
           <Badge tone="neutral">

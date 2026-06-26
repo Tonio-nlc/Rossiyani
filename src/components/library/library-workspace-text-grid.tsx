@@ -43,11 +43,13 @@ export function LibraryWorkspaceTextGrid({
   }
 
   return (
-    <div className="lessons-grid lessons-grid--lessons library-ws-texts">
+    <div className="lessons-grid lessons-grid--lessons ws-card-grid ws-card-grid--items library-ws-texts">
       {texts.map((text) => (
         <div
           key={text.id}
-          className={removingTextId === text.id ? "animate-fade-out" : undefined}
+          className={["ws-card-grid__cell", removingTextId === text.id ? "animate-fade-out" : ""]
+            .filter(Boolean)
+            .join(" ")}
         >
           <LibraryTextCard
             text={text}
@@ -57,7 +59,9 @@ export function LibraryWorkspaceTextGrid({
           />
         </div>
       ))}
-      <LibrarySuggestCard />
+      <div className="ws-card-grid__cell">
+        <LibrarySuggestCard />
+      </div>
     </div>
   );
 }

@@ -43,9 +43,11 @@ export function LessonsHome() {
             </p>
           </div>
         </div>
-        <div className="lessons-grid lessons-grid--collections">
+        <div className="lessons-grid lessons-grid--collections ws-card-grid ws-card-grid--collections">
           {hub.collections.map((collection) => (
-            <LessonsCollectionCard key={collection.id} collection={collection} />
+            <div key={collection.id} className="ws-card-grid__cell">
+              <LessonsCollectionCard collection={collection} />
+            </div>
           ))}
         </div>
       </section>

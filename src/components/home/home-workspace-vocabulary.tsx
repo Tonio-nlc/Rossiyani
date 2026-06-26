@@ -15,26 +15,30 @@ export function HomeWorkspaceVocabulary({ hub }: HomeWorkspaceVocabularyProps) {
         </h2>
       </div>
 
-      <Card as="article" interactive className="lessons-continue home-ws-vocabulary-strip">
-        <div>
-          <p className="lessons-continue__label">Mémoire linguistique</p>
-          <p className="r3-title lessons-continue__title">Vos mots, expressions et phrases</p>
-          <p className="lessons-continue__meta">
+      <Card as="article" interactive className="lessons-continue ws-card home-ws-vocabulary-strip">
+        <div className="ws-card__body">
+          <p className="lessons-continue__label ws-card__eyebrow">Mémoire linguistique</p>
+          <p className="r3-title lessons-continue__title ws-card__title">
+            Vos mots, expressions et phrases
+          </p>
+          <p className="lessons-continue__meta ws-card__desc">
             {hub.savedWordCount} mot{hub.savedWordCount === 1 ? "" : "s"} sauvegardé
             {hub.savedWordCount === 1 ? "" : "s"}
             {hub.manualProgress.total > 0
               ? ` · ${hub.manualProgress.completed}/${hub.manualProgress.total} leçons lues`
               : ""}
           </p>
-          <div className="lessons-hero__metrics" style={{ marginTop: "0.5rem" }}>
+          <div className="ws-card__meta lessons-hero__metrics">
             <Badge tone="violet">Mots</Badge>
             <Badge tone="neutral">Expressions</Badge>
             <Badge tone="green">Phrases</Badge>
           </div>
         </div>
-        <PrimaryButton href={vocabularyPath()} className="lessons-continue__cta">
-          Ouvrir Vocabulary →
-        </PrimaryButton>
+        <footer className="ws-card__footer">
+          <PrimaryButton href={vocabularyPath()} className="lessons-continue__cta">
+            Ouvrir Vocabulary →
+          </PrimaryButton>
+        </footer>
       </Card>
     </section>
   );

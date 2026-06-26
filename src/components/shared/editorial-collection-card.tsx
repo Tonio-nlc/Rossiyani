@@ -49,19 +49,23 @@ export function EditorialCollectionCard({
   return (
     <Card
       href={href}
-      className="lessons-collection-card"
+      className="lessons-collection-card ws-card"
       style={{ "--collection-accent": accent } as CSSProperties}
     >
-      <span
-        className="lessons-collection-card__cover"
-        style={{ background: `linear-gradient(135deg, ${accent}, ${accent}cc)` }}
-        aria-hidden
-      >
-        {icon}
-      </span>
-      <h3 className="r3-title lessons-collection-card__title">{title}</h3>
-      <p className="r3-lead lessons-collection-card__desc">{description}</p>
-      <div className="lessons-collection-card__meta">
+      <header className="ws-card__header">
+        <span
+          className="lessons-collection-card__cover"
+          style={{ background: `linear-gradient(135deg, ${accent}, ${accent}cc)` }}
+          aria-hidden
+        >
+          {icon}
+        </span>
+      </header>
+      <div className="ws-card__body">
+        <h3 className="r3-title ws-card__title lessons-collection-card__title">{title}</h3>
+        <p className="r3-lead ws-card__desc lessons-collection-card__desc">{description}</p>
+      </div>
+      <div className="ws-card__meta lessons-collection-card__meta">
         {level ? <Badge tone="blue">{level}</Badge> : null}
         {textCount > 0 ? (
           <Badge tone="neutral">

@@ -31,14 +31,16 @@ export function LessonsContinuePanel() {
           Reprendre
         </h2>
       </div>
-      <Card as="article" interactive className="lessons-continue">
-        <div>
-          <p className="lessons-continue__label">Continuer l&apos;apprentissage</p>
-          <p className="r3-title lessons-continue__title">{visit.title}</p>
+      <Card as="article" interactive className="lessons-continue ws-card">
+        <div className="ws-card__body">
+          <p className="lessons-continue__label ws-card__eyebrow">Continuer l&apos;apprentissage</p>
+          <p className="r3-title lessons-continue__title ws-card__title">{visit.title}</p>
         </div>
-        <PrimaryButton href={visit.href} className="lessons-continue__cta">
-          Reprendre →
-        </PrimaryButton>
+        <footer className="ws-card__footer">
+          <PrimaryButton href={visit.href} className="lessons-continue__cta">
+            Reprendre →
+          </PrimaryButton>
+        </footer>
       </Card>
     </section>
   );

@@ -18,11 +18,8 @@ import {
   splitLibraryTitle,
 } from "./library-utils";
 
-export type LibraryTextCardVariant = "featured" | "standard" | "compact";
-
 type LibraryTextCardProps = {
   text: TextListItem;
-  variant?: LibraryTextCardVariant;
   disabled?: boolean;
   onRename: (text: TextListItem) => void;
   onDelete: (text: TextListItem) => void;
@@ -30,7 +27,6 @@ type LibraryTextCardProps = {
 
 export const LibraryTextCard = memo(function LibraryTextCard({
   text,
-  variant = "standard",
   disabled = false,
   onRename,
   onDelete,
@@ -44,15 +40,8 @@ export const LibraryTextCard = memo(function LibraryTextCard({
   const collectionName = getCollectionName(text.collectionId);
 
   return (
-    <Card
-      as="article"
-      className={[
-        "lessons-lesson-card",
-        "library-ws-text-card",
-        variant === "featured" ? "library-ws-text-card--featured" : "",
-      ].join(" ")}
-    >
-      <div className="library-ws-text-card__head">
+    <Card as="article" className="lessons-lesson-card library-ws-text-card ws-card">
+      <header className="ws-card__header library-ws-text-card__head">
         <div className="library-ws-text-card__badges">
           <Badge tone="blue">{text.level}</Badge>
           <Badge tone="neutral">{minutes} min</Badge>
@@ -63,21 +52,21 @@ export const LibraryTextCard = memo(function LibraryTextCard({
           onRename={() => onRename(text)}
           onDelete={() => onDelete(text)}
         />
+      </header>
+
+      <div className="ws-card__body">
+        <p className="library-ws-text-card__collection ws-card__eyebrow">{collectionName}</p>
+        <h2 className="r3-title ws-card__title library-ws-text-card__title break-russian">
+          <Link href={`/texts/${text.id}`} prefetch className="library-ws-text-card__title-link focus-kb">
+            {russian}
+          </Link>
+        </h2>
+        <p className="ws-card__desc library-ws-text-card__translation">
+          <em>{translation}</em>
+        </p>
       </div>
 
-      <p className="library-ws-text-card__collection">{collectionName}</p>
-
-      <h2 className="r3-title library-ws-text-card__title break-russian">
-        <Link href={`/texts/${text.id}`} prefetch className="library-ws-text-card__title-link focus-kb">
-          {russian}
-        </Link>
-      </h2>
-
-      <p className="library-ws-text-card__translation">
-        <em>{translation}</em>
-      </p>
-
-      <div className="library-ws-text-card__meta">
+      <div className="ws-card__meta library-ws-text-card__meta">
         <span>{words} mots</span>
         <span className="library-ws-text-card__meta-sep" aria-hidden>
           &bull;
@@ -89,7 +78,7 @@ export const LibraryTextCard = memo(function LibraryTextCard({
 
       <LibraryCardProgress textId={text.id} workspace />
 
-      <footer className="library-ws-text-card__footer">
+      <footer className="ws-card__footer library-ws-text-card__footer">
         <TextButton href={`/texts/${text.id}`} className="lessons-lesson-card__cta library-ws-text-card__cta">
           Lire →
         </TextButton>

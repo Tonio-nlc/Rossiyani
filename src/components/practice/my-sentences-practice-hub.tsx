@@ -58,18 +58,20 @@ export function MySentencesPracticeHub() {
 
       <ul className="practice-my-sentences__list">
         {sentences.map((sentence) => (
-          <li key={sentence.id}>
-            <Card as="article" className="practice-my-sentences__card">
-              <p className="practice-my-sentences__text break-russian">{sentence.text}</p>
-              {sentence.translation ? (
-                <p className="practice-my-sentences__translation">{sentence.translation}</p>
-              ) : null}
-              <p className="practice-my-sentences__source">
-                {sentence.sourceTextTitle}
-                {sentence.collection ? ` · ${sentence.collection}` : ""} ·{" "}
-                {formatSavedDate(sentence.createdAt)}
-              </p>
-              <div className="practice-my-sentences__actions">
+          <li key={sentence.id} className="ws-card-grid__cell">
+            <Card as="article" className="lessons-lesson-card ws-card practice-my-sentences__card">
+              <div className="ws-card__body">
+                <p className="practice-my-sentences__text ws-card__title break-russian">{sentence.text}</p>
+                {sentence.translation ? (
+                  <p className="practice-my-sentences__translation ws-card__desc">{sentence.translation}</p>
+                ) : null}
+                <p className="practice-my-sentences__source">
+                  {sentence.sourceTextTitle}
+                  {sentence.collection ? ` · ${sentence.collection}` : ""} ·{" "}
+                  {formatSavedDate(sentence.createdAt)}
+                </p>
+              </div>
+              <footer className="ws-card__footer practice-my-sentences__actions">
                 <PrimaryButton
                   href={practicePath({
                     savedSentenceId: sentence.id,
@@ -96,7 +98,7 @@ export function MySentencesPracticeHub() {
                 >
                   Retirer
                 </GhostButton>
-              </div>
+              </footer>
             </Card>
           </li>
         ))}

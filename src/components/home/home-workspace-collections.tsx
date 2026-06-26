@@ -52,22 +52,23 @@ export function HomeWorkspaceCollections({ texts }: HomeWorkspaceCollectionsProp
         </div>
       </div>
 
-      <div className="lessons-grid lessons-grid--collections">
+      <div className="lessons-grid lessons-grid--collections ws-card-grid ws-card-grid--collections">
         {FEATURED_COLLECTIONS.map((item) => {
           const collection = getCollectionRecord(item.id);
           const collectionTexts = texts.filter((text) => text.collectionId === item.id);
           const level = dominantLevel(collectionTexts);
 
           return (
-            <EditorialCollectionCard
-              key={item.id}
-              id={item.id}
-              title={item.displayName}
-              description={collection.description}
-              href={`/library?collection=${item.id}`}
-              level={level}
-              textCount={collectionTexts.length}
-            />
+            <div key={item.id} className="ws-card-grid__cell">
+              <EditorialCollectionCard
+                id={item.id}
+                title={item.displayName}
+                description={collection.description}
+                href={`/library?collection=${item.id}`}
+                level={level}
+                textCount={collectionTexts.length}
+              />
+            </div>
           );
         })}
       </div>
