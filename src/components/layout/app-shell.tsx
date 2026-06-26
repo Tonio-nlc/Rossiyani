@@ -21,19 +21,27 @@ const UniversalSearchDialog = dynamic(
 import { NAV_KEYBOARD_SHORTCUTS } from "@/lib/navigation/main-nav";
 
 function resolvePageRootClass(pathname: string | null): string {
+  const r3 = "r3-page-root";
+
   if (pathname?.startsWith("/settings")) {
-    return "settings-page-root v2-page-root";
+    return `settings-page-root v2-page-root ${r3}`;
+  }
+  if (pathname?.startsWith("/import")) {
+    return `import-page-root v2-page-root ${r3}`;
   }
   if (pathname?.startsWith("/practice")) {
-    return "practice-page-root";
+    return `practice-page-root ${r3}`;
   }
   if (pathname?.startsWith("/lessons")) {
-    return "lessons-page-root";
+    return `lessons-page-root ${r3}`;
   }
   if (pathname?.startsWith("/vocabulary")) {
-    return "vocabulary-page-root";
+    return `vocabulary-page-root ${r3}`;
   }
-  return "v2-page-root";
+  if (pathname?.startsWith("/texts/") || pathname === "/reader") {
+    return `reader-page-root v2-page-root ${r3}`;
+  }
+  return `v2-page-root ${r3}`;
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {

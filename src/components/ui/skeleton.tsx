@@ -21,10 +21,10 @@ export function SkeletonText({ lines = 3 }: { lines?: number }) {
 
 export function SkeletonCard() {
   return (
-    <div className="space-y-4 rounded-[24px] border border-[rgba(59,130,246,0.1)] bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-6 shadow-[var(--v2-shadow)]">
+    <div className="space-y-4 rounded-[var(--r3-radius-card,28px)] border border-[var(--r3-border)] bg-[var(--r3-card-bg)] p-6 shadow-[var(--r3-shadow-card)]">
       <Skeleton className="h-4 w-1/3" />
       <SkeletonText lines={2} />
-      <Skeleton className="h-10 w-full rounded-[16px]" />
+      <Skeleton className="h-12 w-full rounded-[var(--r3-radius-md,22px)]" />
     </div>
   );
 }

@@ -1,0 +1,279 @@
+/* ─── Rossiyani V3 — area canvases & cross-workspace card unification ─── */
+
+/* Home + default */
+.r3-page-root.v2-page-root,
+.v2-page-root.r3-page-root {
+  --v2-canvas-bg: var(--r3-area-home);
+  --v2-canvas-glow-a: var(--r3-area-home-glow);
+  --v2-canvas-glow-b: rgba(219, 234, 254, 0.45);
+  --v2-canvas-glow-c: rgba(191, 219, 254, 0.15);
+  background:
+    radial-gradient(ellipse 75% 50% at 5% 0%, var(--r3-area-home-glow), transparent),
+    radial-gradient(ellipse 55% 40% at 95% 8%, rgba(219, 234, 254, 0.5), transparent),
+    radial-gradient(ellipse 45% 35% at 50% 100%, rgba(241, 245, 249, 0.8), transparent),
+    var(--r3-area-home);
+}
+
+/* Library — warm sand */
+.r3-page-root.v2-page-root:has(.library-ws),
+.v2-page-root:has(.library-ws) {
+  --v2-canvas-bg: var(--r3-area-library);
+  --v2-canvas-glow-a: var(--r3-area-library-glow);
+  --v2-canvas-glow-b: rgba(250, 245, 235, 0.7);
+  --v2-canvas-glow-c: rgba(232, 213, 183, 0.12);
+  background:
+    radial-gradient(ellipse 70% 50% at 0% 0%, var(--r3-area-library-glow), transparent),
+    radial-gradient(ellipse 50% 40% at 100% 5%, rgba(250, 245, 235, 0.8), transparent),
+    var(--r3-area-library);
+}
+
+/* Import shares home blue */
+.r3-page-root.import-page-root {
+  --v2-canvas-bg: var(--r3-area-home);
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%, var(--r3-area-home-glow), transparent),
+    radial-gradient(ellipse 50% 40% at 90% 10%, rgba(219, 234, 254, 0.4), transparent),
+    var(--r3-area-home);
+}
+
+/* Vocabulary — violet */
+.vocabulary-page-root.r3-page-root {
+  --vocabulary-page-bg: var(--r3-area-vocabulary);
+  background:
+    radial-gradient(ellipse 75% 55% at 0% 0%, var(--r3-area-vocabulary-glow), transparent),
+    radial-gradient(ellipse 50% 40% at 100% 8%, rgba(237, 233, 254, 0.55), transparent),
+    radial-gradient(ellipse 45% 35% at 50% 100%, rgba(245, 243, 255, 0.6), transparent),
+    var(--r3-area-vocabulary);
+}
+
+/* Lessons — subtle multicolor */
+.lessons-page-root.r3-page-root {
+  --lessons-page-bg: #fafbfd;
+  background:
+    radial-gradient(ellipse 60% 45% at 0% 0%, var(--r3-area-lessons-a), transparent),
+    radial-gradient(ellipse 50% 40% at 100% 5%, var(--r3-area-lessons-b), transparent),
+    radial-gradient(ellipse 45% 35% at 50% 100%, var(--r3-area-lessons-c), transparent),
+    #fafbfd;
+}
+
+/* Practice — green */
+.practice-page-root.r3-page-root {
+  --practice-page-bg: var(--r3-area-practice);
+  background:
+    radial-gradient(ellipse 75% 55% at 0% 0%, var(--r3-area-practice-glow), transparent),
+    radial-gradient(ellipse 55% 40% at 100% 5%, rgba(209, 250, 229, 0.45), transparent),
+    var(--r3-area-practice);
+}
+
+/* Settings */
+.settings-page-root.r3-page-root {
+  background:
+    radial-gradient(ellipse 70% 50% at 0% 0%, var(--r3-area-settings-glow), transparent),
+    var(--r3-area-settings);
+}
+
+/* Reader — blue immersive */
+.reader-page-root.r3-page-root,
+.r3-page-root:has(.reader-ws) {
+  background:
+    radial-gradient(ellipse 70% 50% at 0% 0%, var(--r3-area-reader-glow), transparent),
+    radial-gradient(ellipse 50% 40% at 100% 5%, rgba(219, 234, 254, 0.45), transparent),
+    var(--r3-area-reader);
+}
+
+/* ─── Universal card family (all workspaces) ─── */
+.r3-card,
+.v2-card,
+.r3-page-root .home-ws-card,
+.r3-page-root .library-ws-card,
+.r3-page-root .home-ws-metric,
+.r3-page-root .home-ws-continue,
+.r3-page-root .home-ws-practice-card,
+.r3-page-root .home-ws-reading-card,
+.r3-page-root .home-ws-collection-card,
+.r3-page-root .home-ws-featured-collection,
+.r3-page-root .library-ws-collection-card,
+.r3-page-root .library-ws-text-card,
+.r3-page-root .settings-card,
+.vocabulary-page-root .vocabulary-fiche,
+.vocabulary-page-root .vocabulary-stat,
+.lessons-page-root .lessons-lesson-card,
+.lessons-page-root .lessons-theme-card,
+.practice-page-root .practice-mode-card,
+.practice-page-root .practice-session-card,
+.practice-page-root .practice-my-sentences__card,
+.reader-ws-explorer__word-card,
+.reader-ws-explorer__card--module,
+.reader-ws-complete__card,
+.v2-error-page__card,
+.v2-spotlight,
+.ds-dialog {
+  border: 1px solid var(--r3-border);
+  border-radius: var(--r3-radius-card);
+  background: var(--r3-card-bg);
+  box-shadow: var(--r3-shadow-card);
+  transition:
+    transform var(--r3-duration) var(--r3-ease),
+    box-shadow var(--r3-duration) var(--r3-ease),
+    border-color var(--r3-duration) var(--r3-ease),
+    background var(--r3-duration) var(--r3-ease);
+}
+
+/* Hero cards */
+.r3-page-root .home-ws-card--hero,
+.r3-page-root .home-ws-continue,
+.r3-page-root .library-ws-collection-card--hero,
+.r3-hero-card,
+.vocabulary-page-root .vocabulary-hero-card,
+.settings-profile-identity {
+  border-radius: var(--r3-radius-hero);
+}
+
+/* Interactive hover */
+a.r3-page-root .home-ws-card:hover,
+.r3-page-root a.home-ws-card:hover,
+.r3-page-root .library-ws-card:hover,
+.r3-page-root .home-ws-metric:hover,
+.r3-page-root .home-ws-practice-card:hover,
+.r3-page-root .home-ws-reading-card:hover,
+.r3-page-root .home-ws-collection-card:hover,
+.r3-page-root .library-ws-collection-card:hover,
+.r3-page-root .library-ws-text-card:hover,
+.r3-page-root .settings-card:hover,
+.vocabulary-page-root a.vocabulary-fiche:hover,
+.lessons-page-root a.lessons-lesson-card:hover,
+.lessons-page-root a.lessons-theme-card:hover,
+.practice-page-root a.practice-mode-card:hover,
+.practice-page-root .practice-my-sentences__card:hover,
+.reader-ws-complete__card:hover,
+a.r3-card:hover,
+.r3-card--interactive:hover {
+  border-color: var(--r3-border-hover);
+  background: var(--r3-card-bg-hover);
+  box-shadow: var(--r3-shadow-card-hover);
+  transform: translateY(-4px);
+}
+
+/* Workspace spacing */
+.r3-page-root .home-ws,
+.r3-page-root .library-ws,
+.vocabulary-page-root .vocabulary-shell,
+.lessons-page-root .lessons-shell,
+.practice-page-root .practice-shell {
+  gap: var(--r3-gap-major);
+}
+
+.r3-page-root .home-ws-section,
+.r3-page-root .library-ws-section,
+.vocabulary-page-root .vocabulary-section,
+.lessons-page-root .lessons-section {
+  gap: var(--r3-gap-section);
+}
+
+/* Unified workspace buttons */
+.r3-page-root .home-ws-btn,
+.r3-page-root .library-ws-btn,
+.vocabulary-page-root .vocabulary-empty__cta,
+.practice-page-root .practice-btn,
+.lessons-page-root .lessons-btn {
+  min-height: 3rem;
+  border-radius: var(--r3-radius-pill);
+  font-weight: 600;
+  box-shadow: 0 6px 20px rgba(0, 88, 190, 0.2);
+  transition:
+    background var(--r3-duration) var(--r3-ease),
+    transform var(--r3-duration) var(--r3-ease),
+    box-shadow var(--r3-duration) var(--r3-ease);
+}
+
+.r3-page-root .home-ws-btn:hover,
+.r3-page-root .library-ws-btn:hover {
+  transform: translateY(-2px);
+}
+
+.r3-page-root .home-ws-btn--ghost,
+.r3-page-root .library-ws-btn--ghost {
+  border: 1px solid var(--r3-border);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--r3-shadow-card);
+}
+
+/* Unified badges across workspaces */
+.r3-page-root .home-ws-badge,
+.r3-page-root .library-ws-badge,
+.r3-page-root .library-ws-level-pill,
+.vocabulary-page-root .vocabulary-badge,
+.vocabulary-page-root .vocabulary-nav__pill,
+.lessons-page-root .lessons-level-pill,
+.lessons-page-root .lessons-badge,
+.practice-page-root .practice-badge,
+.reader-ws-explorer__tag {
+  border-radius: var(--r3-radius-pill);
+  font-family: var(--font-workspace), var(--font-ui), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
+/* Spotlight + modals V3 */
+.v2-spotlight {
+  border-radius: var(--r3-radius-hero);
+  box-shadow: var(--r3-shadow-card-hover);
+}
+
+.ds-dialog {
+  border-radius: var(--r3-radius-card);
+  padding: var(--r3-gap-md);
+}
+
+.ds-toast {
+  border-radius: var(--r3-radius-md);
+}
+
+.v2-error-page__card {
+  border-radius: var(--r3-radius-hero);
+  padding: var(--r3-gap-xl) var(--r3-gap-lg);
+}
+
+/* Vocabulary empty */
+.vocabulary-page-root .vocabulary-empty {
+  border-radius: var(--r3-radius-hero);
+  border: 1px solid var(--r3-border);
+  background: var(--r3-card-bg);
+  box-shadow: var(--r3-shadow-card);
+  padding: var(--r3-gap-xl) var(--r3-gap-lg);
+}
+
+/* Lessons empty */
+.lessons-page-root .lessons-empty {
+  border-radius: var(--r3-radius-hero);
+  border: 1px solid var(--r3-border);
+  background: var(--r3-card-bg);
+  box-shadow: var(--r3-shadow-card);
+}
+
+/* Header harmonized on all areas */
+.r3-page-root .ds-top-nav,
+.vocabulary-page-root .ds-top-nav,
+.lessons-page-root .ds-top-nav,
+.practice-page-root .ds-top-nav,
+.settings-page-root .ds-top-nav {
+  --nav-bg: rgba(255, 255, 255, 0.82);
+  --nav-border: var(--r3-border);
+}
+
+.practice-page-root .ds-top-nav {
+  --nav-bg: rgba(255, 255, 255, 0.84);
+}
+
+@media (max-width: 767px) {
+  :root {
+    --r3-gap-major: 3.5rem;
+    --r3-gap-section: 2rem;
+  }
+
+  .r3-hero-card,
+  .r3-page-root .home-ws-card--hero {
+    padding: var(--r3-gap-md);
+  }
+}

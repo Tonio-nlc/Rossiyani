@@ -10,7 +10,7 @@ type GhostButtonProps = {
 };
 
 export function GhostButton({ href, onClick, children, className = "", disabled }: GhostButtonProps) {
-  const classes = ["ds-ghost-btn focus-kb", className].filter(Boolean).join(" ");
+  const classes = ["r3-btn r3-btn--ghost ds-ghost-btn focus-kb", className].filter(Boolean).join(" ");
 
   if (href) {
     return (

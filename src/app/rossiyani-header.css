@@ -3,8 +3,8 @@
 :root {
   --header-height: 4rem;
   --nav-shell-max: 80rem;
-  --nav-bg: rgba(248, 250, 252, 0.82);
-  --nav-border: rgba(100, 116, 139, 0.12);
+  --nav-bg: rgba(255, 255, 255, 0.82);
+  --nav-border: var(--r3-border, rgba(100, 116, 139, 0.12));
   --nav-ink: #111827;
   --nav-muted: #64748b;
   --nav-faint: #94a3b8;

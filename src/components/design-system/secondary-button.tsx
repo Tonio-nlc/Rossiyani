@@ -1,28 +1,28 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-type PrimaryButtonProps = {
+type SecondaryButtonProps = {
   href?: string;
   onClick?: () => void;
   children: ReactNode;
   className?: string;
   disabled?: boolean;
   type?: "button" | "submit";
-  variant?: "default" | "gold";
+  large?: boolean;
 };
 
-export function PrimaryButton({
+export function SecondaryButton({
   href,
   onClick,
   children,
   className = "",
   disabled,
   type = "button",
-  variant = "default",
-}: PrimaryButtonProps) {
+  large = false,
+}: SecondaryButtonProps) {
   const classes = [
-    "r3-btn r3-btn--primary ds-primary-btn focus-kb",
-    variant === "gold" ? "ds-primary-btn--gold" : "",
+    "r3-btn r3-btn--secondary focus-kb",
+    large ? "r3-btn--large" : "",
     className,
   ]
     .filter(Boolean)
@@ -30,7 +30,7 @@ export function PrimaryButton({
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={classes} aria-disabled={disabled}>
         {children}
       </Link>
     );

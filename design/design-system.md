@@ -1,92 +1,136 @@
-# Rossiyani Design System v2
+# Rossiyani Design System V3
 
 ## Product Identity
 
-Rossiyani is a **living learning platform** — fluid, responsive, energetic, premium.
+Rossiyani is a **premium editorial learning environment** for Russian — calm, luminous, breathable.
 
-Not editorial. Not a quiet library. Not beige minimalism.
+Inspiration: Apple, Notion, Linear, Readwise, Kindle — with the tactile warmth of a beautiful book.
 
-Inspiration mix: Busuu, Linear, Arc, Apple, Raycast, Airbnb — without copying any.
-
----
-
-## Design Principles
-
-1. **Every component reacts** — hover, focus, selection, scroll, loading, completion
-2. **Large rounded shapes** — 20–32px radius on cards and surfaces
-3. **Modern spacing** — generous whitespace, effortless sections
-4. **Dynamic backgrounds** — subtle gradients, soft halos, atmosphere (not decoration)
-5. **Area accents** — each major zone has its own visual identity
+Not a dense SaaS dashboard. Not academic beige. White-dominant, subtly tinted canvases.
 
 ---
 
-## Area Color Accents
+## V3 Principles
 
-| Area | Accent |
-|------|--------|
-| Library | Warm sand `#faf7f2` |
-| Reader | Blue `#f0f5ff` |
-| Practice | Green `#f0fdf6` |
-| Vocabulary | Slate `#f8fafc` (canvas + floating cards) |
-| Lessons | Neutral slate `#f8fafc` |
-
-Primary identity blue: `#0058BE`
+1. **One card family** — same radius, shadow, padding, hover lift everywhere
+2. **Hero cards** — large rounded surfaces with illustrations, generous whitespace
+3. **Area tints** — discrete color per zone; never saturated
+4. **Clear hierarchy** — big titles, light subtitles, minimal copy
+5. **Unified motion** — 240ms default, 400ms panels, subtle hover only
 
 ---
 
-## Motion
+## Implementation
 
-- Duration: 200–250ms default, 380ms for panels
-- Easing: `cubic-bezier(0.22, 1, 0.36, 1)` (spring-like)
-- Cards: lift + scale(1.01) on hover
-- Buttons: scale(1.02) on hover, scale(0.96) on press
+| Layer | File |
+|-------|------|
+| Tokens + components | `rossiyani-v3.css` |
+| Area canvases + card unification | `rossiyani-v3-canvas.css` |
+| Header | `rossiyani-header.css` |
+| Primitives (search, dialog, toast) | `rossiyani-primitives.css` |
+| Page root class | `r3-page-root` on all routes via `app-shell.tsx` |
+
+V2 tokens (`--v2-*`) alias to V3 (`--r3-*`) for backward compatibility.
 
 ---
 
-## Typography
+## Area Colors (discrete)
 
-Premium SaaS — no editorial feeling.
+| Area | Canvas | Dominant tint |
+|------|--------|---------------|
+| Home / Import | `#f5f8fc` | Blue |
+| Library | `#faf7f2` | Beige/sand |
+| Reader | `#f3f7ff` | Blue |
+| Vocabulary | `#f8f5ff` | Violet |
+| Lessons | `#fafbfd` | Multicolor gradients |
+| Practice | `#f0faf5` | Green |
+| Settings / Profile | `#f8fafc` | Neutral |
 
-- Headlines: Inter 700, `#111827`
-- Body: Inter 400, `#64748B`
-- Labels: Inter 600 uppercase, `#94A3B8`
-- Russian reading content: serif only in Reader text
+Primary: `#0058BE`
 
 ---
 
 ## Cards
 
-- Gradient: `linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)`
-- Border: `rgba(59, 130, 246, 0.1)`
-- Shadow: soft, large blur
-- Hover: translateY(-3px) scale(1.01), stronger shadow, blue border
+| Token | Value |
+|-------|-------|
+| `--r3-radius-card` | `28px` |
+| `--r3-radius-hero` | `32px` |
+| Shadow | soft multi-layer, large blur |
+| Hover | `translateY(-4px)`, stronger shadow |
+| Padding | `1.5rem` standard, `2rem` hero |
+
+React: `<Card hero interactive href="…">`
 
 ---
 
-## Workspace Reference
+## Buttons
 
-Rossiyani is a premium language learning workspace built around reading — a personal language-learning operating system where every screen helps the learner decide: *What should I do next?*
+| Variant | Class |
+|---------|-------|
+| Primary | `r3-btn--primary` / `<PrimaryButton>` |
+| Secondary | `r3-btn--secondary` / `<SecondaryButton>` |
+| Ghost | `r3-btn--ghost` / `<GhostButton>` |
+| Text | `r3-btn--text` / `<TextButton>` |
 
-### Unified V2 visual language
-
-All major areas share V2 tokens (`workspace-v2.css`): motion, depth, large radii, and area-specific accent backgrounds.
-
-| Area | Wrapper class | Accent |
-|------|---------------|--------|
-| Home / Import | `home-ws` | Blue page `#f7f9fb` |
-| Library | `library-ws` | Warm sand |
-| Reader | `reader-ws` | Blue immersive |
-| Practice | `practice-shell` | Green |
-| Vocabulary | `vocabulary-shell` | Slate |
-| Lessons | `lessons-shell` | Slate |
+Min height: `3rem` (48px). Pill radius.
 
 ---
 
-## Header & Navigation (V2)
+## Badges
 
-The header is the product signature — frosted glass, pill navigation, refined tools. Implementation: `rossiyani-header.css`, `top-navigation.tsx`, `lib/navigation/main-nav.ts`.
+Unified via `<Badge tone="blue|violet|green|amber|rose|neutral">` and `<Tag>`.
 
-### Primary navigation (official)
+Use for levels, categories, time, grammar cases, collections.
+
+---
+
+## Illustrations
+
+Shared SVG library in `components/design-system/illustrations.tsx`:
+
+`IllustrationBook`, `IllustrationLibrary`, `IllustrationVocabulary`, `IllustrationLessons`, `IllustrationPractice`, `IllustrationReader`, `IllustrationSearch`
+
+Wrap in `.r3-illustration--hero` with area tone modifiers.
+
+---
+
+## Typography
+
+| Role | Style |
+|------|-------|
+| Eyebrow | `.r3-eyebrow` — 11px uppercase, label color |
+| Hero title | `.r3-hero-title` — clamp, -0.04em tracking |
+| Section title | `.r3-title` — 20px semibold |
+| Lead | `.r3-lead` — 16px, body color, 1.65 line-height |
+
+Font: Inter (`--font-workspace`). Russian reading: serif in Reader body only.
+
+---
+
+## Spacing
+
+8px grid. Section gap `2.5rem`, major gap `5rem` (mobile `3.5rem`).
+
+---
+
+## Motion
+
+- Easing: `cubic-bezier(0.22, 1, 0.36, 1)`
+- Duration: `240ms` / `400ms`
+- Forbidden: bounce, spring, gamification flourishes
+
+---
+
+## Navigation
+
+Official routes unchanged — see Header section below.
+
+Header: frosted white, pill nav, spotlight search (`/`).
+
+---
+
+## Header & Navigation
 
 | Label | Route | Shortcut |
 |-------|-------|----------|
@@ -97,271 +141,12 @@ The header is the product signature — frosted glass, pill navigation, refined 
 | Lessons | `/lessons` | Alt+4 |
 | Practice | `/practice` | Alt+5 |
 
-No other main nav entries. Profile lives at `/settings` (secondary). Search opens via header button or `/` key.
-
-### Header tokens
-
-| Token | Value |
-|-------|-------|
-| `--header-height` | `4rem` |
-| Background | `rgba(248, 250, 252, 0.82)` + blur |
-| Nav ink / muted | `#111827` / `#64748b` |
-| Accent | `#0058be` |
-| Practice tint | `rgba(240, 253, 246, 0.84)` |
-
-### Responsive
-
-| Breakpoint | Behavior |
-|------------|----------|
-| &lt; 900px | Logo + search icon + hamburger; full nav in mobile sheet |
-| ≥ 900px | Inline pill nav + profile avatar |
-| ≥ 1100px | Search label + `/` kbd hint; wider nav links |
-| ≥ 1280px | Profile label visible |
-
-### Shared primitives (`rossiyani-primitives.css`)
-
-Spotlight search, dialogs, toasts, buttons, error pages, menus — unified V2 motion (`220ms` / `380ms`, `cubic-bezier(0.22, 1, 0.36, 1)`).
-
-| Primitive | Class prefix |
-|-----------|----------------|
-| Search overlay | `v2-spotlight` |
-| Modal / dialog | `ds-dialog` (V2 overrides) |
-| Toast | `ds-toast` |
-| Error page | `v2-error-page` |
-| Dropdown menu | `v2-menu` |
-| Skeleton | `ws-v2-skeleton` / `skeleton-shimmer` |
-
-Settings: `settings-workspace.css` + profile hero on `#account`.
-
-Onboarding first-run flow: **removed** — users land directly in the product.
+Profile: `/settings` · Search: `/` key
 
 ---
 
-# Interface Architecture (legacy notes)
+## Legacy V2 notes
 
-## Workspace System
-
-Used for:
-
-* Home
-* Vocabulary
-* Practice
-* Profile
-* Future analytics
-
-Characteristics:
-
-* Large cards
-* Clear hierarchy
-* Visible progress
-* Strong actions
-* Comfortable spacing
-* Dashboard feeling
+Previous V2 workspace CSS files remain; V3 canvas layer unifies cards and canvases globally. Migrate new work to `<Card>`, `<Badge>`, R3 button components.
 
 ---
-
-## Editorial System (deprecated for new work)
-
-Long-form Reader content uses `reader-ws`. Lessons use the V2 slate accent via `lessons-workspace.css`.
-
----
-
-# Colors
-
-Primary:
-#0058BE
-
-Secondary:
-#006C49
-
-Tertiary:
-#A36700
-
-Background:
-#F7F9FB
-
----
-
-# Typography
-
-## Display
-Typography:
-
-Display:
-Inter 800
-
-Headline:
-Inter 700
-
-Body:
-Inter 400
-
-Label:
-Inter 600
----
-
-## Interface
-
-Inter
-
-Used for:
-
-* Navigation
-* Buttons
-* Metadata
-* Labels
-* Statistics
-
----
-
-# Layout
-
-Content Width
-
-1400px
-
-Maximum Width
-
-1500px
-
-Desktop Padding
-
-32px
-
-Mobile Padding
-
-20px
-
----
-
-# Spacing
-
-Base Grid
-
-8px
-
-Section Spacing
-
-80px
-
-Card Internal Padding
-
-24px
-
-Large Card Padding
-
-32px
-
----
-
-# Radius
-
-Small
-
-12px
-
-Medium
-
-18px
-
-Large
-
-24px
-
-Hero
-
-28px
-
----
-
-# Cards
-
-Background
-
-White
-
-Border
-
-1px solid #E8E3DA
-
-Shadow
-
-0 8px 32px rgba(15,23,42,0.06)
-
-Hover
-
-TranslateY(-2px)
-
----
-
-# Buttons
-
-Primary
-
-Background:
-#1E3155
-
-Text:
-White
-
-Radius:
-14px
-
-Height:
-48px
-
----
-
-Secondary
-
-White background
-
-Border:
-#E8E3DA
-
-Text:
-#1E3155
-
----
-
-# Motion
-
-Duration
-
-200ms
-
-Easing
-
-ease-out
-
-Allowed
-
-* hover elevation
-* subtle fade
-* progress transitions
-
-Forbidden
-
-* bounce
-* spring
-* playful gamification
-
----
-
-# Success Test
-
-If a screen feels like:
-
-* an academic portal
-* a university website
-* a document archive
-
-The design failed.
-
-If a screen feels like:
-
-* a premium learning workspace
-* a modern SaaS product
-* a focused learning dashboard
-
-The design succeeded.

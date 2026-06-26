@@ -1,36 +1,28 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-type PrimaryButtonProps = {
+type TextButtonProps = {
   href?: string;
   onClick?: () => void;
   children: ReactNode;
   className?: string;
   disabled?: boolean;
   type?: "button" | "submit";
-  variant?: "default" | "gold";
 };
 
-export function PrimaryButton({
+export function TextButton({
   href,
   onClick,
   children,
   className = "",
   disabled,
   type = "button",
-  variant = "default",
-}: PrimaryButtonProps) {
-  const classes = [
-    "r3-btn r3-btn--primary ds-primary-btn focus-kb",
-    variant === "gold" ? "ds-primary-btn--gold" : "",
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
+}: TextButtonProps) {
+  const classes = ["r3-btn r3-btn--text focus-kb", className].filter(Boolean).join(" ");
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={classes} aria-disabled={disabled}>
         {children}
       </Link>
     );
