@@ -1,3 +1,4 @@
+import { Card } from "@/components/design-system";
 import { buildWordsMilestone } from "@/lib/home/build-hero-continue-insights";
 import type { HomeDashboardMetrics } from "@/lib/home/build-home-dashboard-metrics";
 import type { LearningStreakSnapshot } from "@/lib/home/learning-streak";
@@ -16,16 +17,16 @@ export function HomeWorkspaceMetrics({ metrics, streak }: HomeWorkspaceMetricsPr
 
   return (
     <div className="home-ws-metrics" aria-label="Learning statistics">
-      <article className="home-ws-card home-ws-metric">
+      <Card as="article" className="home-ws-metric">
         <p className="home-ws-metric__label">Current Streak</p>
         <p className="home-ws-metric__value home-ws-metric__value--accent">
           {formatMetric(metrics.currentStreak)}
           <span className="home-ws-metric__unit">days</span>
         </p>
         <p className="home-ws-metric__hint">Keep the momentum going.</p>
-      </article>
+      </Card>
 
-      <article className="home-ws-card home-ws-metric home-ws-metric--milestone">
+      <Card as="article" className="home-ws-metric home-ws-metric--milestone">
         <p className="home-ws-metric__label">Next Milestone</p>
         <p className="home-ws-metric__goal-title">100 Words Goal</p>
         <p className="home-ws-metric__goal-progress">
@@ -42,9 +43,9 @@ export function HomeWorkspaceMetrics({ metrics, streak }: HomeWorkspaceMetricsPr
             ? `${formatMetric(milestone.remaining)} words remaining`
             : "Milestone reached — set your sights higher."}
         </p>
-      </article>
+      </Card>
 
-      <article className="home-ws-card home-ws-metric">
+      <Card as="article" className="home-ws-metric">
         <p className="home-ws-metric__label">Learning Progress</p>
         <dl className="home-ws-metric-progress__grid">
           <div>
@@ -60,9 +61,9 @@ export function HomeWorkspaceMetrics({ metrics, streak }: HomeWorkspaceMetricsPr
             <dd>{formatMetric(metrics.textsCompleted)}</dd>
           </div>
         </dl>
-      </article>
+      </Card>
 
-      <article className="home-ws-card home-ws-metric">
+      <Card as="article" className="home-ws-metric">
         <p className="home-ws-metric__label">Daily Activity</p>
         <p className="home-ws-metric__value">
           {formatMetric(streak.wordsToday)}
@@ -76,7 +77,7 @@ export function HomeWorkspaceMetrics({ metrics, streak }: HomeWorkspaceMetricsPr
             />
           ))}
         </ul>
-      </article>
+      </Card>
     </div>
   );
 }

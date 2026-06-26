@@ -1,4 +1,5 @@
-export { Badge, type BadgeTone } from "./badge";
+export { Badge } from "./badge";
+export type { BadgeTone } from "./badge";
 export { Card } from "./card";
 export { CollectionCard } from "./collection-card";
 export { ConfirmDialog, Dialog } from "./dialog";

@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { Badge, Card } from "@/components/design-system";
 import { getCollectionRecord, type CollectionId } from "@/content/collections";
 import type { CefrLevel } from "@/types";
 import type { TextListItem } from "@/features/texts";
@@ -46,7 +45,7 @@ export function HomeWorkspaceCollections({ texts }: HomeWorkspaceCollectionsProp
   return (
     <section className="home-ws-section" aria-labelledby="home-ws-collections-heading">
       <div className="home-ws-section__head">
-        <h2 id="home-ws-collections-heading" className="home-ws-section__title">
+        <h2 id="home-ws-collections-heading" className="r3-title home-ws-section__title">
           Featured collections
         </h2>
       </div>
@@ -62,19 +61,19 @@ export function HomeWorkspaceCollections({ texts }: HomeWorkspaceCollectionsProp
               key={item.id}
               className={item.featured ? "home-ws-collection-grid__featured" : undefined}
             >
-              <Link href="/library" className="home-ws-card home-ws-collection focus-kb">
+              <Card href="/library" className="home-ws-collection">
                 <HomeCollectionCover collectionId={item.id} />
                 <div className="home-ws-collection__body">
                   <div className="home-ws-collection__badges">
-                    {level ? <span className="home-ws-badge">{level}</span> : null}
-                    <span className="home-ws-badge home-ws-badge--muted">
+                    {level ? <Badge tone="blue">{level}</Badge> : null}
+                    <Badge tone="slate">
                       {collectionTexts.length} text{collectionTexts.length === 1 ? "" : "s"}
-                    </span>
+                    </Badge>
                   </div>
-                  <h3 className="home-ws-collection__title">{item.displayName}</h3>
-                  <p className="home-ws-collection__description">{collection.description}</p>
+                  <h3 className="r3-title home-ws-collection__title">{item.displayName}</h3>
+                  <p className="r3-lead home-ws-collection__description">{collection.description}</p>
                 </div>
-              </Link>
+              </Card>
             </li>
           );
         })}

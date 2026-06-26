@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { TextButton } from "@/components/design-system";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -18,11 +18,11 @@ export function VocabularySentenceDetail() {
 
   return (
     <article className="vocabulary-detail vocabulary-detail--sentences">
-      <Link href={vocabularyPath("sentences")} className="vocabulary-detail__back focus-kb">
+      <TextButton href={vocabularyPath("sentences")} className="vocabulary-detail__back">
         ← Vocabulary
-      </Link>
-      <h1 className="vocabulary-detail__title break-russian">{russian ?? "Phrase"}</h1>
-      <p className="vocabulary-detail__lead">
+      </TextButton>
+      <h1 className="r3-hero-title vocabulary-detail__title break-russian">{russian ?? "Phrase"}</h1>
+      <p className="r3-lead vocabulary-detail__lead">
         Fiche de phrase en préparation — mots connus, expressions détectées, notions grammaticales et
         révision espacée arriveront ici.
       </p>

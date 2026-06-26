@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { EmptyState } from "@/components/design-system";
 
 import type { VocabularyTab } from "@/lib/vocabulary";
 
@@ -10,6 +10,12 @@ type VocabularyEmptyStateProps = {
   tone?: VocabularyTab;
 };
 
+const TONE_EYEBROW: Record<VocabularyTab, string> = {
+  words: "Mots",
+  expressions: "Expressions",
+  sentences: "Phrases",
+};
+
 export function VocabularyEmptyState({
   title,
   lead,
@@ -18,12 +24,12 @@ export function VocabularyEmptyState({
   tone = "words",
 }: VocabularyEmptyStateProps) {
   return (
-    <div className={["vocabulary-empty", `vocabulary-empty--${tone}`].join(" ")}>
-      <h3 className="vocabulary-empty__title">{title}</h3>
-      <p className="vocabulary-empty__lead">{lead}</p>
-      <Link href={ctaHref} className="vocabulary-empty__cta focus-kb">
-        {ctaLabel}
-      </Link>
-    </div>
+    <EmptyState
+      className={`vocabulary-empty vocabulary-empty--${tone}`}
+      eyebrow={TONE_EYEBROW[tone]}
+      title={title}
+      description={lead}
+      action={{ label: ctaLabel, href: ctaHref }}
+    />
   );
 }

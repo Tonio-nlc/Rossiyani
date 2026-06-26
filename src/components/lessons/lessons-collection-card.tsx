@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
-import Link from "next/link";
 
+import { Badge, Card } from "@/components/design-system";
 import type { LessonsCollection } from "@/lib/lessons/collections";
 
 const ICON_LABELS: Record<LessonsCollection["icon"], string> = {
@@ -21,9 +21,9 @@ type LessonsCollectionCardProps = {
 
 export function LessonsCollectionCard({ collection, lessonCount }: LessonsCollectionCardProps) {
   return (
-    <Link
+    <Card
       href={collection.href}
-      className="lessons-collection-card focus-kb"
+      className="lessons-collection-card"
       style={
         {
           "--collection-accent": collection.accent,
@@ -37,18 +37,16 @@ export function LessonsCollectionCard({ collection, lessonCount }: LessonsCollec
       >
         {ICON_LABELS[collection.icon]}
       </span>
-      <h3 className="lessons-collection-card__title">{collection.title}</h3>
-      <p className="lessons-collection-card__desc">{collection.description}</p>
+      <h3 className="r3-title lessons-collection-card__title">{collection.title}</h3>
+      <p className="r3-lead lessons-collection-card__desc">{collection.description}</p>
       <div className="lessons-collection-card__meta">
-        {collection.difficulty ? (
-          <span className="lessons-tag lessons-tag--accent">{collection.difficulty}</span>
-        ) : null}
+        {collection.difficulty ? <Badge tone="violet">{collection.difficulty}</Badge> : null}
         {typeof lessonCount === "number" ? (
-          <span className="lessons-tag">
+          <Badge tone="neutral">
             {lessonCount} leçon{lessonCount > 1 ? "s" : ""}
-          </span>
+          </Badge>
         ) : null}
       </div>
-    </Link>
+    </Card>
   );
 }

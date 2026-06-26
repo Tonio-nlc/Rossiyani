@@ -2,6 +2,8 @@
 
 import { useCallback, useRef, useState } from "react";
 
+import { PrimaryButton } from "@/components/design-system";
+
 type ImportFilePanelProps = {
   disabled?: boolean;
   onFiles: (files: File[]) => void;
@@ -59,14 +61,13 @@ export function ImportFilePanel({ disabled, onFiles }: ImportFilePanelProps) {
         <p className="home-ws-dropzone__hint">
           Choisissez un fichier texte ou PDF à transformer en expérience de lecture.
         </p>
-        <button
+        <PrimaryButton
           type="button"
-          className="home-ws-btn home-ws-btn--pill focus-kb"
           disabled={disabled}
           onClick={() => fileInputRef.current?.click()}
         >
           Choisir un fichier
-        </button>
+        </PrimaryButton>
         <p className="home-ws-dropzone__formats">.txt · .md · .pdf</p>
       </div>
 

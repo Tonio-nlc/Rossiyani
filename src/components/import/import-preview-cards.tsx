@@ -1,3 +1,5 @@
+import { Card } from "@/components/design-system";
+
 const PREVIEW_ITEMS = [
   {
     id: "word",
@@ -26,10 +28,10 @@ export function ImportPreviewCards() {
   return (
     <section className="home-ws-section" aria-labelledby="import-preview-heading">
       <div className="home-ws-section__head">
-        <h2 id="import-preview-heading" className="home-ws-section__title">
+        <h2 id="import-preview-heading" className="r3-title home-ws-section__title">
           Exemple d&apos;analyse
         </h2>
-        <p className="home-ws-section__subtitle">
+        <p className="r3-lead home-ws-section__subtitle">
           Voici le type de découvertes que Rossiyani génère à partir d&apos;un texte.
         </p>
       </div>
@@ -37,12 +39,14 @@ export function ImportPreviewCards() {
       <ul className="home-ws-sample-grid">
         {PREVIEW_ITEMS.map((item) => (
           <li key={item.id}>
-            <article className="home-ws-card home-ws-sample-card">
-              <p className="home-ws-sample-card__kind">{item.kind}</p>
-              <h3 className="home-ws-card-title break-russian font-reader">{item.title}</h3>
+            <Card as="article" className="home-ws-sample-card">
+              <p className="r3-eyebrow home-ws-sample-card__kind">{item.kind}</p>
+              <h3 className="r3-title home-ws-sample-card__title break-russian font-reader">
+                {item.title}
+              </h3>
               <p className="home-ws-sample-card__subtitle">{item.subtitle}</p>
               <p className="home-ws-sample-card__detail">{item.detail}</p>
-            </article>
+            </Card>
           </li>
         ))}
       </ul>

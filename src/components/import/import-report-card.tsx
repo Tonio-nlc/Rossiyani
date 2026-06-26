@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { Card, PrimaryButton, TextButton } from "@/components/design-system";
 import type { ImportSessionReport } from "@/lib/import-client";
 
 import { ImportQualityReportCard } from "./import-quality-report-card";
@@ -27,15 +26,13 @@ export function ImportReportCard({
   ].filter((stat) => stat.value > 0);
 
   return (
-    <section
-      className={[
-        "home-ws-card home-ws-report",
-        animate ? "animate-success-pop" : "",
-      ].join(" ")}
+    <Card
+      as="section"
+      className={["home-ws-report", animate ? "animate-success-pop" : ""].filter(Boolean).join(" ")}
     >
       <div>
-        <h2 className="home-ws-section__title">{successTitle}</h2>
-        <p className="home-ws-report__lead">
+        <h2 className="r3-title home-ws-section__title">{successTitle}</h2>
+        <p className="r3-lead home-ws-report__lead">
           {report.hasPartialSegments
             ? "Certaines analyses détaillées seront générées plus tard."
             : "Votre système d'apprentissage s'est enrichi à partir de ce texte."}
@@ -88,19 +85,13 @@ export function ImportReportCard({
 
       <div className="home-ws-actions">
         {completedTextId ? (
-          <Link href={`/texts/${completedTextId}`} className="home-ws-btn home-ws-btn--pill focus-kb">
-            Lire maintenant
-          </Link>
+          <PrimaryButton href={`/texts/${completedTextId}`}>Lire maintenant</PrimaryButton>
         ) : null}
-        <Link href="/library" className="home-ws-link focus-kb">
-          Ouvrir dans la bibliothèque →
-        </Link>
-        <Link href="/vocabulary" className="home-ws-link focus-kb">
-          Explorer les découvertes →
-        </Link>
+        <TextButton href="/library">Ouvrir dans la bibliothèque →</TextButton>
+        <TextButton href="/vocabulary">Explorer les découvertes →</TextButton>
       </div>
 
       {report.quality ? <ImportQualityReportCard quality={report.quality} /> : null}
-    </section>
+    </Card>
   );
 }

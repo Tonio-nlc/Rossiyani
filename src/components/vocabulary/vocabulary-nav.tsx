@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@/components/design-system";
 import type { VocabularyStats, VocabularyTab } from "@/lib/vocabulary";
 
 const TABS: Array<{ id: VocabularyTab; label: string }> = [
@@ -7,6 +8,12 @@ const TABS: Array<{ id: VocabularyTab; label: string }> = [
   { id: "expressions", label: "Expressions" },
   { id: "sentences", label: "Sentences" },
 ];
+
+const TAB_BADGE_TONE = {
+  words: "blue",
+  expressions: "violet",
+  sentences: "green",
+} as const;
 
 type VocabularyNavProps = {
   active: VocabularyTab;
@@ -46,7 +53,9 @@ export function VocabularyNav({ active, stats, onChange }: VocabularyNavProps) {
             onClick={() => onChange(tab.id)}
           >
             {tab.label}
-            <span className="vocabulary-nav__count">{countForTab(tab.id, stats)}</span>
+            <Badge tone={TAB_BADGE_TONE[tab.id]} active={isActive} className="vocabulary-nav__count">
+              {countForTab(tab.id, stats)}
+            </Badge>
           </button>
         );
       })}

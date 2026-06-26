@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Card } from "@/components/design-system";
 
 function PlusIcon() {
   return (
@@ -11,12 +11,12 @@ function PlusIcon() {
 
 export function LibrarySuggestCard() {
   return (
-    <Link href="/import" className="library-ws-card library-ws-suggest focus-kb">
+    <Card href="/import" className="library-ws-suggest">
       <PlusIcon />
-      <h3 className="library-ws-suggest__title">Suggérer un texte</h3>
-      <p className="library-ws-suggest__lead">
+      <h3 className="r3-title library-ws-suggest__title">Suggérer un texte</h3>
+      <p className="r3-lead library-ws-suggest__lead">
         Vous cherchez un sujet spécifique&nbsp;? Faites-le nous savoir.
       </p>
-    </Link>
+    </Card>
   );
 }

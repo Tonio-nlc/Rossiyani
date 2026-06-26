@@ -313,6 +313,12 @@ button.r3-card:hover,
   font-size: 1rem;
 }
 
+.r3-btn--sm {
+  min-height: 2.25rem;
+  padding: 0 0.9rem;
+  font-size: 0.8125rem;
+}
+
 .r3-btn:active:not(:disabled) {
   transform: scale(0.98);
 }
@@ -367,6 +373,17 @@ button.r3-card:hover,
 .r3-badge--rose {
   background: var(--r3-badge-rose-bg);
   color: var(--r3-badge-rose-ink);
+}
+
+.r3-badge--slate {
+  background: var(--r3-badge-neutral-bg);
+  color: var(--r3-badge-neutral-ink);
+}
+
+.r3-badge--teal {
+  background: var(--r3-badge-green-bg);
+  color: var(--r3-badge-green-ink);
+  border-color: rgba(4, 120, 87, 0.14);
 }
 
 button.r3-badge,

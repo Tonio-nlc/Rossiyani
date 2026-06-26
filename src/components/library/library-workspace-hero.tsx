@@ -11,8 +11,8 @@ export function LibraryWorkspaceHero({ level, onLevelChange }: LibraryWorkspaceH
   return (
     <header className="library-ws-hero">
       <div>
-        <h1 className="library-ws-hero__title">Bibliothèque</h1>
-        <p className="library-ws-hero__lead">
+        <h1 className="r3-hero-title library-ws-hero__title">Bibliothèque</h1>
+        <p className="r3-lead library-ws-hero__lead">
           Votre bibliothèque russe curatée — textes, collections et progrès de lecture.
         </p>
       </div>

@@ -12,6 +12,8 @@ import {
 } from "@/lib/import-client";
 import type { CefrLevel } from "@/types/domain";
 
+import { PrimaryButton } from "@/components/design-system";
+
 import { ImportMetadataFields } from "./import-metadata-fields";
 
 type ImportPastePanelProps = {
@@ -130,14 +132,9 @@ export function ImportPastePanel({
 
       {showMetadata ? (
         <div className="home-ws-actions">
-          <button
-            type="button"
-            className="home-ws-btn home-ws-btn--pill focus-kb"
-            onClick={handleAnalyze}
-            disabled={disabled || !canAnalyze}
-          >
+          <PrimaryButton type="button" onClick={handleAnalyze} disabled={disabled || !canAnalyze}>
             Analyser le texte
-          </button>
+          </PrimaryButton>
         </div>
       ) : null}
     </div>

@@ -9,6 +9,7 @@ type EmptyStateProps = {
   action?: { label: string; href: string };
   children?: ReactNode;
   visual?: ReactNode;
+  className?: string;
   /** @deprecated Decorative icons removed from editorial empty states. */
   icon?: string;
 };
@@ -20,10 +21,11 @@ export function EmptyState({
   action,
   children,
   visual,
+  className = "",
   icon: _icon,
 }: EmptyStateProps) {
   return (
-    <div className="ds-empty-state animate-fade-up">
+    <div className={["ds-empty-state animate-fade-up", className].filter(Boolean).join(" ")}>
       {visual ? <div className="ds-empty-state__visual">{visual}</div> : null}
       {eyebrow ? <p className="ds-empty-state__eyebrow">{eyebrow}</p> : null}
       <h3>{title}</h3>

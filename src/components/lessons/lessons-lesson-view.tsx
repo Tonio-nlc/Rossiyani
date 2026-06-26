@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { Badge, GhostButton, PrimaryButton, SecondaryButton, TextButton } from "@/components/design-system";
 import {
   MANUAL_CATEGORY_LABELS,
   MANUAL_LEVEL_LABELS,
@@ -29,20 +28,20 @@ export function LessonsLessonView({ lesson }: LessonsLessonViewProps) {
       <LessonsLessonVisitTracker slug={lesson.slug} title={lesson.title} />
 
       <header className="lessons-lesson-hero">
-        <p className="lessons-lesson-hero__type">Leçon · {MANUAL_CATEGORY_LABELS[lesson.category]}</p>
-        <h1 className="lessons-lesson-hero__title">{lesson.title}</h1>
+        <p className="r3-eyebrow lessons-lesson-hero__type">
+          Leçon · {MANUAL_CATEGORY_LABELS[lesson.category]}
+        </p>
+        <h1 className="r3-hero-title lessons-lesson-hero__title">{lesson.title}</h1>
         <div className="lessons-lesson-hero__meta">
-          <span className="lessons-tag">{MANUAL_LEVEL_LABELS[lesson.level]}</span>
-          <span className="lessons-tag lessons-tag--accent">{lesson.estimatedReadingTime} min</span>
-          <span className="lessons-tag">Difficulté {lesson.difficulty}/5</span>
+          <Badge tone="blue">{MANUAL_LEVEL_LABELS[lesson.level]}</Badge>
+          <Badge tone="violet">{lesson.estimatedReadingTime} min</Badge>
+          <Badge tone="neutral">Difficulté {lesson.difficulty}/5</Badge>
         </div>
         <div className="lessons-lesson-hero__actions">
-          <Link href={practiceHref} className="lessons-btn lessons-btn--practice focus-kb">
-            Pratiquer cette leçon →
-          </Link>
-          <Link href={lessonsThemePath(lesson.category)} className="lessons-btn lessons-btn--ghost focus-kb">
+          <SecondaryButton href={practiceHref}>Pratiquer cette leçon →</SecondaryButton>
+          <GhostButton href={lessonsThemePath(lesson.category)}>
             Collection {MANUAL_CATEGORY_LABELS[lesson.category]}
-          </Link>
+          </GhostButton>
         </div>
       </header>
 
@@ -52,9 +51,9 @@ export function LessonsLessonView({ lesson }: LessonsLessonViewProps) {
           <ul className="lessons-prereq__list">
             {prerequisites.map((item) => (
               <li key={item.slug}>
-                <Link href={lessonPath(item.slug)} className="lessons-prereq__link focus-kb">
+                <TextButton href={lessonPath(item.slug)} className="lessons-prereq__link">
                   {item.title}
-                </Link>
+                </TextButton>
               </li>
             ))}
           </ul>
@@ -64,14 +63,14 @@ export function LessonsLessonView({ lesson }: LessonsLessonViewProps) {
       <div className="lessons-stack">
         {intro ? (
           <section className="lessons-block lessons-block--overview" aria-label="Aperçu">
-            <h2 className="lessons-block__title">Aperçu</h2>
+            <h2 className="r3-title lessons-block__title">Aperçu</h2>
             <LessonsMarkdown content={intro} />
           </section>
         ) : null}
 
         {blocks.map((block) => (
           <section key={block.id} className="lessons-block" aria-labelledby={`block-${block.id}`}>
-            <h2 id={`block-${block.id}`} className="lessons-block__title">
+            <h2 id={`block-${block.id}`} className="r3-title lessons-block__title">
               {block.title}
             </h2>
             <LessonsMarkdown content={block.content} />
@@ -82,7 +81,7 @@ export function LessonsLessonView({ lesson }: LessonsLessonViewProps) {
       {related.length > 0 ? (
         <section className="lessons-section" aria-labelledby="related-heading">
           <div className="lessons-section__head">
-            <h2 id="related-heading" className="lessons-section__title">
+            <h2 id="related-heading" className="r3-title lessons-section__title">
               Leçons liées
             </h2>
           </div>
@@ -91,28 +90,23 @@ export function LessonsLessonView({ lesson }: LessonsLessonViewProps) {
       ) : null}
 
       <footer className="lessons-progression">
-        <h2 className="lessons-progression__title">Et maintenant ?</h2>
+        <h2 className="r3-title lessons-progression__title">Et maintenant ?</h2>
         <ul className="lessons-progression__list">
-          <li>Vous avez parcouru {MANUAL_CATEGORY_LABELS[lesson.category].toLowerCase()} — niveau {lesson.level.toUpperCase()}.</li>
+          <li>
+            Vous avez parcouru {MANUAL_CATEGORY_LABELS[lesson.category].toLowerCase()} — niveau{" "}
+            {lesson.level.toUpperCase()}.
+          </li>
           {lesson.keywords.length > 0 ? (
             <li>Mots-clés : {lesson.keywords.slice(0, 5).join(" · ")}</li>
           ) : null}
         </ul>
         <div className="lessons-progression__actions">
-          <Link href={practiceHref} className="lessons-btn lessons-btn--practice focus-kb">
-            Pratiquer →
-          </Link>
+          <SecondaryButton href={practiceHref}>Pratiquer →</SecondaryButton>
           {nextLesson ? (
-            <Link href={lessonPath(nextLesson.slug)} className="lessons-btn lessons-btn--primary focus-kb">
-              Leçon suivante →
-            </Link>
+            <PrimaryButton href={lessonPath(nextLesson.slug)}>Leçon suivante →</PrimaryButton>
           ) : null}
-          <Link href={lessonsThemePath(lesson.category)} className="lessons-btn lessons-btn--ghost focus-kb">
-            Retour à la collection
-          </Link>
-          <Link href={LESSONS_HOME} className="lessons-btn lessons-btn--ghost focus-kb">
-            Toutes les leçons
-          </Link>
+          <GhostButton href={lessonsThemePath(lesson.category)}>Retour à la collection</GhostButton>
+          <GhostButton href={LESSONS_HOME}>Toutes les leçons</GhostButton>
         </div>
       </footer>
     </article>

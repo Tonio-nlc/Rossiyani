@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { Badge, Card, EmptyState } from "@/components/design-system";
 import { MANUAL_CATEGORY_LABELS, MANUAL_LEVEL_LABELS } from "@/features/manual/constants";
 import type { ManualLessonSummary } from "@/features/manual/types";
 import { formatManualCardTitle } from "@/lib/manual/manual-card-layout";
@@ -14,18 +13,16 @@ export function LessonsLessonCard({ lesson }: LessonsLessonCardProps) {
   const href = lessonPath(lesson.slug);
 
   return (
-    <Link href={href} className="lessons-lesson-card focus-kb">
-      <h3 className="lessons-lesson-card__title">{primary}</h3>
-      {secondary ? <p className="lessons-lesson-card__desc">{secondary}</p> : null}
+    <Card href={href} className="lessons-lesson-card">
+      <h3 className="r3-title lessons-lesson-card__title">{primary}</h3>
+      {secondary ? <p className="r3-lead lessons-lesson-card__desc">{secondary}</p> : null}
       <div className="lessons-lesson-card__meta">
-        <span className="lessons-tag">{MANUAL_LEVEL_LABELS[lesson.level]}</span>
-        <span className="lessons-tag lessons-tag--accent">
-          {MANUAL_CATEGORY_LABELS[lesson.category]}
-        </span>
-        <span className="lessons-tag">{lesson.estimatedReadingTime} min</span>
+        <Badge tone="blue">{MANUAL_LEVEL_LABELS[lesson.level]}</Badge>
+        <Badge tone="violet">{MANUAL_CATEGORY_LABELS[lesson.category]}</Badge>
+        <Badge tone="neutral">{lesson.estimatedReadingTime} min</Badge>
       </div>
       <span className="lessons-lesson-card__cta">Ouvrir la leçon →</span>
-    </Link>
+    </Card>
   );
 }
 
@@ -42,10 +39,13 @@ export function LessonsLessonGrid({
 }: LessonsLessonGridProps) {
   if (lessons.length === 0) {
     return (
-      <div className="lessons-empty">
-        <p className="lessons-empty__title">{emptyTitle}</p>
-        <p className="lessons-empty__desc">{emptyDescription}</p>
-      </div>
+      <EmptyState
+        className="lessons-empty"
+        eyebrow="Leçons"
+        title={emptyTitle}
+        description={emptyDescription}
+        action={{ label: "Voir toutes les leçons", href: "/lessons" }}
+      />
     );
   }
 

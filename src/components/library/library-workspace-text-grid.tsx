@@ -1,4 +1,4 @@
-import { EmptyState } from "@/components/ui/empty-state";
+import { EmptyState } from "@/components/design-system";
 import type { TextListItem } from "@/features/texts";
 
 import { LibrarySuggestCard } from "./library-suggest-card";
@@ -45,7 +45,7 @@ export function LibraryWorkspaceTextGrid({
   if (texts.length === 0 && !hasAnyTexts) {
     return (
       <EmptyState
-        icon="📚"
+        eyebrow="Bibliothèque"
         title="Votre bibliothèque est vide"
         description="Importez un texte pour commencer."
         action={{ label: "Importer →", href: "/import" }}
@@ -56,9 +56,9 @@ export function LibraryWorkspaceTextGrid({
   if (texts.length === 0) {
     return (
       <EmptyState
-        icon="🔍"
+        eyebrow="Bibliothèque"
         title="Aucun texte ne correspond"
-        description="Modifiez les filtres."
+        description="Modifiez les filtres pour élargir votre recherche."
       />
     );
   }

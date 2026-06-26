@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useRef } from "react";
 
+import { GhostButton } from "@/components/design-system";
+
 type ImportFolderPanelProps = {
   disabled?: boolean;
   onFiles: (files: File[]) => void;
@@ -39,14 +41,9 @@ export function ImportFolderPanel({ disabled, onFiles }: ImportFolderPanelProps)
         Sélectionnez un dossier entier. Tous les fichiers lisibles seront importés.
       </p>
       <div className="home-ws-actions mt-4">
-        <button
-          type="button"
-          className="home-ws-btn home-ws-btn--ghost home-ws-btn--pill focus-kb"
-          disabled={disabled}
-          onClick={() => folderInputRef.current?.click()}
-        >
+        <GhostButton type="button" disabled={disabled} onClick={() => folderInputRef.current?.click()}>
           Importer un dossier
-        </button>
+        </GhostButton>
       </div>
     </div>
   );

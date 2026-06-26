@@ -1,3 +1,5 @@
+import { Badge } from "@/components/design-system";
+import { mapVocabularyBadgeTone } from "@/lib/design-system/map-badge-tone";
 import type { VocabularyBadge } from "@/lib/vocabulary";
 
 type VocabularyBadgesProps = {
@@ -13,12 +15,9 @@ export function VocabularyBadges({ badges, className = "" }: VocabularyBadgesPro
   return (
     <div className={["vocabulary-badges", className].filter(Boolean).join(" ")}>
       {badges.map((badge) => (
-        <span
-          key={badge.id}
-          className={["vocabulary-badge", `vocabulary-badge--${badge.tone}`].join(" ")}
-        >
+        <Badge key={badge.id} tone={mapVocabularyBadgeTone(badge.tone)}>
           {badge.label}
-        </span>
+        </Badge>
       ))}
     </div>
   );

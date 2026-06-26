@@ -1,5 +1,6 @@
 "use client";
 
+import { Card } from "@/components/design-system";
 import { useLayoutEffect, useRef, useState } from "react";
 
 import type { CategoryId } from "@/content/categories";
@@ -121,7 +122,7 @@ export function ImportSources({
 
         {tab === "url" ? (
           <div className="home-ws-editor">
-            <div className="home-ws-card home-ws-card--surface">
+            <Card className="home-ws-card--surface">
               <input
                 type="url"
                 disabled
@@ -129,10 +130,10 @@ export function ImportSources({
                 className="home-ws-url-input focus-kb"
                 aria-label="URL de l'article"
               />
-              <p className="home-ws-editor__hint mt-4">
+              <p className="r3-lead home-ws-editor__hint mt-4">
                 L&apos;import par URL arrive prochainement.
               </p>
-            </div>
+            </Card>
           </div>
         ) : null}
       </div>

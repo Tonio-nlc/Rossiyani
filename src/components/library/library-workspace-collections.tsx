@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { TextButton } from "@/components/design-system";
 import { useMemo } from "react";
 
 import {
@@ -66,13 +66,13 @@ export function LibraryWorkspaceCollections({
           Current collection
         </h2>
         {!showAllCollections ? (
-          <Link href="/library?collections=all" className="library-ws-link library-ws-link--subtle focus-kb">
+          <TextButton href="/library?collections=all" className="library-ws-section__action">
             View all collections →
-          </Link>
+          </TextButton>
         ) : (
-          <Link href="/library" className="library-ws-link library-ws-link--subtle focus-kb">
+          <TextButton href="/library" className="library-ws-section__action">
             Back to library →
-          </Link>
+          </TextButton>
         )}
       </div>
 

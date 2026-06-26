@@ -7,6 +7,7 @@ import type { PendingImportFile } from "@/lib/import-client";
 import type { CefrLevel } from "@/types/domain";
 
 import { ImportMetadataFields } from "./import-metadata-fields";
+import { Card, GhostButton, PrimaryButton, TextButton } from "@/components/design-system";
 
 type ImportFilePreviewProps = {
   files: PendingImportFile[];
@@ -52,7 +53,7 @@ export function ImportFilePreview({
       <ul className="home-ws-staged-list">
         {files.map((file) => (
           <li key={file.id}>
-            <article className="home-ws-card home-ws-card--surface">
+            <Card as="article" className="home-ws-card--surface">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1 space-y-4">
                   <ImportMetadataFields
@@ -116,18 +117,16 @@ export function ImportFilePreview({
                   ) : null}
                 </div>
                 {files.length > 1 ? (
-                  <button
-                    type="button"
+                  <TextButton
                     onClick={() => onRemove(file.id)}
                     disabled={disabled}
-                    className="home-ws-link focus-kb shrink-0"
-                    aria-label={`Retirer ${file.fileName}`}
+                    className="shrink-0"
                   >
                     Retirer
-                  </button>
+                  </TextButton>
                 ) : null}
               </div>
-            </article>
+            </Card>
           </li>
         ))}
       </ul>
@@ -139,23 +138,13 @@ export function ImportFilePreview({
       ) : null}
 
       <div className="home-ws-actions">
-        <button
-          type="button"
-          className="home-ws-btn home-ws-btn--pill focus-kb"
-          onClick={onImport}
-          disabled={disabled || !allTitlesValid}
-        >
+        <PrimaryButton type="button" onClick={onImport} disabled={disabled || !allTitlesValid}>
           Analyser le texte
           {files.length > 1 ? ` (${files.length})` : ""}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={disabled}
-          className="home-ws-btn home-ws-btn--ghost home-ws-btn--pill focus-kb"
-        >
+        </PrimaryButton>
+        <GhostButton type="button" onClick={onCancel} disabled={disabled}>
           Annuler
-        </button>
+        </GhostButton>
       </div>
     </section>
   );

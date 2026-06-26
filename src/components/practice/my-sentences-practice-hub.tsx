@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { Card, EmptyState, GhostButton, PrimaryButton, TextButton } from "@/components/design-system";
 import { deleteSavedSentence, getSavedSentences } from "@/lib/phrase-mining";
 import { practicePath } from "@/lib/practice/constants";
 import type { SavedSentence } from "@/types/saved-sentence";
@@ -30,17 +30,18 @@ export function MySentencesPracticeHub() {
     return (
       <div className="practice-my-sentences practice-my-sentences--empty">
         <header className="practice-my-sentences__intro">
-          <h1 className="practice-my-sentences__title">Mes phrases</h1>
-          <p className="practice-my-sentences__lead">
+          <h1 className="r3-hero-title practice-my-sentences__title">Mes phrases</h1>
+          <p className="r3-lead practice-my-sentences__lead">
             Pratiquez uniquement les phrases que vous avez enregistrées en lecture.
           </p>
         </header>
-        <p className="practice-my-sentences__empty">
-          Aucune phrase enregistrée pour le moment.{" "}
-          <Link href="/reader" className="practice-my-sentences__link focus-kb">
-            Lire et enregistrer →
-          </Link>
-        </p>
+        <EmptyState
+          className="practice-my-sentences__empty-card"
+          eyebrow="Practice"
+          title="Aucune phrase enregistrée"
+          description="Lisez un texte et enregistrez des phrases pour les retravailler ici."
+          action={{ label: "Lire et enregistrer →", href: "/reader" }}
+        />
       </div>
     );
   }
@@ -48,8 +49,8 @@ export function MySentencesPracticeHub() {
   return (
     <div className="practice-my-sentences">
       <header className="practice-my-sentences__intro">
-        <h1 className="practice-my-sentences__title">Mes phrases</h1>
-        <p className="practice-my-sentences__lead">
+        <h1 className="r3-hero-title practice-my-sentences__title">Mes phrases</h1>
+        <p className="r3-lead practice-my-sentences__lead">
           Retravaillez les phrases extraites de vos lectures — vocabulaire, structure et contexte
           réels.
         </p>
@@ -58,7 +59,7 @@ export function MySentencesPracticeHub() {
       <ul className="practice-my-sentences__list">
         {sentences.map((sentence) => (
           <li key={sentence.id}>
-            <article className="practice-my-sentences__card">
+            <Card as="article" className="practice-my-sentences__card">
               <p className="practice-my-sentences__text break-russian">{sentence.text}</p>
               {sentence.translation ? (
                 <p className="practice-my-sentences__translation">{sentence.translation}</p>
@@ -69,7 +70,7 @@ export function MySentencesPracticeHub() {
                 {formatSavedDate(sentence.createdAt)}
               </p>
               <div className="practice-my-sentences__actions">
-                <Link
+                <PrimaryButton
                   href={practicePath({
                     savedSentenceId: sentence.id,
                     text: sentence.text,
@@ -79,28 +80,24 @@ export function MySentencesPracticeHub() {
                     textTitle: sentence.sourceTextTitle,
                     from: "reader",
                   })}
-                  className="practice-my-sentences__cta focus-kb"
+                  className="practice-my-sentences__cta"
                 >
                   Pratiquer cette phrase →
-                </Link>
-                <Link
-                  href={`/texts/${sentence.sourceTextId}`}
-                  className="practice-my-sentences__link focus-kb"
-                >
+                </PrimaryButton>
+                <TextButton href={`/texts/${sentence.sourceTextId}`} className="practice-my-sentences__link">
                   Relire le texte
-                </Link>
-                <button
-                  type="button"
+                </TextButton>
+                <GhostButton
                   onClick={() => {
                     deleteSavedSentence(sentence.id);
                     refresh();
                   }}
-                  className="practice-my-sentences__remove focus-kb"
+                  className="practice-my-sentences__remove"
                 >
                   Retirer
-                </button>
+                </GhostButton>
               </div>
-            </article>
+            </Card>
           </li>
         ))}
       </ul>

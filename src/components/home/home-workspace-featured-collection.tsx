@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { Badge, Card, GhostButton, PrimaryButton, TextButton } from "@/components/design-system";
 import type { FeaturedCollectionFeature } from "@/lib/home/pick-featured-collection";
 
 import { HomeReadingCover } from "./home-reading-cover";
@@ -16,24 +15,24 @@ export function HomeWorkspaceFeaturedCollection({ feature }: HomeWorkspaceFeatur
   return (
     <section className="home-ws-section" aria-labelledby="home-ws-featured-heading">
       <div className="home-ws-section__head">
-        <h2 id="home-ws-featured-heading" className="home-ws-section__title">
+        <h2 id="home-ws-featured-heading" className="r3-title home-ws-section__title">
           Your learning path
         </h2>
-        <p className="home-ws-section__subtitle">
+        <p className="r3-lead home-ws-section__subtitle">
           Track momentum across lessons in this path.
         </p>
       </div>
-      <article className="home-ws-card home-ws-featured-collection">
+      <Card as="article" className="home-ws-featured-collection">
         <HomeReadingCover collectionId={feature.id} className="home-ws-featured-collection__cover" />
         <div className="home-ws-featured-collection__body">
           <div className="home-ws-featured-collection__badges">
-            {feature.level ? <span className="home-ws-badge">{feature.level}</span> : null}
-            <span className="home-ws-badge home-ws-badge--muted">
+            {feature.level ? <Badge tone="blue">{feature.level}</Badge> : null}
+            <Badge tone="neutral">
               {feature.textCount} text{feature.textCount === 1 ? "" : "s"}
-            </span>
+            </Badge>
           </div>
-          <h2 className="home-ws-featured-collection__title">{feature.name}</h2>
-          <p className="home-ws-featured-collection__description">{feature.description}</p>
+          <h2 className="r3-hero-title home-ws-featured-collection__title">{feature.name}</h2>
+          <p className="r3-lead home-ws-featured-collection__description">{feature.description}</p>
 
           <div className="home-ws-featured-collection__stats">
             <p className="home-ws-featured-collection__stats-label">Path progress</p>
@@ -45,18 +44,14 @@ export function HomeWorkspaceFeaturedCollection({ feature }: HomeWorkspaceFeatur
           </div>
 
           <div className="home-ws-featured-collection__actions">
-            <Link href={feature.continueHref} className="home-ws-btn focus-kb">
-              Continue path →
-            </Link>
-            <Link href={feature.viewHref} className="home-ws-btn--ghost focus-kb">
-              View lessons
-            </Link>
+            <PrimaryButton href={feature.continueHref}>Continue path →</PrimaryButton>
+            <GhostButton href={feature.viewHref}>View lessons</GhostButton>
           </div>
-          <Link href="/library" className="home-ws-link home-ws-featured-collection__browse focus-kb">
+          <TextButton href="/library" className="home-ws-featured-collection__browse">
             See all paths →
-          </Link>
+          </TextButton>
         </div>
-      </article>
+      </Card>
     </section>
   );
 }

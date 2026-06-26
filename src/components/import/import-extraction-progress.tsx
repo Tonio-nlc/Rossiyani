@@ -1,5 +1,6 @@
 "use client";
 
+import { Card } from "@/components/design-system";
 import type { ImportParsePhase } from "@/services/import/parsers";
 
 const PHASE_LABELS: Record<ImportParsePhase, string> = {
@@ -26,10 +27,11 @@ export function ImportExtractionProgress({
   const currentIndex = steps.indexOf(phase);
 
   return (
-    <section className="home-ws-card home-ws-extract animate-fade-up" aria-live="polite" aria-busy={phase !== "done"}>
+    <section aria-live="polite" aria-busy={phase !== "done"}>
+      <Card as="section" className="home-ws-extract animate-fade-up">
       <div>
-        <p className="home-ws-metric__label">Préparation du fichier</p>
-        <p className="home-ws-card-title break-russian font-reader">{fileName}</p>
+        <p className="r3-eyebrow home-ws-extract__label">Préparation du fichier</p>
+        <p className="r3-title home-ws-extract__filename break-russian font-reader">{fileName}</p>
         {totalFiles > 1 ? (
           <p className="home-ws-explore-hub__description">
             Fichier {fileIndex} sur {totalFiles}
@@ -62,6 +64,7 @@ export function ImportExtractionProgress({
       </ol>
 
       <p className="home-ws-report__note">{PHASE_LABELS[phase]}</p>
+      </Card>
     </section>
   );
 }

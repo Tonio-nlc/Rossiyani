@@ -1,3 +1,5 @@
+import { Card } from "@/components/design-system";
+
 import {
   ImportIconCases,
   ImportIconConcepts,
@@ -50,10 +52,10 @@ export function ImportExtractionCards() {
   return (
     <section className="home-ws-section" aria-labelledby="import-extraction-heading">
       <div className="home-ws-section__head">
-        <h2 id="import-extraction-heading" className="home-ws-section__title">
+        <h2 id="import-extraction-heading" className="r3-title home-ws-section__title">
           Ce que Rossiyani crée
         </h2>
-        <p className="home-ws-section__subtitle">
+        <p className="r3-lead home-ws-section__subtitle">
           Rossiyani analyse votre contenu et en tire un système d&apos;apprentissage complet.
         </p>
       </div>
@@ -61,15 +63,15 @@ export function ImportExtractionCards() {
       <ul className="home-ws-feature-grid">
         {EXTRACTION_ITEMS.map((item) => (
           <li key={item.id}>
-            <article className="home-ws-card home-ws-feature-tile">
+            <Card as="article" className="home-ws-feature-tile">
               <div className="home-ws-feature-tile__head">
                 <span className="home-ws-explore-hub__icon" aria-hidden>
                   <item.Icon className="home-ws-explore-hub__icon-svg" />
                 </span>
-                <h3 className="home-ws-card-title">{item.title}</h3>
+                <h3 className="r3-title home-ws-feature-tile__title">{item.title}</h3>
               </div>
-              <p className="home-ws-explore-hub__description">{item.description}</p>
-            </article>
+              <p className="r3-lead home-ws-explore-hub__description">{item.description}</p>
+            </Card>
           </li>
         ))}
       </ul>

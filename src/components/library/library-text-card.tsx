@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { memo } from "react";
 
+import { Badge, Card, TextButton } from "@/components/design-system";
 import { getCategoryLabel } from "@/content/categories";
 import { getCollectionName } from "@/content/collections";
 import type { TextListItem } from "@/features/texts";
@@ -43,16 +44,17 @@ export const LibraryTextCard = memo(function LibraryTextCard({
   const collectionName = getCollectionName(text.collectionId);
 
   return (
-    <article
+    <Card
+      as="article"
       className={[
-        "library-ws-card library-ws-text-card",
+        "library-ws-text-card",
         variant === "featured" ? "library-ws-text-card--featured" : "",
       ].join(" ")}
     >
       <div className="library-ws-text-card__head">
         <div className="library-ws-text-card__badges">
-          <span className="library-ws-badge">{text.level}</span>
-          <span className="library-ws-badge library-ws-badge--muted">{minutes} min</span>
+          <Badge tone="blue">{text.level}</Badge>
+          <Badge tone="neutral">{minutes} min</Badge>
         </div>
         <LibraryCardActions
           disabled={disabled}
@@ -64,7 +66,7 @@ export const LibraryTextCard = memo(function LibraryTextCard({
 
       <p className="library-ws-text-card__collection">{collectionName}</p>
 
-      <h2 className="library-ws-text-card__title break-russian">
+      <h2 className="r3-title library-ws-text-card__title break-russian">
         <Link href={`/texts/${text.id}`} prefetch className="library-ws-text-card__title-link focus-kb">
           {russian}
         </Link>
@@ -87,10 +89,10 @@ export const LibraryTextCard = memo(function LibraryTextCard({
       <LibraryCardProgress textId={text.id} workspace />
 
       <footer className="library-ws-text-card__footer">
-        <Link href={`/texts/${text.id}`} prefetch className="library-ws-text-card__cta focus-kb">
+        <TextButton href={`/texts/${text.id}`} className="library-ws-text-card__cta">
           Lire →
-        </Link>
+        </TextButton>
       </footer>
-    </article>
+    </Card>
   );
 });

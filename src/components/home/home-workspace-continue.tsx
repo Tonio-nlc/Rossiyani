@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { Card, PrimaryButton, TextButton } from "@/components/design-system";
 import { getCefrLevelLabel } from "@/components/library/library-utils";
 import {
   buildHeroContinueInsights,
@@ -41,13 +41,13 @@ export function HomeWorkspaceContinue({ meta, wordsDiscovered }: HomeWorkspaceCo
   );
 
   return (
-    <article className="home-ws-card home-ws-card--hero home-ws-continue">
+    <Card as="article" hero className="home-ws-continue">
       <div className="home-ws-continue__visual">
         <HomeReadingCover collectionId={meta.collectionId} />
       </div>
       <div className="home-ws-continue__body">
-        <p className="home-ws-eyebrow">Pick up where you left off</p>
-        <h2 className="home-ws-continue__title break-russian">{meta.title}</h2>
+        <p className="r3-eyebrow home-ws-eyebrow">Pick up where you left off</p>
+        <h2 className="r3-hero-title home-ws-continue__title break-russian">{meta.title}</h2>
         <dl className="home-ws-continue__meta">
           <div>
             <dt>Path</dt>
@@ -91,14 +91,12 @@ export function HomeWorkspaceContinue({ meta, wordsDiscovered }: HomeWorkspaceCo
           ))}
         </dl>
         <div className="home-ws-continue__actions">
-          <Link href={meta.href} className="home-ws-btn home-ws-btn--large focus-kb">
+          <PrimaryButton href={meta.href} large>
             Continue lesson →
-          </Link>
-          <Link href="/practice" className="home-ws-link focus-kb">
-            Today&apos;s practice
-          </Link>
+          </PrimaryButton>
+          <TextButton href="/practice">Today&apos;s practice</TextButton>
         </div>
       </div>
-    </article>
+    </Card>
   );
 }

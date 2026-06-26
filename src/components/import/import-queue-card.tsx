@@ -1,3 +1,4 @@
+import { Card } from "@/components/design-system";
 import { getCollectionName } from "@/content/collections";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { countWords } from "@/lib/import-client";
@@ -29,9 +30,9 @@ export function ImportQueueCard({ item }: ImportQueueCardProps) {
   const wordLabel = `${wordCount} mot${wordCount === 1 ? "" : "s"}`;
 
   return (
-    <article className="home-ws-card home-ws-queue">
+    <Card as="article" className="home-ws-queue">
       <div>
-        <h3 className="home-ws-card-title break-russian font-reader">{item.title}</h3>
+        <h3 className="r3-title home-ws-queue__title break-russian font-reader">{item.title}</h3>
         {item.collectionId ? (
           <p className="home-ws-explore-hub__description">{getCollectionName(item.collectionId)}</p>
         ) : null}
@@ -58,6 +59,6 @@ export function ImportQueueCard({ item }: ImportQueueCardProps) {
       {item.status === "failed" && item.errorDetails ? (
         <ImportErrorDetails details={item.errorDetails} />
       ) : null}
-    </article>
+    </Card>
   );
 }

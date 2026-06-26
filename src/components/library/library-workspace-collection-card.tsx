@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { Badge, Card, PrimaryButton } from "@/components/design-system";
 import { HomeCollectionCover } from "@/components/home/home-collection-cover";
 import type { LibraryCollectionSummary } from "@/lib/library/build-library-collections";
 
@@ -18,45 +17,36 @@ export function LibraryWorkspaceCollectionCard({
 }: LibraryWorkspaceCollectionCardProps) {
   if (mode === "browse") {
     return (
-      <Link
+      <Card
         href={`/library?collection=${collection.id}`}
-        className="library-ws-card library-ws-collection-card library-ws-collection-card--browse focus-kb"
+        className="library-ws-collection-card library-ws-collection-card--browse"
       >
-        <HomeCollectionCover
-          collectionId={collection.id}
-          className="library-ws-collection-cover"
-        />
+        <HomeCollectionCover collectionId={collection.id} className="library-ws-collection-cover" />
         <div className="library-ws-collection-card__body">
           <p className="library-ws-collection-card__name">{collection.name}</p>
           <h3 className="library-ws-collection-card__russian break-russian">
             {collection.russianTitle}
           </h3>
           <div className="library-ws-collection-card__badges">
-            {collection.level ? (
-              <span className="library-ws-badge">{collection.level}</span>
-            ) : null}
-            <span className="library-ws-badge library-ws-badge--muted">
+            {collection.level ? <Badge tone="blue">{collection.level}</Badge> : null}
+            <Badge tone="neutral">
               {collection.textCount} text{collection.textCount === 1 ? "" : "s"}
-            </span>
+            </Badge>
           </div>
         </div>
-      </Link>
+      </Card>
     );
   }
 
-  const readingMinutes =
-    collection.readingMinutesTotal || collection.averageReadingMinutes;
+  const readingMinutes = collection.readingMinutesTotal || collection.averageReadingMinutes;
 
   return (
-    <article className="library-ws-card library-ws-collection-card library-ws-collection-card--hero">
-      <HomeCollectionCover
-        collectionId={collection.id}
-        className="library-ws-collection-cover"
-      />
+    <Card as="article" hero className="library-ws-collection-card library-ws-collection-card--hero">
+      <HomeCollectionCover collectionId={collection.id} className="library-ws-collection-cover" />
       <div className="library-ws-collection-card__body">
-        <p className="library-ws-collection-card__eyebrow">Collection</p>
+        <p className="r3-eyebrow library-ws-collection-card__eyebrow">Collection</p>
         <p className="library-ws-collection-card__name">{collection.name}</p>
-        <h3 className="library-ws-collection-card__russian break-russian">
+        <h3 className="r3-hero-title library-ws-collection-card__russian break-russian">
           {collection.russianTitle}
         </h3>
 
@@ -98,10 +88,10 @@ export function LibraryWorkspaceCollectionCard({
           </div>
         </div>
 
-        <Link href={collection.continueHref} className="library-ws-btn library-ws-collection-card__cta focus-kb">
+        <PrimaryButton href={collection.continueHref} className="library-ws-collection-card__cta">
           Continue collection →
-        </Link>
+        </PrimaryButton>
       </div>
-    </article>
+    </Card>
   );
 }

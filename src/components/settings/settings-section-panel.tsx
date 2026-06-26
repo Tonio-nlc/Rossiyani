@@ -1,5 +1,7 @@
 "use client";
 
+import { Card } from "@/components/design-system";
+
 import { SettingsProfileHero } from "./settings-profile-hero";
 import type { SettingsSection } from "./settings-types";
 
@@ -13,15 +15,15 @@ export function SettingsSectionPanel({ section }: SettingsSectionPanelProps) {
       {section.id === "account" ? <SettingsProfileHero /> : null}
 
       <header className="settings-section-panel__head">
-        <h2 className="settings-section-panel__title">{section.label}</h2>
-        <p className="settings-section-panel__lead">{section.description}</p>
+        <h2 className="r3-title settings-section-panel__title">{section.label}</h2>
+        <p className="r3-lead settings-section-panel__lead">{section.description}</p>
       </header>
 
       <ul className="settings-card-grid">
         {section.cards.map((card) => (
           <li key={card.id}>
-            <article className="settings-card" aria-labelledby={`settings-card-${card.id}`}>
-              <h3 id={`settings-card-${card.id}`} className="settings-card__title">
+            <Card as="article" className="settings-card" aria-labelledby={`settings-card-${card.id}`}>
+              <h3 id={`settings-card-${card.id}`} className="r3-title settings-card__title">
                 {card.title}
               </h3>
               <p className="settings-card__description">{card.description}</p>
@@ -37,7 +39,7 @@ export function SettingsSectionPanel({ section }: SettingsSectionPanelProps) {
                   </li>
                 ))}
               </ul>
-            </article>
+            </Card>
           </li>
         ))}
       </ul>

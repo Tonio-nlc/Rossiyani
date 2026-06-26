@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Badge } from "@/components/design-system";
 import type { ManualLessonSummary } from "@/features/manual/types";
 import { buildLessonsHubData } from "@/lib/lessons/build-lessons-hub";
 import { LESSONS_HOME } from "@/lib/lessons/paths";
@@ -15,16 +16,16 @@ export function LessonsHome() {
   return (
     <>
       <header className="lessons-hero">
-        <p className="lessons-hero__eyebrow">Apprentissage structuré</p>
-        <h1 className="lessons-hero__title">Leçons</h1>
-        <p className="lessons-hero__lead">
+        <p className="r3-eyebrow lessons-hero__eyebrow">Apprentissage structuré</p>
+        <h1 className="r3-hero-title lessons-hero__title">Leçons</h1>
+        <p className="r3-lead lessons-hero__lead">
           Choisissez un parcours, reprenez votre lecture, ou explorez une leçon — sans vous perdre
           dans le catalogue.
         </p>
         <div className="lessons-hero__metrics">
-          <span className="lessons-metric">{hub.stats.totalLessons} leçons</span>
+          <Badge tone="neutral">{hub.stats.totalLessons} leçons</Badge>
           {hub.stats.visitedCount > 0 ? (
-            <span className="lessons-metric">{hub.stats.visitedCount} déjà lues</span>
+            <Badge tone="blue">{hub.stats.visitedCount} déjà lues</Badge>
           ) : null}
         </div>
       </header>
@@ -34,10 +35,10 @@ export function LessonsHome() {
       <section className="lessons-section" aria-labelledby="paths-heading">
         <div className="lessons-section__head">
           <div>
-            <h2 id="paths-heading" className="lessons-section__title">
+            <h2 id="paths-heading" className="r3-title lessons-section__title">
               Parcours
             </h2>
-            <p className="lessons-section__subtitle">
+            <p className="r3-lead lessons-section__subtitle">
               Cinq entrées thématiques — chacune mène à un ensemble cohérent de leçons.
             </p>
           </div>
@@ -54,10 +55,10 @@ export function LessonsHome() {
       <section className="lessons-section lessons-section--compact" aria-labelledby="levels-heading">
         <div className="lessons-section__head">
           <div>
-            <h2 id="levels-heading" className="lessons-section__title">
+            <h2 id="levels-heading" className="r3-title lessons-section__title">
               Par niveau CECR
             </h2>
-            <p className="lessons-section__subtitle">
+            <p className="r3-lead lessons-section__subtitle">
               Progression du A1 au C2 — une seule entrée par niveau.
             </p>
           </div>
@@ -65,7 +66,7 @@ export function LessonsHome() {
         <nav className="lessons-level-nav" aria-label="Niveaux CECR">
           {hub.levelCollections.map((level) => (
             <Link key={level.id} href={level.href} className="lessons-level-pill focus-kb">
-              {level.difficulty}
+              <Badge tone="blue">{level.difficulty}</Badge>
             </Link>
           ))}
         </nav>
@@ -92,9 +93,9 @@ export function LessonsCollectionHeader({
       <Link href={backHref} className="lessons-back focus-kb">
         {backLabel}
       </Link>
-      <h1 className="lessons-page-header__title">{title}</h1>
-      {description ? <p className="lessons-page-header__meta">{description}</p> : null}
-      {meta ? <p className="lessons-page-header__meta">{meta}</p> : null}
+      <h1 className="r3-hero-title lessons-page-header__title">{title}</h1>
+      {description ? <p className="r3-lead lessons-page-header__meta">{description}</p> : null}
+      {meta ? <p className="r3-lead lessons-page-header__meta">{meta}</p> : null}
     </header>
   );
 }

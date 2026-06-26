@@ -9,6 +9,7 @@ type PrimaryButtonProps = {
   disabled?: boolean;
   type?: "button" | "submit";
   variant?: "default" | "gold";
+  large?: boolean;
 };
 
 export function PrimaryButton({
@@ -19,9 +20,11 @@ export function PrimaryButton({
   disabled,
   type = "button",
   variant = "default",
+  large = false,
 }: PrimaryButtonProps) {
   const classes = [
     "r3-btn r3-btn--primary ds-primary-btn focus-kb",
+    large ? "r3-btn--large" : "",
     variant === "gold" ? "ds-primary-btn--gold" : "",
     className,
   ]

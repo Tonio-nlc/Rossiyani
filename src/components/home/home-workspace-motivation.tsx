@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { Card, PrimaryButton } from "@/components/design-system";
 import type { LearningStreakSnapshot } from "@/lib/home/learning-streak";
 
 type HomeWorkspaceMotivationProps = {
@@ -16,18 +15,18 @@ export function HomeWorkspaceMotivation({ streak, continueHref }: HomeWorkspaceM
 
   return (
     <section className="home-ws-section home-ws-section--compact" aria-labelledby="home-ws-motivation-heading">
-      <article className="home-ws-motivation">
+      <Card as="article" className="home-ws-motivation">
         <div className="home-ws-motivation__copy">
-          <h2 id="home-ws-motivation-heading" className="home-ws-motivation__title">
+          <h2 id="home-ws-motivation-heading" className="r3-title home-ws-motivation__title">
             <span aria-hidden>🔥</span> Current streak · {streak.currentStreak} day
             {streak.currentStreak === 1 ? "" : "s"}
           </h2>
-          <p className="home-ws-motivation__lead">Keep showing up — momentum compounds.</p>
+          <p className="r3-lead home-ws-motivation__lead">Keep showing up — momentum compounds.</p>
         </div>
-        <Link href={ctaHref} className="home-ws-motivation__cta focus-kb">
+        <PrimaryButton href={ctaHref} className="home-ws-motivation__cta">
           Continue learning
-        </Link>
-      </article>
+        </PrimaryButton>
+      </Card>
     </section>
   );
 }

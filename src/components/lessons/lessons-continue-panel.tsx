@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { Card, PrimaryButton } from "@/components/design-system";
 import { getRecentManualLessonVisits } from "@/lib/manual/manual-lesson-history";
 import { lessonPath } from "@/lib/lessons/paths";
 
@@ -27,17 +27,19 @@ export function LessonsContinuePanel() {
   return (
     <section className="lessons-section" aria-labelledby="continue-heading">
       <div className="lessons-section__head">
-        <h2 id="continue-heading" className="lessons-section__title">
+        <h2 id="continue-heading" className="r3-title lessons-section__title">
           Reprendre
         </h2>
       </div>
-      <Link href={visit.href} className="lessons-continue focus-kb">
+      <Card as="article" interactive className="lessons-continue">
         <div>
           <p className="lessons-continue__label">Continuer l&apos;apprentissage</p>
-          <p className="lessons-continue__title">{visit.title}</p>
+          <p className="r3-title lessons-continue__title">{visit.title}</p>
         </div>
-        <span className="lessons-btn lessons-btn--primary">Reprendre →</span>
-      </Link>
+        <PrimaryButton href={visit.href} className="lessons-continue__cta">
+          Reprendre →
+        </PrimaryButton>
+      </Card>
     </section>
   );
 }

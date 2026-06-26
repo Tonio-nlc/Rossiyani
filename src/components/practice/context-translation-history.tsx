@@ -8,15 +8,15 @@ export function ContextTranslationHistory({ entries }: ContextTranslationHistory
   if (entries.length === 0) {
     return (
       <section className="practice-history practice-history--empty" aria-label="Traductions récentes">
-        <h2 className="practice-history__label">Traductions récentes</h2>
-        <p>Vos traductions apparaîtront ici après la première analyse.</p>
+        <h2 className="r3-eyebrow practice-history__label">Traductions récentes</h2>
+        <p className="r3-lead">Vos traductions apparaîtront ici après la première analyse.</p>
       </section>
     );
   }
 
   return (
     <section className="practice-history" aria-label="Traductions récentes">
-      <h2 className="practice-history__label">Traductions récentes</h2>
+      <h2 className="r3-eyebrow practice-history__label">Traductions récentes</h2>
       <ul className="practice-history__list">
         {entries.map((entry) => (
           <li key={entry.id} className="practice-history__item">

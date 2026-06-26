@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export type BadgeTone = "neutral" | "blue" | "violet" | "green" | "amber" | "rose";
+export type BadgeTone = "neutral" | "blue" | "violet" | "green" | "amber" | "rose" | "slate" | "teal";
 
 type BadgeProps = {
   children: ReactNode;
