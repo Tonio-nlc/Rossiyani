@@ -4,11 +4,16 @@ import { memo } from "react";
 
 import { SentenceBlock, type SentenceBlockWord } from "@/components/sentence/sentence-block";
 import type { WordHighlightKind } from "@/lib/reader/build-interactive-words";
+import type { ReaderSentenceInsight } from "@/lib/reader/build-reader-sentence-insight";
 import type { PartOfSpeech } from "@/types";
+
+import { ReaderSentenceInsightPanel } from "./reader-sentence-insight";
+import { SentenceListenButton } from "./sentence-listen-button";
 
 type ReaderSentenceProps = {
   sentenceId: string;
   russianText: string;
+  literalTranslation: string;
   naturalTranslation: string;
   words: SentenceBlockWord[];
   interactiveWordKinds: Map<string, WordHighlightKind>;
@@ -17,7 +22,13 @@ type ReaderSentenceProps = {
   searchMatchWordIds: Set<string>;
   searchActiveWordId: string | null;
   showTranslation: boolean;
+  showTranslationToggle: boolean;
+  showInterlinear: boolean;
   onToggleTranslation: () => void;
+  insight: ReaderSentenceInsight;
+  insightExpanded: boolean;
+  onToggleInsight: () => void;
+  isPlaying?: boolean;
   dimmed: boolean;
   onSelectSentence: () => void;
   onSelectWord: (word: SentenceBlockWord) => void;
@@ -29,6 +40,7 @@ type ReaderSentenceProps = {
 export const ReaderSentence = memo(function ReaderSentence({
   sentenceId,
   russianText,
+  literalTranslation,
   naturalTranslation,
   words,
   interactiveWordKinds,
@@ -37,7 +49,13 @@ export const ReaderSentence = memo(function ReaderSentence({
   searchMatchWordIds,
   searchActiveWordId,
   showTranslation,
+  showTranslationToggle,
+  showInterlinear,
   onToggleTranslation,
+  insight,
+  insightExpanded,
+  onToggleInsight,
+  isPlaying = false,
   dimmed,
   onSelectSentence,
   onSelectWord,
@@ -59,13 +77,19 @@ export const ReaderSentence = memo(function ReaderSentence({
       className={[
         "reader-paragraph reader-ws-sentence-wrap min-w-0",
         dimmed ? "reader-ws-sentence-wrap--muted" : "reader-ws-sentence-wrap--current",
-      ].join(" ")}
+        isPlaying ? "reader-ws-sentence-wrap--playing" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
       <SentenceBlock
         sentenceId={sentenceId}
         russianText={russianText}
+        literalTranslation={literalTranslation}
         naturalTranslation={naturalTranslation}
         showTranslation={showTranslation}
+        showTranslationToggle={showTranslationToggle}
+        showInterlinear={showInterlinear}
         onToggleTranslation={onToggleTranslation}
         words={words}
         interactiveWordKinds={interactiveWordKinds}
@@ -76,7 +100,17 @@ export const ReaderSentence = memo(function ReaderSentence({
         onSelectWord={onSelectWord}
         onHoverWord={onHoverWord}
         onHoverWordLeave={onHoverWordLeave}
+        insightSlot={
+          <ReaderSentenceInsightPanel
+            insight={insight}
+            expanded={insightExpanded}
+            onToggle={onToggleInsight}
+          />
+        }
       />
+      <div className="reader-ws-sentence-actions">
+        <SentenceListenButton sentenceId={sentenceId} />
+      </div>
     </div>
   );
 });

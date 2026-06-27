@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { useAuth } from "@/components/auth/auth-provider";
 import { getExplorationHistory } from "@/lib/explorer/exploration-history";
 import { buildHomeDashboardMetrics } from "@/lib/home/build-home-dashboard-metrics";
 import { getLearningStreakSnapshot } from "@/lib/home/learning-streak";
@@ -24,6 +25,7 @@ function initialsFromName(name: string): string {
 }
 
 export function SettingsProfileHero() {
+  const { user } = useAuth();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -58,14 +60,15 @@ export function SettingsProfileHero() {
     });
 
     const storedName =
-      typeof window !== "undefined" ? window.localStorage.getItem("rossiyani:displayName") : null;
+      user?.displayName ??
+      (typeof window !== "undefined" ? window.localStorage.getItem("rossiyani:displayName") : null);
 
     return {
       metrics: metricsSnapshot,
       streak: streakSnapshot,
       displayName: storedName?.trim() || "Apprenant",
     };
-  }, [ready]);
+  }, [ready, user?.displayName]);
 
   return (
     <section className="settings-profile-hero" aria-label="Votre profil">

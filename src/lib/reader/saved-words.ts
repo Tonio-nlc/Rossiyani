@@ -73,6 +73,11 @@ export function saveReaderWord(input: {
   return entry;
 }
 
+export function findSavedReaderWord(displayForm: string, textId: string): SavedReaderWord | null {
+  const key = wordKey(displayForm, textId);
+  return loadWords().find((entry) => wordKey(entry.displayForm, entry.textId) === key) ?? null;
+}
+
 export function getSavedReaderWords(): SavedReaderWord[] {
   return loadWords().filter((entry) => isLearnableLemma({ isProperNoun: entry.isProperNoun }));
 }

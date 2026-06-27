@@ -30,7 +30,13 @@ export function VocabularyWordFiche({ word }: VocabularyWordFicheProps) {
               </p>
             )}
           </div>
-          <VocabularyAudioButton />
+          <VocabularyAudioButton
+            target={{
+              scope: "utterance",
+              text: word.stressMarked ?? word.russian,
+              cacheKey: `vocab-word:${word.id}`,
+            }}
+          />
         </header>
 
         <dl className="vocabulary-fiche__facts">

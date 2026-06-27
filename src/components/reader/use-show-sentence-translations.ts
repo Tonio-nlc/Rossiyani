@@ -1,26 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-
-import {
-  getShowSentenceTranslationsPreference,
-  setShowSentenceTranslationsPreference,
-} from "@/lib/reader/show-sentence-translations-preference";
+/**
+ * @deprecated Use `use-translation-display.ts`.
+ */
+import { useTranslationDisplay } from "./use-translation-display";
 
 export function useShowSentenceTranslations(): {
   showTranslations: boolean;
   setShowTranslations: (show: boolean) => void;
 } {
-  const [showTranslations, setShowTranslationsState] = useState(false);
+  const { mode, setMode } = useTranslationDisplay();
 
-  useEffect(() => {
-    setShowTranslationsState(getShowSentenceTranslationsPreference());
-  }, []);
-
-  const setShowTranslations = useCallback((show: boolean) => {
-    setShowTranslationsState(show);
-    setShowSentenceTranslationsPreference(show);
-  }, []);
-
-  return { showTranslations, setShowTranslations };
+  return {
+    showTranslations: mode === "all",
+    setShowTranslations: (show: boolean) => setMode(show ? "all" : "manual"),
+  };
 }

@@ -49,13 +49,13 @@ export function ReaderInTextSearch({
             onPrevious();
           }
         }}
-        placeholder="Search in this text…"
-        aria-label="Search in text"
+        placeholder="Rechercher dans ce texte…"
+        aria-label="Rechercher dans le texte"
         className="reader-ws-search__input focus-kb"
       />
       {hasQuery ? (
-        <p className="reader-ws-search__meta">
-          {resultCount > 0 ? `${activeIndex + 1} / ${resultCount}` : "No results"}
+        <p className="reader-ws-search__meta" aria-live="polite">
+          {resultCount > 0 ? `${activeIndex + 1} / ${resultCount}` : "Aucun résultat"}
         </p>
       ) : null}
     </div>

@@ -1,4 +1,11 @@
+import { POS_LABELS_FR } from "@/features/grammar";
+import { formatCaseLabelFr } from "@/features/grammar";
 import { isDisplayableUiText } from "@/lib/formatting/ui-placeholder-guard";
+import {
+  formatAspectFr,
+  formatGenderFr,
+  formatNumberFr,
+} from "@/lib/formatting/word-morphology-display";
 import {
   isSentenceLevelExplanation,
   WORD_EXPLANATION_EMPTY,
@@ -15,71 +22,6 @@ const GENERIC_FILLER_PATTERNS = [
   /^mot (?:russe )?(?:qui |de )/i,
   /^forme (?:du |de )?(?:mot|lemme)/i,
 ];
-
-const POS_LABEL: Record<PartOfSpeech, string> = {
-  noun: "noun",
-  verb: "verb",
-  adjective: "adjective",
-  pronoun: "pronoun",
-  adverb: "adverb",
-  numeral: "numeral",
-  preposition: "preposition",
-  conjunction: "conjunction",
-  particle: "particle",
-  interjection: "interjection",
-};
-
-function formatGender(value: string | null): string | null {
-  if (!value?.trim()) {
-    return null;
-  }
-  const v = value.toLowerCase();
-  if (v.includes("masc") || v === "m") {
-    return "masculine";
-  }
-  if (v.includes("fem") || v === "f") {
-    return "feminine";
-  }
-  if (v.includes("neut")) {
-    return "neuter";
-  }
-  return value.trim().toLowerCase();
-}
-
-function formatNumber(value: string | null): string | null {
-  if (!value?.trim()) {
-    return null;
-  }
-  const v = value.toLowerCase();
-  if (v.includes("plur") || v === "pl") {
-    return "plural";
-  }
-  if (v.includes("sing") || v === "sg") {
-    return "singular";
-  }
-  return value.trim().toLowerCase();
-}
-
-function formatCase(value: string | null): string | null {
-  if (!value?.trim()) {
-    return null;
-  }
-  return value.trim().toLowerCase();
-}
-
-function formatAspect(value: string | null): string | null {
-  if (!value?.trim()) {
-    return null;
-  }
-  const v = value.toLowerCase();
-  if (v.includes("imperf")) {
-    return "imperfective";
-  }
-  if (v.includes("perf")) {
-    return "perfective";
-  }
-  return value.trim().toLowerCase();
-}
 
 function isGenericFiller(text: string): boolean {
   const trimmed = text.trim();
@@ -103,32 +45,32 @@ function isUsefulStoredExplanation(
 }
 
 function describeForm(occurrence: WordOccurrenceContext): string | null {
-  const pos = POS_LABEL[occurrence.partOfSpeech];
-  const gender = formatGender(occurrence.gender);
-  const number = formatNumber(occurrence.number);
-  const grammaticalCase = formatCase(occurrence.case);
-  const aspect = formatAspect(occurrence.aspect);
+  const pos = POS_LABELS_FR[occurrence.partOfSpeech] ?? occurrence.partOfSpeech;
+  const gender = formatGenderFr(occurrence.gender);
+  const number = formatNumberFr(occurrence.number);
+  const grammaticalCase = formatCaseLabelFr(occurrence.case);
+  const aspect = formatAspectFr(occurrence.aspect);
 
   if (occurrence.partOfSpeech === "adjective" && gender && number) {
-    const casePart = grammaticalCase ? `${grammaticalCase} ` : "";
-    return `This is the ${gender} ${number} ${casePart}form.`.replace(/\s+/g, " ");
+    const casePart = grammaticalCase ? ` au ${grammaticalCase.toLowerCase()}` : "";
+    return `C'est la forme ${gender.toLowerCase()} ${number.toLowerCase()}${casePart}.`;
   }
 
   if (occurrence.partOfSpeech === "noun" && gender && number) {
-    const casePart = grammaticalCase ? `${grammaticalCase} ` : "";
-    return `This is the ${gender} ${number} ${casePart}form.`.replace(/\s+/g, " ");
+    const casePart = grammaticalCase ? ` au ${grammaticalCase.toLowerCase()}` : "";
+    return `C'est la forme ${gender.toLowerCase()} ${number.toLowerCase()}${casePart}.`;
   }
 
   if (occurrence.partOfSpeech === "verb" && aspect) {
-    return `This is the ${aspect} ${pos} form.`;
+    return `C'est la forme ${aspect.toLowerCase()} du verbe.`;
   }
 
   if (grammaticalCase && pos) {
-    return `This ${pos} appears in the ${grammaticalCase} case here.`;
+    return `Ce ${pos.toLowerCase()} apparaît ici au cas ${grammaticalCase.toLowerCase()}.`;
   }
 
   if (pos) {
-    return `This is a ${pos} form of ${occurrence.lemma}.`;
+    return `C'est une forme du ${pos.toLowerCase()} « ${occurrence.lemma} ».`;
   }
 
   return null;
@@ -155,17 +97,17 @@ export function buildLinguisticExplanation(
   if (
     options?.agreementTarget &&
     occurrence.partOfSpeech === "adjective" &&
-    !paragraphs.some((line) => line.includes("agrees with"))
+    !paragraphs.some((line) => line.includes("s'accorde avec"))
   ) {
-    paragraphs.push(`This adjective agrees with ${options.agreementTarget}.`);
+    paragraphs.push(`Cet adjectif s'accorde avec ${options.agreementTarget}.`);
   }
 
   const tier = options?.frequencyTier?.toLowerCase();
   if (
     (tier === "core" || tier === "high" || occurrence.frequency === "common") &&
-    !paragraphs.some((line) => line.includes("everyday"))
+    !paragraphs.some((line) => line.includes("courant"))
   ) {
-    paragraphs.push("Frequently used in everyday Russian.");
+    paragraphs.push("Mot fréquent dans le russe quotidien.");
   }
 
   return paragraphs.slice(0, 3);

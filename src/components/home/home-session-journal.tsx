@@ -129,7 +129,7 @@ function ReviewSection({ entries }: { entries: SessionJournalEntry[] }) {
 
 function QuickLinksSection({ narrative }: { narrative: SessionJournal }) {
   const continueHref = narrative.continueReading?.href ?? "/library";
-  const reviewHref = narrative.toReview[0]?.href ?? "/practice";
+  const reviewHref = "/review";
   const practiceHref = narrative.nextStep?.href ?? "/practice";
 
   return (

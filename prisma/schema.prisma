@@ -603,3 +603,146 @@ model FeaturedCandidate {
   @@index([lastFeatured])
   @@index([validated])
 }
+
+// ---------------------------------------------------------------------------
+// Audio — cached TTS clips (Reader, Vocabulary, Review)
+// ---------------------------------------------------------------------------
+
+enum AudioScope {
+  SENTENCE
+  WORD
+  UTTERANCE
+}
+
+enum AudioProvider {
+  STATIC
+  AZURE
+  ELEVENLABS
+}
+
+model AudioClip {
+  id          String        @id @default(cuid())
+  scope       AudioScope
+  /// sentenceId, wordId, or utterance cache key
+  entityId    String
+  voiceId     String
+  provider    AudioProvider
+  contentHash String
+  mimeType    String        @default("audio/mpeg")
+  publicUrl   String
+  durationMs  Int?
+  createdAt   DateTime      @default(now())
+
+  @@unique([scope, entityId, voiceId, provider])
+  @@index([contentHash])
+}
+
+// ---------------------------------------------------------------------------
+// Auth & user sync (Sprint 5)
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  displayName  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions    Session[]
+  resetTokens PasswordResetToken[]
+  data        UserData?
+  reviewItems ReviewItem[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+/// Versioned JSON snapshot of learner state (reading, vocabulary, prefs).
+model UserData {
+  userId    String   @id
+  version   Int      @default(1)
+  payload   Json
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Review — spaced repetition (SRS)
+// ---------------------------------------------------------------------------
+
+enum ReviewCardType {
+  VOCABULARY
+  EXPRESSION
+  GRAMMAR
+}
+
+enum ReviewLearningState {
+  NEW
+  LEARNING
+  REVIEW
+  MASTERED
+}
+
+model ReviewItem {
+  id             String              @id @default(cuid())
+  userId         String
+  type           ReviewCardType
+  /// Stable dedup key, e.g. vocab:wordId, expr:discoveryId, grammar:sentenceId
+  sourceKey      String
+  content        Json
+  easeFactor     Float               @default(2.5)
+  intervalDays   Int                 @default(0)
+  repetitions    Int                 @default(0)
+  state          ReviewLearningState @default(NEW)
+  nextReviewAt   DateTime
+  lastReviewedAt DateTime?
+  suspended      Boolean             @default(false)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs ReviewLog[]
+
+  @@unique([userId, sourceKey])
+  @@index([userId, nextReviewAt])
+  @@index([userId, suspended])
+}
+
+model ReviewLog {
+  id           String   @id @default(cuid())
+  reviewItemId String
+  rating       Int
+  reviewedAt   DateTime @default(now())
+  timeMs       Int?
+
+  item ReviewItem @relation(fields: [reviewItemId], references: [id], onDelete: Cascade)
+
+  @@index([reviewItemId])
+  @@index([reviewedAt])
+}

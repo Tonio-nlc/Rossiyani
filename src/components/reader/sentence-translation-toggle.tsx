@@ -26,11 +26,11 @@ export function SentenceTranslationToggle({
     >
       {expanded ? (
         <>
-          Hide translation <span aria-hidden>↓</span>
+          Masquer la traduction <span aria-hidden>↓</span>
         </>
       ) : (
         <>
-          Show translation <span aria-hidden>→</span>
+          Afficher la traduction <span aria-hidden>→</span>
         </>
       )}
     </button>

@@ -151,6 +151,17 @@ export function computeSentencePercent(
   return Math.min(100, Math.round((sentencesSeenCount / totalSentences) * 100));
 }
 
+/** True when every sentence has been seen while reading (viewport intersection). */
+export function isTextReadingComplete(
+  progress: TextReadingProgress | null,
+  totalSentences: number,
+): boolean {
+  if (!progress || totalSentences <= 0) {
+    return false;
+  }
+  return progress.sentencesSeenIds.length >= totalSentences;
+}
+
 export function formatLastReadLabel(isoDate: string): string {
   const date = new Date(isoDate);
   const now = new Date();

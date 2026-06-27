@@ -1,193 +1,286 @@
 "use client";
 
-import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 
-import { completeOnboarding } from "@/lib/onboarding";
+import type { TextListItem } from "@/features/texts";
+import {
+  applyOnboardingPreferences,
+  completeOnboarding,
+  LEARNER_LEVEL_OPTIONS,
+  LEARNING_GOAL_OPTIONS,
+  ONBOARDING_AUDIO_SPEED_OPTIONS,
+  pickFirstOnboardingText,
+  THEME_OPTIONS,
+  TRANSLATION_DEFAULT_OPTIONS,
+  type LearnerLevel,
+  type LearningGoal,
+  type OnboardingTranslationDefault,
+  type ThemePreference,
+} from "@/lib/onboarding";
 
-const STEPS = [
-  {
-    title: "Bienvenue dans Rossiyani",
-    body: "Rossiyani n'est pas un traducteur. C'est un microscope linguistique — chaque mot devient une porte d'entrée vers la grammaire russe.",
-    visual: "welcome" as const,
-  },
-  {
-    title: "Comment ça fonctionne",
-    body: "Cliquez sur un mot. Rossiyani décompose la forme, révèle la terminaison, et explique pourquoi le russe fléchit ainsi.",
-    visual: "animation" as const,
-  },
-  {
-    title: "Quatre espaces pour explorer",
-    body: "Bibliothèque, Reader, Explorer et Recherche — tout est connecté par le même graphe de connaissances.",
-    visual: "spaces" as const,
-  },
-  {
-    title: "Prêt à commencer",
-    body: "Importez un texte russe ou ouvrez la bibliothèque pour votre première lecture guidée.",
-    visual: "cta" as const,
-  },
-];
+import { OnboardingOption, OnboardingShell } from "./onboarding-shell";
+
+const STEP_COUNT = 5;
 
 type OnboardingFlowProps = {
-  onComplete: () => void;
+  texts: TextListItem[];
 };
 
-export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
+export function OnboardingFlow({ texts }: OnboardingFlowProps) {
+  const router = useRouter();
   const [step, setStep] = useState(0);
-  const current = STEPS[step];
-  const isLast = step === STEPS.length - 1;
+  const [level, setLevel] = useState<LearnerLevel | null>(null);
+  const [goal, setGoal] = useState<LearningGoal | null>(null);
+  const [translationDefault, setTranslationDefault] =
+    useState<OnboardingTranslationDefault>("manual");
+  const [audioSpeed, setAudioSpeed] = useState(1);
+  const [theme, setTheme] = useState<ThemePreference>("light");
+  const [submitting, setSubmitting] = useState(false);
 
-  const finish = useCallback(() => {
-    completeOnboarding();
-    onComplete();
-  }, [onComplete]);
+  const firstText = useMemo(() => {
+    if (!level) {
+      return null;
+    }
+    return pickFirstOnboardingText(texts, level);
+  }, [level, texts]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        finish();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [finish]);
+  const goNext = () => setStep((current) => Math.min(current + 1, STEP_COUNT - 1));
+  const goBack = () => setStep((current) => Math.max(current - 1, 0));
 
-  return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-[var(--background)]/95 p-4 backdrop-blur-md">
-      <div className="animate-microscope-in w-full max-w-lg rounded-3xl border border-[var(--border)] bg-[var(--surface-elevated)] p-6 shadow-[var(--shadow-soft)] sm:p-8">
-        <div className="mb-6 flex gap-2">
-          {STEPS.map((_, i) => (
-            <div
-              key={i}
-              className={[
-                "h-1 flex-1 rounded-full transition-colors duration-300",
-                i <= step ? "bg-[var(--accent-violet)]" : "bg-[var(--surface)]",
-              ].join(" ")}
-            />
-          ))}
-        </div>
+  const finish = () => {
+    if (!level || !goal || !firstText || submitting) {
+      return;
+    }
+    setSubmitting(true);
+    const profile = completeOnboarding({
+      level,
+      goal,
+      theme,
+      translationDefault,
+      audioSpeed,
+      firstTextId: firstText.id,
+    });
+    applyOnboardingPreferences(profile);
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("rossiyani:lastTextId", firstText.id);
+    }
+    router.replace(`/texts/${firstText.id}`);
+  };
 
-        {current.visual === "welcome" ? (
-          <div className="mb-6 text-center">
-            <span className="text-5xl" aria-hidden>
-              🔬
-            </span>
-          </div>
-        ) : null}
+  if (step === 0) {
+    return (
+      <OnboardingShell
+        step={step}
+        total={STEP_COUNT}
+        eyebrow="Étape 1 sur 5"
+        title="Apprendre le russe par la lecture"
+        lead="Rossiyani vous accompagne dans de vrais textes — mot par mot, phrase par phrase."
+        footer={
+          <>
+            <span />
+            <button type="button" className="onboarding__primary focus-kb" onClick={goNext}>
+              Commencer
+            </button>
+          </>
+        }
+      >
+        <ul className="onboarding__bullets">
+          <li>Lire des textes authentiques, à votre rythme.</li>
+          <li>Comprendre chaque mot et chaque phrase quand vous en avez besoin.</li>
+          <li>Progresser naturellement — sans listes à mémoriser.</li>
+        </ul>
+      </OnboardingShell>
+    );
+  }
 
-        {current.visual === "animation" ? <MorphologyAnimation /> : null}
-
-        {current.visual === "spaces" ? <SpacesPreview /> : null}
-
-        {current.visual === "cta" ? (
-          <div className="mb-6 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 text-center">
-            <p className="font-reader text-2xl text-[var(--accent-violet-bright)]">городке</p>
-            <p className="mt-3 text-sm text-[var(--muted)]">Votre premier texte vous attend.</p>
-          </div>
-        ) : null}
-
-        <h2 className="font-reader text-2xl font-semibold text-[var(--foreground)]">{current.title}</h2>
-        <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{current.body}</p>
-
-        <div className="mt-8 flex items-center justify-between gap-3">
-          {step > 0 ? (
-            <button
-              type="button"
-              onClick={() => setStep((s) => s - 1)}
-              className="focus-kb rounded-xl px-4 py-2.5 text-sm text-[var(--muted)] transition hover:text-[var(--foreground)]"
-            >
+  if (step === 1) {
+    return (
+      <OnboardingShell
+        step={step}
+        total={STEP_COUNT}
+        eyebrow="Étape 2 sur 5"
+        title="Où en êtes-vous ?"
+        lead="Cela nous aide à choisir votre premier texte."
+        footer={
+          <>
+            <button type="button" className="onboarding__ghost focus-kb" onClick={goBack}>
               Retour
             </button>
-          ) : (
             <button
               type="button"
-              onClick={finish}
-              className="focus-kb rounded-xl px-4 py-2.5 text-sm text-[var(--muted)] transition hover:text-[var(--foreground)]"
-            >
-              Passer
-            </button>
-          )}
-
-          {isLast ? (
-            <div className="flex gap-2">
-              <Link
-                href="/import"
-                onClick={finish}
-                className="focus-kb rounded-xl border border-[var(--border)] px-4 py-2.5 text-sm transition hover:border-[var(--border-strong)]"
-              >
-                Importer
-              </Link>
-              <Link
-                href="/library"
-                onClick={finish}
-                className="btn-primary focus-kb rounded-xl px-5 py-2.5 text-sm font-semibold"
-              >
-                Commencer à lire
-              </Link>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setStep((s) => s + 1)}
-              className="btn-primary focus-kb rounded-xl px-5 py-2.5 text-sm font-semibold"
+              className="onboarding__primary focus-kb"
+              disabled={!level}
+              onClick={goNext}
             >
               Continuer
             </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MorphologyAnimation() {
-  const [stage, setStage] = useState(0);
-  const stages = ["городке", "городок", "городк + е", "Pourquoi ?"];
-
-  return (
-    <div className="mb-6">
-      <button
-        type="button"
-        onClick={() => setStage((s) => (s + 1) % stages.length)}
-        className="focus-kb w-full rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 text-center transition hover:border-[var(--accent-violet)]/40"
+          </>
+        }
       >
-        <p
-          className={[
-            "font-reader text-2xl transition-all duration-500",
-            stage === 3 ? "text-[var(--accent-cyan-bright)]" : "text-[var(--foreground)]",
-          ].join(" ")}
-        >
-          {stages[stage]}
-        </p>
-        <p className="mt-2 text-xs text-[var(--muted)]">Cliquez pour avancer</p>
-      </button>
-    </div>
-  );
-}
+        <div className="onboarding__options">
+          {LEARNER_LEVEL_OPTIONS.map((option) => (
+            <OnboardingOption
+              key={option.id}
+              label={option.label}
+              description={option.description}
+              selected={level === option.id}
+              onSelect={() => setLevel(option.id)}
+            />
+          ))}
+        </div>
+      </OnboardingShell>
+    );
+  }
 
-function SpacesPreview() {
-  const spaces = [
-    { icon: "📚", label: "Bibliothèque", desc: "Vos textes russes", href: "/library" },
-    { icon: "🔬", label: "Reader", desc: "Lecture + microscope", href: "/library" },
-    { icon: "📚", label: "Vocabulary", desc: "Mémoire linguistique", href: "/vocabulary" },
-    { icon: "🔎", label: "Recherche", desc: "Trouver instantanément", href: "/vocabulary" },
-  ];
+  if (step === 2) {
+    return (
+      <OnboardingShell
+        step={step}
+        total={STEP_COUNT}
+        eyebrow="Étape 3 sur 5"
+        title="Pourquoi apprenez-vous le russe ?"
+        lead="Vos recommandations s'affineront avec le temps."
+        footer={
+          <>
+            <button type="button" className="onboarding__ghost focus-kb" onClick={goBack}>
+              Retour
+            </button>
+            <button
+              type="button"
+              className="onboarding__primary focus-kb"
+              disabled={!goal}
+              onClick={goNext}
+            >
+              Continuer
+            </button>
+          </>
+        }
+      >
+        <div className="onboarding__options onboarding__options--grid">
+          {LEARNING_GOAL_OPTIONS.map((option) => (
+            <OnboardingOption
+              key={option.id}
+              label={option.label}
+              selected={goal === option.id}
+              onSelect={() => setGoal(option.id)}
+            />
+          ))}
+        </div>
+      </OnboardingShell>
+    );
+  }
+
+  if (step === 3) {
+    return (
+      <OnboardingShell
+        step={step}
+        total={STEP_COUNT}
+        eyebrow="Étape 4 sur 5"
+        title="Quelques préférences"
+        lead="Modifiables à tout moment dans les réglages."
+        footer={
+          <>
+            <button type="button" className="onboarding__ghost focus-kb" onClick={goBack}>
+              Retour
+            </button>
+            <button type="button" className="onboarding__primary focus-kb" onClick={goNext}>
+              Continuer
+            </button>
+          </>
+        }
+      >
+        <div className="onboarding__pref-group">
+          <p className="onboarding__pref-label">Traductions</p>
+          <div className="onboarding__options">
+            {TRANSLATION_DEFAULT_OPTIONS.map((option) => (
+              <OnboardingOption
+                key={option.id}
+                label={option.label}
+                description={option.description}
+                selected={translationDefault === option.id}
+                onSelect={() => setTranslationDefault(option.id)}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="onboarding__pref-group">
+          <p className="onboarding__pref-label">Vitesse audio</p>
+          <div className="onboarding__chip-row">
+            {ONBOARDING_AUDIO_SPEED_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={[
+                  "onboarding__chip focus-kb",
+                  audioSpeed === option.value ? "onboarding__chip--active" : "",
+                ].join(" ")}
+                onClick={() => setAudioSpeed(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="onboarding__pref-group">
+          <p className="onboarding__pref-label">Thème</p>
+          <div className="onboarding__chip-row">
+            {THEME_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                className={[
+                  "onboarding__chip focus-kb",
+                  theme === option.id ? "onboarding__chip--active" : "",
+                ].join(" ")}
+                onClick={() => setTheme(option.id)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </OnboardingShell>
+    );
+  }
 
   return (
-    <div className="mb-6 grid grid-cols-2 gap-2">
-      {spaces.map((s) => (
-        <Link
-          key={s.label}
-          href={s.href}
-          className="focus-kb card-hover rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 transition hover:border-[var(--border-strong)]"
-        >
-          <span className="text-xl" aria-hidden>
-            {s.icon}
-          </span>
-          <p className="mt-2 text-sm font-semibold">{s.label}</p>
-          <p className="text-xs text-[var(--muted)]">{s.desc}</p>
-        </Link>
-      ))}
-    </div>
+    <OnboardingShell
+      step={step}
+      total={STEP_COUNT}
+      eyebrow="Étape 5 sur 5"
+      title="Votre première lecture"
+      lead="Pas d'écran de bienvenue — on ouvre directement un texte adapté à vous."
+      footer={
+        <>
+          <button type="button" className="onboarding__ghost focus-kb" onClick={goBack}>
+            Retour
+          </button>
+          <button
+            type="button"
+            className="onboarding__primary focus-kb"
+            disabled={!firstText || submitting}
+            onClick={finish}
+          >
+            {submitting ? "Ouverture…" : "Lire maintenant"}
+          </button>
+        </>
+      }
+    >
+      {firstText ? (
+        <article className="onboarding__text-preview">
+          <p className="onboarding__text-level">{firstText.level}</p>
+          <h2 className="onboarding__text-title">{firstText.title}</h2>
+          <p className="onboarding__text-meta">
+            {firstText.sentenceCount} phrase{firstText.sentenceCount > 1 ? "s" : ""} · texte court
+            pour débuter
+          </p>
+        </article>
+      ) : (
+        <p className="onboarding__empty">Aucun texte disponible pour l&apos;instant.</p>
+      )}
+    </OnboardingShell>
   );
 }

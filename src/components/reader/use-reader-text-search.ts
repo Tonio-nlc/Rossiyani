@@ -53,12 +53,6 @@ export function useReaderTextSearch(
 
   const activeResult = results[activeIndex] ?? null;
 
-  useEffect(() => {
-    if (activeResult) {
-      onActivateResult(activeResult);
-    }
-  }, [activeResult, onActivateResult]);
-
   const setQuery = useCallback((value: string) => {
     setQueryState(value);
     if (value.trim()) {
@@ -85,15 +79,19 @@ export function useReaderTextSearch(
     if (results.length === 0) {
       return;
     }
-    setActiveIndex((current) => (current + 1) % results.length);
-  }, [results.length]);
+    const next = (activeIndex + 1) % results.length;
+    setActiveIndex(next);
+    onActivateResult(results[next]!);
+  }, [activeIndex, onActivateResult, results]);
 
   const goToPrevious = useCallback(() => {
     if (results.length === 0) {
       return;
     }
-    setActiveIndex((current) => (current - 1 + results.length) % results.length);
-  }, [results.length]);
+    const next = (activeIndex - 1 + results.length) % results.length;
+    setActiveIndex(next);
+    onActivateResult(results[next]!);
+  }, [activeIndex, onActivateResult, results]);
 
   return {
     query,

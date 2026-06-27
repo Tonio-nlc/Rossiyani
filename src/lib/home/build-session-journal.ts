@@ -11,6 +11,7 @@ import {
   continueReadingRationale,
   recommendedPracticeRationale,
 } from "@/lib/home/session-rationale";
+import { formatReviewState, getLocalDueCards } from "@/lib/review";
 import type { SavedReaderWord } from "@/lib/reader/saved-words";
 import {
   formatLastReadLabel,
@@ -195,6 +196,15 @@ function collectRecentlyLearned(input: BuildSessionJournalInput): SessionJournal
 }
 
 function collectToReview(input: BuildSessionJournalInput): SessionJournalEntry[] {
+  const dueCards = getLocalDueCards(5);
+  if (dueCards.length > 0) {
+    return dueCards.map((card) => ({
+      label: card.item.content.prompt,
+      href: "/review",
+      detail: formatReviewState(card.item.state),
+    }));
+  }
+
   const entries: SessionJournalEntry[] = [];
   const seen = new Set<string>();
 

@@ -1,4 +1,4 @@
-import { formatCaseLabelFr, normalizeCaseKey } from "@/features/grammar";
+import { formatCaseLabelFr, normalizeCaseKey, POS_LABELS_FR } from "@/features/grammar";
 import type { ReaderTextData } from "@/features/texts";
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
 import { buildLinguisticExplanation } from "@/lib/reader/build-linguistic-explanation";
@@ -32,27 +32,14 @@ export type ExplorerContextView = {
 type ReaderSentence = ReaderTextData["sentences"][number];
 type ReaderSentenceWord = ReaderSentence["words"][number];
 
-const POS_LABEL_EN: Record<string, string> = {
-  noun: "noun",
-  verb: "verb",
-  adjective: "adjective",
-  pronoun: "pronoun",
-  adverb: "adverb",
-  numeral: "numeral",
-  preposition: "preposition",
-  conjunction: "conjunction",
-  particle: "particle",
-  interjection: "interjection",
-};
-
-const CASE_FUNCTION_EN: Record<string, string> = {
-  nominative: "Subject",
-  genitive: "Possession or partitive",
-  dative: "Indirect object",
-  accusative: "Direct object",
-  instrumental: "Instrument or means",
-  prepositional: "Location or topic",
-  locative: "Location",
+const CASE_FUNCTION_FR: Record<string, string> = {
+  nominative: "Sujet",
+  genitive: "Possession ou partitif",
+  dative: "Complément d'objet indirect",
+  accusative: "Complément d'objet direct",
+  instrumental: "Instrument ou moyen",
+  prepositional: "Lieu ou thème",
+  locative: "Lieu",
 };
 
 const POSSESSIVE_PATTERN =
@@ -127,7 +114,7 @@ function resolveCaseFunction(caseValue: string | null): string | null {
   if (!caseKey) {
     return null;
   }
-  return CASE_FUNCTION_EN[caseKey] ?? null;
+  return CASE_FUNCTION_FR[caseKey] ?? null;
 }
 
 function findAgreementTarget(
@@ -158,7 +145,7 @@ function buildRoleBullets(
   const bullets: string[] = [];
   const { occurrence } = detail;
   const caseFunction = resolveCaseFunction(occurrence.case ?? snapshot.case);
-  const posLabel = POS_LABEL_EN[occurrence.partOfSpeech] ?? occurrence.partOfSpeech;
+  const posLabel = POS_LABELS_FR[occurrence.partOfSpeech as PartOfSpeech] ?? occurrence.partOfSpeech;
   const numberLabel = formatNumberFr(occurrence.number ?? snapshot.number);
   const genderLabel = formatGenderFr(occurrence.gender ?? snapshot.gender);
   const aspectLabel = formatAspectFr(occurrence.aspect ?? snapshot.aspect);
@@ -177,20 +164,20 @@ function buildRoleBullets(
   }
 
   if (genderLabel && occurrence.partOfSpeech !== "verb") {
-    bullets.push(`${genderLabel.toLowerCase()} form`);
+    bullets.push(`forme ${genderLabel.toLowerCase()}`);
   }
 
   if (aspectLabel && occurrence.partOfSpeech === "verb") {
-    bullets.push(`${aspectLabel.toLowerCase()} verb`);
+    bullets.push(`verbe ${aspectLabel.toLowerCase()}`);
   }
 
   if (agreementTarget && occurrence.partOfSpeech === "adjective") {
-    bullets.push(`agrees with ${agreementTarget}`);
+    bullets.push(`s'accorde avec ${agreementTarget}`);
   }
 
   const tier = detail.lemmaKnowledge?.frequencyTier?.toLowerCase();
   if (tier === "core" || tier === "high" || occurrence.frequency === "common") {
-    bullets.push("everyday vocabulary");
+    bullets.push("vocabulaire courant");
   }
 
   return dedupeBullets(bullets).slice(0, 6);
@@ -257,18 +244,18 @@ function buildSentenceFunction(
     return caseFunction;
   }
 
-  const pos = POS_LABEL_EN[detail.occurrence.partOfSpeech];
-  if (pos === "verb") {
-    return "Predicate";
+  const pos = POS_LABELS_FR[detail.occurrence.partOfSpeech as PartOfSpeech];
+  if (pos === "Verbe") {
+    return "Prédicat";
   }
-  if (pos === "adjective") {
-    return "Modifier";
+  if (pos === "Adjectif") {
+    return "Modificateur";
   }
-  if (pos === "adverb") {
-    return "Adverbial modifier";
+  if (pos === "Adverbe") {
+    return "Complément circonstanciel";
   }
-  if (pos === "preposition") {
-    return "Preposition";
+  if (pos === "Préposition") {
+    return "Préposition";
   }
 
   return null;
@@ -283,23 +270,25 @@ function describeRelationship(
   const selectedTerm = selected.stressMarked || selected.original;
 
   if (neighbor.partOfSpeech === "adjective" && direction === "before") {
-    return { term, description: `describes ${selectedTerm}` };
+    return { term, description: `décrit ${selectedTerm}` };
   }
 
   if (POSSESSIVE_PATTERN.test(neighbor.original) && direction === "before") {
-    return { term, description: "possessive modifier" };
+    return { term, description: "modificateur possessif" };
   }
 
   if (neighbor.partOfSpeech === "preposition" && direction === "before") {
     const caseLabel = formatCaseLabelFr(selected.case);
     return {
       term,
-      description: caseLabel ? `governs the ${caseLabel.toLowerCase()} form` : "governs this word",
+      description: caseLabel
+        ? `régit la forme au ${caseLabel.toLowerCase()}`
+        : "régit ce mot",
     };
   }
 
   if (neighbor.partOfSpeech === "verb" && direction === "after") {
-    return { term, description: `action involving ${selectedTerm}` };
+    return { term, description: `action impliquant ${selectedTerm}` };
   }
 
   if (
@@ -307,7 +296,7 @@ function describeRelationship(
     neighbor.partOfSpeech === "verb" &&
     direction === "before"
   ) {
-    return { term, description: `verb linked to ${selectedTerm}` };
+    return { term, description: `verbe lié à ${selectedTerm}` };
   }
 
   if (
@@ -315,7 +304,7 @@ function describeRelationship(
     neighbor.partOfSpeech === "noun" &&
     direction === "after"
   ) {
-    return { term, description: `acts on ${term}` };
+    return { term, description: `agit sur ${term}` };
   }
 
   return null;

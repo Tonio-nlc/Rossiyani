@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { ReaderView } from "@/components/reader/reader-view";
+import { FirstReadingCoach } from "@/components/onboarding/first-reading-coach";
 import { getTextForReader } from "@/features/texts";
 
 import ReaderEmptyPage from "./empty-state";
@@ -19,5 +20,10 @@ export default async function ReaderPage({ params }: PageProps) {
     return <ReaderEmptyPage textTitle={text.title} />;
   }
 
-  return <ReaderView text={text} />;
+  return (
+    <>
+      <ReaderView text={text} />
+      <FirstReadingCoach textId={textId} />
+    </>
+  );
 }

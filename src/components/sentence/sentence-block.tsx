@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { memo } from "react";
 
 import { buildSentenceDisplay } from "@/lib/formatting/build-sentence-display";
@@ -9,6 +10,7 @@ import type { PartOfSpeech } from "@/types";
 import { resolveSentenceBlockWord } from "../reader/reader-word-utils";
 import { SentenceTranslationToggle } from "../reader/sentence-translation-toggle";
 import { WordToken } from "../word/word-token";
+import { SentenceInterlinearTranslation } from "./sentence-interlinear-translation";
 import { SentenceNaturalTranslation } from "./sentence-natural-translation";
 
 export type SentenceBlockWord = {
@@ -29,8 +31,11 @@ export type SentenceBlockWord = {
 type SentenceBlockProps = {
   sentenceId: string;
   russianText: string;
+  literalTranslation?: string | null;
   naturalTranslation?: string | null;
   showTranslation?: boolean;
+  showTranslationToggle?: boolean;
+  showInterlinear?: boolean;
   onToggleTranslation?: () => void;
   words: SentenceBlockWord[];
   interactiveWordKinds: Map<string, WordHighlightKind>;
@@ -41,13 +46,17 @@ type SentenceBlockProps = {
   onSelectWord: (word: SentenceBlockWord) => void;
   onHoverWord?: (word: SentenceBlockWord) => void;
   onHoverWordLeave?: () => void;
+  insightSlot?: ReactNode;
 };
 
 export const SentenceBlock = memo(function SentenceBlock({
   sentenceId,
   russianText,
+  literalTranslation,
   naturalTranslation,
   showTranslation = false,
+  showTranslationToggle = true,
+  showInterlinear = false,
   onToggleTranslation,
   words,
   interactiveWordKinds,
@@ -58,6 +67,7 @@ export const SentenceBlock = memo(function SentenceBlock({
   onSelectWord,
   onHoverWord,
   onHoverWordLeave,
+  insightSlot = null,
 }: SentenceBlockProps) {
   const wordByPosition = new Map(words.map((word) => [word.position, word]));
   const segments = buildSentenceDisplay(
@@ -65,6 +75,7 @@ export const SentenceBlock = memo(function SentenceBlock({
     words.map((word) => ({ position: word.position, original: word.original })),
   );
   const hasTranslation = Boolean(naturalTranslation?.trim());
+  const hasLiteral = Boolean(literalTranslation?.trim());
 
   return (
     <div role="group" aria-label="Phrase" className="reader-sentence-block reader-ws-sentence">
@@ -113,13 +124,20 @@ export const SentenceBlock = memo(function SentenceBlock({
           );
         })}
       </p>
-      {onToggleTranslation ? (
+
+      <SentenceInterlinearTranslation
+        text={literalTranslation ?? ""}
+        visible={showInterlinear && hasLiteral}
+      />
+
+      {showTranslationToggle && onToggleTranslation ? (
         <SentenceTranslationToggle
           expanded={showTranslation}
           onToggle={onToggleTranslation}
           hasTranslation={hasTranslation}
         />
       ) : null}
+
       {hasTranslation ? (
         <div
           className={[
@@ -137,6 +155,8 @@ export const SentenceBlock = memo(function SentenceBlock({
           </div>
         </div>
       ) : null}
+
+      {insightSlot}
     </div>
   );
 });

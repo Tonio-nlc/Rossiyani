@@ -15,6 +15,10 @@ export type ReaderTextData = {
     russianText: string;
     literalTranslation: string;
     naturalTranslation: string;
+    russianLogic: string;
+    orderExplanation: string;
+    nativeUsageNotes: string;
+    register: string;
     difficultyScore: number;
     needsReview: boolean;
     analysisState: "PENDING" | "PROCESSING" | "READY" | "FAILED";
@@ -80,6 +84,10 @@ export async function getTextForReader(textId: string): Promise<ReaderTextData |
       russianText: s.russianText,
       literalTranslation: s.literalTranslation,
       naturalTranslation: s.naturalTranslation,
+      russianLogic: s.russianLogic,
+      orderExplanation: s.orderExplanation,
+      nativeUsageNotes: s.nativeUsageNotes,
+      register: s.register,
       difficultyScore: s.difficultyScore,
       needsReview: s.needsReview,
       analysisState: s.analysisState,

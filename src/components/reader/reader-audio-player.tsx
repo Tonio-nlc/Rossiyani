@@ -1,83 +1,95 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useMemo } from "react";
+
+import { useAudioPlayback } from "@/components/audio/audio-playback-provider";
 
 export type ReaderAudioPlayerProps = {
-  sentenceCount: number;
-  currentSentenceIndex: number;
-  onSentenceSeek?: (index: number) => void;
+  sentenceIds: string[];
+  startSentenceId: string | null;
+  onSentenceSeek?: (sentenceId: string) => void;
 };
 
-const SPEED_OPTIONS = [0.75, 1, 1.25, 1.5];
-
-function formatTime(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-}
-
 export function ReaderAudioPlayer({
-  sentenceCount,
-  currentSentenceIndex,
+  sentenceIds,
+  startSentenceId,
   onSentenceSeek,
 }: ReaderAudioPlayerProps) {
-  const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const [progress, setProgress] = useState(0);
-  const timerRef = useRef<number | null>(null);
+  const {
+    state,
+    speed,
+    textSession,
+    cycleSpeed,
+    playText,
+    pause,
+    resume,
+    stop,
+    seekSentenceIndex,
+  } = useAudioPlayback();
 
-  const duration = Math.max(sentenceCount * 8, 60);
-  const currentTime = Math.min((currentSentenceIndex / Math.max(sentenceCount, 1)) * duration, duration);
+  const sentenceCount = sentenceIds.length;
+  const currentIndex = textSession?.currentIndex ?? 0;
+  const progress =
+    sentenceCount > 1 ? (currentIndex / (sentenceCount - 1)) * 100 : sentenceCount === 1 ? 0 : 0;
 
-  useEffect(() => {
-    setProgress(sentenceCount > 0 ? (currentSentenceIndex / sentenceCount) * 100 : 0);
-  }, [currentSentenceIndex, sentenceCount]);
+  const isActive = state === "playing" || state === "paused" || state === "loading";
+  const playing = state === "playing" || state === "loading";
 
-  useEffect(() => {
-    if (!playing) {
-      if (timerRef.current) {
-        window.clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
+  const startIndex = useMemo(() => {
+    if (!startSentenceId) {
+      return 0;
+    }
+    const index = sentenceIds.indexOf(startSentenceId);
+    return index >= 0 ? index : 0;
+  }, [sentenceIds, startSentenceId]);
+
+  const handlePlayPause = useCallback(() => {
+    if (state === "playing") {
+      pause();
       return;
     }
-
-    timerRef.current = window.setInterval(() => {
-      setProgress((value) => Math.min(value + 0.4 * speed, 100));
-    }, 200);
-
-    return () => {
-      if (timerRef.current) {
-        window.clearInterval(timerRef.current);
-      }
-    };
-  }, [playing, speed]);
+    if (state === "paused") {
+      resume();
+      return;
+    }
+    if (sentenceIds.length === 0) {
+      return;
+    }
+    void playText(sentenceIds, textSession?.currentIndex ?? startIndex);
+  }, [pause, playText, resume, sentenceIds, startIndex, state, textSession?.currentIndex]);
 
   const handleSeek = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (sentenceCount <= 1) {
+        return;
+      }
       const value = Number(event.target.value);
-      setProgress(value);
-      if (onSentenceSeek && sentenceCount > 0) {
-        const index = Math.round((value / 100) * (sentenceCount - 1));
-        onSentenceSeek(index);
+      const index = Math.round((value / 100) * (sentenceCount - 1));
+      seekSentenceIndex(index);
+      const sentenceId = sentenceIds[index];
+      if (sentenceId) {
+        onSentenceSeek?.(sentenceId);
       }
     },
-    [onSentenceSeek, sentenceCount],
+    [onSentenceSeek, seekSentenceIndex, sentenceCount, sentenceIds],
   );
 
-  const cycleSpeed = () => {
-    const index = SPEED_OPTIONS.indexOf(speed);
-    setSpeed(SPEED_OPTIONS[(index + 1) % SPEED_OPTIONS.length]);
-  };
+  const handleStop = useCallback(() => {
+    stop();
+  }, [stop]);
+
+  if (sentenceCount === 0) {
+    return null;
+  }
 
   return (
-    <div className="reader-ws-player" aria-label="Audio player">
+    <div className="reader-ws-player" aria-label="Lecteur audio">
       <div className="reader-ws-player__inner">
         <button
           type="button"
           className="reader-ws-player__play focus-kb"
-          onClick={() => setPlaying((value) => !value)}
-          aria-label={playing ? "Pause" : "Play"}
+          onClick={handlePlayPause}
+          aria-label={playing ? "Pause" : "Lecture"}
         >
           {playing ? (
             <svg viewBox="0 0 20 20" fill="none" aria-hidden className="reader-ws-player__play-icon">
@@ -96,14 +108,16 @@ export function ReaderAudioPlayer({
             min={0}
             max={100}
             step={0.1}
-            value={progress}
+            value={isActive ? progress : 0}
             onChange={handleSeek}
             className="reader-ws-player__range"
-            aria-label="Playback progress"
+            aria-label="Progression dans le texte"
+            disabled={sentenceCount <= 1}
           />
           <div className="reader-ws-player__times">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(duration)}</span>
+            <span>
+              {currentIndex + 1} / {sentenceCount}
+            </span>
           </div>
         </div>
 
@@ -111,12 +125,18 @@ export function ReaderAudioPlayer({
           {speed}x
         </button>
 
-        <button type="button" className="reader-ws-player__download focus-kb" aria-label="Download audio">
-          <svg viewBox="0 0 20 20" fill="none" aria-hidden className="reader-ws-player__download-icon">
-            <path d="M10 4.5v8m0 0 3-3m-3 3-3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M5 15.5h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-        </button>
+        {isActive ? (
+          <button
+            type="button"
+            className="reader-ws-player__download focus-kb"
+            onClick={handleStop}
+            aria-label="Arrêter la lecture"
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden className="reader-ws-player__download-icon">
+              <rect x="6" y="6" width="8" height="8" rx="1" fill="currentColor" />
+            </svg>
+          </button>
+        ) : null}
       </div>
     </div>
   );

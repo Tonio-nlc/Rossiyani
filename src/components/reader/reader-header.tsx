@@ -5,10 +5,11 @@ import Link from "next/link";
 import {
   ReaderIconBookmark,
   ReaderIconButton,
-  ReaderIconMore,
   ReaderIconSearch,
   ReaderIconTextSize,
 } from "./reader-icon-button";
+import { ReaderTranslationMenu } from "./reader-translation-menu";
+import type { TranslationDisplayMode } from "@/lib/reader/translation-display-preference";
 
 type ReaderHeaderProps = {
   collectionName: string;
@@ -19,9 +20,13 @@ type ReaderHeaderProps = {
   percent: number;
   fontScale: number;
   bookmarked: boolean;
+  translationMode: TranslationDisplayMode;
+  interlinear: boolean;
   onFontScaleChange: (scale: number) => void;
   onBookmarkToggle: () => void;
   onOpenSearch: () => void;
+  onTranslationModeChange: (mode: TranslationDisplayMode) => void;
+  onInterlinearChange: (enabled: boolean) => void;
 };
 
 export function ReaderHeader({
@@ -33,9 +38,13 @@ export function ReaderHeader({
   percent,
   fontScale,
   bookmarked,
+  translationMode,
+  interlinear,
   onFontScaleChange,
   onBookmarkToggle,
   onOpenSearch,
+  onTranslationModeChange,
+  onInterlinearChange,
 }: ReaderHeaderProps) {
   const cycleFontScale = () => {
     const scales = [1, 1.125, 1.25];
@@ -46,9 +55,9 @@ export function ReaderHeader({
 
   return (
     <header className="reader-ws-header">
-      <nav className="reader-ws-header__breadcrumb" aria-label="Breadcrumb">
+      <nav className="reader-ws-header__breadcrumb" aria-label="Fil d'Ariane">
         <Link href="/library" className="reader-ws-header__crumb focus-kb">
-          Library
+          Bibliothèque
         </Link>
         <span className="reader-ws-header__crumb-sep" aria-hidden>
           /
@@ -66,41 +75,44 @@ export function ReaderHeader({
           <dl className="reader-ws-header__meta">
             {author ? (
               <div>
-                <dt>Author</dt>
+                <dt>Auteur</dt>
                 <dd>{author}</dd>
               </div>
             ) : null}
             <div>
-              <dt>Level</dt>
+              <dt>Niveau</dt>
               <dd>{level}</dd>
             </div>
             <div>
-              <dt>Reading time</dt>
+              <dt>Temps de lecture</dt>
               <dd>{estimatedMinutes} min</dd>
             </div>
             <div>
-              <dt>Progress</dt>
-              <dd>{percent}%</dd>
+              <dt>Progression</dt>
+              <dd>{percent} %</dd>
             </div>
           </dl>
         </div>
 
         <div className="reader-ws-header__actions">
-          <ReaderIconButton label="Search in text" onClick={onOpenSearch}>
+          <ReaderIconButton label="Rechercher dans le texte" onClick={onOpenSearch}>
             <ReaderIconSearch />
           </ReaderIconButton>
-          <ReaderIconButton label="Adjust font size" onClick={cycleFontScale}>
+          <ReaderTranslationMenu
+            mode={translationMode}
+            interlinear={interlinear}
+            onModeChange={onTranslationModeChange}
+            onInterlinearChange={onInterlinearChange}
+          />
+          <ReaderIconButton label="Ajuster la taille du texte" onClick={cycleFontScale}>
             <ReaderIconTextSize />
           </ReaderIconButton>
           <ReaderIconButton
-            label={bookmarked ? "Remove bookmark" : "Bookmark"}
+            label={bookmarked ? "Retirer le signet" : "Ajouter un signet"}
             onClick={onBookmarkToggle}
             active={bookmarked}
           >
             <ReaderIconBookmark filled={bookmarked} />
-          </ReaderIconButton>
-          <ReaderIconButton label="More actions" onClick={() => undefined}>
-            <ReaderIconMore />
           </ReaderIconButton>
         </div>
       </div>

@@ -128,12 +128,12 @@
 .reader-ws__content {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 1rem 5.25rem;
+  padding: 1rem 1rem 2rem;
 }
 
 @media (min-width: 768px) {
   .reader-ws__content {
-    padding: 1.15rem 1.5rem 5.25rem;
+    padding: 1.15rem 1.5rem 2rem;
   }
 }
 
@@ -408,6 +408,185 @@
   color: var(--rw-ink);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.reader-ws-interlinear {
+  margin: 0.4rem 0 0;
+  padding-left: 0.7rem;
+  border-left: 2px solid color-mix(in srgb, var(--rw-border) 85%, transparent);
+  font-family: var(--rw-font);
+  font-size: calc(0.75rem * var(--rw-font-scale));
+  font-style: italic;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--rw-muted) 88%, transparent);
+  max-width: 96%;
+}
+
+.reader-ws-translation-menu {
+  position: relative;
+}
+
+.reader-ws-translation-menu__panel {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 0;
+  z-index: 45;
+  width: min(17rem, calc(100vw - 2rem));
+  padding: 0.85rem;
+  border: 1px solid var(--rw-border);
+  border-radius: 14px;
+  background: var(--rw-surface);
+  box-shadow: var(--rw-shadow-lg);
+}
+
+.reader-ws-translation-menu__heading {
+  margin: 0 0 0.65rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--rw-ink);
+}
+
+.reader-ws-translation-menu__fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.reader-ws-translation-menu__legend {
+  margin-bottom: 0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--rw-muted);
+}
+
+.reader-ws-translation-menu__options {
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.reader-ws-translation-menu__option {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.reader-ws-translation-menu__option--active {
+  border-color: color-mix(in srgb, var(--rw-primary) 25%, var(--rw-border));
+  background: var(--rw-primary-soft);
+}
+
+.reader-ws-translation-menu__option-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--rw-ink);
+}
+
+.reader-ws-translation-menu__option-hint {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.6875rem;
+  color: var(--rw-muted);
+}
+
+.reader-ws-translation-menu__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--rw-border);
+  cursor: pointer;
+}
+
+.reader-ws-translation-menu__check input {
+  margin-top: 0.15rem;
+}
+
+.reader-ws-translation-menu__check-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--rw-ink);
+}
+
+.reader-ws-translation-menu__check-hint {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.6875rem;
+  color: var(--rw-muted);
+}
+
+.reader-ws-sentence-insight-wrap {
+  margin-top: 0.35rem;
+}
+
+.reader-ws-sentence-insight-toggle {
+  align-self: flex-start;
+  margin: 0.15rem 0 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: var(--rw-font);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: color-mix(in srgb, var(--rw-muted) 75%, transparent);
+  cursor: pointer;
+}
+
+.reader-ws-sentence-insight-toggle:hover {
+  color: var(--rw-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.reader-ws-sentence-insight {
+  margin-top: 0.55rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--rw-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--rw-surface) 92%, var(--rw-bg));
+}
+
+.reader-ws-sentence-insight__section + .reader-ws-sentence-insight__section {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--rw-border) 70%, transparent);
+}
+
+.reader-ws-sentence-insight__section-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--rw-muted);
+}
+
+.reader-ws-sentence-insight__section-body {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--rw-ink);
+}
+
+.reader-ws-sentence-insight__more {
+  margin-top: 0.25rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 0.75rem;
+  color: var(--rw-muted);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .reader-ws .reader-paragraph {
@@ -1216,6 +1395,72 @@
   filter: saturate(0.94);
 }
 
+.reader-ws-sentence-wrap--playing {
+  box-shadow: inset 3px 0 0 var(--accent, #3b6fd4);
+}
+
+.reader-ws-sentence-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.35rem;
+}
+
+.reader-ws-sentence-listen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-muted, #6b7280);
+  cursor: pointer;
+  transition:
+    color var(--v2-duration, 220ms) ease,
+    background var(--v2-duration, 220ms) ease;
+}
+
+.reader-ws-sentence-listen:hover {
+  color: var(--ink, #1f2937);
+  background: color-mix(in srgb, var(--surface-muted, #f3f4f6) 80%, transparent);
+}
+
+.reader-ws-sentence-listen__icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.reader-ws-explorer__audio {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--surface-muted, #f3f4f6);
+  color: var(--ink-muted, #6b7280);
+  cursor: pointer;
+}
+
+.reader-ws-explorer__audio:hover {
+  color: var(--ink, #1f2937);
+}
+
+.reader-ws-explorer__audio-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.reader-ws-explorer__word-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
 .reader-ws .reader-sentence-block__russian {
   font-size: calc(1.9375rem * var(--rw-font-scale));
   line-height: 1.78;
@@ -1963,6 +2208,22 @@
 .reader-ws-explorer__actions {
   padding: 0.5rem 1.25rem 1rem;
   gap: 0.65rem;
+}
+
+.reader-ws-explorer__action--review {
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.8125rem;
+}
+
+.reader-ws-explorer__action--review-active {
+  color: var(--v2-primary, #0058be);
+}
+
+.reader-ws-explorer__review-state {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--v2-body, #64748b);
 }
 
 .reader-ws-explorer__panel {

@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { PlayAudioButton } from "@/components/audio/play-audio-button";
+import { POS_LABELS_FR } from "@/features/grammar";
 import {
   buildReaderExplorerView,
   type ExplorerGrammarSection,
@@ -10,11 +12,23 @@ import {
 import type { ReaderTextData } from "@/features/texts";
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
 import type { ReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel-data";
-import { isReaderWordSaved, saveReaderWord } from "@/lib/reader/saved-words";
+import {
+  findSavedReaderWord,
+  isReaderWordSaved,
+  saveReaderWord,
+} from "@/lib/reader/saved-words";
+import {
+  enqueueVocabularyReview,
+  findVocabularyReviewItem,
+  formatReviewState,
+  isVocabularyInReview,
+  removeVocabularyReview,
+} from "@/lib/review";
+import type { PartOfSpeech } from "@/types";
 import type { WordDetailGraph } from "@/types/word-detail-graph";
 
 import { ReaderExplorerSkeleton } from "./reader-explorer-skeleton";
-import { ReaderIconSave, ReaderIconSpeaker } from "./reader-icon-button";
+import { ReaderIconSave } from "./reader-icon-button";
 
 type ReaderExplorerPanelProps = {
   detail: WordDetailGraph | null;
@@ -25,9 +39,9 @@ type ReaderExplorerPanelProps = {
 };
 
 const TABS: Array<{ id: ReaderExplorerTab; label: string }> = [
-  { id: "dictionary", label: "Dictionary" },
-  { id: "grammar", label: "Grammar" },
-  { id: "context", label: "Context" },
+  { id: "dictionary", label: "Dictionnaire" },
+  { id: "grammar", label: "Grammaire" },
+  { id: "context", label: "Contexte" },
 ];
 
 function GrammarSectionCard({
@@ -49,7 +63,7 @@ function GrammarSectionCard({
       <h3 className="reader-ws-explorer__section-title">{section.title}</h3>
 
       {section.id === "morphology" && chipLabels.length > 0 ? (
-        <div className="reader-ws-explorer__tags" aria-label="Morphology">
+        <div className="reader-ws-explorer__tags" aria-label="Morphologie">
           {chipLabels.map((tag) => (
             <span key={tag} className="reader-ws-explorer__tag">
               {tag}
@@ -94,6 +108,28 @@ export function ReaderExplorerPanel({
 }: ReaderExplorerPanelProps) {
   const [activeTab, setActiveTab] = useState<ReaderExplorerTab>("dictionary");
   const [saved, setSaved] = useState(false);
+  const [inReview, setInReview] = useState(false);
+  const [reviewState, setReviewState] = useState<string | null>(null);
+
+  const savedWordId = useMemo(() => {
+    if (!snapshot) {
+      return null;
+    }
+    return (
+      findSavedReaderWord(snapshot.stressMarked || snapshot.original, snapshot.textId)?.id ?? null
+    );
+  }, [snapshot]);
+
+  useEffect(() => {
+    if (!savedWordId) {
+      setInReview(false);
+      setReviewState(null);
+      return;
+    }
+    setInReview(isVocabularyInReview(savedWordId));
+    const item = findVocabularyReviewItem(savedWordId);
+    setReviewState(item ? formatReviewState(item.state) : null);
+  }, [savedWordId, saved]);
 
   const view = useMemo(
     () =>
@@ -106,24 +142,74 @@ export function ReaderExplorerPanel({
     [detail, snapshot, textIndex, sentence],
   );
 
+  const partOfSpeechLabel = snapshot?.partOfSpeech
+    ? (POS_LABELS_FR[snapshot.partOfSpeech as PartOfSpeech] ?? snapshot.partOfSpeech)
+    : view?.partOfSpeech;
+
   const handleSave = () => {
     if (!snapshot) {
       return;
     }
-    saveReaderWord({
+    const entry = saveReaderWord({
       displayForm: snapshot.stressMarked || snapshot.original,
       lemma: snapshot.lemma,
       textId: snapshot.textId,
       isProperNoun: snapshot.isProperNoun,
     });
+    if (entry) {
+      enqueueVocabularyReview(entry, {
+        translation: view?.dictionary.translation ?? null,
+        stressMarked: snapshot.stressMarked,
+        partOfSpeech: partOfSpeechLabel ?? null,
+        exampleRussian: view?.dictionary.examples[0] ?? null,
+        wordId: snapshot.id,
+      });
+      setSaved(true);
+      setInReview(true);
+      setReviewState("Nouveau");
+    }
+  };
+
+  const handleReviewToggle = () => {
+    if (!snapshot) {
+      return;
+    }
+    const word =
+      findSavedReaderWord(snapshot.stressMarked || snapshot.original, snapshot.textId) ??
+      saveReaderWord({
+        displayForm: snapshot.stressMarked || snapshot.original,
+        lemma: snapshot.lemma,
+        textId: snapshot.textId,
+        isProperNoun: snapshot.isProperNoun,
+      });
+    if (!word) {
+      return;
+    }
+
+    if (inReview) {
+      removeVocabularyReview(word.id);
+      setInReview(false);
+      setReviewState(null);
+      return;
+    }
+
+    enqueueVocabularyReview(word, {
+      translation: view?.dictionary.translation ?? null,
+      stressMarked: snapshot.stressMarked,
+      partOfSpeech: partOfSpeechLabel ?? null,
+      exampleRussian: view?.dictionary.examples[0] ?? null,
+      wordId: snapshot.id,
+    });
     setSaved(true);
+    setInReview(true);
+    setReviewState("Nouveau");
   };
 
   if (!snapshot) {
     return (
       <div className="reader-ws-explorer">
         <header className="reader-ws-explorer__head">
-          <h2 className="reader-ws-explorer__title">Explorer</h2>
+          <h2 className="reader-ws-explorer__title">Explorateur</h2>
         </header>
         <div className="reader-ws-explorer__empty">
           <span className="reader-ws-explorer__empty-icon" aria-hidden>
@@ -133,9 +219,10 @@ export function ReaderExplorerPanel({
               <path d="M8.5 11h5M11 8.5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </span>
-          <p className="reader-ws-explorer__empty-title">Select a word</p>
+          <p className="reader-ws-explorer__empty-title">Sélectionnez un mot</p>
           <p className="reader-ws-explorer__empty-copy">
-            Tap any highlighted word in the text to see translation, grammar, and context.
+            Cliquez sur un mot surligné dans le texte pour voir sa traduction, sa grammaire et son
+            contexte.
           </p>
         </div>
       </div>
@@ -148,7 +235,7 @@ export function ReaderExplorerPanel({
   return (
     <div className="reader-ws-explorer">
       <header className="reader-ws-explorer__head">
-        <h2 className="reader-ws-explorer__title">Explorer</h2>
+        <h2 className="reader-ws-explorer__title">Explorateur</h2>
       </header>
 
       <article className="reader-ws-explorer__word-card">
@@ -161,20 +248,23 @@ export function ReaderExplorerPanel({
               <p className="reader-ws-explorer__translit">{view.transliteration}</p>
             ) : null}
           </div>
-          <button type="button" className="reader-ws-explorer__speak focus-kb" aria-label="Pronunciation">
-            <ReaderIconSpeaker />
-          </button>
+          <PlayAudioButton
+            target={{ scope: "word", entityId: snapshot.id }}
+            label="Écouter le mot"
+            className="reader-ws-explorer__audio focus-kb"
+            iconClassName="reader-ws-explorer__audio-icon"
+          />
         </div>
-        {view?.partOfSpeech ? (
+        {partOfSpeechLabel ? (
           <div className="reader-ws-explorer__word-meta">
             <span className="reader-ws-explorer__tag reader-ws-explorer__tag--meta">
-              {view.partOfSpeech}
+              {partOfSpeechLabel}
             </span>
           </div>
         ) : null}
       </article>
 
-      <div className="reader-ws-explorer__tabs" role="tablist" aria-label="Word details">
+      <div className="reader-ws-explorer__tabs" role="tablist" aria-label="Détails du mot">
         {TABS.map((tab) => (
           <button
             key={tab.id}
@@ -198,13 +288,13 @@ export function ReaderExplorerPanel({
         {activeTab === "dictionary" ? (
           <div className="reader-ws-explorer__stack">
             <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
-              <p className="reader-ws-explorer__card-label">Translation</p>
+              <p className="reader-ws-explorer__card-label">Traduction</p>
               <p className="reader-ws-explorer__card-value reader-ws-explorer__card-value--lead">
                 {view?.dictionary.translation ?? "—"}
               </p>
               {view && view.dictionary.meanings.length > 1 ? (
                 <div className="reader-ws-explorer__field">
-                  <p className="reader-ws-explorer__card-label">Meanings</p>
+                  <p className="reader-ws-explorer__card-label">Sens</p>
                   <ul className="reader-ws-explorer__list">
                     {view.dictionary.meanings.map((meaning) => (
                       <li key={meaning}>{meaning}</li>
@@ -216,7 +306,7 @@ export function ReaderExplorerPanel({
 
             {view && view.dictionary.examples.length > 0 ? (
               <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
-                <p className="reader-ws-explorer__card-label">Examples</p>
+                <p className="reader-ws-explorer__card-label">Exemples</p>
                 <ul className="reader-ws-explorer__list reader-ws-explorer__list--examples">
                   {view.dictionary.examples.map((example) => (
                     <li key={example} className="break-russian">
@@ -241,7 +331,7 @@ export function ReaderExplorerPanel({
               ))
             ) : (
               <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
-                <p className="reader-ws-explorer__muted">No grammar details available yet.</p>
+                <p className="reader-ws-explorer__muted">Aucun détail grammatical disponible pour l'instant.</p>
               </article>
             )}
           </div>
@@ -252,13 +342,13 @@ export function ReaderExplorerPanel({
             {view?.context.available ? (
               <>
                 <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
-                  <p className="reader-ws-explorer__card-label">Context</p>
+                  <p className="reader-ws-explorer__card-label">Contexte</p>
                   <p className="reader-ws-explorer__context-word break-russian">
                     {view.context.selectedWord}
                   </p>
                   {view.context.roleBullets.length > 0 ? (
                     <div className="reader-ws-explorer__context-block">
-                      <p className="reader-ws-explorer__context-subhead">Used in this sentence as</p>
+                      <p className="reader-ws-explorer__context-subhead">Dans cette phrase</p>
                       <ul className="reader-ws-explorer__context-bullets">
                         {view.context.roleBullets.map((bullet) => (
                           <li key={bullet}>{bullet}</li>
@@ -270,21 +360,21 @@ export function ReaderExplorerPanel({
 
                 {view.context.naturalMeaning ? (
                   <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
-                    <p className="reader-ws-explorer__card-label">Natural meaning in this sentence</p>
+                    <p className="reader-ws-explorer__card-label">Sens naturel dans cette phrase</p>
                     <p className="reader-ws-explorer__prose">{view.context.naturalMeaning}</p>
                   </article>
                 ) : null}
 
                 {view.context.sentenceFunction ? (
                   <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
-                    <p className="reader-ws-explorer__card-label">Function in the sentence</p>
+                    <p className="reader-ws-explorer__card-label">Fonction dans la phrase</p>
                     <p className="reader-ws-explorer__card-value">{view.context.sentenceFunction}</p>
                   </article>
                 ) : null}
 
                 {view.context.relationships.length > 0 ? (
                   <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
-                    <p className="reader-ws-explorer__card-label">Relationship with nearby words</p>
+                    <p className="reader-ws-explorer__card-label">Liens avec les mots voisins</p>
                     <ul className="reader-ws-explorer__context-relations">
                       {view.context.relationships.map((relationship) => (
                         <li key={`${relationship.term}-${relationship.description}`}>
@@ -303,7 +393,7 @@ export function ReaderExplorerPanel({
             ) : (
               <article className="reader-ws-explorer__card reader-ws-explorer__card--module">
                 <p className="reader-ws-explorer__muted">
-                  Context analysis is not available for this word yet.
+                  L'analyse contextuelle n'est pas encore disponible pour ce mot.
                 </p>
               </article>
             )}
@@ -312,10 +402,6 @@ export function ReaderExplorerPanel({
       </div>
 
       <footer className="reader-ws-explorer__actions">
-        <button type="button" className="reader-ws-explorer__action reader-ws-explorer__action--ghost focus-kb">
-          <ReaderIconSpeaker />
-          Listen
-        </button>
         <button
           type="button"
           className="reader-ws-explorer__action focus-kb"
@@ -323,7 +409,20 @@ export function ReaderExplorerPanel({
           disabled={isSaved}
         >
           <ReaderIconSave />
-          {isSaved ? "Saved" : "Save Word"}
+          {isSaved ? "Enregistré" : "Enregistrer le mot"}
+        </button>
+        <button
+          type="button"
+          className={[
+            "reader-ws-explorer__action reader-ws-explorer__action--review focus-kb",
+            inReview ? "reader-ws-explorer__action--review-active" : "",
+          ].join(" ")}
+          onClick={handleReviewToggle}
+        >
+          {inReview ? "Dans les révisions" : "Ajouter aux révisions"}
+          {reviewState ? (
+            <span className="reader-ws-explorer__review-state">{reviewState}</span>
+          ) : null}
         </button>
       </footer>
     </div>

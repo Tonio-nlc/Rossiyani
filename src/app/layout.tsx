@@ -17,6 +17,8 @@ import "./practice-workspace.css";
 import "./lessons-workspace.css";
 import "./vocabulary-workspace.css";
 import "./settings-workspace.css";
+import "./auth-workspace.css";
+import "./theme-preference.css";
 
 const fontEditorial = EB_Garamond({
   subsets: ["latin", "cyrillic"],

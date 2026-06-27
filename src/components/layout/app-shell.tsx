@@ -4,9 +4,14 @@ import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
+import { AudioPlaybackProvider } from "@/components/audio/audio-playback-provider";
+import { AuthProvider } from "@/components/auth/auth-provider";
 import { EditorialContainer, TopNavigation } from "@/components/design-system";
 import { SyncLearningSignals } from "@/components/discovery/sync-learning-signals";
 import { SearchProvider } from "@/components/layout/search-context";
+import { OnboardingGuard } from "@/components/onboarding/onboarding-guard";
+import { ThemePreferenceInit } from "@/components/preferences/theme-preference-init";
+import { UserSyncProvider } from "@/components/sync/user-sync-provider";
 
 import { OfflineBanner } from "./offline-banner";
 
@@ -23,6 +28,9 @@ import { NAV_KEYBOARD_SHORTCUTS } from "@/lib/navigation/main-nav";
 function resolvePageRootClass(pathname: string | null): string {
   const r3 = "r3-page-root";
 
+  if (pathname?.startsWith("/onboarding")) {
+    return `onboarding-page-root v2-page-root ${r3}`;
+  }
   if (pathname?.startsWith("/settings")) {
     return `settings-page-root v2-page-root ${r3}`;
   }
@@ -77,17 +85,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [router]);
 
+  const hideChrome = pathname?.startsWith("/onboarding");
+
   return (
     <SearchProvider openSearch={openSearch}>
-      <div className={["min-h-screen min-w-0 overflow-x-clip", pageRootClass].join(" ")}>
-        <OfflineBanner />
-        <TopNavigation onOpenSearch={openSearch} />
+      <AuthProvider>
+        <UserSyncProvider>
+          <AudioPlaybackProvider>
+            <ThemePreferenceInit />
+            <OnboardingGuard />
+            <div className={["min-h-screen min-w-0 overflow-x-clip", pageRootClass].join(" ")}>
+        {!hideChrome ? <OfflineBanner /> : null}
+        {!hideChrome ? <TopNavigation onOpenSearch={openSearch} /> : null}
         <SyncLearningSignals />
         <EditorialContainer as="main" className="ds-app-main min-w-0">
           {children}
         </EditorialContainer>
-        {searchOpen ? <UniversalSearchDialog open={searchOpen} onClose={closeSearch} /> : null}
-      </div>
+        {!hideChrome && searchOpen ? (
+          <UniversalSearchDialog open={searchOpen} onClose={closeSearch} />
+        ) : null}
+            </div>
+          </AudioPlaybackProvider>
+        </UserSyncProvider>
+      </AuthProvider>
     </SearchProvider>
   );
 }

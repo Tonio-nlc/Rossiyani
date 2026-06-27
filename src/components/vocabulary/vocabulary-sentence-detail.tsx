@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { getSavedSentenceById } from "@/lib/phrase-mining";
 import { vocabularyPath } from "@/lib/vocabulary";
 
+import { VocabularyAudioButton } from "./vocabulary-audio-button";
+
 export function VocabularySentenceDetail() {
   const params = useParams<{ id: string }>();
   const [russian, setRussian] = useState<string | null>(null);
@@ -21,7 +23,18 @@ export function VocabularySentenceDetail() {
       <TextButton href={vocabularyPath("sentences")} className="vocabulary-detail__back">
         ← Vocabulary
       </TextButton>
-      <h1 className="r3-hero-title vocabulary-detail__title break-russian">{russian ?? "Phrase"}</h1>
+      <div className="vocabulary-detail__head">
+        <h1 className="r3-hero-title vocabulary-detail__title break-russian">{russian ?? "Phrase"}</h1>
+        {russian ? (
+          <VocabularyAudioButton
+            target={{
+              scope: "utterance",
+              text: russian,
+              cacheKey: `vocab-sentence:${params.id}`,
+            }}
+          />
+        ) : null}
+      </div>
       <p className="r3-lead vocabulary-detail__lead">
         Fiche de phrase en préparation — mots connus, expressions détectées, notions grammaticales et
         révision espacée arriveront ici.

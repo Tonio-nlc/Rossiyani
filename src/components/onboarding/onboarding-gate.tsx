@@ -6,39 +6,25 @@ import { isOnboardingComplete } from "@/lib/onboarding";
 
 import { OnboardingFlow } from "./onboarding-flow";
 
-export function OnboardingGate({ children }: { children: React.ReactNode }) {
-  const [ready, setReady] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+type OnboardingGateProps = {
+  texts: import("@/features/texts").TextListItem[];
+};
+
+/** @deprecated Use /onboarding route with OnboardingGuard instead. */
+export function OnboardingGate({ texts }: OnboardingGateProps) {
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
-    setShowOnboarding(!isOnboardingComplete());
-    setReady(true);
+    setShow(!isOnboardingComplete());
   }, []);
 
-  useEffect(() => {
-    if (showOnboarding) {
-      document.body.classList.add("modal-open");
-    } else {
-      document.body.classList.remove("modal-open");
-    }
-    return () => document.body.classList.remove("modal-open");
-  }, [showOnboarding]);
-
-  if (!ready) {
-    return <>{children}</>;
+  if (!show) {
+    return null;
   }
 
   return (
-    <>
-      <div
-        aria-hidden={showOnboarding}
-        className={showOnboarding ? "pointer-events-none select-none" : undefined}
-      >
-        {children}
-      </div>
-      {showOnboarding ? (
-        <OnboardingFlow onComplete={() => setShowOnboarding(false)} />
-      ) : null}
-    </>
+    <div className="fixed inset-0 z-[90] overflow-y-auto bg-[var(--paper)]">
+      <OnboardingFlow texts={texts} />
+    </div>
   );
 }

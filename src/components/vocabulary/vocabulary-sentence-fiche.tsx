@@ -24,7 +24,13 @@ export function VocabularySentenceFiche({ sentence }: VocabularySentenceFichePro
               </p>
             )}
           </div>
-          <VocabularyAudioButton />
+          <VocabularyAudioButton
+            target={{
+              scope: "utterance",
+              text: sentence.russian,
+              cacheKey: `vocab-sentence:${sentence.id}`,
+            }}
+          />
         </header>
 
         <dl className="vocabulary-fiche__facts vocabulary-fiche__facts--compact">

@@ -4,6 +4,7 @@ import {
   clearTextReadingProgress,
   formatLastReadLabel,
   getTextReadingProgress,
+  isTextReadingComplete,
   renderProgressBlocks,
   upsertReadingProgress,
 } from "@/lib/reader/reading-progress";
@@ -96,5 +97,32 @@ describe("reading-progress", () => {
 
     clearTextReadingProgress("text-1");
     expect(getTextReadingProgress("text-1")).toBeNull();
+  });
+
+  it("detects when all sentences have been seen", () => {
+    expect(isTextReadingComplete(null, 3)).toBe(false);
+
+    const partial = upsertReadingProgress({
+      textId: "t3",
+      lastSentenceId: "s1",
+      seenSentenceId: "s1",
+      totalWords: 10,
+    });
+    expect(isTextReadingComplete(partial, 3)).toBe(false);
+
+    const complete = upsertReadingProgress({
+      textId: "t3",
+      lastSentenceId: "s3",
+      seenSentenceId: "s2",
+      totalWords: 10,
+    });
+    const finished = upsertReadingProgress({
+      textId: "t3",
+      lastSentenceId: "s3",
+      seenSentenceId: "s3",
+      totalWords: 10,
+    });
+    expect(isTextReadingComplete(complete, 3)).toBe(false);
+    expect(isTextReadingComplete(finished, 3)).toBe(true);
   });
 });

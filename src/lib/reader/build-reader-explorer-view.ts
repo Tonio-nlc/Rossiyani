@@ -144,7 +144,7 @@ function buildGrammarSections(
   }
 
   if (view.lemma && !definition.some((row) => /lemme|lemma/i.test(row.label))) {
-    definition.unshift({ label: "Lemma", value: view.lemma });
+    definition.unshift({ label: "Lemme", value: view.lemma });
   }
 
   const sectionNotes = collectUniqueSectionNotes(view);
@@ -175,17 +175,17 @@ function buildGrammarSections(
   const sections: ExplorerGrammarSection[] = [];
 
   if (definition.length > 0) {
-    sections.push({ id: "definition", title: "Definition", rows: definition, prose: null });
+    sections.push({ id: "definition", title: "Définition", rows: definition, prose: null });
   }
 
   if (morphology.length > 0) {
-    sections.push({ id: "morphology", title: "Morphology", rows: morphology, prose: null });
+    sections.push({ id: "morphology", title: "Morphologie", rows: morphology, prose: null });
   }
 
   if (prose || filteredExplanationRows.length > 0) {
     sections.push({
       id: "explanation",
-      title: "Grammar explanation",
+      title: "Explication grammaticale",
       rows: filteredExplanationRows,
       prose,
     });

@@ -26,7 +26,7 @@ export function ReaderShell({
             "reader-ws__explorer",
             explorerOpen ? "reader-ws__explorer--open" : "reader-ws__explorer--collapsed",
           ].join(" ")}
-          aria-label="Explorer panel"
+          aria-label="Panneau explorateur"
         >
           {onToggleExplorer ? (
             <button
@@ -35,7 +35,7 @@ export function ReaderShell({
               onClick={onToggleExplorer}
               aria-expanded={explorerOpen}
             >
-              Explorer
+              Explorateur
             </button>
           ) : null}
           <div className="reader-ws__explorer-scroll">{explorer}</div>

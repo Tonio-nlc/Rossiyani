@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/design-system";
 
+import { SettingsAccountPanel } from "./settings-account-panel";
 import { SettingsProfileHero } from "./settings-profile-hero";
 import type { SettingsSection } from "./settings-types";
 
@@ -12,7 +13,12 @@ type SettingsSectionPanelProps = {
 export function SettingsSectionPanel({ section }: SettingsSectionPanelProps) {
   return (
     <div className="settings-section-panel">
-      {section.id === "account" ? <SettingsProfileHero /> : null}
+      {section.id === "account" ? (
+        <>
+          <SettingsProfileHero />
+          <SettingsAccountPanel />
+        </>
+      ) : null}
 
       <header className="settings-section-panel__head">
         <h2 className="r3-title settings-section-panel__title">{section.label}</h2>

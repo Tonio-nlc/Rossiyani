@@ -30,6 +30,7 @@ import { getSavedReaderWords } from "@/lib/reader/saved-words";
 import { HomeWorkspaceCollections } from "./home-workspace-collections";
 import { HomeWorkspaceContinue } from "./home-workspace-continue";
 import { HomeWorkspaceRecommendedReading } from "./home-workspace-recommended-reading";
+import { HomeWorkspaceReview } from "./home-workspace-review";
 import { HomeWorkspaceTodaysPractice } from "./home-workspace-todays-practice";
 import { HomeWorkspaceVocabulary } from "./home-workspace-vocabulary";
 
@@ -154,6 +155,7 @@ export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
       </header>
 
       {continueMeta ? <HomeWorkspaceContinue meta={continueMeta} /> : null}
+      <HomeWorkspaceReview />
       <HomeWorkspaceTodaysPractice cards={todaysPractice} />
       <HomeWorkspaceCollections texts={texts} />
       <HomeWorkspaceRecommendedReading texts={recommendedTexts} />

@@ -1,19 +1,32 @@
-const STORAGE_KEY = "rossiyani:showSentenceTranslations";
+const LEGACY_KEY = "rossiyani:showSentenceTranslations";
 
+function isBrowser(): boolean {
+  return typeof localStorage !== "undefined";
+}
+
+/** @deprecated Use `getTranslationDisplayMode()` from `translation-display-preference.ts`. */
 export function getShowSentenceTranslationsPreference(): boolean {
-  if (typeof window === "undefined") {
+  if (!isBrowser()) {
     return false;
   }
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw === null) {
-    return false;
-  }
+  const raw = localStorage.getItem(LEGACY_KEY);
   return raw === "1";
 }
 
+/** @deprecated Use `setTranslationDisplayMode()` from `translation-display-preference.ts`. */
 export function setShowSentenceTranslationsPreference(show: boolean): void {
-  if (typeof window === "undefined") {
+  if (!isBrowser()) {
     return;
   }
-  localStorage.setItem(STORAGE_KEY, show ? "1" : "0");
+  localStorage.setItem(LEGACY_KEY, show ? "1" : "0");
 }
+
+export {
+  getInterlinearTranslationPreference,
+  getTranslationDisplayMode,
+  resolveTranslationVisible,
+  setInterlinearTranslationPreference,
+  setTranslationDisplayMode,
+  shouldShowTranslationToggle,
+  type TranslationDisplayMode,
+} from "./translation-display-preference";

@@ -112,7 +112,7 @@ export function buildReadingSessionSummary(
           href: lemmaPath(fallbackLemma.lemma, fallbackLemma.partOfSpeech),
         }
       : {
-          label: "Ouvrir l'Explorer",
+          label: "Ouvrir l'explorateur",
           rationale: "Parcourir le lexique et les observations",
           href: "/vocabulary",
         };

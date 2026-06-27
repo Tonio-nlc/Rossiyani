@@ -69,26 +69,26 @@ function buildTiles(actions: ReadingSessionContinueAction[]): CompletionTile[] {
 
   return [
     {
-      title: "Continue Reading",
-      description: continueAction?.rationale ?? "Pick another text from your library",
+      title: continueAction?.label ?? "Continuer la lecture",
+      description: continueAction?.rationale ?? "Choisir un autre texte dans votre bibliothèque",
       href: continueAction?.href ?? "/library",
       icon: "continue",
     },
     {
-      title: "Practice Vocabulary",
-      description: practiceAction?.rationale ?? "Reinforce words from this session",
+      title: practiceAction?.label ?? "Pratiquer le vocabulaire",
+      description: practiceAction?.rationale ?? "Renforcer les mots de cette session",
       href: practiceAction?.href ?? "/practice",
       icon: "practice",
     },
     {
-      title: "Open Explorer",
-      description: explorerAction?.rationale ?? "Dive deeper into grammar and lemmas",
+      title: explorerAction?.label ?? "Ouvrir l'explorateur",
+      description: explorerAction?.rationale ?? "Approfondir la grammaire et le lexique",
       href: explorerAction?.href ?? "/vocabulary",
       icon: "explorer",
     },
     {
-      title: "Return to Library",
-      description: libraryAction?.rationale ?? "Review your texts and progress",
+      title: libraryAction?.label ?? "Retourner à la bibliothèque",
+      description: libraryAction?.rationale ?? "Revoir vos textes et votre progression",
       href: libraryAction?.href ?? "/library",
       icon: "library",
     },
@@ -105,7 +105,7 @@ export function ReaderCompletionCard({ textTitle, continueActions }: ReaderCompl
           <span className="reader-ws-complete__check" aria-hidden>
             ✓
           </span>
-          Reading completed
+          Lecture terminée
         </p>
         <h2 id="reader-ws-complete-heading" className="reader-ws-complete__title break-russian">
           {textTitle}

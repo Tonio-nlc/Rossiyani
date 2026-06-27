@@ -1,4 +1,6 @@
 export { buildVocabularyData, mergeWordEnrichment } from "./build-vocabulary-data";
+export { buildVocabularyWordFiche } from "./build-vocabulary-word-fiche";
+export { fetchVocabularyWordFiche } from "./fetch-vocabulary-word-fiche";
 export { fetchWordEnrichment } from "./enrich-words-client";
 export { loadVocabularyExpressions } from "./load-expressions";
 export {
@@ -22,3 +24,4 @@ export type {
   VocabularyWord,
   VocabularyWordEnrichment,
 } from "./types";
+export type { VocabularyWordFiche } from "./vocabulary-word-fiche-types";

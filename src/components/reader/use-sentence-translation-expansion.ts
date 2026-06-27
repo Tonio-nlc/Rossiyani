@@ -6,7 +6,7 @@ export function useSentenceTranslationExpansion() {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
 
   const isExpanded = useCallback(
-    (sentenceId: string, showAll: boolean) => showAll || expandedIds.has(sentenceId),
+    (sentenceId: string) => expandedIds.has(sentenceId),
     [expandedIds],
   );
 
@@ -22,5 +22,5 @@ export function useSentenceTranslationExpansion() {
     });
   }, []);
 
-  return { isExpanded, toggleExpanded };
+  return { isExpanded, toggleExpanded, expandedIds };
 }

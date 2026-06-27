@@ -20,7 +20,13 @@ export function VocabularyExpressionFiche({ expression }: VocabularyExpressionFi
               <p className="vocabulary-fiche__translation">{expression.translation}</p>
             ) : null}
           </div>
-          <VocabularyAudioButton />
+          <VocabularyAudioButton
+            target={{
+              scope: "utterance",
+              text: expression.russian,
+              cacheKey: `vocab-expression:${expression.id}`,
+            }}
+          />
         </header>
 
         {expression.meaning ? (

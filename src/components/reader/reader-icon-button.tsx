@@ -52,12 +52,22 @@ export function ReaderIconBookmark({ filled = false }: { filled?: boolean }) {
   );
 }
 
-export function ReaderIconMore() {
+export function ReaderIconTranslation() {
   return (
     <svg viewBox="0 0 20 20" fill="none" aria-hidden className="reader-ws-icon-btn__svg">
-      <circle cx="5" cy="10" r="1.25" fill="currentColor" />
-      <circle cx="10" cy="10" r="1.25" fill="currentColor" />
-      <circle cx="15" cy="10" r="1.25" fill="currentColor" />
+      <path
+        d="M5 6.5h10M5 10h7M5 13.5h9"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M13.5 5.5 16 8l-2.5 2.5"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useAudioPlayback } from "@/components/audio/audio-playback-provider";
 import { getCollectionName } from "@/content/collections";
 import type { ReaderTextData } from "@/features/texts";
 import { isLearnableLemma } from "@/lib/linguistics/lexical-metadata";
@@ -12,8 +13,13 @@ import { buildInteractiveWordsBySentence } from "@/lib/reader/build-interactive-
 import { buildTextIntroduction } from "@/lib/reader/build-text-introduction";
 import { buildReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel-data";
 import { buildReadingSessionSummary } from "@/lib/reader/build-reading-session-summary";
+import { buildReaderSentenceInsight } from "@/lib/reader/build-reader-sentence-insight";
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
-import { getTextReadingProgress } from "@/lib/reader/reading-progress";
+import { getTextReadingProgress, isTextReadingComplete } from "@/lib/reader/reading-progress";
+import {
+  resolveTranslationVisible,
+  shouldShowTranslationToggle,
+} from "@/lib/reader/translation-display-preference";
 import type { PartOfSpeech } from "@/types";
 import { prefetchWordDetail } from "@/lib/reader/reader-word-detail-store";
 
@@ -35,7 +41,8 @@ import { useReaderWordLookup } from "./use-reader-word-lookup";
 import { useReaderKeyboard } from "./use-reader-keyboard";
 import { useReadingProgress } from "./use-reading-progress";
 import { useSentenceTranslationExpansion } from "./use-sentence-translation-expansion";
-import { useShowSentenceTranslations } from "./use-show-sentence-translations";
+import { useSentenceInsightExpansion } from "./use-sentence-insight-expansion";
+import { useTranslationDisplay } from "./use-translation-display";
 
 type ReaderWorkspaceProps = {
   text: ReaderTextData;
@@ -87,7 +94,6 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   );
   const [selectedWordSnapshot, setSelectedWordSnapshot] = useState<ReaderWordSnapshot | null>(null);
   const [hoveredWordSnapshot, setHoveredWordSnapshot] = useState<ReaderWordSnapshot | null>(null);
-  const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
   const [visibleSentenceIds, setVisibleSentenceIds] = useState<string[]>(() =>
     text.sentences[0] ? [text.sentences[0].id] : [],
   );
@@ -100,9 +106,22 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   const restoredRef = useRef(false);
   const sentenceRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  const { showTranslations: showAllTranslations } = useShowSentenceTranslations();
-  const { isExpanded, toggleExpanded } = useSentenceTranslationExpansion();
+  const { mode: translationMode, setMode: setTranslationMode, interlinear, setInterlinear } =
+    useTranslationDisplay();
+  const { isExpanded, toggleExpanded, expandedIds } = useSentenceTranslationExpansion();
+  const { isInsightExpanded, toggleInsight } = useSentenceInsightExpansion();
   const { focusMode } = useFocusMode();
+
+  const { activeSentenceId: playingSentenceId } = useAudioPlayback();
+
+  const sentenceIds = useMemo(() => text.sentences.map((sentence) => sentence.id), [text.sentences]);
+
+  const showTranslationToggle = shouldShowTranslationToggle(translationMode);
+
+  const insightBySentence = useMemo(
+    () => new Map(text.sentences.map((sentence) => [sentence.id, buildReaderSentenceInsight(sentence)])),
+    [text.sentences],
+  );
 
   const hasPendingAnalysis = useMemo(
     () =>
@@ -133,6 +152,11 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     recordWord,
     progress,
   } = useReadingProgress(text);
+
+  const isReadingComplete = useMemo(
+    () => isTextReadingComplete(progress, totalSentences),
+    [progress, totalSentences],
+  );
 
   const interactiveBySentence = useMemo(() => buildInteractiveWordsBySentence(text), [text]);
   const textIndex = useMemo(() => buildReaderTextPhraseIndex(text), [text]);
@@ -250,11 +274,19 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   }, [text.id, text.sentences]);
 
   useEffect(() => {
+    if (!playingSentenceId) {
+      return;
+    }
+    sentenceRefs.current.get(playingSentenceId)?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [playingSentenceId]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         let changed = false;
-        let topMostIndex = -1;
-        let topMostRatio = 0;
 
         for (const entry of entries) {
           const sentenceId = entry.target.getAttribute("data-sentence-id");
@@ -268,20 +300,10 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
               changed = true;
             }
             recordSentence(sentenceId);
-
-            const index = text.sentences.findIndex((sentence) => sentence.id === sentenceId);
-            if (index >= 0 && entry.intersectionRatio >= topMostRatio) {
-              topMostRatio = entry.intersectionRatio;
-              topMostIndex = index;
-            }
           } else if (visibleSentenceIdsRef.current.has(sentenceId)) {
             visibleSentenceIdsRef.current.delete(sentenceId);
             changed = true;
           }
-        }
-
-        if (topMostRatio > 0) {
-          setCurrentSentenceIndex(topMostIndex);
         }
 
         if (changed) {
@@ -389,18 +411,6 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     saveBookmarks(bookmarks);
   }, [text.id]);
 
-  const scrollToSentenceIndex = useCallback(
-    (index: number) => {
-      const sentence = text.sentences[index];
-      if (!sentence) {
-        return;
-      }
-      setSelectedSentenceId(sentence.id);
-      sentenceRefs.current.get(sentence.id)?.scrollIntoView({ behavior: "smooth", block: "center" });
-    },
-    [text.sentences],
-  );
-
   const selectedWordSentence = useMemo(() => {
     if (!selectedWordSnapshot) {
       return null;
@@ -412,6 +422,13 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     <ReaderShell
       explorerOpen={explorerOpen || selectedWordSnapshot !== null}
       onToggleExplorer={() => setExplorerOpen((value) => !value)}
+      footer={
+        <ReaderAudioPlayer
+          sentenceIds={sentenceIds}
+          startSentenceId={selectedSentenceId}
+          onSentenceSeek={handleSelectSentence}
+        />
+      }
       explorer={
         <ReaderExplorerPanel
           detail={detail}
@@ -421,19 +438,12 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
           sentence={selectedWordSentence}
         />
       }
-      footer={
-        <ReaderAudioPlayer
-          sentenceCount={totalSentences}
-          currentSentenceIndex={currentSentenceIndex}
-          onSentenceSeek={scrollToSentenceIndex}
-        />
-      }
     >
       {explorerOpen && selectedWordSnapshot ? (
         <button
           type="button"
           className="reader-ws__explorer-backdrop"
-          aria-label="Close explorer"
+          aria-label="Fermer l'explorateur"
           onClick={() => {
             setExplorerOpen(false);
             setSelectedWordSnapshot(null);
@@ -453,9 +463,13 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
           percent={percent}
           fontScale={fontScale}
           bookmarked={bookmarked}
+          translationMode={translationMode}
+          interlinear={interlinear}
           onFontScaleChange={handleFontScaleChange}
           onBookmarkToggle={handleBookmarkToggle}
           onOpenSearch={textSearch.focusSearch}
+          onTranslationModeChange={setTranslationMode}
+          onInterlinearChange={setInterlinear}
         />
 
         {textSearch.isOpen || textSearch.query.trim().length > 0 ? (
@@ -476,10 +490,8 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
 
         <div className="reader-ws__article-wrap">
           <article className="reader-ws-article">
-            {text.sentences.map((sentence, index) => {
-              const dimmed = focusMode
-                ? selectedSentenceId !== sentence.id
-                : index !== currentSentenceIndex;
+            {text.sentences.map((sentence) => {
+              const dimmed = focusMode && selectedSentenceId !== sentence.id;
               const analyzing = isSentenceAnalyzing(
                 sentence.analysisState,
                 sentence.words.length,
@@ -497,12 +509,20 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
                       }
                     }}
                     data-sentence-id={sentence.id}
-                    className={dimmed ? "reader-ws-sentence-wrap--muted" : "reader-ws-sentence-wrap--current"}
+                    className={[
+                      dimmed ? "reader-ws-sentence-wrap--muted" : "reader-ws-sentence-wrap--current",
+                      playingSentenceId === sentence.id ? "reader-ws-sentence-wrap--playing" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
                   >
                     <ReaderSentenceAnalyzing
                       russianText={sentence.russianText}
+                      literalTranslation={sentence.literalTranslation}
                       naturalTranslation={sentence.naturalTranslation}
-                      showTranslation={isExpanded(sentence.id, showAllTranslations)}
+                      showTranslation={resolveTranslationVisible(sentence.id, translationMode, expandedIds)}
+                      showTranslationToggle={showTranslationToggle}
+                      showInterlinear={interlinear}
                       onToggleTranslation={() => toggleExpanded(sentence.id)}
                     />
                   </div>
@@ -513,7 +533,9 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
                 <ReaderSentence
                   key={sentence.id}
                   sentenceId={sentence.id}
+                  isPlaying={playingSentenceId === sentence.id}
                   russianText={sentence.russianText}
+                  literalTranslation={sentence.literalTranslation}
                   naturalTranslation={sentence.naturalTranslation}
                   words={mapSentenceWords(sentence.words)}
                   interactiveWordKinds={interactiveBySentence.get(sentence.id) ?? new Map()}
@@ -521,8 +543,13 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
                   hoveredWordId={hoveredWordId}
                   searchMatchWordIds={searchMatchWordIds}
                   searchActiveWordId={textSearch.activeResult?.wordId ?? null}
-                  showTranslation={isExpanded(sentence.id, showAllTranslations)}
+                  showTranslation={resolveTranslationVisible(sentence.id, translationMode, expandedIds)}
+                  showTranslationToggle={showTranslationToggle}
+                  showInterlinear={interlinear}
                   onToggleTranslation={() => toggleExpanded(sentence.id)}
+                  insight={insightBySentence.get(sentence.id)!}
+                  insightExpanded={isInsightExpanded(sentence.id)}
+                  onToggleInsight={() => toggleInsight(sentence.id)}
                   dimmed={dimmed}
                   onSelectSentence={() => handleSelectSentence(sentence.id)}
                   onSelectWord={(word) =>
@@ -548,10 +575,12 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
             })}
           </article>
 
-          <ReaderCompletionCard
-            textTitle={text.title}
-            continueActions={readingSessionSummary.continueActions}
-          />
+          {isReadingComplete ? (
+            <ReaderCompletionCard
+              textTitle={text.title}
+              continueActions={readingSessionSummary.continueActions}
+            />
+          ) : null}
           {textIntroduction ? (
             <ReaderAboutText introduction={textIntroduction} defaultCollapsed />
           ) : null}
