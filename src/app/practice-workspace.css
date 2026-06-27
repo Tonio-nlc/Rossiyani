@@ -17,7 +17,8 @@
 
 
 .practice-page-root .ds-editorial-container:has(.practice-shell),
-.practice-page-root .ds-editorial-container:has(.practice-my-sentences) {
+.practice-page-root .ds-editorial-container:has(.practice-my-sentences),
+.practice-page-root .ds-editorial-container:has(.compose-hub) {
   max-width: none;
   width: 100%;
   padding-inline: 0;

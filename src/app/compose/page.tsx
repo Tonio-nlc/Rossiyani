@@ -1,23 +1,20 @@
-import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
-type ComposeRedirectPageProps = {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
+import { ComposeWorkspace } from "@/components/compose/compose-workspace";
+
+import "../practice-workspace.css";
+import "./compose-workspace.css";
+
+export const metadata = {
+  title: "Compose · Rossiyani",
+  description:
+    "Atelier d'écriture en russe : traduction, reformulation, rédaction libre et exercices après lecture.",
 };
 
-export default async function ComposeRedirectPage({ searchParams }: ComposeRedirectPageProps) {
-  const params = await searchParams;
-  const query = new URLSearchParams();
-
-  for (const [key, value] of Object.entries(params)) {
-    if (typeof value === "string") {
-      query.set(key, value);
-    } else if (Array.isArray(value)) {
-      for (const item of value) {
-        query.append(key, item);
-      }
-    }
-  }
-
-  const suffix = query.toString();
-  redirect(suffix ? `/practice?${suffix}` : "/practice");
+export default function ComposePage() {
+  return (
+    <Suspense fallback={null}>
+      <ComposeWorkspace />
+    </Suspense>
+  );
 }

@@ -37,7 +37,7 @@ function resolvePageRootClass(pathname: string | null): string {
   if (pathname?.startsWith("/import")) {
     return `import-page-root v2-page-root ${r3}`;
   }
-  if (pathname?.startsWith("/practice")) {
+  if (pathname?.startsWith("/practice") || pathname?.startsWith("/compose")) {
     return `practice-page-root ${r3}`;
   }
   if (pathname?.startsWith("/lessons")) {

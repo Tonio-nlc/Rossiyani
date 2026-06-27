@@ -1,3 +1,5 @@
+export type ComposeMode = import("./modes").ComposeMode;
+
 export type ComposeTheme =
   | "daily_life"
   | "work"
@@ -10,6 +12,28 @@ export type ComposeRegister = "casual" | "neutral" | "formal";
 
 export type ComposeVerdict = "natural" | "correct" | "unusual" | "needs_correction";
 
+export type ComposeCorrection = {
+  id: string;
+  fragment: string;
+  corrected: string;
+  explanation: string;
+  rule: string;
+  contextNote: string;
+};
+
+export type ComposeOverview = {
+  strengths: string[];
+  improvements: string[];
+};
+
+export type ComposeVocabularyLink = {
+  word: string;
+  label: string;
+  href: string | null;
+  encountered: boolean;
+  savedWordId: string | null;
+};
+
 export type ComposeLinguisticBlock = {
   id: string;
   category: string;
@@ -20,6 +44,7 @@ export type ComposeLinguisticBlock = {
 export type ComposeAlternative = {
   register: string;
   text: string;
+  nuance?: string;
 };
 
 export type ComposeStructure = {
@@ -47,8 +72,13 @@ export type PracticeRewritePreset = {
 };
 
 export type ComposeAnalysis = {
+  mode?: ComposeMode;
   verdict: ComposeVerdict;
   summary: string;
+  correctedSentence?: string | null;
+  overview?: ComposeOverview;
+  corrections?: ComposeCorrection[];
+  vocabularyLinks?: ComposeVocabularyLink[];
   linguisticBlocks: ComposeLinguisticBlock[];
   alternatives: ComposeAlternative[];
   structures: ComposeStructure[];
@@ -58,10 +88,30 @@ export type ComposeAnalysis = {
 };
 
 export type ComposeAnalyzeRequest = {
+  mode?: ComposeMode;
   context?: string;
   russianText: string;
+  frenchPrompt?: string;
+  referenceRussian?: string;
   theme?: ComposeTheme;
   register?: ComposeRegister;
+  knownWords?: Array<{
+    word: string;
+    lemma: string | null;
+    savedWordId: string;
+    textId: string;
+  }>;
+};
+
+export type PostReadingExercise = {
+  id: string;
+  type: "translation" | "reformulation" | "structure";
+  title: string;
+  frenchPrompt?: string;
+  referenceRussian?: string;
+  hint?: string;
+  textId: string;
+  textTitle: string;
 };
 
 export type SavedComposePhrase = {
@@ -91,10 +141,10 @@ export const COMPOSE_REGISTERS: Array<{ id: ComposeRegister; label: string }> = 
 ];
 
 export const COMPOSE_VERDICT_LABELS: Record<ComposeVerdict, string> = {
-  natural: "✓ Natural",
-  correct: "✓ Correct",
-  unusual: "⚠ Understandable but unusual",
-  needs_correction: "✗ Needs correction",
+  natural: "Naturel",
+  correct: "Correct",
+  unusual: "Compréhensible, mais inhabituel",
+  needs_correction: "À corriger",
 };
 
 export const PRACTICE_REWRITE_PRESETS: PracticeRewritePreset[] = [

@@ -1,0 +1,414 @@
+/* ─── Compose — writing studio (Sprint 9) ─── */
+
+.compose-hub__recent {
+  margin-top: -1rem;
+}
+
+.compose-mode-card__eyebrow {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(5, 150, 105, 0.85);
+}
+
+.compose-mode-card__meta {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.65);
+}
+
+.compose-recent-texts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.compose-recent-texts__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.125rem;
+  border-radius: 1rem;
+  border: 1px solid var(--practice-border, rgba(16, 185, 129, 0.14));
+  background: #fff;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.compose-recent-texts__link:hover {
+  border-color: var(--practice-border-hover, rgba(16, 185, 129, 0.28));
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.08);
+}
+
+.compose-recent-texts__title {
+  font-weight: 600;
+}
+
+.compose-recent-texts__meta {
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.6);
+}
+
+.compose-exercise-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 40rem;
+}
+
+.compose-exercise-header__eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(5, 150, 105, 0.85);
+}
+
+.compose-exercise-header__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  line-height: 1.15;
+}
+
+.compose-exercise-header__lead,
+.compose-exercise-header__source,
+.compose-exercise-header__prompt,
+.compose-exercise-header__reference {
+  margin: 0;
+  color: rgba(17, 24, 39, 0.72);
+  line-height: 1.55;
+}
+
+.compose-exercise-header__reference {
+  padding: 0.875rem 1rem;
+  border-radius: 0.875rem;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--practice-border);
+}
+
+.compose-exercise-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 40rem;
+}
+
+.compose-prompt-card {
+  padding: 1.25rem 1.375rem;
+  border-radius: 1rem;
+  background: #fff;
+  border: 1px solid var(--practice-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.compose-prompt-card--empty {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.compose-prompt-card__label {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(17, 24, 39, 0.55);
+}
+
+.compose-prompt-card__text {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+
+.compose-exercise-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.compose-exercise-tabs__item {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--practice-border);
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.compose-exercise-tabs__item--active {
+  background: var(--practice-primary, #059669);
+  border-color: var(--practice-primary, #059669);
+  color: #fff;
+}
+
+.compose-analysis-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 40rem;
+}
+
+.compose-analysis-card {
+  animation: compose-card-reveal 0.45s ease both;
+}
+
+.compose-analysis-card--reveal {
+  opacity: 0;
+}
+
+@keyframes compose-card-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.compose-analysis-card__title {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(17, 24, 39, 0.55);
+}
+
+.compose-analysis-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.compose-analysis-card__verdict {
+  margin: 0;
+  font-weight: 700;
+  color: var(--practice-primary, #059669);
+}
+
+.compose-analysis-card--review .compose-analysis-card__verdict {
+  color: #b45309;
+}
+
+.compose-analysis-card__summary {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.compose-analysis-card__label {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(17, 24, 39, 0.55);
+}
+
+.compose-overview-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .compose-overview-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.compose-bullet-list {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.compose-sentence {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  line-height: 1.55;
+}
+
+.compose-sentence--original {
+  background: rgba(254, 243, 199, 0.45);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.compose-sentence--corrected {
+  background: rgba(209, 250, 229, 0.55);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.compose-correction-diff {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.compose-correction-diff__from {
+  text-decoration: line-through;
+  color: rgba(185, 28, 28, 0.85);
+}
+
+.compose-correction-diff__to {
+  color: var(--practice-primary, #059669);
+  font-weight: 600;
+}
+
+.compose-explanation-stack {
+  gap: 0.875rem;
+}
+
+.compose-explanation-item {
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  background: rgba(240, 253, 250, 0.65);
+  border: 1px solid rgba(16, 185, 129, 0.12);
+}
+
+.compose-explanation-item__rule {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.compose-explanation-item__note,
+.compose-explanation-item__context {
+  margin: 0.35rem 0 0;
+  line-height: 1.5;
+  font-size: 0.9375rem;
+}
+
+.compose-explanation-item__context {
+  color: rgba(17, 24, 39, 0.65);
+  font-size: 0.875rem;
+}
+
+.compose-alternatives {
+  gap: 0.75rem;
+}
+
+.compose-alternative-card {
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  background: #fff;
+  border: 1px solid var(--practice-border);
+}
+
+.compose-alternative-card__register {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(17, 24, 39, 0.55);
+}
+
+.compose-alternative-card__text {
+  margin: 0.35rem 0 0;
+  line-height: 1.55;
+}
+
+.compose-alternative-card__nuance {
+  margin: 0.35rem 0 0;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.65);
+}
+
+.compose-reuse {
+  gap: 1.25rem;
+}
+
+.compose-vocab-links {
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.compose-vocab-links__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.compose-vocab-links__item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+@media (min-width: 640px) {
+  .compose-vocab-links__item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.compose-vocab-links__word {
+  margin: 0;
+  font-weight: 600;
+}
+
+.compose-vocab-links__meta {
+  margin: 0.15rem 0 0;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.6);
+}
+
+.compose-vocab-links__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.compose-inline-links {
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.compose-authentic-list {
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.compose-authentic-list__excerpt {
+  margin: 0.25rem 0 0;
+  font-size: 0.9375rem;
+  color: rgba(17, 24, 39, 0.72);
+}
+
+.compose-analysis-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}

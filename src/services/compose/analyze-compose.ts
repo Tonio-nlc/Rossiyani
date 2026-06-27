@@ -25,6 +25,12 @@ import {
   buildComposeUserPrompt,
   composeAnalysisSchema,
 } from "./compose-prompt";
+import {
+  enrichVocabularyLinks,
+  type KnownReaderWord,
+} from "./enrich-vocabulary-links";
+
+export type { KnownReaderWord };
 
 async function callComposeModel(system: string, user: string): Promise<string | null> {
   const provider = process.env.AI_PROVIDER;
@@ -272,20 +278,32 @@ async function findAuthenticExamples(russianText: string): Promise<ComposeAnalys
 
 async function fallbackAnalysis(input: ComposeAnalyzeRequest): Promise<ComposeAnalysis> {
   const words = input.russianText.trim().split(/\s+/).filter(Boolean);
-  const [structures, examples, relatedExpressions] = await Promise.all([
+  const [structures, examples, relatedExpressions, vocabularyLinks] = await Promise.all([
     enrichStructures(words.slice(0, 5)),
     findAuthenticExamples(input.russianText),
     findRelatedExpressionsFallback(input.russianText),
+    enrichVocabularyLinks({
+      russianText: input.russianText,
+      knownWords: input.knownWords,
+    }),
   ]);
 
   return {
+    mode: input.mode,
     verdict: words.length > 2 ? "unusual" : "needs_correction",
-    summary: "Analysis unavailable offline — explore linked structures in Explorer.",
+    summary: "Analyse hors ligne — explorez les structures liées dans Vocabulary.",
+    correctedSentence: input.russianText.trim(),
+    overview: {
+      strengths: ["Vous avez produit une phrase en russe."],
+      improvements: ["Relancez l'analyse lorsque la connexion est disponible."],
+    },
+    corrections: [],
+    vocabularyLinks,
     linguisticBlocks: [
       {
         id: "fallback-0",
-        category: "Register",
-        note: input.register ? `Target register: ${input.register}.` : "Neutral register assumed.",
+        category: "Registre",
+        note: input.register ? `Registre visé : ${input.register}.` : "Registre neutre supposé.",
       },
     ],
     alternatives: [],
@@ -356,9 +374,10 @@ function fallbackRewrite(original: string, instruction: string): { text: string;
 }
 
 export async function analyzeComposeText(input: ComposeAnalyzeRequest): Promise<ComposeAnalysis> {
+  const mode = input.mode ?? "free";
   const raw = await callComposeModel(
-    buildComposeSystemPrompt(),
-    buildComposeUserPrompt(input),
+    buildComposeSystemPrompt(mode),
+    buildComposeUserPrompt({ ...input, mode }),
   );
 
   if (!raw) {
@@ -367,20 +386,42 @@ export async function analyzeComposeText(input: ComposeAnalyzeRequest): Promise<
 
   try {
     const parsed = composeAnalysisSchema.parse(parseJsonFromModel(raw));
-    const [linguisticBlocks, structures, authenticExamples, relatedExpressions] = await Promise.all([
+    const [
+      linguisticBlocks,
+      structures,
+      authenticExamples,
+      relatedExpressions,
+      vocabularyLinks,
+    ] = await Promise.all([
       enrichLinguisticBlocks(parsed.linguisticBlocks),
       enrichStructures(parsed.structures),
       findAuthenticExamples(input.russianText),
       parsed.relatedExpressions?.length
         ? enrichRelatedExpressions(parsed.relatedExpressions)
         : findRelatedExpressionsFallback(input.russianText),
+      enrichVocabularyLinks({
+        russianText: input.russianText,
+        knownWords: input.knownWords,
+      }),
     ]);
 
     return {
+      mode,
       verdict: parsed.verdict,
       summary: parsed.summary,
+      correctedSentence: parsed.correctedSentence ?? null,
+      overview: parsed.overview,
+      corrections: (parsed.corrections ?? []).map((entry, index) => ({
+        id: `correction-${index}`,
+        ...entry,
+      })),
+      vocabularyLinks,
       linguisticBlocks,
-      alternatives: parsed.alternatives.slice(0, 4),
+      alternatives: parsed.alternatives.slice(0, 4).map((alt) => ({
+        register: alt.register,
+        text: alt.text,
+        nuance: alt.nuance,
+      })),
       structures,
       authenticExamples,
       relatedExpressions,

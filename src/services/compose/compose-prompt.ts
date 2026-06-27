@@ -1,10 +1,28 @@
 import { z } from "zod";
 
-import type { ComposeRegister, ComposeTheme } from "@/lib/compose/types";
+import type { ComposeMode, ComposeRegister, ComposeTheme } from "@/lib/compose/types";
 
 export const composeAnalysisSchema = z.object({
   verdict: z.enum(["natural", "correct", "unusual", "needs_correction"]),
   summary: z.string().min(1),
+  correctedSentence: z.string().optional().nullable(),
+  overview: z
+    .object({
+      strengths: z.array(z.string().min(1)).min(1).max(4),
+      improvements: z.array(z.string().min(1)).min(1).max(4),
+    })
+    .optional(),
+  corrections: z
+    .array(
+      z.object({
+        fragment: z.string().min(1),
+        corrected: z.string().min(1),
+        explanation: z.string().min(1),
+        rule: z.string().min(1),
+        contextNote: z.string().min(1),
+      }),
+    )
+    .optional(),
   linguisticBlocks: z.array(
     z.object({
       category: z.string().min(1),
@@ -16,6 +34,7 @@ export const composeAnalysisSchema = z.object({
     z.object({
       register: z.string().min(1),
       text: z.string().min(1),
+      nuance: z.string().optional(),
     }),
   ),
   structures: z.array(z.string().min(1)),
@@ -32,41 +51,83 @@ export const composeAnalysisSchema = z.object({
 
 export type ComposeAnalysisPayload = z.infer<typeof composeAnalysisSchema>;
 
-export function buildComposeSystemPrompt(): string {
-  return `You are a Russian linguistic analyst for Rossiyani — an editorial writing studio, NOT a chatbot.
+const MODE_INSTRUCTIONS: Record<ComposeMode, string> = {
+  translation:
+    "The learner translated a French prompt into Russian. Judge accuracy to the intended meaning, then teach natural phrasing.",
+  reformulation:
+    "The learner rewrote a reference Russian sentence with a different natural formulation. Compare both versions and explain stylistic or structural differences.",
+  free:
+    "The learner wrote freely in Russian. Analyze grammar, vocabulary, cases, conjugations, word order, and unnatural phrasing.",
+  post_reading:
+    "This exercise follows a completed reading. Reinforce vocabulary and structures from that context while correcting the production.",
+};
+
+export function buildComposeSystemPrompt(mode: ComposeMode = "free"): string {
+  return `You are a Russian writing tutor for Rossiyani Compose — an editorial writing studio, NOT a chatbot or translation engine.
+
+Mode: ${mode}
+${MODE_INSTRUCTIONS[mode]}
 
 Respond with ONLY valid JSON matching this schema:
 {
   "verdict": "natural" | "correct" | "unusual" | "needs_correction",
-  "summary": "one concise sentence",
-  "linguisticBlocks": [{ "category": "Case|Verb aspect|Word order|Register|Collocations|...", "note": "...", "explorerQuery": "optional search term" }],
-  "alternatives": [{ "register": "Neutral|Conversational|Formal|...", "text": "Russian sentence" }],
-  "structures": ["short Russian grammar/vocab patterns found"],
-  "relatedExpressions": [{ "label": "Russian phrase", "reason": "one short sentence explaining why it is relevant" }],
-  "authenticExampleHints": ["optional topic keywords for finding texts"]
+  "summary": "one concise pedagogical sentence in French",
+  "correctedSentence": "full corrected Russian sentence or null if already perfect",
+  "overview": {
+    "strengths": ["2-3 short strengths in French"],
+    "improvements": ["2-3 main improvement axes in French"]
+  },
+  "corrections": [{
+    "fragment": "problematic fragment from learner text",
+    "corrected": "corrected fragment",
+    "explanation": "why in simple French",
+    "rule": "grammar/vocab rule name",
+    "contextNote": "when this rule applies"
+  }],
+  "linguisticBlocks": [{ "category": "Cas|Aspect|Ordre des mots|Registre|...", "note": "...", "explorerQuery": "optional" }],
+  "alternatives": [{ "register": "Neutre|Familier|Formel|...", "text": "Russian sentence", "nuance": "short French nuance" }],
+  "structures": ["short Russian grammar/vocab patterns"],
+  "relatedExpressions": [{ "label": "Russian phrase", "reason": "why explore next" }],
+  "authenticExampleHints": ["optional keywords"]
 }
 
 Rules:
+- Write pedagogical notes in French. Russian only in examples and corrected text.
 - Never conversational tone. Never ask questions. Never markdown.
-- Focus on why a native would phrase it differently.
-- Provide 2-4 alternatives when possible.
-- Extract concrete structures (phrases, patterns) from the sentence.
-- Suggest 3-4 related expressions with a clear reason each (why explore this next).
+- Each correction must teach something: why, which rule, which context.
+- Provide 2-4 natural alternatives with nuance when possible.
+- correctedSentence must reflect the learner's intended meaning.
 - verdict "natural" only if truly idiomatic for the requested register.`;
 }
 
 export function buildComposeUserPrompt(input: {
+  mode?: ComposeMode;
   context?: string;
   russianText: string;
+  frenchPrompt?: string;
+  referenceRussian?: string;
   theme?: ComposeTheme;
   register?: ComposeRegister;
 }): string {
-  const lines = [
-    `Russian production to analyze:\n${input.russianText.trim()}`,
-  ];
+  const mode = input.mode ?? "free";
+  const lines: string[] = [];
 
-  if (input.context?.trim()) {
-    lines.push(`\nIntended meaning (context, may be in any language):\n${input.context.trim()}`);
+  if (mode === "translation" && input.frenchPrompt?.trim()) {
+    lines.push(`French prompt to translate:\n${input.frenchPrompt.trim()}`);
+  }
+
+  if (mode === "reformulation" && input.referenceRussian?.trim()) {
+    lines.push(`Reference Russian sentence:\n${input.referenceRussian.trim()}`);
+  }
+
+  if (mode === "post_reading" && input.context?.trim()) {
+    lines.push(`Reading context:\n${input.context.trim()}`);
+  }
+
+  lines.push(`\nLearner's Russian production:\n${input.russianText.trim()}`);
+
+  if (input.context?.trim() && mode !== "post_reading") {
+    lines.push(`\nIntended meaning / notes:\n${input.context.trim()}`);
   }
 
   if (input.theme) {
