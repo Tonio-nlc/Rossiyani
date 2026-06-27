@@ -1,165 +1,83 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { Badge } from "@/components/design-system";
 import type { HomeJournalData } from "@/features/home";
 import type { TextListItem } from "@/features/texts";
-import { getSavedComposePhrases } from "@/lib/compose/saved-phrases";
-import { getSavedContextTranslationLessons } from "@/lib/context-translation/saved-lessons";
-import { buildLearningSignals } from "@/lib/discovery/build-learning-signals";
-import {
-  getDiscoveryArchive,
-  getSavedDiscoveries,
-} from "@/lib/discovery/saved-discoveries";
 import { getExplorationHistory } from "@/lib/explorer/exploration-history";
-import { buildExplorationHubData } from "@/lib/home/build-exploration-hub";
-import { buildHomeDashboardMetrics } from "@/lib/home/build-home-dashboard-metrics";
-import { buildTodaysPractice } from "@/lib/home/build-todays-practice";
 import {
-  buildSessionJournal,
-  buildSessionJournalFromServer,
-  type SessionJournal,
-} from "@/lib/home/build-session-journal";
-import { getLearningStreakSnapshot } from "@/lib/home/learning-streak";
-import { pickRecommendedTexts } from "@/lib/home/pick-recommended-texts";
-import { resolveContinueReading } from "@/lib/home/resolve-continue-reading";
+  buildHomeSessionViewModel,
+  hasHomeProgress,
+  type HomeSessionViewModel,
+} from "@/lib/home/build-home-session";
 import { getAllReadingProgress } from "@/lib/reader/reading-progress";
-import { getSavedReaderWords } from "@/lib/reader/saved-words";
 
 import { HomeWorkspaceCollections } from "./home-workspace-collections";
 import { HomeWorkspaceContinue } from "./home-workspace-continue";
-import { HomeWorkspaceRecommendedReading } from "./home-workspace-recommended-reading";
+import { HomeWorkspaceDiscovery } from "./home-workspace-discovery";
+import { HomeWorkspaceJourney } from "./home-workspace-journey";
+import { HomeWorkspaceProgress } from "./home-workspace-progress";
 import { HomeWorkspaceReview } from "./home-workspace-review";
-import { HomeWorkspaceTodaysPractice } from "./home-workspace-todays-practice";
-import { HomeWorkspaceVocabulary } from "./home-workspace-vocabulary";
 
 type HomeDashboardProps = {
   journal: HomeJournalData;
   texts: TextListItem[];
 };
 
+const EMPTY_SESSION: HomeSessionViewModel = {
+  userState: "first_launch",
+  greeting: "Bienvenue",
+  subtitle: "Chargement de votre session…",
+  continueBlock: null,
+  review: null,
+  journey: [],
+  discovery: null,
+  progress: {
+    textsCompleted: 0,
+    wordsLearned: 0,
+    cardsMastered: 0,
+    currentStreak: 0,
+  },
+  collections: [],
+};
+
 export function HomeDashboard({ journal, texts }: HomeDashboardProps) {
-  const [narrative, setNarrative] = useState<SessionJournal>(() =>
-    buildSessionJournalFromServer(journal, texts),
-  );
-  const [clientReady, setClientReady] = useState(false);
-  const [savedWordCount, setSavedWordCount] = useState(0);
+  const [session, setSession] = useState<HomeSessionViewModel>(EMPTY_SESSION);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const readingProgress = getAllReadingProgress();
-    const exploration = getExplorationHistory();
-    const savedWords = getSavedReaderWords();
-
-    setNarrative(
-      buildSessionJournal({
+    setSession(
+      buildHomeSessionViewModel({
         journal,
         texts,
-        signals: buildLearningSignals(),
-        savedWords,
-        savedDiscoveries: getSavedDiscoveries(),
-        exploration,
-        discoveryArchive: getDiscoveryArchive(),
-        savedPhrases: getSavedComposePhrases(),
-        readingProgress,
+        readingProgress: getAllReadingProgress(),
+        exploration: getExplorationHistory(),
       }),
     );
-    setSavedWordCount(savedWords.length);
-    setClientReady(true);
+    setReady(true);
   }, [journal, texts]);
-
-  const streak = useMemo(() => {
-    if (!clientReady) {
-      return { currentStreak: 0, wordsToday: 0 };
-    }
-    return getLearningStreakSnapshot(getExplorationHistory());
-  }, [clientReady]);
-
-  const metrics = useMemo(() => {
-    if (!clientReady) {
-      return { wordsExplored: 0, textsCompleted: 0, conceptsExplored: 0 };
-    }
-    return buildHomeDashboardMetrics({
-      readingProgress: getAllReadingProgress(),
-      exploration: getExplorationHistory(),
-      savedWords: getSavedReaderWords(),
-      streak: getLearningStreakSnapshot(getExplorationHistory()),
-    });
-  }, [clientReady]);
-
-  const continueMeta = useMemo(
-    () => resolveContinueReading(narrative, texts),
-    [narrative, texts],
-  );
-
-  const readingProgress = useMemo(
-    () => (clientReady ? getAllReadingProgress() : {}),
-    [clientReady],
-  );
-
-  const recommendedTexts = useMemo(
-    () => pickRecommendedTexts(texts, readingProgress, continueMeta?.textId ?? null),
-    [texts, readingProgress, continueMeta?.textId],
-  );
-
-  const todaysPractice = useMemo(() => {
-    if (!clientReady) {
-      return buildTodaysPractice({
-        journal,
-        composePhraseCount: 0,
-        contextLessonCount: 0,
-      });
-    }
-    return buildTodaysPractice({
-      journal,
-      composePhraseCount: getSavedComposePhrases().length,
-      contextLessonCount: getSavedContextTranslationLessons().length,
-    });
-  }, [clientReady, journal]);
-
-  const explorationHub = useMemo(() => {
-    if (!clientReady) {
-      return buildExplorationHubData({ savedWordCount: 0, exploration: [] });
-    }
-    return buildExplorationHubData({
-      savedWordCount,
-      exploration: getExplorationHistory(),
-    });
-  }, [clientReady, savedWordCount]);
 
   return (
     <div className="home-ws">
-      <header className="lessons-hero home-ws-hero">
-        <p className="r3-eyebrow lessons-hero__eyebrow">Espace d&apos;apprentissage</p>
-        <h1 className="r3-hero-title lessons-hero__title">Rossiyani</h1>
-        <p className="r3-lead lessons-hero__lead">
-          Reprenez votre lecture, pratiquez un peu, explorez vos collections — sans tableau de bord,
-          juste votre progression.
-        </p>
-        <div className="lessons-hero__metrics">
-          {streak.currentStreak > 0 ? (
-            <Badge tone="blue">
-              {streak.currentStreak} jour{streak.currentStreak === 1 ? "" : "s"} de suite
-            </Badge>
-          ) : null}
-          {metrics.wordsExplored > 0 ? (
-            <Badge tone="neutral">{metrics.wordsExplored} mots explorés</Badge>
-          ) : null}
-          {metrics.textsCompleted > 0 ? (
-            <Badge tone="green">{metrics.textsCompleted} textes terminés</Badge>
-          ) : null}
-          {streak.wordsToday > 0 ? (
-            <Badge tone="violet">{streak.wordsToday} mots aujourd&apos;hui</Badge>
-          ) : null}
-        </div>
+      <header className="home-ws-header">
+        <p className="home-ws-header__eyebrow">Rossiyani</p>
+        <h1 className="home-ws-header__title">{session.greeting}</h1>
+        <p className="home-ws-header__lead">{session.subtitle}</p>
       </header>
 
-      {continueMeta ? <HomeWorkspaceContinue meta={continueMeta} /> : null}
-      <HomeWorkspaceReview />
-      <HomeWorkspaceTodaysPractice cards={todaysPractice} />
-      <HomeWorkspaceCollections texts={texts} />
-      <HomeWorkspaceRecommendedReading texts={recommendedTexts} />
-      <HomeWorkspaceVocabulary hub={explorationHub} />
+      {session.continueBlock ? <HomeWorkspaceContinue block={session.continueBlock} /> : null}
+
+      {ready && session.review ? <HomeWorkspaceReview review={session.review} /> : null}
+
+      {ready ? <HomeWorkspaceJourney texts={session.journey} /> : null}
+
+      <HomeWorkspaceDiscovery discovery={session.discovery} />
+
+      {ready && hasHomeProgress(session.progress) ? (
+        <HomeWorkspaceProgress progress={session.progress} />
+      ) : null}
+
+      {ready ? <HomeWorkspaceCollections collections={session.collections} /> : null}
     </div>
   );
 }

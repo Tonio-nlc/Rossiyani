@@ -32,6 +32,7 @@ type EditorialCollectionCardProps = {
   level?: CefrLevel | null;
   textCount?: number;
   progressPercent?: number;
+  eyebrow?: string;
 };
 
 export function EditorialCollectionCard({
@@ -42,6 +43,7 @@ export function EditorialCollectionCard({
   level = null,
   textCount = 0,
   progressPercent,
+  eyebrow,
 }: EditorialCollectionCardProps) {
   const accent = COLLECTION_ACCENTS[id] ?? "#64748b";
   const icon = COLLECTION_ICONS[id] ?? title.charAt(0);
@@ -62,6 +64,7 @@ export function EditorialCollectionCard({
         </span>
       </header>
       <div className="ws-card__body">
+        {eyebrow ? <p className="lessons-collection-card__eyebrow">{eyebrow}</p> : null}
         <h3 className="r3-title ws-card__title lessons-collection-card__title">{title}</h3>
         <p className="r3-lead ws-card__desc lessons-collection-card__desc">{description}</p>
       </div>
