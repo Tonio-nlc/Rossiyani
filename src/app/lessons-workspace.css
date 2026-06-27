@@ -42,10 +42,10 @@
   --lessons-border: rgba(100, 116, 139, 0.14);
   --lessons-border-hover: rgba(100, 116, 139, 0.28);
   --lessons-font: var(--font-workspace), var(--font-ui), system-ui, sans-serif;
-  --lessons-gap-major: 4rem;
-  --lessons-gap-card: 2rem;
+  --lessons-gap-major: var(--ws-rhythm-section, 4.5rem);
+  --lessons-gap-card: var(--ws-rhythm-inner, 1.5rem);
   --lessons-gap-inner: 1.5rem;
-  --lessons-gap-control: 1rem;
+  --lessons-gap-control: var(--ws-rhythm-control, 1rem);
   width: 100%;
   max-width: 72rem;
   margin-inline: auto;
@@ -156,7 +156,7 @@
 .lessons-section {
   display: flex;
   flex-direction: column;
-  gap: var(--lessons-gap-card);
+  gap: var(--ws-rhythm-inner, var(--lessons-gap-card));
 }
 
 .lessons-section__head {
@@ -164,7 +164,14 @@
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 0.75rem 1rem;
+  gap: var(--ws-rhythm-control, var(--lessons-gap-control));
+  margin-bottom: calc(var(--ws-rhythm-head-content, 2rem) - var(--ws-rhythm-inner, var(--lessons-gap-card)));
+}
+
+.lessons-section__head > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-rhythm-title-desc, 0.625rem);
 }
 
 .lessons-section__title {
@@ -176,7 +183,7 @@
 }
 
 .lessons-section__subtitle {
-  margin: 0.35rem 0 0;
+  margin: 0;
   font-size: 0.9375rem;
   line-height: 1.55;
   color: var(--v2-body, #64748b);

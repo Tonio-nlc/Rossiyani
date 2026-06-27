@@ -342,12 +342,12 @@ article.r3-card.ws-card,
   overflow: hidden;
 }
 
-/* Practice legacy grid/card rules */
+/* Practice legacy grid/card rules — skip ws-card shells (Lessons-aligned) */
 .practice-shell .practice-mode-grid {
   display: contents;
 }
 
-.practice-shell .practice-mode-card {
+.practice-shell .practice-mode-card:not(.ws-card) {
   min-height: 0 !important;
   height: auto !important;
   padding: 0 !important;
@@ -355,6 +355,31 @@ article.r3-card.ws-card,
   background: transparent !important;
   box-shadow: none !important;
   transform: none !important;
+}
+
+/* Practice hub — breathable mode cards */
+.practice-shell {
+  --ws-card-padding: 1.75rem 1.5rem;
+  --ws-card-gap: 1rem;
+  --ws-card-body-gap: 0.5rem;
+}
+
+.practice-shell .practice-mode-card.ws-card,
+.practice-shell a.r3-card.practice-mode-card.ws-card {
+  padding: var(--ws-card-padding) !important;
+  gap: var(--ws-card-gap) !important;
+}
+
+.practice-shell .practice-mode-card .ws-card__body {
+  gap: var(--ws-card-body-gap);
+}
+
+.practice-shell .practice-mode-card .ws-card__footer {
+  padding-top: 0.375rem;
+}
+
+.practice-shell .practice-mode-card__icon {
+  margin-bottom: 0.125rem;
 }
 
 /* Hover: lift only, no scale (prevents overlap) */

@@ -2,15 +2,33 @@
    Shared rhythm, sections, cards, and interactions for all workspaces.
 */
 
+/* ─── Vertical rhythm scale (8px base) ─── */
+:root {
+  --ws-rhythm-tight: 0.5rem; /* 8px — micro */
+  --ws-rhythm-title-desc: 0.625rem; /* 10px — titre → description */
+  --ws-rhythm-control: 1rem; /* 16px — contrôles, pills */
+  --ws-rhythm-inner: 1.5rem; /* 24px — éléments dans une section */
+  --ws-rhythm-head-content: 2rem; /* 32px — bloc titre → contenu */
+  --ws-rhythm-section: 4.5rem; /* 72px — entre sections */
+}
+
+@media (max-width: 767px) {
+  :root {
+    --ws-rhythm-inner: 1.25rem;
+    --ws-rhythm-head-content: 1.625rem;
+    --ws-rhythm-section: 3.5rem;
+  }
+}
+
 .home-ws,
 .library-ws,
 .vocabulary-shell,
 .practice-shell,
 .practice-my-sentences {
-  --ws-gap-major: 4rem;
-  --ws-gap-card: 2rem;
+  --ws-gap-major: var(--ws-rhythm-section);
+  --ws-gap-card: var(--ws-rhythm-inner);
   --ws-gap-inner: 1.5rem;
-  --ws-gap-control: 1rem;
+  --ws-gap-control: var(--ws-rhythm-control);
   --ws-border: rgba(100, 116, 139, 0.14);
   --ws-border-hover: rgba(100, 116, 139, 0.28);
   --ws-font: var(--font-workspace), var(--font-ui), system-ui, sans-serif;
@@ -42,7 +60,7 @@
 .lessons-section {
   display: flex;
   flex-direction: column;
-  gap: var(--ws-gap-card, var(--lessons-gap-card, 2rem));
+  gap: var(--ws-rhythm-inner);
 }
 
 .home-ws-section__head,
@@ -52,7 +70,16 @@
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 0.75rem 1rem;
+  gap: var(--ws-rhythm-control);
+  margin-bottom: calc(var(--ws-rhythm-head-content) - var(--ws-rhythm-inner));
+}
+
+.lessons-section__head > div,
+.home-ws-section__head > div,
+.library-ws-section__head > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-rhythm-title-desc);
 }
 
 .home-ws-section__title,
@@ -68,7 +95,7 @@
 .home-ws-section__subtitle,
 .library-ws-section__subtitle,
 .lessons-section__subtitle {
-  margin: 0.35rem 0 0;
+  margin: 0;
   font-size: 0.9375rem;
   line-height: 1.55;
   color: var(--r3-body, #64748b);
@@ -251,7 +278,7 @@ a.r3-card.lessons-lesson-card:hover {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem 1rem;
+  gap: var(--ws-rhythm-control, 0.75rem) var(--ws-rhythm-inner, 1rem);
 }
 
 .home-ws .home-ws-vocabulary-strip {

@@ -166,8 +166,11 @@ a.r3-card:hover,
 .r3-page-root .home-ws-section,
 .r3-page-root .library-ws-section,
 .vocabulary-page-root .vocabulary-section,
-.lessons-page-root .lessons-section {
-  gap: var(--r3-gap-section);
+.lessons-page-root .lessons-section,
+.home-ws .lessons-section,
+.library-ws .lessons-section,
+.practice-shell .lessons-section {
+  gap: var(--ws-rhythm-inner, var(--r3-gap-section));
 }
 
 /* Unified workspace buttons */
