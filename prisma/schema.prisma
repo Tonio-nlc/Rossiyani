@@ -42,6 +42,19 @@ enum PartOfSpeech {
   interjection
 }
 
+enum LexicalType {
+  common_noun
+  proper_noun
+  verb
+  adjective
+  pronoun
+  numeral
+  particle
+  interjection
+  abbreviation
+  other
+}
+
 enum WordFrequency {
   VERY_COMMON
   COMMON
@@ -176,6 +189,8 @@ model Word {
   stem          String
   ending        String
   partOfSpeech  PartOfSpeech
+  isProperNoun  Boolean?
+  lexicalType   LexicalType?
   case          String?
   gender        String?
   number        String?
@@ -220,6 +235,8 @@ model KnowledgeLemma {
   id                   String                @id @default(cuid())
   lemma                String
   partOfSpeech         PartOfSpeech
+  isProperNoun         Boolean?
+  lexicalType          LexicalType?
   stressMarked         String
   frequency            WordFrequency?
   frequencyTier        FrequencyTier?
@@ -237,6 +254,8 @@ model KnowledgeLemma {
   @@unique([lemma, partOfSpeech])
   @@index([lemma])
   @@index([occurrenceCount])
+  @@index([isProperNoun])
+  @@index([lexicalType])
 }
 
 model KnowledgeForm {

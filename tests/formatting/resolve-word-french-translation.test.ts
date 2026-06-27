@@ -6,6 +6,7 @@ import {
   resolveWordLexicalMeanings,
 } from "@/lib/formatting/resolve-word-lexical-gloss";
 import { buildWordDetail } from "./semantic-fixtures";
+import { stubLemmaEntity } from "../helpers/lemma-entity-stub";
 
 describe("resolveWordFrenchTranslation strict", () => {
   it("never derives translation from explanation arrows", () => {
@@ -49,18 +50,13 @@ describe("resolveWordFrenchTranslation strict", () => {
       },
       domain: {
         form: null,
-        lemma: {
+        lemma: stubLemmaEntity({
           id: "lemma-1",
           lemma: "городок",
           partOfSpeech: "noun",
-          stressMarked: "городок",
-          frequency: null,
-          frequencyTier: null,
-          occurrenceCount: 1,
           canonicalExplanation: "Petite localité.",
           frenchComparison: "dans la ville",
-          reviewStatus: "CANONICAL",
-        },
+        }),
         ending: null,
         case: null,
         concepts: [],

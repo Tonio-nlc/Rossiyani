@@ -3,6 +3,7 @@ import type { Prisma } from "@prisma/client";
 import { auditPipelineStep } from "@/lib/diagnostics/import-pipeline-audit";
 import { logImportError, logPrismaError } from "@/lib/diagnostics";
 import { wordTranslationForStorage } from "@/lib/import/word-translation";
+import { wordLexicalStorageFields } from "@/lib/linguistics/word-lexical-storage";
 import { prisma } from "@/lib/prisma";
 import type { SentenceAnalysisOutput } from "@/services/ai/schemas";
 
@@ -92,6 +93,7 @@ function mapWord(word: SentenceAnalysisOutput["words"][number]): Prisma.WordCrea
     stem: word.stem,
     ending: word.ending,
     partOfSpeech: word.partOfSpeech,
+    ...wordLexicalStorageFields(word),
     case: word.case ?? null,
     gender: word.gender ?? null,
     number: word.number ?? null,

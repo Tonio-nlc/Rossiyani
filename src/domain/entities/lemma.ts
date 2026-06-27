@@ -1,6 +1,7 @@
 import type {
   FrequencyTier,
   KnowledgeReviewStatus,
+  LexicalType,
   PartOfSpeech,
   WordFrequency,
 } from "@/types/domain";
@@ -10,6 +11,8 @@ export type LemmaEntity = {
   id: string;
   lemma: string;
   partOfSpeech: PartOfSpeech;
+  isProperNoun: boolean | null;
+  lexicalType: LexicalType | null;
   stressMarked: string;
   frequency: WordFrequency | null;
   frequencyTier: FrequencyTier | null;

@@ -387,6 +387,8 @@ function salvagePartialWord(
     stem: original,
     ending: "",
     partOfSpeech: "noun",
+    isProperNoun: false,
+    lexicalType: "common_noun",
     explanation: "Analyse partielle — champs minimaux uniquement.",
     analysisStatus: "partial",
   };

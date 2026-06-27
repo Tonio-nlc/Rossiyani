@@ -90,6 +90,7 @@ export function mapSentenceWords(
     stem: string;
     ending: string;
     partOfSpeech: string;
+    isProperNoun?: boolean | null;
     case: string | null;
     lemma: string;
     explanation: string;

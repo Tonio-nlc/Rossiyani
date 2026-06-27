@@ -26,6 +26,8 @@ export function mapLemma(row: KnowledgeLemma): LemmaEntity {
     id: row.id,
     lemma: row.lemma,
     partOfSpeech: row.partOfSpeech,
+    isProperNoun: row.isProperNoun,
+    lexicalType: row.lexicalType,
     stressMarked: row.stressMarked,
     frequency: row.frequency,
     frequencyTier: row.frequencyTier,

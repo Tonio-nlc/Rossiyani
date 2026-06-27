@@ -2,6 +2,7 @@ import { estimateReadingMinutes } from "@/components/library/library-utils";
 import { getCollectionRecord, type CollectionId } from "@/content/collections";
 import type { TextListItem } from "@/features/texts";
 import { isDisplayableLibraryText } from "@/lib/home/displayable-text";
+import { countLearnableWordsSeen } from "@/lib/linguistics/lexical-metadata";
 import type { TextReadingProgress } from "@/lib/reader/reading-progress";
 
 export type FeaturedCollectionFeature = {
@@ -82,7 +83,7 @@ function collectionStats(
 ): Pick<FeaturedCollectionFeature, "wordsDiscovered" | "conceptsExplored" | "averageReadingMinutes"> {
   const wordsDiscovered = collectionTexts.reduce((total, text) => {
     const progress = readingProgress[text.id];
-    return total + (progress?.wordsSeenIds.length ?? 0);
+    return total + (progress ? countLearnableWordsSeen(progress) : 0);
   }, 0);
 
   const readingMinutes = collectionTexts.map((text) => estimateReadingMinutes(text.sentenceCount));

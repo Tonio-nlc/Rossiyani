@@ -1,4 +1,5 @@
 import type { ExplorationEntry } from "@/lib/explorer/exploration-history";
+import { countLearnableWordsSeen } from "@/lib/linguistics/lexical-metadata";
 import type { LearningStreakSnapshot } from "@/lib/home/learning-streak";
 import type { SavedReaderWord } from "@/lib/reader/saved-words";
 import type { TextReadingProgress } from "@/lib/reader/reading-progress";
@@ -21,7 +22,7 @@ export function buildHomeDashboardMetrics(input: {
   const textsCompleted = progressEntries.filter((entry) => entry.percent >= 100).length;
 
   const wordsExplored = progressEntries.reduce(
-    (total, entry) => total + entry.wordsSeenIds.length,
+    (total, entry) => total + countLearnableWordsSeen(entry),
     0,
   );
 

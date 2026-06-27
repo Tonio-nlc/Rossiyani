@@ -6,6 +6,7 @@ import {
 } from "@/lib/diagnostics/import-pipeline-audit";
 import { formLookupKey, phraseLookupKey } from "@/lib/normalization/russian-key";
 import { wordTranslationForStorage } from "@/lib/import/word-translation";
+import { wordLexicalStorageFields } from "@/lib/linguistics/word-lexical-storage";
 import { prisma } from "@/lib/prisma";
 import type { WordAnalysisOutput } from "@/types/analysis";
 import type { SentenceAnalysisOutput } from "@/services/ai/schemas";
@@ -85,6 +86,7 @@ function sentenceDataFields(
           stem: word.stem,
           ending: word.ending,
           partOfSpeech: word.partOfSpeech,
+          ...wordLexicalStorageFields(word),
           case: word.case ?? null,
           gender: word.gender ?? null,
           number: word.number ?? null,

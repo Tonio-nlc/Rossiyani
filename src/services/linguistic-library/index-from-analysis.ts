@@ -39,30 +39,44 @@ export async function indexFromAnalysis(
   });
 
   for (const word of analysis.words) {
-    const lemma = await prisma.knowledgeLemma.upsert({
-      where: {
-        lemma_partOfSpeech: {
-          lemma: word.lemma,
-          partOfSpeech: word.partOfSpeech,
-        },
-      },
-      create: {
-        lemma: word.lemma,
-        partOfSpeech: word.partOfSpeech,
-        stressMarked: word.stressMarked,
-        frequency: word.frequency ?? null,
-        frequencyTier: word.frequencyTier ?? null,
-        frenchComparison: word.translationCanonical ?? null,
-      },
-      update: {
-        stressMarked: word.stressMarked,
-        frequency: word.frequency ?? undefined,
-        frequencyTier: word.frequencyTier ?? undefined,
-      },
+    const lemmaKey = {
+      lemma: word.lemma,
+      partOfSpeech: word.partOfSpeech,
+    };
+    const existingLemma = await prisma.knowledgeLemma.findUnique({
+      where: { lemma_partOfSpeech: lemmaKey },
+      select: { id: true, frenchComparison: true, lexicalType: true },
     });
+
+    const lemma = existingLemma
+      ? await prisma.knowledgeLemma.update({
+          where: { id: existingLemma.id },
+          data: {
+            stressMarked: word.stressMarked,
+            frequency: word.frequency ?? undefined,
+            frequencyTier: word.frequencyTier ?? undefined,
+            ...(existingLemma.lexicalType === null
+              ? {
+                  isProperNoun: word.isProperNoun,
+                  lexicalType: word.lexicalType,
+                }
+              : {}),
+          },
+        })
+      : await prisma.knowledgeLemma.create({
+          data: {
+            ...lemmaKey,
+            isProperNoun: word.isProperNoun,
+            lexicalType: word.lexicalType,
+            stressMarked: word.stressMarked,
+            frequency: word.frequency ?? null,
+            frequencyTier: word.frequencyTier ?? null,
+            frenchComparison: word.translationCanonical ?? null,
+          },
+        });
     lemmasIndexed += 1;
 
-    if (word.translationCanonical && !lemma.frenchComparison) {
+    if (word.translationCanonical && !lemma.frenchComparison && !existingLemma?.frenchComparison) {
       await prisma.knowledgeLemma.update({
         where: { id: lemma.id },
         data: { frenchComparison: word.translationCanonical },

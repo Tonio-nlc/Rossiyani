@@ -1,3 +1,5 @@
+import { countLearnableWordsSeen } from "@/lib/linguistics/lexical-metadata";
+
 const STORAGE_KEY = "rossiyani:readingProgress";
 
 export type TextReadingProgress = {
@@ -5,6 +7,8 @@ export type TextReadingProgress = {
   lastSentenceId: string;
   lastWordId: string | null;
   wordsSeenIds: string[];
+  /** Subset of wordsSeenIds excluding proper nouns — used for vocabulary stats. */
+  learnableWordsSeenIds?: string[];
   sentencesSeenIds: string[];
   totalWords: number;
   percent: number;
@@ -81,6 +85,7 @@ export function upsertReadingProgress(input: {
   lastSentenceId: string;
   lastWordId?: string | null;
   seenWordId?: string;
+  seenWordLearnable?: boolean;
   seenSentenceId?: string;
   totalWords: number;
   readingTimeDeltaMs?: number;
@@ -88,10 +93,15 @@ export function upsertReadingProgress(input: {
   const store = loadStore();
   const existing = store[input.textId];
   const wordsSeen = new Set(existing?.wordsSeenIds ?? []);
+  const learnableWordsSeen = new Set(existing?.learnableWordsSeenIds ?? []);
   const sentencesSeen = new Set(existing?.sentencesSeenIds ?? []);
 
   if (input.seenWordId) {
     wordsSeen.add(input.seenWordId);
+    const trackAsLearnable = input.seenWordLearnable !== false;
+    if (trackAsLearnable) {
+      learnableWordsSeen.add(input.seenWordId);
+    }
   }
   if (input.seenSentenceId) {
     sentencesSeen.add(input.seenSentenceId);
@@ -100,6 +110,7 @@ export function upsertReadingProgress(input: {
   const totalWords = Math.max(input.totalWords, existing?.totalWords ?? 0);
   const readingTimeMs = (existing?.readingTimeMs ?? 0) + (input.readingTimeDeltaMs ?? 0);
   const wordsSeenIds = [...wordsSeen];
+  const learnableWordsSeenIds = [...learnableWordsSeen];
   const sentencesSeenIds = [...sentencesSeen];
   const percent = computePercent(wordsSeenIds.length, totalWords);
 
@@ -108,6 +119,7 @@ export function upsertReadingProgress(input: {
     lastSentenceId: input.lastSentenceId,
     lastWordId: input.lastWordId ?? existing?.lastWordId ?? null,
     wordsSeenIds,
+    learnableWordsSeenIds,
     sentencesSeenIds,
     totalWords,
     percent,
@@ -119,6 +131,8 @@ export function upsertReadingProgress(input: {
   saveStore(store);
   return progress;
 }
+
+export { countLearnableWordsSeen };
 
 export function estimateReadingMinutes(totalWords: number): number {
   if (totalWords <= 0) {

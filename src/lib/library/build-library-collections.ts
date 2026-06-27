@@ -7,6 +7,7 @@ import {
 import type { TextListItem } from "@/features/texts";
 import { isDisplayableLibraryText } from "@/lib/home/displayable-text";
 import type { ExplorationEntry } from "@/lib/explorer/exploration-history";
+import { countLearnableWordsSeen } from "@/lib/linguistics/lexical-metadata";
 import type { TextReadingProgress } from "@/lib/reader/reading-progress";
 import type { CefrLevel } from "@/types";
 
@@ -229,7 +230,8 @@ export function buildLibraryCollections(input: {
         : 0;
 
     const wordsDiscovered = collectionTexts.reduce((total, text) => {
-      return total + (input.readingProgress[text.id]?.wordsSeenIds.length ?? 0);
+      const progress = input.readingProgress[text.id];
+      return total + (progress ? countLearnableWordsSeen(progress) : 0);
     }, 0);
 
     return {

@@ -5,6 +5,7 @@ import { CASE_LEGEND_ENTRIES } from "@/features/grammar/case-legend-data";
 import { formatPosLabelFr, pickLemmaTranslation } from "@/lib/explorer/lemma-display";
 import { observedInContexts, patternObservedInTexts } from "@/lib/explorer/explorer-ia";
 import { firstSentence } from "@/features/explorer/entity/types";
+import { LEARNABLE_LEMMA_WHERE } from "@/lib/linguistics/lexical-metadata";
 import { prisma } from "@/lib/prisma";
 
 export type LemmaBrowseCard = {
@@ -78,6 +79,7 @@ function caseDescription(question: string): string {
 
 export async function getLemmaBrowseCards(limit = 12): Promise<LemmaBrowseCard[]> {
   const rows = await prisma.knowledgeLemma.findMany({
+    where: LEARNABLE_LEMMA_WHERE,
     orderBy: { occurrenceCount: "desc" },
     take: limit,
     select: {
@@ -254,6 +256,7 @@ export async function getRandomDiscoveryCard(): Promise<PortalBrowseCard | null>
   const dayBucket = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
   const [lemmaRows, conceptRows] = await Promise.all([
     prisma.knowledgeLemma.findMany({
+      where: LEARNABLE_LEMMA_WHERE,
       orderBy: { occurrenceCount: "desc" },
       take: 10,
       select: {

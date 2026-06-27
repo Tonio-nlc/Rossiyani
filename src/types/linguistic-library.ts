@@ -1,4 +1,4 @@
-import type { PartOfSpeech, PhraseGroupType, WordFrequency, FrequencyTier } from "./domain";
+import type { FrequencyTier, LexicalType, PartOfSpeech, PhraseGroupType, WordFrequency } from "./domain";
 import type { SentenceAnalysisOutput } from "./analysis";
 
 /** Result of a sentence-level knowledge lookup. */
@@ -13,6 +13,8 @@ export type KnowledgeLemmaRecord = {
   id: string;
   lemma: string;
   partOfSpeech: PartOfSpeech;
+  isProperNoun: boolean | null;
+  lexicalType: LexicalType | null;
   stressMarked: string;
   frequency: WordFrequency | null;
   frequencyTier: FrequencyTier | null;

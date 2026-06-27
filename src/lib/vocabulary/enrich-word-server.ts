@@ -1,4 +1,5 @@
 import { formatPosLabelFr } from "@/lib/explorer/lemma-display";
+import { LEARNABLE_LEMMA_WHERE } from "@/lib/linguistics/lexical-metadata";
 import { estimatedLevelFromLemma } from "@/lib/explorer/explorer-ia";
 import { buildFrequencyVisual } from "@/lib/explorer/lemma-display";
 import { formatDominantAspectFr } from "@/lib/explorer/lemma-display";
@@ -14,9 +15,9 @@ async function resolveLemmaKnowledge(
   lemma: string,
 ): Promise<{ knowledge: LemmaKnowledge; partOfSpeech: PartOfSpeech } | null> {
   const row = await prisma.knowledgeLemma.findFirst({
-    where: { lemma },
+    where: { lemma, ...LEARNABLE_LEMMA_WHERE },
     orderBy: { occurrenceCount: "desc" },
-    select: { lemma: true, partOfSpeech: true },
+    select: { lemma: true, partOfSpeech: true, isProperNoun: true },
   });
 
   if (!row) {

@@ -1,4 +1,5 @@
 import type { ExplorationEntry } from "@/lib/explorer/exploration-history";
+import { countLearnableWordsSeen } from "@/lib/linguistics/lexical-metadata";
 import {
   getAllReadingProgress,
   type TextReadingProgress,
@@ -71,7 +72,7 @@ function countWordsSeenToday(progressEntries: TextReadingProgress[]): number {
 
   for (const entry of progressEntries) {
     if (dayKey(new Date(entry.lastReadAt)) === todayKey) {
-      total += entry.wordsSeenIds.length;
+      total += countLearnableWordsSeen(entry);
     }
   }
 

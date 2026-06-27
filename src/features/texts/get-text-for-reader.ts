@@ -26,6 +26,8 @@ export type ReaderTextData = {
       stem: string;
       ending: string;
       partOfSpeech: string;
+      isProperNoun: boolean | null;
+      lexicalType: string | null;
       case: string | null;
       explanation: string;
       lemma: string;
@@ -89,6 +91,8 @@ export async function getTextForReader(textId: string): Promise<ReaderTextData |
         stem: w.stem,
         ending: w.ending,
         partOfSpeech: w.partOfSpeech,
+        isProperNoun: w.isProperNoun,
+        lexicalType: w.lexicalType,
         case: w.case,
         explanation: w.explanation,
         lemma: w.lemma,

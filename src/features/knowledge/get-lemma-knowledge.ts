@@ -74,6 +74,8 @@ export async function getLemmaKnowledge(
   return {
     lemma: graph.lemma.lemma,
     partOfSpeech: graph.lemma.partOfSpeech,
+    isProperNoun: graph.lemma.isProperNoun,
+    lexicalType: graph.lemma.lexicalType,
     stressMarked: pickDisplayStress(graph.lemma.stressMarked, graph.lemma.lemma),
     frequency: graph.lemma.frequency,
     frequencyTier: graph.lemma.frequencyTier,

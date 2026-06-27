@@ -91,13 +91,14 @@ export function useReadingProgress(text: ReaderTextData) {
   );
 
   const recordWord = useCallback(
-    (wordId: string, sentenceId: string) => {
+    (wordId: string, sentenceId: string, isLearnable = true) => {
       flushReadingTime();
       const next = upsertReadingProgress({
         textId: text.id,
         lastSentenceId: sentenceId,
         lastWordId: wordId,
         seenWordId: wordId,
+        seenWordLearnable: isLearnable,
         seenSentenceId: sentenceId,
         totalWords,
       });

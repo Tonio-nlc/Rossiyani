@@ -297,6 +297,8 @@ function inputToSyntheticWord(
     stem: input.stem,
     ending: input.ending,
     partOfSpeech: input.partOfSpeech,
+    isProperNoun: null,
+    lexicalType: null,
     case: input.case,
     gender: input.gender,
     number: input.number,

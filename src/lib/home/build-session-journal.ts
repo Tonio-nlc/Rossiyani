@@ -1,5 +1,6 @@
-import type { LearningSignals } from "@/features/discovery";
 import type { HomeJournalData } from "@/features/home";
+import type { LearningSignals } from "@/features/discovery";
+import { countLearnableWordsSeen } from "@/lib/linguistics/lexical-metadata";
 import { getCollectionName } from "@/content/collections";
 import type { TextListItem } from "@/features/texts";
 import type { SavedComposePhrase } from "@/lib/compose/types";
@@ -151,10 +152,11 @@ function collectRecentlyLearned(input: BuildSessionJournalInput): SessionJournal
   const recentProgress = recentTextId ? input.readingProgress[recentTextId] : null;
   if (recentProgress && recentProgress.wordsSeenIds.length > 0) {
     const textTitle = textTitleById(input.texts, recentTextId!);
+    const learnableCount = countLearnableWordsSeen(recentProgress);
     timed.push({
       at: recentProgress.lastReadAt,
       entry: {
-        label: `${recentProgress.wordsSeenIds.length} mot${recentProgress.wordsSeenIds.length > 1 ? "s" : ""} exploré${recentProgress.wordsSeenIds.length > 1 ? "s" : ""}`,
+        label: `${learnableCount} mot${learnableCount > 1 ? "s" : ""} exploré${learnableCount > 1 ? "s" : ""}`,
         detail: textTitle ? `Dans ${textTitle}` : "Lors de votre dernière lecture",
         href: `/texts/${recentTextId}`,
       },

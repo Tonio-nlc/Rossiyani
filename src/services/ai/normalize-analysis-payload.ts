@@ -1,5 +1,6 @@
 import { reconcileWordStem } from "@/lib/formatting/word-form";
 import { extractWordTranslationFromRaw } from "@/lib/import/word-translation";
+import { isProperNounPartOfSpeech } from "@/lib/linguistics/lexical-metadata";
 
 import type { PhraseGroupAnalysisOutput } from "./schemas";
 
@@ -52,7 +53,14 @@ function normalizeWords(words: unknown): RawWord[] {
     const original = String(word.original ?? "");
     const ending = String(word.ending ?? "");
     const stem = String(word.stem ?? "");
+    const properFromPos = isProperNounPartOfSpeech(word.partOfSpeech);
     word.partOfSpeech = normalizePartOfSpeechValue(word.partOfSpeech);
+    if (properFromPos || word.isProperNoun === true) {
+      word.isProperNoun = true;
+      if (!word.lexicalType) {
+        word.lexicalType = "proper_noun";
+      }
+    }
     word.stem = reconcileWordStem(original, stem, ending);
     const { translationCanonical, translationAlternatives } = extractWordTranslationFromRaw(word);
     if (translationCanonical) {
@@ -144,8 +152,7 @@ function normalizePartOfSpeechValue(value: unknown): unknown {
   if (typeof value !== "string") {
     return value;
   }
-  const key = value.trim().toLowerCase().replace(/-/g, " ");
-  if (key === "proper noun" || key === "proper_noun" || key === "name" || key === "propn") {
+  if (isProperNounPartOfSpeech(value)) {
     return "noun";
   }
   return value.trim().toLowerCase();

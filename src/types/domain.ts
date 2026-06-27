@@ -20,6 +20,18 @@ export type PartOfSpeech =
   | "particle"
   | "interjection";
 
+export type LexicalType =
+  | "common_noun"
+  | "proper_noun"
+  | "verb"
+  | "adjective"
+  | "pronoun"
+  | "numeral"
+  | "particle"
+  | "interjection"
+  | "abbreviation"
+  | "other";
+
 export type WordFrequency = "VERY_COMMON" | "COMMON" | "UNCOMMON" | "RARE";
 
 export type FrequencyTier = "TOP_500" | "TOP_1000" | "TOP_3000" | "BEYOND_TOP_3000";
@@ -71,6 +83,8 @@ export type Word = {
   stem: string;
   ending: string;
   partOfSpeech: PartOfSpeech;
+  isProperNoun?: boolean | null;
+  lexicalType?: LexicalType | null;
   case?: string;
   gender?: string;
   number?: string;

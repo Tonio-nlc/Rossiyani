@@ -2,6 +2,7 @@ import { LOCAL_DICTIONARY_GLOSS } from "@/lib/formatting/estimate-word-translati
 import type { PartOfSpeech } from "@/types/domain";
 import type { WordDetailGraph } from "@/types/word-detail-graph";
 
+import { stubLemmaEntity } from "../helpers/lemma-entity-stub";
 import { stubLemmaKnowledge } from "../helpers/lemma-knowledge-stub";
 
 export function buildWordDetail(overrides: Partial<WordDetailGraph> = {}): WordDetailGraph {
@@ -251,18 +252,14 @@ export const SEMANTIC_FIXTURES: SemanticFixture[] = [
 export function fixtureToDetail(fixture: SemanticFixture): WordDetailGraph {
   const lemmaEntity =
     fixture.lemmaFrenchComparison && fixture.translationSource === "KnowledgeLemma"
-      ? {
+      ? stubLemmaEntity({
           id: `lemma-${fixture.id}`,
           lemma: fixture.lemma,
           partOfSpeech: fixture.partOfSpeech,
           stressMarked: fixture.original,
-          frequency: null,
-          frequencyTier: null,
-          occurrenceCount: 1,
           canonicalExplanation: fixture.explanation ?? "Explication pédagogique du lemme.",
           frenchComparison: fixture.lemmaFrenchComparison,
-          reviewStatus: "CANONICAL" as const,
-        }
+        })
       : null;
 
   return buildWordDetail({

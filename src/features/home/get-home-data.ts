@@ -1,3 +1,4 @@
+import { LEARNABLE_LEMMA_WHERE } from "@/lib/linguistics/lexical-metadata";
 import { prisma } from "@/lib/prisma";
 import { getLemmaGraph } from "@/services/knowledge-graph/get-lemma-graph";
 import {
@@ -65,7 +66,7 @@ const MOTION_VERBS = [
 
 export async function getHomeWorkspaceStats(textCount: number): Promise<HomeWorkspaceStats> {
   const [knownWords, grammarConcepts] = await Promise.all([
-    prisma.knowledgeLemma.count(),
+    prisma.knowledgeLemma.count({ where: LEARNABLE_LEMMA_WHERE }),
     prisma.knowledgeConcept.count({
       where: {
         category: { in: ["GRAMMAR_PATTERN", "CONSTRUCTION", "PREPOSITION_PATTERN"] },
@@ -190,6 +191,7 @@ export async function getTodaysInsight(): Promise<HomeTodaysInsight | null> {
     where: {
       lemma: { in: MOTION_VERBS },
       occurrenceCount: { gt: 0 },
+      ...LEARNABLE_LEMMA_WHERE,
     },
     orderBy: { occurrenceCount: "desc" },
   });
@@ -198,7 +200,7 @@ export async function getTodaysInsight(): Promise<HomeTodaysInsight | null> {
     motionCandidates.length > 0
       ? motionCandidates
       : await prisma.knowledgeLemma.findMany({
-          where: { partOfSpeech: "verb", occurrenceCount: { gt: 0 } },
+          where: { partOfSpeech: "verb", occurrenceCount: { gt: 0 }, ...LEARNABLE_LEMMA_WHERE },
           orderBy: { occurrenceCount: "desc" },
           take: 40,
         });
@@ -338,7 +340,7 @@ export async function getExploreTopics(): Promise<HomeExploreTopic[]> {
         category: { in: ["GRAMMAR_PATTERN", "CONSTRUCTION", "PREPOSITION_PATTERN"] },
       },
     }),
-    prisma.knowledgeLemma.count(),
+    prisma.knowledgeLemma.count({ where: LEARNABLE_LEMMA_WHERE }),
     prisma.knowledgeConcept.count({
       where: {
         OR: [

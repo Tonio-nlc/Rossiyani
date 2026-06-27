@@ -18,6 +18,8 @@ const JSON_SHAPE = `{
       "stem": "stem",
       "ending": "ending (empty string if none)",
       "partOfSpeech": "noun|verb|...",
+      "isProperNoun": false,
+      "lexicalType": "common_noun|proper_noun|verb|adjective|pronoun|numeral|particle|interjection|abbreviation|other",
       "case": "string or null",
       "gender": "string or null",
       "number": "string or null",
@@ -51,6 +53,7 @@ Return ONLY valid JSON (no markdown).
 Rules:
 - All explanations and translations in French.
 - Each word MUST include "translation": a concise French gloss for that token (word-for-word meaning in context). Do NOT leave translation empty.
+- Set isProperNoun=true and lexicalType=proper_noun for personal names, places, countries, organizations, and brands (e.g. Москва, Анна, Google). Otherwise isProperNoun=false with the matching lexicalType.
 - "words" contains ONLY linguistic tokens (nouns, verbs, pronouns, etc.). Do NOT include punctuation (. , ! ? …) as words — punctuation stays in russianText only.
 - stem + ending must reconstruct original (stem may be lowercase; capitalization may be on original only, e.g. Таяла = таял + а).
 - Stress marks mandatory in stressMarked (not in stem/ending).

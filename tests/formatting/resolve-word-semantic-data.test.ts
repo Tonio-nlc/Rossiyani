@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { resolveWordSemanticData } from "@/lib/formatting/resolve-word-semantic-data";
 import { buildWordDetail } from "./semantic-fixtures";
+import { stubLemmaEntity } from "../helpers/lemma-entity-stub";
 
 describe("resolveWordSemanticData strict rules", () => {
   it("prefers Word.translationCanonical over KnowledgeLemma and dictionary", () => {
@@ -26,18 +27,13 @@ describe("resolveWordSemanticData strict rules", () => {
         },
         domain: {
           form: null,
-          lemma: {
+          lemma: stubLemmaEntity({
             id: "l1",
             lemma: "яблоня",
             partOfSpeech: "noun",
-            stressMarked: "яблоня",
-            frequency: null,
-            frequencyTier: null,
-            occurrenceCount: 1,
             canonicalExplanation: "Arbre fruitier.",
             frenchComparison: "pommier (knowledge)",
-            reviewStatus: "CANONICAL",
-          },
+          }),
           ending: null,
           case: null,
           concepts: [],
@@ -74,18 +70,13 @@ describe("resolveWordSemanticData strict rules", () => {
         },
         domain: {
           form: null,
-          lemma: {
+          lemma: stubLemmaEntity({
             id: "l1",
             lemma: "стол",
             partOfSpeech: "noun",
-            stressMarked: "стол",
-            frequency: null,
-            frequencyTier: null,
-            occurrenceCount: 1,
             canonicalExplanation: "Meuble avec un plateau horizontal.",
             frenchComparison: "table",
-            reviewStatus: "CANONICAL",
-          },
+          }),
           ending: null,
           case: null,
           concepts: [],

@@ -114,6 +114,7 @@ export function ReaderExplorerPanel({
       displayForm: snapshot.stressMarked || snapshot.original,
       lemma: snapshot.lemma,
       textId: snapshot.textId,
+      isProperNoun: snapshot.isProperNoun,
     });
     setSaved(true);
   };

@@ -83,7 +83,7 @@ describe("sentenceAnalysisOutputSchema", () => {
     expect(result.register).toBe("neutral");
   });
 
-  it("normalizes proper noun POS to noun", () => {
+  it("normalizes proper noun POS to noun and marks lexical metadata", () => {
     const payload = {
       ...validAnalysis,
       words: validAnalysis.words.map((word, index) =>
@@ -99,6 +99,8 @@ describe("sentenceAnalysisOutputSchema", () => {
     };
     const result = parseSentenceAnalysisOutput(payload);
     expect(result.words[3]?.partOfSpeech).toBe("noun");
+    expect(result.words[3]?.isProperNoun).toBe(true);
+    expect(result.words[3]?.lexicalType).toBe("proper_noun");
   });
 
   it("accepts stem + ending mismatch without rejecting the word", () => {

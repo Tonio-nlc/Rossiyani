@@ -181,6 +181,8 @@ function mapFormRow(row: FormWithLemma): KnowledgeFormLookupResult {
       id: row.lemma.id,
       lemma: row.lemma.lemma,
       partOfSpeech: row.lemma.partOfSpeech,
+      isProperNoun: row.lemma.isProperNoun,
+      lexicalType: row.lemma.lexicalType,
       stressMarked: row.lemma.stressMarked,
       frequency: row.lemma.frequency,
       frequencyTier: row.lemma.frequencyTier,

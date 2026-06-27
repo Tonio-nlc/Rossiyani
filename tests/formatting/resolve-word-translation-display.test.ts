@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { resolveWordTranslationDisplay } from "@/lib/formatting/resolve-word-translation-display";
 import { buildWordDetail } from "./semantic-fixtures";
+import { stubLemmaEntity } from "../helpers/lemma-entity-stub";
 
 describe("resolveWordTranslationDisplay strict", () => {
   it("uses KnowledgeLemma.frenchComparison", () => {
@@ -24,18 +25,12 @@ describe("resolveWordTranslationDisplay strict", () => {
         },
         domain: {
           form: null,
-          lemma: {
+          lemma: stubLemmaEntity({
             id: "l1",
             lemma: "иной",
             partOfSpeech: "adjective",
-            stressMarked: "иной",
-            frequency: null,
-            frequencyTier: null,
-            occurrenceCount: 1,
-            canonicalExplanation: null,
             frenchComparison: "autre",
-            reviewStatus: "CANONICAL",
-          },
+          }),
           ending: null,
           case: null,
           concepts: [],
@@ -97,18 +92,12 @@ describe("resolveWordTranslationDisplay strict", () => {
         },
         domain: {
           form: null,
-          lemma: {
+          lemma: stubLemmaEntity({
             id: "l1",
             lemma: "иной",
             partOfSpeech: "adjective",
-            stressMarked: "иной",
-            frequency: null,
-            frequencyTier: null,
-            occurrenceCount: 1,
-            canonicalExplanation: null,
             frenchComparison: "autre",
-            reviewStatus: "CANONICAL",
-          },
+          }),
           ending: null,
           case: null,
           concepts: [],

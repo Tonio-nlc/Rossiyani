@@ -1,5 +1,6 @@
 import { lemmaPath } from "@/components/explorer/explorer-routes";
 import type { ReaderTextData } from "@/features/texts";
+import { isLearnableLemma } from "@/lib/linguistics/lexical-metadata";
 import { practicePath } from "@/lib/practice/constants";
 import { isDisplayableUiText } from "@/lib/formatting/ui-placeholder-guard";
 
@@ -32,6 +33,10 @@ export function buildReadingSessionSummary(
   for (const sentence of text.sentences) {
     for (const word of sentence.words) {
       if (!seenSet.has(word.id)) {
+        continue;
+      }
+
+      if (!isLearnableLemma({ isProperNoun: word.isProperNoun })) {
         continue;
       }
 

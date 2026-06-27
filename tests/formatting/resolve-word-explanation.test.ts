@@ -9,6 +9,8 @@ import {
 } from "@/lib/formatting/word-explanation-guard";
 import type { WordDetailGraph } from "@/types/word-detail-graph";
 
+import { stubLemmaEntity } from "../helpers/lemma-entity-stub";
+
 function minimalDetail(overrides: Partial<WordDetailGraph> = {}): WordDetailGraph {
   return {
     wordId: "w1",
@@ -166,18 +168,13 @@ describe("resolveCompactWordExplanation", () => {
         },
         domain: {
           ...minimalDetail().domain,
-          lemma: {
+          lemma: stubLemmaEntity({
             id: "lemma-1",
             lemma: "яблоня",
             partOfSpeech: "noun",
-            stressMarked: "яблоня",
-            frequency: null,
-            frequencyTier: null,
-            occurrenceCount: 1,
             canonicalExplanation: "Nom féminin désignant l'arbre fruitier.",
             frenchComparison: "pommier",
-            reviewStatus: "CANONICAL",
-          },
+          }),
         },
       }),
     );
@@ -198,18 +195,13 @@ describe("resolveCompactWordExplanation", () => {
         },
         domain: {
           ...minimalDetail().domain,
-          lemma: {
+          lemma: stubLemmaEntity({
             id: "lemma-2",
             lemma: "день",
             partOfSpeech: "noun",
-            stressMarked: "день",
-            frequency: null,
-            frequencyTier: null,
-            occurrenceCount: 1,
             canonicalExplanation: "Nom masculin signifiant jours.",
             frenchComparison: "jour",
-            reviewStatus: "CANONICAL",
-          },
+          }),
         },
       }),
     );

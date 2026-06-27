@@ -19,6 +19,7 @@ export type SentenceBlockWord = {
   stem: string;
   ending: string;
   partOfSpeech: PartOfSpeech;
+  isProperNoun?: boolean | null;
   case: string | null;
   lemma: string;
   explanation: string;

@@ -2,6 +2,7 @@ import { lemmaPath } from "@/components/explorer/explorer-routes";
 import { getDateKey } from "@/features/discovery/discovery-seed";
 import { getTodaysDiscovery } from "@/features/discovery";
 import { getLearnerContext } from "@/features/discovery/get-learner-context";
+import { LEARNABLE_LEMMA_WHERE } from "@/lib/linguistics/lexical-metadata";
 import { prisma } from "@/lib/prisma";
 
 import { getFeaturedLesson } from "./get-featured-lesson";
@@ -42,7 +43,7 @@ export async function getHomeJournalData(): Promise<HomeJournalData> {
   const [todaysDiscovery, lemmaPool, { signals }] = await Promise.all([
     getTodaysDiscovery(),
     prisma.knowledgeLemma.findMany({
-      where: { occurrenceCount: { gt: 0 } },
+      where: { occurrenceCount: { gt: 0 }, ...LEARNABLE_LEMMA_WHERE },
       orderBy: { occurrenceCount: "desc" },
       take: 40,
       select: { lemma: true, partOfSpeech: true },

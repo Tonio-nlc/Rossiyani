@@ -1,6 +1,7 @@
 import type {
   KnowledgeConceptCategory,
   KnowledgeReviewStatus,
+  LexicalType,
   PartOfSpeech,
   PhraseGroupType,
   WordFrequency,
@@ -91,6 +92,8 @@ export type GraphLemmaNode = {
   id: string;
   lemma: string;
   partOfSpeech: PartOfSpeech;
+  isProperNoun: boolean | null;
+  lexicalType: LexicalType | null;
   stressMarked: string;
   frequency: WordFrequency | null;
   frequencyTier: FrequencyTier | null;
@@ -237,6 +240,8 @@ export type LemmaLessonRef = {
 export type LemmaKnowledge = {
   lemma: string;
   partOfSpeech: PartOfSpeech;
+  isProperNoun: boolean | null;
+  lexicalType: LexicalType | null;
   stressMarked: string | null;
   frequency: WordFrequency | null;
   frequencyTier: FrequencyTier | null;

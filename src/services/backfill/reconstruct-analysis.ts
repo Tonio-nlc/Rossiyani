@@ -1,6 +1,7 @@
 import type { PhraseGroup, Sentence, Word } from "@prisma/client";
 
 import { parseCulturalNotes, parseSyntaxAnalysis } from "@/domain/mappers";
+import { resolveWordLexicalMetadata } from "@/lib/linguistics/lexical-metadata";
 import type { SentenceAnalysisOutput } from "@/services/ai/schemas";
 
 type SentenceWithRelations = Sentence & {
@@ -38,15 +39,23 @@ export function reconstructAnalysisFromSentence(
     analysisStatus: sortedWords.length > 0 ? "complete" : "partial",
     syntaxAnalysis: parseSyntaxAnalysis(sentence.syntaxAnalysisJson) ?? undefined,
     culturalNotes: parseCulturalNotes(sentence.culturalNotesJson),
-    words: sortedWords.map((word) => ({
-      position: word.position,
-      original: word.original,
-      lemma: word.lemma,
-      stressMarked: word.stressMarked,
-      stem: word.stem,
-      ending: word.ending,
-      partOfSpeech: word.partOfSpeech,
-      case: word.case,
+    words: sortedWords.map((word) => {
+      const lexical = resolveWordLexicalMetadata({
+        partOfSpeech: word.partOfSpeech,
+        isProperNoun: word.isProperNoun,
+        lexicalType: word.lexicalType,
+      });
+      return {
+        position: word.position,
+        original: word.original,
+        lemma: word.lemma,
+        stressMarked: word.stressMarked,
+        stem: word.stem,
+        ending: word.ending,
+        partOfSpeech: word.partOfSpeech,
+        isProperNoun: lexical.isProperNoun,
+        lexicalType: lexical.lexicalType,
+        case: word.case,
       gender: word.gender,
       number: word.number,
       tense: word.tense,
@@ -56,7 +65,8 @@ export function reconstructAnalysisFromSentence(
       frequencyTier: word.frequencyTier,
       translationCanonical: word.translationCanonical ?? undefined,
       translationAlternatives: parseTranslationAlternatives(word.translationAlternatives),
-    })),
+      };
+    }),
     phraseGroups: sentence.phraseGroups.map((group) => ({
       type: group.type,
       label: group.label,

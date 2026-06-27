@@ -8,6 +8,7 @@ import {
   buildWordDetail,
   fixtureToDetail,
 } from "./semantic-fixtures";
+import { stubLemmaEntity } from "../helpers/lemma-entity-stub";
 
 describe("semantic strict validation suite", () => {
   it("covers at least 100 words", () => {
@@ -80,18 +81,14 @@ describe("semantic contamination guards", () => {
         frenchComparisonCanonical: "pommier",
         domain: {
           form: null,
-          lemma: {
+          lemma: stubLemmaEntity({
             id: "l-demo",
             lemma: "этот",
             partOfSpeech: "pronoun",
-            stressMarked: "этот",
-            frequency: null,
-            frequencyTier: null,
-            occurrenceCount: 1,
             canonicalExplanation: "Pronom démonstratif.",
             frenchComparison: null,
-            reviewStatus: "CANONICAL",
-          },
+            lexicalType: "pronoun",
+          }),
           ending: null,
           case: null,
           concepts: [],

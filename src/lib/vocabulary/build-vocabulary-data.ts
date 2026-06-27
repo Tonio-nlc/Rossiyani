@@ -1,4 +1,5 @@
 import { getSavedSentences } from "@/lib/phrase-mining";
+import { isLearnableLemma } from "@/lib/linguistics/lexical-metadata";
 import { practicePath } from "@/lib/practice/constants";
 import { getSavedReaderWords } from "@/lib/reader/saved-words";
 
@@ -16,7 +17,9 @@ import type {
 } from "./types";
 
 function mapWords(): VocabularyWord[] {
-  return getSavedReaderWords().map((entry) => ({
+  return getSavedReaderWords()
+    .filter((entry) => isLearnableLemma({ isProperNoun: entry.isProperNoun }))
+    .map((entry) => ({
     id: entry.id,
     russian: entry.displayForm,
     headword: entry.lemma,
@@ -33,7 +36,7 @@ function mapWords(): VocabularyWord[] {
     exampleRussian: null,
     exampleTranslation: null,
     badges: [createBadge("saved", "Enregistré", "blue")],
-  }));
+    }));
 }
 
 function mapExpressions(): VocabularyExpression[] {

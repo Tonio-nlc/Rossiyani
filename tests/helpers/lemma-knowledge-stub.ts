@@ -4,6 +4,8 @@ export function stubLemmaKnowledge(overrides: Partial<LemmaKnowledge> = {}): Lem
   return {
     lemma: "test",
     partOfSpeech: "noun",
+    isProperNoun: false,
+    lexicalType: "common_noun",
     stressMarked: null,
     frequency: null,
     frequencyTier: null,

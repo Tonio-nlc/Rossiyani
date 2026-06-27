@@ -56,6 +56,7 @@ export function toReaderWordSnapshot(word: ReaderWordSnapshotInput) {
     partOfSpeech: word.partOfSpeech as PartOfSpeech,
     case: word.case,
     lemma: word.lemma,
+    isProperNoun: word.isProperNoun ?? null,
     explanation: word.explanation,
     gender: word.gender ?? null,
     number: word.number ?? null,

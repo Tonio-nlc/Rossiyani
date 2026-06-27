@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { getCollectionName } from "@/content/collections";
 import type { ReaderTextData } from "@/features/texts";
+import { isLearnableLemma } from "@/lib/linguistics/lexical-metadata";
 import { setLastReadTextId } from "@/lib/last-read-text";
 import type { ReaderSearchEntry } from "@/lib/reader/build-reader-search-index";
 import { buildInteractiveWordsBySentence } from "@/lib/reader/build-interactive-words";
@@ -326,7 +327,11 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
       setHoveredWordSnapshot(null);
       setExplorerOpen(true);
       prefetchWordDetail(word.id);
-      recordWord(word.id, sentenceId);
+      recordWord(
+        word.id,
+        sentenceId,
+        isLearnableLemma({ isProperNoun: word.isProperNoun }),
+      );
     },
     [text.id, text.sentences, recordWord],
   );
