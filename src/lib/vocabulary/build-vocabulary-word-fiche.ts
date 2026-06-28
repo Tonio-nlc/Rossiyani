@@ -20,8 +20,10 @@ import type {
   VocabularyFicheLink,
   VocabularyFichePhrase,
   VocabularyFicheRow,
+  VocabularyLinguisticDetails,
   VocabularyWordFiche,
 } from "./vocabulary-word-fiche-types";
+import { buildVocabularyPatternSlice } from "@/services/vocabulary/build-vocabulary-pattern-slice";
 
 const IRREGULAR_VERBS = new Set([
   "быть",
@@ -127,7 +129,9 @@ function inferGenderFromForms(knowledge: LemmaKnowledge): string | null {
   return null;
 }
 
-function buildGrammarSection(knowledge: LemmaKnowledge): VocabularyWordFiche["grammar"] {
+function buildGrammarSection(
+  knowledge: LemmaKnowledge,
+): NonNullable<VocabularyLinguisticDetails["grammar"]> | null {
   const rows: VocabularyFicheRow[] = [];
   const pos = knowledge.partOfSpeech;
   let title = "Grammaire";
@@ -339,23 +343,56 @@ export async function buildVocabularyWordFiche(input: {
 
   const knowledge = resolved.knowledge;
   const definitions = buildLemmaDefinitions(knowledge);
-  const frequencyVisual = buildFrequencyVisual(
-    knowledge.frequency,
-    knowledge.frequencyTier,
-    knowledge.occurrenceCount,
-  );
   const wordId = await resolveWordId(
     knowledge.lemma,
     resolved.partOfSpeech,
     input.textId,
   );
   const sourceTextTitle = await lookupTextTitle(input.textId);
+  const patternSlice = await buildVocabularyPatternSlice({
+    lemma: knowledge.lemma,
+    partOfSpeech: resolved.partOfSpeech,
+    knowledge,
+    sourceTextId: input.textId,
+  });
+
+  const knowledgeExamples = mapExamples(knowledge);
+  const patternExamples = patternSlice.patterns.flatMap((pattern) =>
+    pattern.encounteredExamples.map((example) => ({
+      id: example.id,
+      russian: example.russian,
+      translation: example.translation,
+      textId: example.textId,
+      textTitle: example.textTitle,
+      textHref: example.textHref,
+      audioCacheKey: example.audioCacheKey,
+    })),
+  );
+
+  const encounteredExamples = dedupeEncounteredExamples([
+    ...patternExamples,
+    ...knowledgeExamples,
+  ]);
+
+  const grammar = buildGrammarSection(knowledge);
+  const linguisticLinks = mapLinguisticLinks(knowledge);
 
   const falseFriendWarning =
     knowledge.frenchComparison &&
     /faux ami|false friend/i.test(knowledge.frenchComparison)
       ? knowledge.frenchComparison
       : null;
+
+  const linguistic: VocabularyLinguisticDetails = {
+    definitions,
+    nuances: knowledge.simpleExplanation,
+    frenchComparison: knowledge.frenchComparison,
+    falseFriendWarning,
+    grammar,
+    collocations: linguisticLinks.collocations,
+    concepts: linguisticLinks.concepts,
+    cases: linguisticLinks.cases,
+  };
 
   return {
     savedWordId: input.savedWordId,
@@ -368,11 +405,6 @@ export async function buildVocabularyWordFiche(input: {
     primaryTranslation: knowledge.primaryTranslation,
     cefrLevel: estimatedLevelFromLemma(knowledge),
     frequencyLabel: formatFrequencyLabelFr(knowledge),
-    frequencyStars: frequencyVisual?.filledStars ?? null,
-    pronunciationNote:
-      knowledge.stressMarked && knowledge.stressMarked !== knowledge.lemma
-        ? `Accent tonique : ${knowledge.stressMarked}`
-        : null,
     audioTarget: wordId
       ? { scope: "word", entityId: wordId }
       : {
@@ -380,17 +412,12 @@ export async function buildVocabularyWordFiche(input: {
           text: knowledge.stressMarked ?? knowledge.lemma,
           cacheKey: `vocab-word:${input.savedWordId}`,
         },
-    understand: {
-      definitions,
-      nuances: knowledge.simpleExplanation,
-      frenchComparison: knowledge.frenchComparison,
-      falseFriendWarning,
-    },
-    grammar: buildGrammarSection(knowledge),
-    examples: mapExamples(knowledge),
-    expressions: mapExpressions(knowledge),
+    patternSlice,
+    encounteredExamples,
     family: mapFamily(knowledge),
-    linguisticLinks: mapLinguisticLinks(knowledge),
+    variants: grammar?.forms ?? [],
+    expressions: mapExpressions(knowledge),
+    linguistic,
     review: {
       savedAt: input.savedAt,
       lastSeenAt: input.savedAt,
@@ -401,7 +428,22 @@ export async function buildVocabularyWordFiche(input: {
       occurrenceCount: knowledge.occurrenceCount,
     },
     readerHref: textPath(input.textId),
-    explorerHref: lemmaPath(knowledge.lemma, resolved.partOfSpeech),
     wordId,
   };
+}
+
+function dedupeEncounteredExamples(examples: VocabularyFicheExample[]): VocabularyFicheExample[] {
+  const seen = new Set<string>();
+  const result: VocabularyFicheExample[] = [];
+
+  for (const example of examples) {
+    const key = `${example.textId ?? "x"}:${example.russian}`;
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    result.push(example);
+  }
+
+  return result.slice(0, 8);
 }

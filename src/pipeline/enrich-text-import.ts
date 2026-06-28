@@ -35,6 +35,7 @@ import {
   runExplanationsStage,
   runFixedExpressionsStage,
   runKnowledgeGraphStage,
+  runPatternIndexStage,
   runLiteralTranslationStage,
   runMorphologyStage,
   runNaturalTranslationStage,
@@ -321,6 +322,7 @@ export async function enrichTextImport(
         sentenceId,
       );
       const kgOutput = await runKnowledgeGraphStage(storedCtx, analysis, storageOutput);
+      const patternOutput = await runPatternIndexStage(storedCtx, analysis, storageOutput);
 
       await translationTracker.recordSentence({
         sentenceIndex: segment.sentenceIndex,
@@ -330,6 +332,14 @@ export async function enrichTextImport(
 
       wordCount += analysis.words.length;
       phraseGroupCount += storageOutput.phraseGroupCount;
+
+      if (patternOutput.patternCount > 0) {
+        logImportPhase("pattern index", {
+          sentenceId,
+          primaryPatternId: patternOutput.primaryPatternId,
+          patternCount: patternOutput.patternCount,
+        });
+      }
     } catch (error) {
       translationTracker.recordWarning();
       segmentStats.lost += 1;

@@ -1,4 +1,5 @@
 import type { PartOfSpeech } from "@/types/domain";
+import type { VocabularyPatternSlice } from "@/types/vocabulary-pattern-experience";
 
 export type VocabularyFicheRow = {
   label: string;
@@ -55,6 +56,22 @@ export type VocabularyFicheReview = {
   occurrenceCount: number;
 };
 
+export type VocabularyLinguisticDetails = {
+  definitions: VocabularyFicheDefinition[];
+  nuances: string | null;
+  frenchComparison: string | null;
+  falseFriendWarning: string | null;
+  grammar: {
+    title: string;
+    rows: VocabularyFicheRow[];
+    forms: VocabularyFicheFormRow[];
+    note: string | null;
+  } | null;
+  collocations: VocabularyFicheLink[];
+  concepts: VocabularyFicheLink[];
+  cases: VocabularyFicheLink[];
+};
+
 export type VocabularyWordFiche = {
   savedWordId: string;
   lookupLemma: string;
@@ -66,8 +83,6 @@ export type VocabularyWordFiche = {
   primaryTranslation: string | null;
   cefrLevel: string | null;
   frequencyLabel: string | null;
-  frequencyStars: number | null;
-  pronunciationNote: string | null;
   audioTarget: {
     scope: "word";
     entityId: string;
@@ -76,29 +91,13 @@ export type VocabularyWordFiche = {
     text: string;
     cacheKey: string;
   };
-  understand: {
-    definitions: VocabularyFicheDefinition[];
-    nuances: string | null;
-    frenchComparison: string | null;
-    falseFriendWarning: string | null;
-  };
-  grammar: {
-    title: string;
-    rows: VocabularyFicheRow[];
-    forms: VocabularyFicheFormRow[];
-    note: string | null;
-  } | null;
-  examples: VocabularyFicheExample[];
-  expressions: VocabularyFichePhrase[];
+  patternSlice: VocabularyPatternSlice;
+  encounteredExamples: VocabularyFicheExample[];
   family: VocabularyFicheLink[];
-  linguisticLinks: {
-    collocations: VocabularyFicheLink[];
-    concepts: VocabularyFicheLink[];
-    cases: VocabularyFicheLink[];
-    relatedLemmas: VocabularyFicheLink[];
-  };
+  variants: VocabularyFicheFormRow[];
+  expressions: VocabularyFichePhrase[];
+  linguistic: VocabularyLinguisticDetails;
   review: VocabularyFicheReview;
   readerHref: string | null;
-  explorerHref: string | null;
   wordId: string | null;
 };

@@ -1,0 +1,74 @@
+{
+  "id": "lp.verbs.preferred_constructions.v1",
+  "slug": "preferred_constructions",
+  "internalName": "Verb-driven valency and construction preferences",
+  "userFacingName": "Chaque verbe a ses constructions favorites",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "lexique.collocation",
+  "taxonomyPath": ["lexique", "collocation", "verb_valency"],
+  "tags": ["A2", "verbs", "dative", "valency"],
+  "pedagogicalObjective": "Développer l'intuition que le russe associe des verbes à des cadres syntaxiques fixes.",
+  "cognitiveSurprise": "On ne « aide » pas « à quelqu'un » comme en français : « помогать » attend autre chose.",
+  "observation": "Certains verbes apparaissent toujours avec les mêmes petits mots autour d'eux.",
+  "insight": "Apprendre un verbe, c'est souvent apprendre son « cadre » — comme une coque prête à recevoir des noms.",
+  "comprehension": "Помогать требует дательный : « aider » construit avec le datif (кому?), pas un calque du français.",
+  "formalization": "Régit de valence : verbes + cas obligatoires ; constructions figées à mémoriser par paires.",
+  "nuances": "Certaines constructions sont idiomatiques et ne se déduisent pas du sens du verbe seul.",
+  "examples": [
+    {
+      "id": "ex.val.1",
+      "russian": "Я помогаю маме.",
+      "french": "J'aide maman.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.val.2",
+      "russian": "Он интересуется музыкой.",
+      "french": "Il s'intéresse à la musique.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [
+    {
+      "wrong": "Я помогаю маму",
+      "why": "Помогать régit le datif, pas l'accusatif.",
+      "correction": "Я помогаю маме",
+      "learnerProfile": "francophone"
+    }
+  ],
+  "variants": [],
+  "prerequisites": ["lp.morphology.role_terminations.v1"],
+  "relatedPatterns": [
+    {
+      "patternId": "lp.morphology.dative_recipient.v1",
+      "relationType": "reinforces",
+      "label": "Donner, dire — à qui ?"
+    }
+  ],
+  "confusedWith": [],
+  "recommendedLevel": "A2",
+  "frequency": "frequent",
+  "difficulty": 3,
+  "introductionConditions": {
+    "prerequisitePatternIds": ["lp.morphology.role_terminations.v1"],
+    "minExposureCount": 4
+  },
+  "masteryConditions": {
+    "minExposureCount": 7,
+    "minRetrievalGoodRate": 0.8,
+    "minProductionSuccess": 2
+  },
+  "knowledgeConceptKeys": ["dative_case", "verb_valency"],
+  "detectionRules": [
+    {
+      "type": "lexical",
+      "rule": "verb_governed_case_mismatch",
+      "weight": 0.75
+    }
+  ],
+  "createdAt": "2026-06-01T00:00:00.000Z",
+  "updatedAt": "2026-06-01T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

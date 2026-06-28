@@ -14,7 +14,7 @@ type CompletionTile = {
   title: string;
   description: string;
   href: string;
-  icon: "continue" | "practice" | "explorer" | "library";
+  icon: "continue" | "library";
 };
 
 function CompletionIcon({ kind }: { kind: CompletionTile["icon"] }) {
@@ -31,28 +31,6 @@ function CompletionIcon({ kind }: { kind: CompletionTile["icon"] }) {
     );
   }
 
-  if (kind === "practice") {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden className="reader-ws-complete__icon-svg">
-        <path
-          d="M8 5.5h8a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-11a1 1 0 0 1 1-1Z"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        />
-        <path d="M10 10h5M10 13.5h5M10 17h3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
-  if (kind === "explorer") {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden className="reader-ws-complete__icon-svg">
-        <circle cx="12" cy="12" r="7" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M12 8.5V12l2.5 1.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden className="reader-ws-complete__icon-svg">
       <path
@@ -65,30 +43,18 @@ function CompletionIcon({ kind }: { kind: CompletionTile["icon"] }) {
 }
 
 function buildTiles(actions: ReadingSessionContinueAction[]): CompletionTile[] {
-  const [continueAction, practiceAction, explorerAction, libraryAction] = actions;
+  const [continueAction, libraryAction] = actions;
 
   return [
     {
-      title: continueAction?.label ?? "Continuer la lecture",
-      description: continueAction?.rationale ?? "Choisir un autre texte dans votre bibliothèque",
+      title: continueAction?.label ?? "Lire un autre texte",
+      description: continueAction?.rationale ?? "Continuer à découvrir le russe en lisant",
       href: continueAction?.href ?? "/library",
       icon: "continue",
     },
     {
-      title: practiceAction?.label ?? "Pratiquer le vocabulaire",
-      description: practiceAction?.rationale ?? "Renforcer les mots de cette session",
-      href: practiceAction?.href ?? "/practice",
-      icon: "practice",
-    },
-    {
-      title: explorerAction?.label ?? "Ouvrir l'explorateur",
-      description: explorerAction?.rationale ?? "Approfondir la grammaire et le lexique",
-      href: explorerAction?.href ?? "/vocabulary",
-      icon: "explorer",
-    },
-    {
       title: libraryAction?.label ?? "Retourner à la bibliothèque",
-      description: libraryAction?.rationale ?? "Revoir vos textes et votre progression",
+      description: libraryAction?.rationale ?? "Revoir vos textes",
       href: libraryAction?.href ?? "/library",
       icon: "library",
     },
@@ -110,9 +76,13 @@ export function ReaderCompletionCard({ textTitle, continueActions }: ReaderCompl
         <h2 id="reader-ws-complete-heading" className="reader-ws-complete__title break-russian">
           {textTitle}
         </h2>
+        <p className="reader-ws-complete__lead">
+          Vous avez lu ce texte jusqu&apos;au bout. La grammaire se construit en lisant — pas en
+          suivant une leçon.
+        </p>
       </div>
 
-      <ul className="reader-ws-complete__grid">
+      <ul className="reader-ws-complete__grid reader-ws-complete__grid--two">
         {tiles.map((tile) => (
           <li key={tile.title}>
             <Link href={tile.href} className="reader-ws-complete__card focus-kb">

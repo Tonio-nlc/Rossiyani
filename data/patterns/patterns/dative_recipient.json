@@ -1,0 +1,80 @@
+{
+  "id": "lp.morphology.dative_recipient.v1",
+  "slug": "dative_recipient",
+  "internalName": "Dative for indirect object / recipient",
+  "userFacingName": "Donner, dire, téléphoner — à qui ?",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "morphology.case_system",
+  "taxonomyPath": ["morphology", "case_system", "dative"],
+  "tags": ["A2", "dative", "recipient", "case"],
+  "pedagogicalObjective": "Repérer le rôle de destinataire marqué par le datif après des verbes de communication et de transfert.",
+  "cognitiveSurprise": "En français on dit « à ma sœur » ; en russe, c'est une terminaison sur le nom, sans préposition.",
+  "observation": "Après des verbes comme « donner » ou « dire », un nom change de forme pour désigner la personne qui reçoit.",
+  "insight": "Le datif répond à « à qui ? » — comme une flèche vers le bénéficiaire de l'action.",
+  "comprehension": "Я дал книгу сестре : « сестре » marque la destinataire ; le livre reste à l'accusatif, la sœur au datif.",
+  "formalization": "Datif (дательный падеж) : complément d'attribution, destinataire, expérienceur avec certains verbes.",
+  "nuances": "Le datif impersonnel (мне холодно) et les verbes à datif fixe seront approfondis plus tard.",
+  "examples": [
+    {
+      "id": "ex.dat.1",
+      "russian": "Я дал книгу сестре.",
+      "french": "J'ai donné le livre à ma sœur.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.dat.2",
+      "russian": "Он сказал мне правду.",
+      "french": "Il m'a dit la vérité.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.dat.3",
+      "russian": "Я звоню маме.",
+      "french": "J'appelle maman.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [
+    {
+      "wrong": "Я дал книгу сестру",
+      "why": "Le destinataire prend le datif, pas l'accusatif.",
+      "correction": "Я дал книгу сестре",
+      "learnerProfile": "francophone"
+    }
+  ],
+  "variants": [],
+  "prerequisites": ["lp.morphology.role_terminations.v1"],
+  "relatedPatterns": [
+    {
+      "patternId": "lp.verbs.preferred_constructions.v1",
+      "relationType": "reinforces",
+      "label": "Constructions verbales favorites"
+    }
+  ],
+  "confusedWith": ["lp.morphology.accusative_object.v1"],
+  "recommendedLevel": "A2",
+  "frequency": "core",
+  "difficulty": 3,
+  "introductionConditions": {
+    "prerequisitePatternIds": ["lp.morphology.role_terminations.v1"],
+    "minExposureCount": 5
+  },
+  "masteryConditions": {
+    "minExposureCount": 8,
+    "minRetrievalGoodRate": 0.8,
+    "minDaysSinceFirstSeen": 7
+  },
+  "knowledgeConceptKeys": ["dative_case", "indirect_object"],
+  "detectionRules": [
+    {
+      "type": "morphology",
+      "rule": "dative_noun_after_transfer_verb",
+      "weight": 0.8
+    }
+  ],
+  "createdAt": "2026-06-01T00:00:00.000Z",
+  "updatedAt": "2026-06-01T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

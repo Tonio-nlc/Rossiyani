@@ -13,6 +13,7 @@ function makeText(): ReaderTextData {
     level: "A1",
     collectionId: "everyday-russian",
     categoryIds: [],
+    patternSlice: { patterns: {}, bySentenceId: {} },
     sentences: [
       {
         id: "s1",

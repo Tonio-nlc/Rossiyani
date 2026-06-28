@@ -1,0 +1,37 @@
+[
+  {
+    "id": "morphology.case_system",
+    "slug": "case_system",
+    "titleFr": "Système des cas",
+    "description": "Les terminaisons signalent le rôle des noms dans la phrase.",
+    "taxonomyRoot": "morphology"
+  },
+  {
+    "id": "syntax.possession",
+    "slug": "possession",
+    "titleFr": "Possession et existence",
+    "description": "Exprimer ce qu'on a ou ce qui existe près de quelqu'un.",
+    "taxonomyRoot": "syntax"
+  },
+  {
+    "id": "syntax.information_structure",
+    "slug": "information_structure",
+    "titleFr": "Structure de l'information",
+    "description": "Ce que le russe supprime, met en avant ou réordonne.",
+    "taxonomyRoot": "syntax"
+  },
+  {
+    "id": "lexique.collocation",
+    "slug": "collocation",
+    "titleFr": "Collocations et valence",
+    "description": "Les cadres syntaxiques préférés des verbes et expressions.",
+    "taxonomyRoot": "lexique"
+  },
+  {
+    "id": "verbs.aspect",
+    "slug": "aspect",
+    "titleFr": "Aspect verbal",
+    "description": "Comment le russe voit l'action : en cours, achevée, habituelle.",
+    "taxonomyRoot": "verbs"
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "familiesFile": "families.json",
+  "pathsFile": "paths.json",
+  "patternFiles": [
+    "patterns/role_terminations.json",
+    "patterns/possession_existence.json",
+    "patterns/zero_subject.json",
+    "patterns/preferred_constructions.json",
+    "patterns/dative_recipient.json",
+    "patterns/pair_intuition.json"
+  ]
+}

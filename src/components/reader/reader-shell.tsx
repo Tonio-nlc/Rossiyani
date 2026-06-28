@@ -4,17 +4,17 @@ import type { ReactNode } from "react";
 
 type ReaderShellProps = {
   children: ReactNode;
-  explorer: ReactNode;
-  explorerOpen?: boolean;
-  onToggleExplorer?: () => void;
+  wordPanel: ReactNode;
+  wordPanelOpen?: boolean;
+  onToggleWordPanel?: () => void;
   footer?: ReactNode;
 };
 
 export function ReaderShell({
   children,
-  explorer,
-  explorerOpen = true,
-  onToggleExplorer,
+  wordPanel,
+  wordPanelOpen = true,
+  onToggleWordPanel,
   footer,
 }: ReaderShellProps) {
   return (
@@ -24,21 +24,21 @@ export function ReaderShell({
         <aside
           className={[
             "reader-ws__explorer",
-            explorerOpen ? "reader-ws__explorer--open" : "reader-ws__explorer--collapsed",
+            wordPanelOpen ? "reader-ws__explorer--open" : "reader-ws__explorer--collapsed",
           ].join(" ")}
-          aria-label="Panneau explorateur"
+          aria-label="Panneau mot"
         >
-          {onToggleExplorer ? (
+          {onToggleWordPanel ? (
             <button
               type="button"
               className="reader-ws__explorer-toggle focus-kb lg:hidden"
-              onClick={onToggleExplorer}
-              aria-expanded={explorerOpen}
+              onClick={onToggleWordPanel}
+              aria-expanded={wordPanelOpen}
             >
-              Explorateur
+              Mot
             </button>
           ) : null}
-          <div className="reader-ws__explorer-scroll">{explorer}</div>
+          <div className="reader-ws__explorer-scroll">{wordPanel}</div>
         </aside>
       </div>
       {footer}

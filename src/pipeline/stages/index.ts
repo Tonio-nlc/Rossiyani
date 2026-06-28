@@ -11,3 +11,4 @@ export {
 export { runCulturalPointsStage } from "./cultural-points-stage";
 export { runStorageStage } from "./storage-stage";
 export { runKnowledgeGraphStage } from "./knowledge-graph-stage";
+export { runPatternIndexStage, type PatternIndexOutput } from "./pattern-index-stage";

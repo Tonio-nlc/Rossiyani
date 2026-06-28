@@ -48,8 +48,8 @@ export function VocabularyWordReviewPanel({ fiche }: VocabularyWordReviewPanelPr
         translation: fiche.primaryTranslation,
         stressMarked: fiche.stressMarked,
         partOfSpeech: fiche.partOfSpeechLabel,
-        exampleRussian: fiche.examples[0]?.russian ?? null,
-        exampleTranslation: fiche.examples[0]?.translation ?? null,
+        exampleRussian: fiche.encounteredExamples[0]?.russian ?? null,
+        exampleTranslation: fiche.encounteredExamples[0]?.translation ?? null,
         wordId: fiche.audioTarget.scope === "word" ? fiche.audioTarget.entityId : null,
       });
     }

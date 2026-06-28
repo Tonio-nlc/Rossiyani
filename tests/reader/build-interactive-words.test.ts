@@ -6,12 +6,15 @@ import {
 } from "@/lib/reader/build-interactive-words";
 import type { ReaderTextData } from "@/features/texts";
 
+const emptyPatternSlice = { patterns: {}, bySentenceId: {} } as const;
+
 const sampleText: ReaderTextData = {
   id: "t1",
   title: "Test",
   level: "B1",
   collectionId: "everyday-russian",
   categoryIds: [],
+  patternSlice: emptyPatternSlice,
   sentences: [
     {
       id: "s1",

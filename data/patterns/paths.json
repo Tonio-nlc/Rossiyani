@@ -1,0 +1,51 @@
+[
+  {
+    "id": "path.case_and_roles",
+    "slug": "case_and_roles",
+    "titleFr": "Le système des rôles",
+    "description": "Les terminaisons russes sont des signaux de fonction, pas des décorations.",
+    "objective": "Anticiper et lire les rôles grammaticaux à travers les formes de surface.",
+    "recommendedLevel": "A1",
+    "collectionIds": ["everyday-russian", "travel-russian"],
+    "steps": [
+      {
+        "patternId": "lp.morphology.role_terminations.v1",
+        "introductionTextIds": ["text-a1-family-01"]
+      },
+      {
+        "patternId": "lp.syntax.possession_existence.v1"
+      },
+      {
+        "patternId": "lp.morphology.dative_recipient.v1"
+      }
+    ]
+  },
+  {
+    "id": "path.information_flow",
+    "slug": "information_flow",
+    "titleFr": "Ordre et focus",
+    "description": "Ce qu'on connaît déjà vient avant ; l'information neuve, après.",
+    "objective": "Accepter l'ellipse et l'ordre informatif du russe parlé.",
+    "recommendedLevel": "A1",
+    "collectionIds": ["dialogues", "stories"],
+    "steps": [
+      {
+        "patternId": "lp.syntax.zero_subject.v1"
+      }
+    ]
+  },
+  {
+    "id": "path.verbal_perspective",
+    "slug": "verbal_perspective",
+    "titleFr": "Regard sur l'action",
+    "description": "Le russe choisit comment voir l'action avant de choisir le temps.",
+    "objective": "Distinguer processus et résultat via les paires aspectuelles.",
+    "recommendedLevel": "A2",
+    "collectionIds": ["stories", "everyday-russian"],
+    "steps": [
+      {
+        "patternId": "lp.aspect.pair_intuition.v1"
+      }
+    ]
+  }
+]

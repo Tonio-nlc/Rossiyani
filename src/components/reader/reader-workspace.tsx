@@ -13,7 +13,6 @@ import { buildInteractiveWordsBySentence } from "@/lib/reader/build-interactive-
 import { buildTextIntroduction } from "@/lib/reader/build-text-introduction";
 import { buildReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel-data";
 import { buildReadingSessionSummary } from "@/lib/reader/build-reading-session-summary";
-import { buildReaderSentenceInsight } from "@/lib/reader/build-reader-sentence-insight";
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
 import { getTextReadingProgress, isTextReadingComplete } from "@/lib/reader/reading-progress";
 import {
@@ -26,14 +25,13 @@ import { prefetchWordDetail } from "@/lib/reader/reader-word-detail-store";
 import { ReaderAboutText } from "./reader-about-text";
 import { ReaderAudioPlayer } from "./reader-audio-player";
 import { ReaderCompletionCard } from "./reader-completion-card";
-import { ReaderExplorerPanel } from "./reader-explorer-panel";
+import { ReaderWordPanel } from "./reader-word-panel";
 import { ReaderHeader } from "./reader-header";
 import { ReaderInTextSearch } from "./reader-in-text-search";
 import { ReaderShell } from "./reader-shell";
 import { mapSentenceWords, ReaderSentence } from "./reader-sentence";
 import { isSentenceAnalyzing, ReaderSentenceAnalyzing } from "./reader-sentence-analyzing";
 import { toReaderWordSnapshot } from "./reader-word-utils";
-import { useFocusMode } from "./use-focus-mode";
 import { useReaderTextSearch } from "./use-reader-text-search";
 import { useReaderWordDetailStore } from "./use-reader-word-detail-store";
 import { useReaderWordPrefetch } from "./use-reader-word-prefetch";
@@ -41,7 +39,7 @@ import { useReaderWordLookup } from "./use-reader-word-lookup";
 import { useReaderKeyboard } from "./use-reader-keyboard";
 import { useReadingProgress } from "./use-reading-progress";
 import { useSentenceTranslationExpansion } from "./use-sentence-translation-expansion";
-import { useSentenceInsightExpansion } from "./use-sentence-insight-expansion";
+import { useReaderPatternExperience } from "./use-reader-pattern-experience";
 import { useTranslationDisplay } from "./use-translation-display";
 
 type ReaderWorkspaceProps = {
@@ -97,7 +95,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   const [visibleSentenceIds, setVisibleSentenceIds] = useState<string[]>(() =>
     text.sentences[0] ? [text.sentences[0].id] : [],
   );
-  const [explorerOpen, setExplorerOpen] = useState(false);
+  const [wordPanelOpen, setWordPanelOpen] = useState(false);
   const [fontScale, setFontScale] = useState(1);
   const [bookmarked, setBookmarked] = useState(false);
   const visibleSentenceIdsRef = useRef<Set<string>>(
@@ -109,8 +107,6 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   const { mode: translationMode, setMode: setTranslationMode, interlinear, setInterlinear } =
     useTranslationDisplay();
   const { isExpanded, toggleExpanded, expandedIds } = useSentenceTranslationExpansion();
-  const { isInsightExpanded, toggleInsight } = useSentenceInsightExpansion();
-  const { focusMode } = useFocusMode();
 
   const { activeSentenceId: playingSentenceId } = useAudioPlayback();
 
@@ -118,10 +114,11 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
 
   const showTranslationToggle = shouldShowTranslationToggle(translationMode);
 
-  const insightBySentence = useMemo(
-    () => new Map(text.sentences.map((sentence) => [sentence.id, buildReaderSentenceInsight(sentence)])),
-    [text.sentences],
-  );
+  const {
+    recordSentenceExposure,
+    buildWordExperience,
+    patternEchoBySentence,
+  } = useReaderPatternExperience(text);
 
   const hasPendingAnalysis = useMemo(
     () =>
@@ -300,6 +297,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
               changed = true;
             }
             recordSentence(sentenceId);
+            recordSentenceExposure(sentenceId);
           } else if (visibleSentenceIdsRef.current.has(sentenceId)) {
             visibleSentenceIdsRef.current.delete(sentenceId);
             changed = true;
@@ -318,7 +316,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     }
 
     return () => observer.disconnect();
-  }, [text.sentences, recordSentence]);
+  }, [text.sentences, recordSentence, recordSentenceExposure]);
 
   const handleSelectSentence = useCallback(
     (sentenceId: string) => {
@@ -347,7 +345,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
         }),
       );
       setHoveredWordSnapshot(null);
-      setExplorerOpen(true);
+      setWordPanelOpen(true);
       prefetchWordDetail(word.id);
       recordWord(
         word.id,
@@ -411,17 +409,22 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     saveBookmarks(bookmarks);
   }, [text.id]);
 
-  const selectedWordSentence = useMemo(() => {
+  const patternExperience = useMemo(() => {
     if (!selectedWordSnapshot) {
       return null;
     }
-    return text.sentences.find((sentence) => sentence.id === selectedWordSnapshot.sentenceId) ?? null;
-  }, [selectedWordSnapshot, text.sentences]);
+    return buildWordExperience(selectedWordSnapshot.sentenceId, selectedWordSnapshot.position);
+  }, [buildWordExperience, selectedWordSnapshot]);
+
+  const closeWordPanel = useCallback(() => {
+    setWordPanelOpen(false);
+    setSelectedWordSnapshot(null);
+  }, []);
 
   return (
     <ReaderShell
-      explorerOpen={explorerOpen || selectedWordSnapshot !== null}
-      onToggleExplorer={() => setExplorerOpen((value) => !value)}
+      wordPanelOpen={wordPanelOpen || selectedWordSnapshot !== null}
+      onToggleWordPanel={() => setWordPanelOpen((value) => !value)}
       footer={
         <ReaderAudioPlayer
           sentenceIds={sentenceIds}
@@ -429,25 +432,23 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
           onSentenceSeek={handleSelectSentence}
         />
       }
-      explorer={
-        <ReaderExplorerPanel
+      wordPanel={
+        <ReaderWordPanel
           detail={detail}
           loading={loading}
           snapshot={selectedWordSnapshot}
           textIndex={textIndex}
-          sentence={selectedWordSentence}
+          patternExperience={patternExperience}
+          onClose={closeWordPanel}
         />
       }
     >
-      {explorerOpen && selectedWordSnapshot ? (
+      {wordPanelOpen && selectedWordSnapshot ? (
         <button
           type="button"
           className="reader-ws__explorer-backdrop"
-          aria-label="Fermer l'explorateur"
-          onClick={() => {
-            setExplorerOpen(false);
-            setSelectedWordSnapshot(null);
-          }}
+          aria-label="Fermer le panneau mot"
+          onClick={closeWordPanel}
         />
       ) : null}
 
@@ -491,7 +492,6 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
         <div className="reader-ws__article-wrap">
           <article className="reader-ws-article">
             {text.sentences.map((sentence) => {
-              const dimmed = focusMode && selectedSentenceId !== sentence.id;
               const analyzing = isSentenceAnalyzing(
                 sentence.analysisState,
                 sentence.words.length,
@@ -510,7 +510,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
                     }}
                     data-sentence-id={sentence.id}
                     className={[
-                      dimmed ? "reader-ws-sentence-wrap--muted" : "reader-ws-sentence-wrap--current",
+                      "reader-ws-sentence-wrap--current",
                       playingSentenceId === sentence.id ? "reader-ws-sentence-wrap--playing" : "",
                     ]
                       .filter(Boolean)
@@ -547,10 +547,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
                   showTranslationToggle={showTranslationToggle}
                   showInterlinear={interlinear}
                   onToggleTranslation={() => toggleExpanded(sentence.id)}
-                  insight={insightBySentence.get(sentence.id)!}
-                  insightExpanded={isInsightExpanded(sentence.id)}
-                  onToggleInsight={() => toggleInsight(sentence.id)}
-                  dimmed={dimmed}
+                  showPatternEcho={patternEchoBySentence.get(sentence.id) ?? false}
                   onSelectSentence={() => handleSelectSentence(sentence.id)}
                   onSelectWord={(word) =>
                     handleSelectWord(sentence.id, {

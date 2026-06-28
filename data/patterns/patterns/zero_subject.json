@@ -1,0 +1,68 @@
+{
+  "id": "lp.syntax.zero_subject.v1",
+  "slug": "zero_subject",
+  "internalName": "Pro-drop and contextually recoverable subjects",
+  "userFacingName": "Le russe supprime ce qui est évident",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "syntax.information_structure",
+  "taxonomyPath": ["syntax", "information_structure", "pro_drop"],
+  "tags": ["A1", "subject", "ellipsis", "dialogue"],
+  "pedagogicalObjective": "Accepter que le sujet disparaisse quand le contexte suffit.",
+  "cognitiveSurprise": "Une phrase « complète » en français peut n'avoir qu'un verbe en russe.",
+  "observation": "Beaucoup de phrases russes courtes n'ont pas de pronom visible pour « je / tu / il ».",
+  "insight": "Si on sait déjà de qui on parle, le russe n'a pas besoin de le répéter — le verbe porte souvent l'information.",
+  "comprehension": "Les terminaisons verbales indiquent souvent la personne ; le contexte fait le reste.",
+  "formalization": "Pro-drop : sujet nul récupérable par conjugaison et contexte.",
+  "nuances": "En écrit formel, le sujet peut être réintroduit pour clarté.",
+  "examples": [
+    {
+      "id": "ex.zero.1",
+      "russian": "Пойдём в кино?",
+      "french": "On va au cinéma ?",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.zero.2",
+      "russian": "Здесь хорошо.",
+      "french": "C'est bien ici.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [
+    {
+      "id": "cex.zero.1",
+      "russian": "Он сказал, что придёт.",
+      "french": "Il a dit qu'il viendrait.",
+      "note": "Quand l'ambiguïté est réelle, le sujet revient.",
+      "isCanonical": false
+    }
+  ],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 2,
+  "introductionConditions": {
+    "prerequisitePatternIds": [],
+    "minExposureCount": 2
+  },
+  "masteryConditions": {
+    "minExposureCount": 5,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": ["pro_drop", "subject_ellipsis"],
+  "detectionRules": [
+    {
+      "type": "syntax",
+      "rule": "finite_verb_without_explicit_subject",
+      "weight": 0.6
+    }
+  ],
+  "createdAt": "2026-06-01T00:00:00.000Z",
+  "updatedAt": "2026-06-01T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

@@ -4,10 +4,8 @@ import { memo } from "react";
 
 import { SentenceBlock, type SentenceBlockWord } from "@/components/sentence/sentence-block";
 import type { WordHighlightKind } from "@/lib/reader/build-interactive-words";
-import type { ReaderSentenceInsight } from "@/lib/reader/build-reader-sentence-insight";
 import type { PartOfSpeech } from "@/types";
 
-import { ReaderSentenceInsightPanel } from "./reader-sentence-insight";
 import { SentenceListenButton } from "./sentence-listen-button";
 
 type ReaderSentenceProps = {
@@ -25,11 +23,8 @@ type ReaderSentenceProps = {
   showTranslationToggle: boolean;
   showInterlinear: boolean;
   onToggleTranslation: () => void;
-  insight: ReaderSentenceInsight;
-  insightExpanded: boolean;
-  onToggleInsight: () => void;
+  showPatternEcho?: boolean;
   isPlaying?: boolean;
-  dimmed: boolean;
   onSelectSentence: () => void;
   onSelectWord: (word: SentenceBlockWord) => void;
   onHoverWord?: (word: SentenceBlockWord) => void;
@@ -52,11 +47,8 @@ export const ReaderSentence = memo(function ReaderSentence({
   showTranslationToggle,
   showInterlinear,
   onToggleTranslation,
-  insight,
-  insightExpanded,
-  onToggleInsight,
+  showPatternEcho = false,
   isPlaying = false,
-  dimmed,
   onSelectSentence,
   onSelectWord,
   onHoverWord,
@@ -76,8 +68,9 @@ export const ReaderSentence = memo(function ReaderSentence({
       }}
       className={[
         "reader-paragraph reader-ws-sentence-wrap min-w-0",
-        dimmed ? "reader-ws-sentence-wrap--muted" : "reader-ws-sentence-wrap--current",
+        "reader-ws-sentence-wrap--current",
         isPlaying ? "reader-ws-sentence-wrap--playing" : "",
+        showPatternEcho ? "reader-ws-sentence-wrap--pattern-echo" : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -100,13 +93,6 @@ export const ReaderSentence = memo(function ReaderSentence({
         onSelectWord={onSelectWord}
         onHoverWord={onHoverWord}
         onHoverWordLeave={onHoverWordLeave}
-        insightSlot={
-          <ReaderSentenceInsightPanel
-            insight={insight}
-            expanded={insightExpanded}
-            onToggle={onToggleInsight}
-          />
-        }
       />
       <div className="reader-ws-sentence-actions">
         <SentenceListenButton sentenceId={sentenceId} />

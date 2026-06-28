@@ -1,0 +1,90 @@
+{
+  "id": "lp.morphology.role_terminations.v1",
+  "slug": "role_terminations",
+  "internalName": "Surface case marking on nominals",
+  "userFacingName": "Les mots changent selon leur rôle",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "morphology.case_system",
+  "taxonomyPath": ["morphology", "case_system", "role_marking"],
+  "tags": ["A1", "nouns", "endings", "case"],
+  "pedagogicalObjective": "Anticiper qu'un nom russe change de forme selon sa fonction, avant de nommer les cas.",
+  "cognitiveSurprise": "En français, « ma sœur » ne change pas de forme selon le verbe ; en russe, le nom se modifie souvent.",
+  "observation": "Dans une phrase russe, un même mot peut apparaître avec des terminaisons différentes.",
+  "insight": "Ces terminaisons ne sont pas aléatoires : elles signalent le rôle du mot dans la phrase — un peu comme des étiquettes.",
+  "comprehension": "Le russe indique grammaticalement le rôle de chaque nom en modifiant la fin du mot. C'est pour cela que « сестра », « сестры », « сестре » ne sont pas interchangeables.",
+  "formalization": "Les noms se déclinent en six cas : nominatif, génitif, datif, accusatif, instrumental, prépositionnel.",
+  "nuances": "Certains noms ont des désinences irrégulières ; l'animé/inanimé modifie l'accusatif masculin.",
+  "examples": [
+    {
+      "id": "ex.role.1",
+      "russian": "У моей сестры есть кот.",
+      "french": "Ma sœur a un chat.",
+      "isCanonical": true,
+      "textId": "text-a1-family-01"
+    },
+    {
+      "id": "ex.role.2",
+      "russian": "Я вижу сестру.",
+      "french": "Je vois ma sœur.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.role.3",
+      "russian": "С сестрой в кино.",
+      "french": "Au cinéma avec ma sœur.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [
+    {
+      "id": "cex.role.1",
+      "russian": "Кофе был вкусный.",
+      "french": "Le café était bon.",
+      "note": "Certains emprunts ne déclinent pas au singulier.",
+      "isCanonical": false
+    }
+  ],
+  "commonErrors": [
+    {
+      "wrong": "У меня сестра",
+      "why": "Après « у », le possesseur prend une autre forme selon le sens visé.",
+      "correction": "У моей сестры",
+      "learnerProfile": "francophone"
+    }
+  ],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [
+    {
+      "patternId": "lp.morphology.negation_genitive.v1",
+      "relationType": "specializes",
+      "label": "La négation de l'existence"
+    }
+  ],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 2,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [],
+    "editorialTextIds": ["text-a1-family-01"]
+  },
+  "masteryConditions": {
+    "minExposureCount": 8,
+    "minRetrievalGoodRate": 0.8,
+    "minProductionSuccess": 1
+  },
+  "knowledgeConceptKeys": ["genitive_case", "accusative_case", "declension_nouns"],
+  "detectionRules": [
+    {
+      "type": "morphology",
+      "rule": "noun_ending_variation_same_lemma",
+      "weight": 0.7
+    }
+  ],
+  "createdAt": "2026-06-01T00:00:00.000Z",
+  "updatedAt": "2026-06-01T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

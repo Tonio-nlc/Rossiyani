@@ -1,0 +1,74 @@
+{
+  "id": "lp.aspect.pair_intuition.v1",
+  "slug": "pair_intuition",
+  "internalName": "Imperfective / perfective pair intuition",
+  "userFacingName": "Deux verbes pour une même idée d'action",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "verbs.aspect",
+  "taxonomyPath": ["verbs", "aspect", "pair_intuition"],
+  "tags": ["A2", "aspect", "verbs", "pairs"],
+  "pedagogicalObjective": "Voir qu'un même sens peut avoir deux verbes : l'un pour le processus, l'autre pour le résultat.",
+  "cognitiveSurprise": "Le russe ne choisit pas seulement le temps — il choisit d'abord *comment* regarder l'action.",
+  "observation": "Des verbes proches comme писать et написать coexistent pour parler d'actions similaires.",
+  "insight": "L'un suit l'action en cours ; l'autre la voit comme achevée ou comme un fait.",
+  "comprehension": "Писать = écrire (en cours) ; написать = écrire (jusqu'au bout). Le choix dépend de ce qu'on veut montrer.",
+  "formalization": "Couples aspectuels : imperfectif (процесс) / perfectif (результат).",
+  "nuances": "Tous les verbes ne forment pas une paire régulière ; certains sont perfectifs de base.",
+  "examples": [
+    {
+      "id": "ex.pair.1",
+      "russian": "Он писал письмо.",
+      "french": "Il écrivait / était en train d'écrire la lettre.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.pair.2",
+      "russian": "Он написал письмо.",
+      "french": "Il a écrit (et a fini) la lettre.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [
+    {
+      "wrong": "Вчера я писал письмо и закончил",
+      "why": "Contexte ponctuel passé achevé → souvent perfectif.",
+      "correction": "Вчера я написал письмо",
+      "learnerProfile": "francophone"
+    }
+  ],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [
+    {
+      "patternId": "lp.verbs.prefix_perspective.v1",
+      "relationType": "specializes",
+      "label": "Préfixes et perspective"
+    }
+  ],
+  "confusedWith": [],
+  "recommendedLevel": "A2",
+  "frequency": "frequent",
+  "difficulty": 3,
+  "introductionConditions": {
+    "prerequisitePatternIds": [],
+    "minExposureCount": 4
+  },
+  "masteryConditions": {
+    "minExposureCount": 10,
+    "minRetrievalGoodRate": 0.75,
+    "minProductionSuccess": 2
+  },
+  "knowledgeConceptKeys": ["imperfective_aspect", "perfective_aspect", "verb_pairs"],
+  "detectionRules": [
+    {
+      "type": "morphology",
+      "rule": "aspect_pair_same_stem",
+      "weight": 0.7
+    }
+  ],
+  "createdAt": "2026-06-01T00:00:00.000Z",
+  "updatedAt": "2026-06-01T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

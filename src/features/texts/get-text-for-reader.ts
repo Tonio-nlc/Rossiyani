@@ -1,7 +1,9 @@
 import { resolveTextCollectionId } from "@/content/collections";
 import { normalizeCategoryIds, type CategoryId } from "@/content/categories";
 import type { CollectionId } from "@/content/collections";
+import { loadReaderPatternSlice } from "@/features/reader/load-reader-pattern-slice";
 import { prisma } from "@/lib/prisma";
+import type { ReaderPatternSlice } from "@/types/reader-pattern-experience";
 
 export type ReaderTextData = {
   id: string;
@@ -9,6 +11,7 @@ export type ReaderTextData = {
   level: string;
   collectionId: CollectionId;
   categoryIds: CategoryId[];
+  patternSlice: ReaderPatternSlice;
   sentences: Array<{
     id: string;
     position: number;
@@ -72,12 +75,15 @@ export async function getTextForReader(textId: string): Promise<ReaderTextData |
     return null;
   }
 
+  const patternSlice = await loadReaderPatternSlice(textId);
+
   return {
     id: text.id,
     title: text.title,
     level: text.level,
     collectionId: resolveTextCollectionId(text),
     categoryIds: normalizeCategoryIds(text.categoryIds),
+    patternSlice,
     sentences: text.sentences.map((s) => ({
       id: s.id,
       position: s.position,

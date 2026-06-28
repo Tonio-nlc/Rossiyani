@@ -1,14 +1,6 @@
 "use client";
 
-const SECTIONS = [
-  { id: "comprendre", label: "Comprendre" },
-  { id: "grammaire", label: "Grammaire" },
-  { id: "exemples", label: "Exemples" },
-  { id: "expressions", label: "Expressions" },
-  { id: "famille", label: "Famille" },
-  { id: "liens", label: "Liens" },
-  { id: "revision", label: "Révision" },
-] as const;
+import { SECTIONS } from "./vocabulary-word-fiche-sections";
 
 type VocabularyWordFicheNavProps = {
   visibleIds?: string[];

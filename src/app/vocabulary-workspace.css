@@ -1208,6 +1208,59 @@
   text-decoration: none;
 }
 
+/* Rossiyani 2.0 — pattern-first fiche */
+.vocab-fiche--pattern-first .vocab-fiche__translation {
+  font-size: 1.125rem;
+}
+
+.vocab-fiche__lead {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--v2-heading, #111827);
+}
+
+.vocab-fiche-patterns {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.vocab-fiche-pattern-fallback {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--v2-border, #e2e8f0);
+  border-radius: 10px;
+  background: var(--v2-surface-muted, #f8fafc);
+}
+
+.vocab-fiche-pattern-fallback__title {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.vocab-fiche-pattern-fallback__copy {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--v2-body, #64748b);
+}
+
+.vocab-fiche-details-block {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--v2-border, #e2e8f0) 70%, transparent);
+}
+
+.vocab-fiche-details-block__title {
+  margin: 0 0 0.65rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--v2-body, #64748b);
+}
+
 .vocab-fiche__inline-link:hover {
   text-decoration: underline;
 }

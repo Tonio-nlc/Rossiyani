@@ -1,0 +1,73 @@
+{
+  "id": "lp.syntax.possession_existence.v1",
+  "slug": "possession_existence",
+  "internalName": "Possession as existence (у + genitive / у меня есть)",
+  "userFacingName": "Avoir, c'est « il y a près de moi »",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "syntax.possession",
+  "taxonomyPath": ["syntax", "possession", "u_genitive"],
+  "tags": ["A1", "possession", "existence", "genitive"],
+  "pedagogicalObjective": "Construire l'intuition que « avoir » se dit souvent « près de quelqu'un, il y a… »",
+  "cognitiveSurprise": "« J'ai un frère » se construit comme « il existe un frère près de moi » — pas comme une propriété directe.",
+  "observation": "Pour dire ce qu'on possède, le russe utilise souvent « у » + une forme modifiée du nom, et parfois « есть ».",
+  "insight": "Imaginez « chez moi, il y a… » plutôt que « je possède… ».",
+  "comprehension": "У меня есть брат = littéralement « près de moi, il y a un frère ». Le possesseur et l'objet possédé prennent des formes qui marquent leurs rôles.",
+  "formalization": "Construction « у + génitif » pour la possession ; « у меня есть » = locution figée d'existence.",
+  "nuances": "« Есть » est souvent omis à l'oral ; le génitif partitif pour « il n'y a pas de… ».",
+  "examples": [
+    {
+      "id": "ex.poss.1",
+      "russian": "У меня есть брат.",
+      "french": "J'ai un frère.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.poss.2",
+      "russian": "У неё нет времени.",
+      "french": "Elle n'a pas le temps.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [
+    {
+      "wrong": "Я имею брат",
+      "why": "« Иметь » n'est pas la construction naturelle pour la possession personnelle.",
+      "correction": "У меня есть брат",
+      "learnerProfile": "francophone"
+    }
+  ],
+  "variants": [],
+  "prerequisites": ["lp.morphology.role_terminations.v1"],
+  "relatedPatterns": [
+    {
+      "patternId": "lp.morphology.role_terminations.v1",
+      "relationType": "reinforces",
+      "label": "Les mots changent selon leur rôle"
+    }
+  ],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 2,
+  "introductionConditions": {
+    "prerequisitePatternIds": ["lp.morphology.role_terminations.v1"],
+    "minReaderTextsCompleted": 1
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.8
+  },
+  "knowledgeConceptKeys": ["u_genitive_possession", "existence_construction"],
+  "detectionRules": [
+    {
+      "type": "syntax",
+      "rule": "u_genitive_existence",
+      "weight": 0.85
+    }
+  ],
+  "createdAt": "2026-06-01T00:00:00.000Z",
+  "updatedAt": "2026-06-01T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

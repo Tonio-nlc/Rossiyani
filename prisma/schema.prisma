@@ -167,6 +167,10 @@ model Sentence {
   phraseGroups       PhraseGroup[]
   conceptLinks       KnowledgeConceptSentence[]
   phraseLinks        KnowledgePhraseSentence[]
+  patternInstances   PatternInstance[]
+  /// LP primaire détecté à l'import (indexation pattern).
+  primaryPatternId   String?
+  patternIndexedAt   DateTime?
 
   @@unique([textId, position])
   @@index([textId])
@@ -518,6 +522,95 @@ model KnowledgePhraseOccurrence {
 }
 
 // ---------------------------------------------------------------------------
+// Pattern System — instances indexed at import (see docs/product/PATTERN_SYSTEM.md)
+// ---------------------------------------------------------------------------
+
+enum ExplanationDepth {
+  L1
+  L2
+  L3
+  L4
+  L5
+}
+
+/// Manifestation concrète d'un Learning Pattern dans une phrase analysée.
+model PatternInstance {
+  id                   String           @id @default(cuid())
+  patternId            String
+  sentenceId           String
+  textId               String?
+  startPosition        Int
+  endPosition          Int
+  salience             Float
+  confidence           Float
+  detectionScore       Float
+  isPrimary            Boolean          @default(false)
+  introductionLevel    ExplanationDepth @default(L2)
+  evidenceJson         String
+  triggeringTokensJson String
+  occurrenceId         String?
+  phraseOccurrenceId   String?
+  detectedAt           DateTime         @default(now())
+  sentence             Sentence         @relation(fields: [sentenceId], references: [id], onDelete: Cascade)
+
+  @@unique([sentenceId, patternId])
+  @@index([patternId])
+  @@index([sentenceId])
+  @@index([textId])
+  @@index([isPrimary])
+}
+
+/// Pedagogical learning state per user × Learning Pattern (Learning State Engine).
+enum UserPatternLifecycleState {
+  LATENT
+  OBSERVED
+  NOTICED
+  UNDERSTOOD
+  CONNECTED
+  REUSED
+  MASTERED
+}
+
+model UserLearningPatternState {
+  id                      String                    @id @default(cuid())
+  userId                  String
+  patternId               String
+  exposureCount           Int                       @default(0)
+  distinctTextIdsJson     String                    @default("[]")
+  exploreCount            Int                       @default(0)
+  noticeCount             Int                       @default(0)
+  vocabularyVisitCount    Int                       @default(0)
+  explanationDepthsJson   String                    @default("[]")
+  retrievalAttempts       Int                       @default(0)
+  retrievalSuccesses      Int                       @default(0)
+  productionAttempts      Int                       @default(0)
+  productionSuccesses     Int                       @default(0)
+  connectedPatternIdsJson String                    @default("[]")
+  exposureLevel           Float                     @default(0)
+  observationQuality      Float                     @default(0)
+  comprehensionEstimate   Float                     @default(0)
+  confidenceLevel         Float                     @default(0)
+  reuseCapability         Float                     @default(0)
+  temporalStability       Float                     @default(0)
+  lifecycleState          UserPatternLifecycleState @default(LATENT)
+  firstSeenAt             DateTime?
+  lastSeenAt              DateTime?
+  lastExploredAt          DateTime?
+  lastRetrievedAt         DateTime?
+  lastProducedAt          DateTime?
+  computedAt              DateTime                  @default(now())
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, patternId])
+  @@index([userId])
+  @@index([patternId])
+  @@index([lifecycleState])
+}
+
+// ---------------------------------------------------------------------------
 // Industrial import — bulk queue (see docs/KNOWLEDGE_PIPELINE.md)
 // ---------------------------------------------------------------------------
 
@@ -649,10 +742,11 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  sessions    Session[]
-  resetTokens PasswordResetToken[]
-  data        UserData?
-  reviewItems ReviewItem[]
+  sessions               Session[]
+  resetTokens            PasswordResetToken[]
+  data                   UserData?
+  reviewItems            ReviewItem[]
+  learningPatternStates  UserLearningPatternState[]
 }
 
 model Session {
