@@ -3,11 +3,25 @@
   "familiesFile": "families.json",
   "pathsFile": "paths.json",
   "patternFiles": [
-    "patterns/role_terminations.json",
-    "patterns/possession_existence.json",
+    "patterns/stress_marks.json",
+    "patterns/nominative_default.json",
+    "patterns/present_conjugation.json",
     "patterns/zero_subject.json",
-    "patterns/preferred_constructions.json",
+    "patterns/negation_ne.json",
+    "patterns/questions_intonation.json",
+    "patterns/basic_word_order.json",
+    "patterns/role_terminations.json",
+    "patterns/gender_intuition.json",
+    "patterns/possession_existence.json",
+    "patterns/accusative_object.json",
+    "patterns/v_na_location.json",
+    "patterns/adjective_agreement.json",
+    "patterns/plural_forms.json",
     "patterns/dative_recipient.json",
+    "patterns/impersonal_experience.json",
+    "patterns/imperative_forms.json",
+    "patterns/prepositional_topic.json",
+    "patterns/preferred_constructions.json",
     "patterns/pair_intuition.json"
   ]
 }

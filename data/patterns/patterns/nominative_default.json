@@ -1,0 +1,73 @@
+{
+  "id": "lp.morphology.nominative_default.v1",
+  "slug": "nominative_default",
+  "internalName": "Nominative as dictionary/subject form",
+  "userFacingName": "La forme du dictionnaire est le point de départ",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "morphology.case_system",
+  "taxonomyPath": [
+    "morphology",
+    "case_system",
+    "nominative"
+  ],
+  "tags": [
+    "A1",
+    "nouns",
+    "nominative"
+  ],
+  "pedagogicalObjective": "Reconnaître la forme de base d'un nom avant d'observer ses variantes.",
+  "cognitiveSurprise": "Le mot que vous cherchez dans le dictionnaire est aussi celui qui nomme souvent qui ou quoi fait l'action.",
+  "observation": "Dans « Маша читает », « Маша » ressemble à la forme que l'on apprend en premier.",
+  "insight": "Quand un nom n'est ni possesseur, ni objet, ni lieu, il est souvent dans sa forme « de départ ».",
+  "comprehension": "Le nominatif présente le sujet ou nomme une chose isolée — c'est la forme de citation.",
+  "formalization": "Nominatif (именительный падеж) : sujet, prédicat nominale, appellation.",
+  "nuances": "Les listes et titres utilisent souvent le nominatif.",
+  "examples": [
+    {
+      "id": "ex.nom.1",
+      "russian": "Маша читает книгу.",
+      "french": "Macha lit un livre.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.nom.2",
+      "russian": "Это мой брат.",
+      "french": "C'est mon frère.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 1,
+  "introductionConditions": {
+    "minExposureCount": 2,
+    "prerequisitePatternIds": [],
+    "editorialTextIds": [
+      "text-a1-intro-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "nominative_case"
+  ],
+  "detectionRules": [
+    {
+      "type": "morphology",
+      "rule": "nominative_subject",
+      "weight": 0.65
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

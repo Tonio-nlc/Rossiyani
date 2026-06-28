@@ -1,0 +1,82 @@
+{
+  "id": "lp.syntax.impersonal_experience.v1",
+  "slug": "impersonal_experience",
+  "internalName": "Dative experiencer + neuter (мне холодно)",
+  "userFacingName": "« Il me froid » plutôt que « je suis froid »",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "syntax.core",
+  "taxonomyPath": [
+    "syntax",
+    "core",
+    "impersonal_experience"
+  ],
+  "tags": [
+    "A1",
+    "dative",
+    "impersonal"
+  ],
+  "pedagogicalObjective": "Accepter les phrases sans « je » grammatical pour les sensations.",
+  "cognitiveSurprise": "On ne dit pas « я холодный » pour la météo ressentie — c'est « мне холодно ».",
+  "observation": "Мне холодно, ему скучно, нам весело — datif + adverbe/neutre.",
+  "insight": "Le russe externalise l'état : il fait froid *à moi*, pas *je suis* froid.",
+  "comprehension": "Datif expérienceur + predicat impersonnel (холодно, жарко, скучно).",
+  "formalization": "Construction impersonnelle avec datif expérienceur.",
+  "nuances": "Différent de « у меня есть » (possession).",
+  "examples": [
+    {
+      "id": "ex.imp.1",
+      "russian": "Мне холодно, закрой окно.",
+      "french": "J'ai froid, ferme la fenêtre.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.imp.2",
+      "russian": "Ему скучно дома.",
+      "french": "Il s'ennuie à la maison.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [
+    {
+      "patternId": "lp.morphology.dative_recipient.v1",
+      "relationType": "reinforces",
+      "label": "Le datif « à qui »"
+    }
+  ],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 3,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.morphology.role_terminations.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-weather-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "dative_experiencer",
+    "impersonal"
+  ],
+  "detectionRules": [
+    {
+      "type": "syntax",
+      "rule": "dative_impersonal_predicate",
+      "weight": 0.8
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

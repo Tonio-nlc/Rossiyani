@@ -1,0 +1,76 @@
+{
+  "id": "lp.morphology.adjective_agreement.v1",
+  "slug": "adjective_agreement",
+  "internalName": "Gender/number/case agreement on adjectives",
+  "userFacingName": "L'adjectif s'accorde avec le nom",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "morphology.case_system",
+  "taxonomyPath": [
+    "morphology",
+    "case_system",
+    "adjective_agreement"
+  ],
+  "tags": [
+    "A1",
+    "adjectives",
+    "agreement"
+  ],
+  "pedagogicalObjective": "Voir l'adjectif comme « collé » au nom qu'il qualifie.",
+  "cognitiveSurprise": "« Un grand appartement » et « une grande chambre » changent aussi l'adjectif.",
+  "observation": "Большой дом, большая комната, большое окно — même idée, trois formes.",
+  "insight": "L'adjectif répète le genre, le nombre et le rôle du nom — c'est un écho grammatical.",
+  "comprehension": "Accord en genre, nombre et cas avec le nom head.",
+  "formalization": "Déclinaison adjectivale (aperçu A1).",
+  "nuances": "Couleurs et adjectifs courts ont des régularités propres.",
+  "examples": [
+    {
+      "id": "ex.adj.1",
+      "russian": "Маленький город, маленькая улица.",
+      "french": "Petite ville, petite rue.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.adj.2",
+      "russian": "Новая квартира очень светлая.",
+      "french": "Le nouvel appartement est très lumineux.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 3,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.morphology.gender_intuition.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-describe-01",
+      "text-a1-school-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "adjective_agreement"
+  ],
+  "detectionRules": [
+    {
+      "type": "morphology",
+      "rule": "adjective_noun_agreement",
+      "weight": 0.8
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

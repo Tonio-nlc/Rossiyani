@@ -1,0 +1,78 @@
+{
+  "id": "lp.prepositions.v_na_location.v1",
+  "slug": "v_na_location",
+  "internalName": "в/на + prepositional vs accusative direction",
+  "userFacingName": "В et На indiquent où (et parfois où aller)",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "prepositions.location",
+  "taxonomyPath": [
+    "prepositions",
+    "location",
+    "v_na"
+  ],
+  "tags": [
+    "A1",
+    "prepositions",
+    "location"
+  ],
+  "pedagogicalObjective": "Distinguer être quelque part et aller quelque part via la forme du nom.",
+  "cognitiveSurprise": "« Je suis au café » et « je vais au café » ne construisent pas « café » pareil.",
+  "observation": "Я в школе (où je suis) vs Я иду в школу (direction).",
+  "insight": "В/на + forme « statique » = lieu ; в/на + forme « cible » = mouvement.",
+  "comprehension": "Prépositionnel = position ; accusatif = direction avec в/на.",
+  "formalization": "Prépositionnel de lieu ; accusatif de direction.",
+  "nuances": "На can mean « on the surface » vs в « inside ».",
+  "examples": [
+    {
+      "id": "ex.vna.1",
+      "russian": "Я в метро.",
+      "french": "Je suis dans le métro.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.vna.2",
+      "russian": "Мы идём в парк.",
+      "french": "Nous allons au parc.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 3,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.morphology.role_terminations.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-metro-01",
+      "text-a1-city-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "preposition_v",
+    "preposition_na",
+    "locative_case"
+  ],
+  "detectionRules": [
+    {
+      "type": "syntax",
+      "rule": "v_na_location_or_direction",
+      "weight": 0.85
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

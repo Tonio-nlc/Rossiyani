@@ -33,5 +33,40 @@
     "titleFr": "Aspect verbal",
     "description": "Comment le russe voit l'action : en cours, achevée, habituelle.",
     "taxonomyRoot": "verbs"
+  },
+  {
+    "id": "foundation.literacy",
+    "slug": "literacy",
+    "titleFr": "Alphabet et lecture",
+    "description": "Décoder l'écrit cyrillique et l'accent tonique.",
+    "taxonomyRoot": "foundation"
+  },
+  {
+    "id": "verbs.conjugation",
+    "slug": "conjugation",
+    "titleFr": "Conjugaison",
+    "description": "Présent, impératif et personnes verbales.",
+    "taxonomyRoot": "verbs"
+  },
+  {
+    "id": "syntax.core",
+    "slug": "core_syntax",
+    "titleFr": "Syntaxe de base",
+    "description": "Négation, ordre des mots, questions, impersonnel.",
+    "taxonomyRoot": "syntax"
+  },
+  {
+    "id": "lexique.questions",
+    "slug": "questions",
+    "titleFr": "Questions",
+    "description": "Interroger par l'intonation et les mots interrogatifs.",
+    "taxonomyRoot": "lexique"
+  },
+  {
+    "id": "prepositions.location",
+    "slug": "location",
+    "titleFr": "Prépositions de lieu",
+    "description": "В, на — où l'on est et où l'on va.",
+    "taxonomyRoot": "prepositions"
   }
 ]

@@ -1,0 +1,76 @@
+{
+  "id": "lp.lexique.questions_intonation.v1",
+  "slug": "questions_intonation",
+  "internalName": "Yes/no via intonation and question words",
+  "userFacingName": "Une question peut se faire par l'intonation",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "lexique.questions",
+  "taxonomyPath": [
+    "lexique",
+    "questions",
+    "intonation"
+  ],
+  "tags": [
+    "A1",
+    "questions",
+    "intonation"
+  ],
+  "pedagogicalObjective": "Distinguer affirmation et question sans calquer « est-ce que ».",
+  "cognitiveSurprise": "Ты дома? peut suffire — pas besoin d'un mot « question » en plus.",
+  "observation": "L'intonation monte ; ou un mot comme где, что, кто ouvre la question.",
+  "insight": "Le russe questionne souvent par le contexte et la mélodie, pas par une formule fixe.",
+  "comprehension": "Questions fermées : intonation ; ouvertes : mots interrogatifs en tête.",
+  "formalization": "Intonation interrogative ; particule ли (A2).",
+  "nuances": "Где vs куда — lieu statique vs direction (lié à в/на).",
+  "examples": [
+    {
+      "id": "ex.q.1",
+      "russian": "Ты дома?",
+      "french": "Tu es à la maison ?",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.q.2",
+      "russian": "Где метро?",
+      "french": "Où est le métro ?",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 1,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.verbs.present_conjugation.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-cafe-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "questions",
+    "interrogative_words"
+  ],
+  "detectionRules": [
+    {
+      "type": "syntax",
+      "rule": "question_intonation_or_wh",
+      "weight": 0.6
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

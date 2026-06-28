@@ -1,5 +1,88 @@
 [
   {
+    "id": "path.a1_foundation",
+    "slug": "a1_foundation",
+    "titleFr": "Foundation Pack A1",
+    "description": "Le plus petit parcours cohérent pour comprendre la logique du russe — lecture avant grammaire.",
+    "objective": "Permettre à un débutant francophone de lire des textes courts en construisant les modèles mentaux indispensables.",
+    "recommendedLevel": "A1",
+    "collectionIds": ["everyday-russian", "dialogues", "travel-russian"],
+    "steps": [
+      {
+        "patternId": "lp.foundation.stress_marks.v1",
+        "introductionTextIds": ["text-a1-intro-01"]
+      },
+      {
+        "patternId": "lp.morphology.nominative_default.v1",
+        "introductionTextIds": ["text-a1-intro-01"]
+      },
+      {
+        "patternId": "lp.verbs.present_conjugation.v1",
+        "introductionTextIds": ["text-a1-intro-01"]
+      },
+      {
+        "patternId": "lp.syntax.zero_subject.v1",
+        "introductionTextIds": ["text-a1-cafe-01"]
+      },
+      {
+        "patternId": "lp.syntax.negation_ne.v1",
+        "introductionTextIds": ["text-a1-evening-01"]
+      },
+      {
+        "patternId": "lp.lexique.questions_intonation.v1",
+        "introductionTextIds": ["text-a1-cafe-01"]
+      },
+      {
+        "patternId": "lp.syntax.basic_word_order.v1",
+        "introductionTextIds": ["text-a1-day-01"]
+      },
+      {
+        "patternId": "lp.morphology.role_terminations.v1",
+        "introductionTextIds": ["text-a1-family-01"]
+      },
+      {
+        "patternId": "lp.morphology.gender_intuition.v1",
+        "introductionTextIds": ["text-a1-describe-01"]
+      },
+      {
+        "patternId": "lp.syntax.possession_existence.v1",
+        "introductionTextIds": ["text-a1-home-01"]
+      },
+      {
+        "patternId": "lp.morphology.accusative_object.v1",
+        "introductionTextIds": ["text-a1-shop-01"]
+      },
+      {
+        "patternId": "lp.prepositions.v_na_location.v1",
+        "introductionTextIds": ["text-a1-metro-01"]
+      },
+      {
+        "patternId": "lp.morphology.adjective_agreement.v1",
+        "introductionTextIds": ["text-a1-describe-01"]
+      },
+      {
+        "patternId": "lp.morphology.plural_forms.v1",
+        "introductionTextIds": ["text-a1-school-01"]
+      },
+      {
+        "patternId": "lp.morphology.dative_recipient.v1",
+        "introductionTextIds": ["text-a1-friend-01"]
+      },
+      {
+        "patternId": "lp.syntax.impersonal_experience.v1",
+        "introductionTextIds": ["text-a1-weather-01"]
+      },
+      {
+        "patternId": "lp.verbs.imperative_forms.v1",
+        "introductionTextIds": ["text-a1-friend-01"]
+      },
+      {
+        "patternId": "lp.morphology.prepositional_topic.v1",
+        "introductionTextIds": ["text-a1-city-01"]
+      }
+    ]
+  },
+  {
     "id": "path.case_and_roles",
     "slug": "case_and_roles",
     "titleFr": "Le système des rôles",

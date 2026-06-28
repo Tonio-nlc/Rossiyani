@@ -1,0 +1,75 @@
+{
+  "id": "lp.syntax.negation_ne.v1",
+  "slug": "negation_ne",
+  "internalName": "не + verb negation",
+  "userFacingName": "La négation entoure le verbe",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "syntax.core",
+  "taxonomyPath": [
+    "syntax",
+    "core",
+    "negation"
+  ],
+  "tags": [
+    "A1",
+    "negation",
+    "syntax"
+  ],
+  "pedagogicalObjective": "Repérer не comme pivot de la phrase négative au présent.",
+  "cognitiveSurprise": "Le russe place souvent не juste devant le verbe — pas autour de toute la phrase comme en français.",
+  "observation": "Я не знаю, Он не работает — не colle au verbe.",
+  "insight": "Nier l'action, c'est nier le verbe en premier lieu.",
+  "comprehension": "Structure de base : sujet + не + verbe ; autres négations viendront plus tard.",
+  "formalization": "Негation verbal avec не ; négation d'existence = construction distincte (plus tard).",
+  "nuances": "Не ... ничего / никогда = renforcement (A2).",
+  "examples": [
+    {
+      "id": "ex.neg.1",
+      "russian": "Я не понимаю.",
+      "french": "Je ne comprends pas.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.neg.2",
+      "russian": "Она не работает сегодня.",
+      "french": "Elle ne travaille pas aujourd'hui.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 2,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.verbs.present_conjugation.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-evening-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "verbal_negation"
+  ],
+  "detectionRules": [
+    {
+      "type": "syntax",
+      "rule": "ne_before_finite_verb",
+      "weight": 0.8
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

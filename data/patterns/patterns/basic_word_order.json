@@ -1,0 +1,75 @@
+{
+  "id": "lp.syntax.basic_word_order.v1",
+  "slug": "basic_word_order",
+  "internalName": "SVO default with flexible focus",
+  "userFacingName": "L'ordre des mots est flexible mais pas libre",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "syntax.core",
+  "taxonomyPath": [
+    "syntax",
+    "core",
+    "word_order"
+  ],
+  "tags": [
+    "A1",
+    "word_order",
+    "syntax"
+  ],
+  "pedagogicalObjective": "Lire sujet → verbe → complément comme fil par défaut.",
+  "cognitiveSurprise": "On peut dire « Книгу читает Маша » — mais ce n'est pas le neutre du quotidien.",
+  "observation": "Dans les textes A1, le sujet précède presque toujours le verbe.",
+  "insight": "L'ordre « normal » raconte qui fait quoi ; le déplacement met en avant une information.",
+  "comprehension": "SVO neutre ; déviation = emphase (approfondi en A2).",
+  "formalization": "Ordre SVO par défaut ; thème / rhème en A2.",
+  "nuances": "Les adverbes de temps peuvent ouvrir la phrase.",
+  "examples": [
+    {
+      "id": "ex.wo.1",
+      "russian": "Маша пьёт кофе.",
+      "french": "Macha boit du café.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.wo.2",
+      "russian": "Сегодня я работаю дома.",
+      "french": "Aujourd'hui je travaille à la maison.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 2,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.syntax.zero_subject.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-day-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "word_order_svo"
+  ],
+  "detectionRules": [
+    {
+      "type": "syntax",
+      "rule": "svo_default_order",
+      "weight": 0.55
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

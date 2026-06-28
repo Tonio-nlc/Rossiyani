@@ -1,0 +1,84 @@
+{
+  "id": "lp.verbs.present_conjugation.v1",
+  "slug": "present_conjugation",
+  "internalName": "Present tense person endings",
+  "userFacingName": "Les verbes changent selon la personne",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "verbs.conjugation",
+  "taxonomyPath": [
+    "verbs",
+    "conjugation",
+    "present"
+  ],
+  "tags": [
+    "A1",
+    "verbs",
+    "present"
+  ],
+  "pedagogicalObjective": "Entendre je/tu/il dans les terminaisons verbales du présent.",
+  "cognitiveSurprise": "« Je lis » et « tu lis » ne se distinguent pas seulement par un pronom — la fin du verbe change.",
+  "observation": "Читаю, читаешь, читает — même verbe, fins différentes.",
+  "insight": "Les terminaisons verbales remplacent souvent les pronoms ; c'est pourquoi le russe peut les omettre.",
+  "comprehension": "Présent : -у/-ю, -ешь, -ет, -ем, -ете, -ут/-ют selon les classes de conjugaison.",
+  "formalization": "Conjugaison au présent ; 1re et 2e conjugaison.",
+  "nuances": "Les verbes en -ать/-ять suivent des modèles réguliers en A1.",
+  "examples": [
+    {
+      "id": "ex.pres.1",
+      "russian": "Я читаю газету.",
+      "french": "Je lis le journal.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.pres.2",
+      "russian": "Ты живёшь в Москве?",
+      "french": "Tu habites à Moscou ?",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [
+    {
+      "wrong": "Я читает",
+      "why": "La 1re personne ne prend pas la terminaison de la 3e.",
+      "correction": "Я читаю",
+      "learnerProfile": "francophone"
+    }
+  ],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 2,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.morphology.nominative_default.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-intro-01",
+      "text-a1-day-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "present_tense",
+    "verb_conjugation"
+  ],
+  "detectionRules": [
+    {
+      "type": "morphology",
+      "rule": "present_finite_verb",
+      "weight": 0.7
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

@@ -1,0 +1,74 @@
+{
+  "id": "lp.foundation.stress_marks.v1",
+  "slug": "stress_marks",
+  "internalName": "Lexical stress as meaning cue",
+  "userFacingName": "L'accent tonique guide la prononciation",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "foundation.literacy",
+  "taxonomyPath": [
+    "foundation",
+    "literacy",
+    "stress"
+  ],
+  "tags": [
+    "A1",
+    "pronunciation",
+    "stress"
+  ],
+  "pedagogicalObjective": "Lire à voix haute sans deviner — l'accent indique la voyelle porteuse.",
+  "cognitiveSurprise": "Changer l'accent peut changer le mot : « муха » (mouche) ≠ « мúха » n'existe pas — « мука » (farine).",
+  "observation": "Un des syllabes du mot russe est plus fort ; elle est souvent marquée dans les textes pédagogiques.",
+  "insight": "Avant de mémoriser, écoutez où tombe l'accent — c'est la charnière de la prononciation.",
+  "comprehension": "L'accent tonique n'est pas optionnel : il stabilise la voyelle et distingue des mots proches.",
+  "formalization": "Accent lexique mobile ; marquage éditorial recommandé en A1.",
+  "nuances": "Certains noms ont un accent mobile au pluriel.",
+  "examples": [
+    {
+      "id": "ex.stress.1",
+      "russian": "молоко́",
+      "french": "lait",
+      "note": "accent sur la dernière",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.stress.2",
+      "russian": "за́втра",
+      "french": "demain",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 1,
+  "introductionConditions": {
+    "minExposureCount": 2,
+    "prerequisitePatternIds": [],
+    "editorialTextIds": [
+      "text-a1-intro-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "lexical_stress"
+  ],
+  "detectionRules": [
+    {
+      "type": "morphology",
+      "rule": "stress_marked_token",
+      "weight": 0.5
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

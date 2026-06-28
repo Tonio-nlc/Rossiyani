@@ -1,0 +1,78 @@
+{
+  "id": "lp.verbs.imperative_forms.v1",
+  "slug": "imperative_forms",
+  "internalName": "Imperative 2nd person",
+  "userFacingName": "Demander, inviter — formes courtes",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "verbs.conjugation",
+  "taxonomyPath": [
+    "verbs",
+    "conjugation",
+    "imperative"
+  ],
+  "tags": [
+    "A1",
+    "imperative",
+    "verbs"
+  ],
+  "pedagogicalObjective": "Reconnaître les invitations et ordres doux du quotidien.",
+  "cognitiveSurprise": "« Allons » et « donne » sont souvent un seul mot : Пойдём, Дай.",
+  "observation": "Скажи, слушай, идём — verbe à l'impératif, souvent sans sujet.",
+  "insight": "L'impératif s'adresse directement ; il complète le pro-drop des dialogues.",
+  "comprehension": "Impératif singulier et pluriel ; основа du présent + terminaison.",
+  "formalization": "Impératif 2e personne.",
+  "nuances": "Давай(те) + infinitif pour suggestion.",
+  "examples": [
+    {
+      "id": "ex.imp.1",
+      "russian": "Скажи, пожалуйста.",
+      "french": "Dis-moi, s'il te plaît.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.imp.2",
+      "russian": "Давайте пойдём в кино!",
+      "french": "Allons au cinéma !",
+      "isCanonical": true,
+      "textId": "text-a1-cafe-01"
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 2,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.verbs.present_conjugation.v1",
+      "lp.syntax.zero_subject.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-friend-01",
+      "text-a1-cafe-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "imperative"
+  ],
+  "detectionRules": [
+    {
+      "type": "morphology",
+      "rule": "imperative_mood",
+      "weight": 0.75
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

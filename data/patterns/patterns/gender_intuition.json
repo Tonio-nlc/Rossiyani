@@ -1,0 +1,75 @@
+{
+  "id": "lp.morphology.gender_intuition.v1",
+  "slug": "gender_intuition",
+  "internalName": "Gender as agreement anchor",
+  "userFacingName": "Chaque nom est masculin, féminin ou neutre",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "morphology.case_system",
+  "taxonomyPath": [
+    "morphology",
+    "case_system",
+    "gender"
+  ],
+  "tags": [
+    "A1",
+    "gender",
+    "nouns"
+  ],
+  "pedagogicalObjective": "Deviner le genre par les terminaisons et les accords avant de le nommer.",
+  "cognitiveSurprise": "« Une table » est féminin en russe ; l'adjectif et le verbe passé le rappellent.",
+  "observation": "Стол, старая книга, большое окно — les modificateurs « s'accordent ».",
+  "insight": "Le genre n'est pas une étiquette scolaire : c'est ce qui fait chanter les mots ensemble.",
+  "comprehension": "Terminaisons typiques : -а/-я fém., consonne masc., -о/-е neutre (avec exceptions).",
+  "formalization": "Genre grammatical : masculin, féminin, neutre.",
+  "nuances": "Noms en -ь (masc. ou fém.) à mémoriser.",
+  "examples": [
+    {
+      "id": "ex.gen.1",
+      "russian": "Старый стол, старая книга.",
+      "french": "Vieille table, vieux livre.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.gen.2",
+      "russian": "Моё окно большое.",
+      "french": "Ma fenêtre est grande.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 2,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.morphology.role_terminations.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-describe-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "grammatical_gender"
+  ],
+  "detectionRules": [
+    {
+      "type": "morphology",
+      "rule": "gender_agreement_adjective",
+      "weight": 0.75
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

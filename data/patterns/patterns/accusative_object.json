@@ -1,0 +1,88 @@
+{
+  "id": "lp.morphology.accusative_object.v1",
+  "slug": "accusative_object",
+  "internalName": "Accusative direct object (inanimate)",
+  "userFacingName": "L'objet direct prend une autre forme",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "morphology.case_system",
+  "taxonomyPath": [
+    "morphology",
+    "case_system",
+    "accusative"
+  ],
+  "tags": [
+    "A1",
+    "accusative",
+    "object"
+  ],
+  "pedagogicalObjective": "Voir l'objet « touché » par l'action marqué par la terminaison.",
+  "cognitiveSurprise": "« Je lis un journal » change la fin de « journal » — pas en français.",
+  "observation": "После « читаю », « вижу », « покупаю » le nom objet change souvent.",
+  "insight": "L'accusatif répond à « quoi ? » après une action qui atteint quelque chose.",
+  "comprehension": "Inanimé : souvent = nominatif au pluriel ; fém. sing. en -у/-ю.",
+  "formalization": "Accusatif inanimé ; animé = génitif sing. (A2).",
+  "nuances": "Ne pas généraliser aux personnes (animé).",
+  "examples": [
+    {
+      "id": "ex.acc.1",
+      "russian": "Я читаю книгу.",
+      "french": "Je lis un livre.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.acc.2",
+      "russian": "Он покупает хлеб.",
+      "french": "Il achète du pain.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [
+    {
+      "wrong": "Я читаю книга",
+      "why": "L'objet direct inanimé féminin prend une autre terminaison.",
+      "correction": "Я читаю книгу",
+      "learnerProfile": "francophone"
+    }
+  ],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [
+    {
+      "patternId": "lp.syntax.possession_existence.v1",
+      "relationType": "contrasts",
+      "label": "Avoir vs agir sur un objet"
+    }
+  ],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 2,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.morphology.role_terminations.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-shop-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "accusative_case"
+  ],
+  "detectionRules": [
+    {
+      "type": "morphology",
+      "rule": "accusative_direct_object",
+      "weight": 0.8
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

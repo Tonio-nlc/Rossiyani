@@ -1,0 +1,353 @@
+# Foundation Pack A1 — spécifications éditoriales des textes
+# Format aligné sur LEARNING_CURRICULUM.md §5.3
+# Statut : à rédiger — aucun texte importé en base à ce jour
+
+version: 1
+packId: pack.a1_foundation
+patternPath: path.a1_foundation
+
+texts:
+  - id: text-a1-intro-01
+    titleFr: "Bonjour, je m'appelle…"
+    titleRu: "Привет!"
+    collection: everyday-russian
+    wordCount: 80-100
+    readingOrder: 1
+    status: to_write
+    note: "Texte d'amorce — exception quota : 3 LP foundation (stress, nominatif, présent)"
+    curriculum:
+      level: A1.0
+      introduces:
+        - lp.foundation.stress_marks.v1
+        - lp.morphology.nominative_default.v1
+        - lp.verbs.present_conjugation.v1
+      reinforces: []
+    scenes:
+      - Présentation (имя, откуда)
+      - Phrases courtes au présent (живу, учусь)
+    canonicalAnchors:
+      - "Меня зовут…"
+      - "Я живу в…"
+
+  - id: text-a1-family-01
+    titleFr: "Ma famille"
+    titleRu: "Моя семья"
+    collection: everyday-russian
+    wordCount: 100-120
+    readingOrder: 2
+    status: referenced_only
+    curriculum:
+      level: A1.1
+      introduces:
+        - lp.morphology.role_terminations.v1
+      reinforces:
+        - lp.morphology.nominative_default.v1
+        - lp.verbs.present_conjugation.v1
+        - lp.foundation.stress_marks.v1
+    scenes:
+      - Membres de la famille au nominatif
+      - У моей сестры есть… (génitif possessif sans nommer le cas)
+    canonicalAnchors:
+      - "У моей сестры есть кот."
+
+  - id: text-a1-home-01
+    titleFr: "Ma chambre"
+    titleRu: "Моя комната"
+    collection: everyday-russian
+    wordCount: 90-110
+    readingOrder: 3
+    status: to_write
+    curriculum:
+      level: A1.1
+      introduces:
+        - lp.syntax.possession_existence.v1
+      reinforces:
+        - lp.morphology.role_terminations.v1
+        - lp.morphology.nominative_default.v1
+        - lp.verbs.present_conjugation.v1
+    scenes:
+      - Description de la chambre (у меня есть…)
+      - Objets du quotidien
+    canonicalAnchors:
+      - "У меня есть маленькая комната."
+
+  - id: text-a1-cafe-01
+    titleFr: "Au café"
+    titleRu: "В кафе"
+    collection: dialogues
+    wordCount: 80-100
+    readingOrder: 4
+    status: to_write
+    note: "Dialogue — 2 LP nouveaux (ellipse + questions) ; impératif en renforcement léger"
+    curriculum:
+      level: A1.1
+      introduces:
+        - lp.syntax.zero_subject.v1
+        - lp.lexique.questions_intonation.v1
+      reinforces:
+        - lp.verbs.present_conjugation.v1
+        - lp.verbs.imperative_forms.v1
+        - lp.foundation.stress_marks.v1
+    scenes:
+      - Commander au café (dialogue court)
+      - Questions par intonation
+    canonicalAnchors:
+      - "Что будете?"
+      - "Кофе, пожалуйста."
+
+  - id: text-a1-day-01
+    titleFr: "Ma journée"
+    titleRu: "Мой день"
+    collection: everyday-russian
+    wordCount: 110-130
+    readingOrder: 5
+    status: to_write
+    curriculum:
+      level: A1.2
+      introduces:
+        - lp.syntax.basic_word_order.v1
+      reinforces:
+        - lp.verbs.present_conjugation.v1
+        - lp.syntax.zero_subject.v1
+        - lp.foundation.stress_marks.v1
+        - lp.morphology.nominative_default.v1
+    scenes:
+      - Routine matin → soir
+      - Focus informatif (известное → новое)
+    canonicalAnchors:
+      - "Утром я встаю рано."
+
+  - id: text-a1-metro-01
+    titleFr: "Dans le métro"
+    titleRu: "В метро"
+    collection: travel-russian
+    wordCount: 90-110
+    readingOrder: 6
+    status: to_write
+    curriculum:
+      level: A1.2
+      introduces:
+        - lp.prepositions.v_na_location.v1
+      reinforces:
+        - lp.syntax.zero_subject.v1
+        - lp.lexique.questions_intonation.v1
+        - lp.verbs.present_conjugation.v1
+    scenes:
+      - Se rendre au travail (в метро, на работу)
+      - Lieu vs direction
+    canonicalAnchors:
+      - "Я еду в метро."
+      - "Мы на станции."
+
+  - id: text-a1-shop-01
+    titleFr: "Les courses"
+    titleRu: "В магазине"
+    collection: everyday-russian
+    wordCount: 100-120
+    readingOrder: 7
+    status: to_write
+    curriculum:
+      level: A1.2
+      introduces:
+        - lp.morphology.accusative_object.v1
+      reinforces:
+        - lp.morphology.role_terminations.v1
+        - lp.syntax.basic_word_order.v1
+        - lp.prepositions.v_na_location.v1
+    scenes:
+      - Acheter du pain, du lait (objet direct)
+      - Changement de terminaison sur l'objet
+    canonicalAnchors:
+      - "Я покупаю хлеб."
+      - "Она берёт молоко."
+
+  - id: text-a1-describe-01
+    titleFr: "Mon ami Paul"
+    titleRu: "Мой друг Павел"
+    collection: everyday-russian
+    wordCount: 100-120
+    readingOrder: 8
+    status: to_write
+    note: "Genre + accord adjectif — même scène, 2 LP liés"
+    curriculum:
+      level: A1.2
+      introduces:
+        - lp.morphology.gender_intuition.v1
+        - lp.morphology.adjective_agreement.v1
+      reinforces:
+        - lp.morphology.nominative_default.v1
+        - lp.morphology.role_terminations.v1
+        - lp.verbs.present_conjugation.v1
+    scenes:
+      - Portrait physique et personnalité
+      - Adjectifs accordés (высокий, умная — contraste M/F)
+    canonicalAnchors:
+      - "Павел — высокий и весёлый."
+      - "Его сестра умная."
+
+  - id: text-a1-school-01
+    titleFr: "À l'université"
+    titleRu: "В университете"
+    collection: everyday-russian
+    wordCount: 110-130
+    readingOrder: 9
+    status: to_write
+    curriculum:
+      level: A1.3
+      introduces:
+        - lp.morphology.plural_forms.v1
+      reinforces:
+        - lp.morphology.adjective_agreement.v1
+        - lp.morphology.gender_intuition.v1
+        - lp.prepositions.v_na_location.v1
+        - lp.morphology.nominative_default.v1
+    scenes:
+      - Cours, amis, professeurs (pluriel)
+      - В университете (lieu)
+    canonicalAnchors:
+      - "Мои друзья учатся здесь."
+      - "Интересные лекции."
+
+  - id: text-a1-weather-01
+    titleFr: "L'hiver à Moscou"
+    titleRu: "Зима в Москве"
+    collection: travel-russian
+    wordCount: 90-110
+    readingOrder: 10
+    status: to_write
+    curriculum:
+      level: A1.3
+      introduces:
+        - lp.syntax.impersonal_experience.v1
+      reinforces:
+        - lp.prepositions.v_na_location.v1
+        - lp.morphology.nominative_default.v1
+        - lp.verbs.present_conjugation.v1
+    scenes:
+      - Météo, sensations (мне холодно, идёт снег)
+    canonicalAnchors:
+      - "Мне холодно."
+      - "Идёт снег."
+
+  - id: text-a1-friend-01
+    titleFr: "On se voit demain ?"
+    titleRu: "Увидимся завтра?"
+    collection: dialogues
+    wordCount: 80-100
+    readingOrder: 11
+    status: to_write
+    curriculum:
+      level: A1.3
+      introduces:
+        - lp.morphology.dative_recipient.v1
+        - lp.verbs.imperative_forms.v1
+      reinforces:
+        - lp.syntax.zero_subject.v1
+        - lp.lexique.questions_intonation.v1
+        - lp.morphology.role_terminations.v1
+    scenes:
+      - Fixer un rendez-vous (дать, сказать, позвонить)
+      - Invitations (давай, пойдём)
+    canonicalAnchors:
+      - "Давай встретимся завтра!"
+      - "Я звоню другу."
+
+  - id: text-a1-city-01
+    titleFr: "Une promenade"
+    titleRu: "Прогулка по городу"
+    collection: travel-russian
+    wordCount: 120-140
+    readingOrder: 12
+    status: to_write
+    curriculum:
+      level: A1.3
+      introduces:
+        - lp.morphology.prepositional_topic.v1
+      reinforces:
+        - lp.prepositions.v_na_location.v1
+        - lp.morphology.plural_forms.v1
+        - lp.morphology.gender_intuition.v1
+        - lp.syntax.basic_word_order.v1
+    scenes:
+      - Visite de la ville (о музее, в парке)
+      - Parler de / être dans un lieu
+    canonicalAnchors:
+      - "Мы гуляем в парке."
+      - "Рассказываю о музее."
+
+  - id: text-a1-evening-01
+    titleFr: "Le soir à la maison"
+    titleRu: "Вечером дома"
+    collection: everyday-russian
+    wordCount: 100-120
+    readingOrder: 13
+    status: to_write
+    curriculum:
+      level: A1.3
+      introduces:
+        - lp.syntax.negation_ne.v1
+      reinforces:
+        - lp.syntax.possession_existence.v1
+        - lp.verbs.present_conjugation.v1
+        - lp.syntax.impersonal_experience.v1
+        - lp.syntax.zero_subject.v1
+    scenes:
+      - Soirée tranquille (не смотрю, не хочу)
+      - Négation entourant le verbe
+    canonicalAnchors:
+      - "Я не смотрю телевизор."
+      - "Сегодня не хочу гулять."
+
+  - id: text-a1-dialogue-01
+    titleFr: "Deux voisins"
+    titleRu: "Два соседа"
+    collection: dialogues
+    wordCount: 100-120
+    readingOrder: 14
+    status: to_write
+    note: "Recyclage pur — aucun LP nouveau"
+    curriculum:
+      level: A1.3
+      introduces: []
+      reinforces:
+        - lp.syntax.zero_subject.v1
+        - lp.lexique.questions_intonation.v1
+        - lp.verbs.imperative_forms.v1
+        - lp.morphology.dative_recipient.v1
+        - lp.syntax.negation_ne.v1
+        - lp.morphology.accusative_object.v1
+    scenes:
+      - Conversation entre voisins (invitation, refus poli)
+
+  - id: text-a1-capstone-01
+    titleFr: "Première semaine"
+    titleRu: "Первая неделя"
+    collection: everyday-russian
+    wordCount: 140-160
+    readingOrder: 15
+    status: to_write
+    note: "Synthèse — tous les 18 LP en contexte narratif"
+    curriculum:
+      level: A1.3
+      introduces: []
+      reinforces:
+        - lp.foundation.stress_marks.v1
+        - lp.morphology.nominative_default.v1
+        - lp.verbs.present_conjugation.v1
+        - lp.syntax.zero_subject.v1
+        - lp.syntax.negation_ne.v1
+        - lp.lexique.questions_intonation.v1
+        - lp.syntax.basic_word_order.v1
+        - lp.morphology.role_terminations.v1
+        - lp.morphology.gender_intuition.v1
+        - lp.syntax.possession_existence.v1
+        - lp.morphology.accusative_object.v1
+        - lp.prepositions.v_na_location.v1
+        - lp.morphology.adjective_agreement.v1
+        - lp.morphology.plural_forms.v1
+        - lp.morphology.dative_recipient.v1
+        - lp.syntax.impersonal_experience.v1
+        - lp.verbs.imperative_forms.v1
+        - lp.morphology.prepositional_topic.v1
+    scenes:
+      - Récit d'une première semaine à Moscou (métro, cours, café, soir)

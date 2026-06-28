@@ -1,0 +1,57 @@
+{
+  "id": "pack.a1_foundation",
+  "version": 1,
+  "titleFr": "Foundation Pack A1",
+  "patternPathId": "path.a1_foundation",
+  "patternCount": 18,
+  "textCount": 15,
+  "minExposuresPerPattern": 3,
+  "minDistinctTextsPerPattern": 2,
+  "patterns": [
+    { "order": 1, "patternId": "lp.foundation.stress_marks.v1", "priority": "P0", "stage": "decoder" },
+    { "order": 2, "patternId": "lp.morphology.nominative_default.v1", "priority": "P0", "stage": "situer" },
+    { "order": 3, "patternId": "lp.verbs.present_conjugation.v1", "priority": "P0", "stage": "situer" },
+    { "order": 4, "patternId": "lp.syntax.zero_subject.v1", "priority": "P0", "stage": "situer" },
+    { "order": 5, "patternId": "lp.syntax.negation_ne.v1", "priority": "P1", "stage": "situer" },
+    { "order": 6, "patternId": "lp.lexique.questions_intonation.v1", "priority": "P1", "stage": "situer" },
+    { "order": 7, "patternId": "lp.syntax.basic_word_order.v1", "priority": "P1", "stage": "situer" },
+    { "order": 8, "patternId": "lp.morphology.role_terminations.v1", "priority": "P0", "stage": "relier" },
+    { "order": 9, "patternId": "lp.morphology.gender_intuition.v1", "priority": "P0", "stage": "relier" },
+    { "order": 10, "patternId": "lp.syntax.possession_existence.v1", "priority": "P0", "stage": "relier" },
+    { "order": 11, "patternId": "lp.morphology.accusative_object.v1", "priority": "P1", "stage": "relier" },
+    { "order": 12, "patternId": "lp.prepositions.v_na_location.v1", "priority": "P1", "stage": "relier" },
+    { "order": 13, "patternId": "lp.morphology.adjective_agreement.v1", "priority": "P1", "stage": "qualifier" },
+    { "order": 14, "patternId": "lp.morphology.plural_forms.v1", "priority": "P1", "stage": "qualifier" },
+    { "order": 15, "patternId": "lp.morphology.dative_recipient.v1", "priority": "P2", "stage": "qualifier" },
+    { "order": 16, "patternId": "lp.syntax.impersonal_experience.v1", "priority": "P1", "stage": "qualifier" },
+    { "order": 17, "patternId": "lp.verbs.imperative_forms.v1", "priority": "P1", "stage": "qualifier" },
+    { "order": 18, "patternId": "lp.morphology.prepositional_topic.v1", "priority": "P2", "stage": "qualifier" }
+  ],
+  "excludedFromPack": [
+    {
+      "patternId": "lp.aspect.pair_intuition.v1",
+      "reason": "A2 — aspect ; introduit après temporalité A1.3"
+    },
+    {
+      "patternId": "lp.verbs.preferred_constructions.v1",
+      "reason": "A2 — valence verbes ; renforce le datif après exposition"
+    }
+  ],
+  "readingPath": [
+    "text-a1-intro-01",
+    "text-a1-family-01",
+    "text-a1-home-01",
+    "text-a1-cafe-01",
+    "text-a1-day-01",
+    "text-a1-metro-01",
+    "text-a1-shop-01",
+    "text-a1-describe-01",
+    "text-a1-school-01",
+    "text-a1-weather-01",
+    "text-a1-friend-01",
+    "text-a1-city-01",
+    "text-a1-evening-01",
+    "text-a1-dialogue-01",
+    "text-a1-capstone-01"
+  ]
+}

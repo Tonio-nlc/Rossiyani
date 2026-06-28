@@ -1,0 +1,75 @@
+{
+  "id": "lp.morphology.plural_forms.v1",
+  "slug": "plural_forms",
+  "internalName": "Nominative plural patterns",
+  "userFacingName": "Le pluriel a ses propres terminaisons",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "morphology.case_system",
+  "taxonomyPath": [
+    "morphology",
+    "case_system",
+    "plural"
+  ],
+  "tags": [
+    "A1",
+    "plural",
+    "nouns"
+  ],
+  "pedagogicalObjective": "Reconnaître les pluriels courants sans apprendre toutes les règles d'un coup.",
+  "cognitiveSurprise": "« Mes amis » ne se dit pas en ajoutant un seul mot — le nom change.",
+  "observation": "Друзья, книги, окна — terminaisons -ы/-и/-а selon le genre.",
+  "insight": "Le pluriel est une autre « forme de rôle » — souvent liée au nominatif pluriel.",
+  "comprehension": "Masc. en consonne → -ы/-и ; fém. -а → -ы ; neutre -о → -а.",
+  "formalization": "Pluriel nominatif ; autres cas au pluriel en A2.",
+  "nuances": "Pluriels irréguliers (друзья, дети).",
+  "examples": [
+    {
+      "id": "ex.pl.1",
+      "russian": "У меня два брата.",
+      "french": "J'ai deux frères.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.pl.2",
+      "russian": "Мои друзья в Москве.",
+      "french": "Mes amis sont à Moscou.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 2,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.morphology.gender_intuition.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-school-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "plural_nouns"
+  ],
+  "detectionRules": [
+    {
+      "type": "morphology",
+      "rule": "nominative_plural",
+      "weight": 0.7
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}

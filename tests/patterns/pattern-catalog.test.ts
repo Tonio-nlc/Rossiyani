@@ -68,16 +68,16 @@ describe("pattern catalog — load", () => {
   it("loads the seed catalog from data/patterns", async () => {
     const catalog = await loadCatalogFromDirectory(CATALOG_ROOT);
     expect(catalog.version).toBe(1);
-    expect(catalog.patterns.length).toBe(6);
+    expect(catalog.patterns.length).toBe(20);
     expect(catalog.families.length).toBeGreaterThan(0);
-    expect(catalog.paths.length).toBe(3);
+    expect(catalog.paths.length).toBe(4);
   });
 
   it("exposes patterns through PatternCatalogService", async () => {
     const service = await PatternCatalogService.loadFromDirectory(CATALOG_ROOT);
     const pattern = service.getPattern("lp.morphology.role_terminations.v1");
     expect(pattern?.userFacingName).toBe("Les mots changent selon leur rôle");
-    expect(service.getPatterns()).toHaveLength(6);
+    expect(service.getPatterns()).toHaveLength(20);
   });
 });
 
@@ -134,6 +134,16 @@ describe("pattern catalog — relations", () => {
       "possession_existence",
       "dative_recipient",
     ]);
+  });
+
+  it("resolves the A1 foundation pack path with 18 patterns", async () => {
+    const service = await PatternCatalogService.loadFromDirectory(CATALOG_ROOT);
+    const foundationPath = service.getLearningPath("path.a1_foundation");
+    expect(foundationPath?.steps).toHaveLength(18);
+
+    const foundationPatterns = service.getLearningPathPatterns("path.a1_foundation");
+    expect(foundationPatterns[0]?.slug).toBe("stress_marks");
+    expect(foundationPatterns.at(-1)?.slug).toBe("prepositional_topic");
   });
 });
 

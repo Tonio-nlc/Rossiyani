@@ -1,0 +1,75 @@
+{
+  "id": "lp.morphology.prepositional_topic.v1",
+  "slug": "prepositional_topic",
+  "internalName": "Prepositional for location topic & о + prep",
+  "userFacingName": "Parler de / être dans un lieu",
+  "version": 1,
+  "status": "canonical",
+  "familyId": "morphology.case_system",
+  "taxonomyPath": [
+    "morphology",
+    "case_system",
+    "prepositional"
+  ],
+  "tags": [
+    "A1",
+    "prepositional",
+    "location"
+  ],
+  "pedagogicalObjective": "Lire в/на + forme statique et о pour « au sujet de ».",
+  "cognitiveSurprise": "« Je suis à la maison » utilise une forme du nom que vous n'avez pas encore vue au nominatif.",
+  "observation": "В школе, на работе, о фильме — préposition + forme en -е/-и.",
+  "insight": "Le prépositionnel répond à « où ? » (statique) et « à propos de quoi ? » avec о.",
+  "comprehension": "Prépositionnel : lieu statique avec в/на ; sujet de conversation avec о.",
+  "formalization": "Prépositionnel (местный падеж).",
+  "nuances": "Distinction avec accusatif directionnel (в школу).",
+  "examples": [
+    {
+      "id": "ex.prep.1",
+      "russian": "Мы говорим о фильме.",
+      "french": "Nous parlons du film.",
+      "isCanonical": true
+    },
+    {
+      "id": "ex.prep.2",
+      "russian": "Он на работе.",
+      "french": "Il est au travail.",
+      "isCanonical": true
+    }
+  ],
+  "counterExamples": [],
+  "commonErrors": [],
+  "variants": [],
+  "prerequisites": [],
+  "relatedPatterns": [],
+  "confusedWith": [],
+  "recommendedLevel": "A1",
+  "frequency": "core",
+  "difficulty": 3,
+  "introductionConditions": {
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.prepositions.v_na_location.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-city-01"
+    ]
+  },
+  "masteryConditions": {
+    "minExposureCount": 6,
+    "minRetrievalGoodRate": 0.75
+  },
+  "knowledgeConceptKeys": [
+    "prepositional_case"
+  ],
+  "detectionRules": [
+    {
+      "type": "morphology",
+      "rule": "prepositional_after_v_na_o",
+      "weight": 0.8
+    }
+  ],
+  "createdAt": "2026-06-27T00:00:00.000Z",
+  "updatedAt": "2026-06-27T00:00:00.000Z",
+  "reviewedBy": "editorial"
+}
