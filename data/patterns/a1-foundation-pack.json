@@ -1,10 +1,10 @@
 {
   "id": "pack.a1_foundation",
-  "version": 1,
+  "version": 2,
   "titleFr": "Foundation Pack A1",
   "patternPathId": "path.a1_foundation",
   "patternCount": 18,
-  "textCount": 15,
+  "textCount": 22,
   "minExposuresPerPattern": 3,
   "minDistinctTextsPerPattern": 2,
   "patterns": [
@@ -51,7 +51,14 @@
     "text-a1-friend-01",
     "text-a1-city-01",
     "text-a1-evening-01",
+    "text-a1-breakfast-01",
+    "text-a1-phone-01",
+    "text-a1-park-01",
+    "text-a1-colors-01",
+    "text-a1-market-01",
+    "text-a1-weekend-01",
     "text-a1-dialogue-01",
+    "text-a1-bridge-01",
     "text-a1-capstone-01"
   ]
 }

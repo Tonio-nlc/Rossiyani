@@ -15,6 +15,9 @@ export type NormalizedImportDocument = {
   rawText: string;
   title: string;
   source: string;
+  textId?: string;
+  collectionId?: string;
+  level?: CefrLevel;
   metadata: ImportDocumentMetadata;
   extractionMethod?: "direct" | "ocr";
   sourceType: ImportSourceType;

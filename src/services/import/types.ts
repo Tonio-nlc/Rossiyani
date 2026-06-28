@@ -2,6 +2,8 @@ import type { CefrLevel } from "@/types/domain";
 import type { ImportRunMetrics } from "@/types/import-pipeline";
 
 export type ImportRussianTextInput = {
+  /** Stable editorial id (e.g. text-a1-intro-01) — used for LP introduction mapping. */
+  textId?: string;
   title: string;
   level: CefrLevel;
   collectionId?: string;

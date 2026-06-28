@@ -75,7 +75,12 @@ export async function getTextForReader(textId: string): Promise<ReaderTextData |
     return null;
   }
 
-  const patternSlice = await loadReaderPatternSlice(textId);
+  let patternSlice: ReaderPatternSlice = { patterns: {}, bySentenceId: {} };
+  try {
+    patternSlice = await loadReaderPatternSlice(textId);
+  } catch (error) {
+    console.error("[reader] pattern slice unavailable — reading without LP data", error);
+  }
 
   return {
     id: text.id,

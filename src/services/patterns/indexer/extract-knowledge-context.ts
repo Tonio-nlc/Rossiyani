@@ -14,6 +14,29 @@ const TRANSFER_VERB_LEMMAS = new Set([
   "пожелать",
 ]);
 
+const DATIVE_EXPERIENCER_FORMS = new Set([
+  "мне",
+  "тебе",
+  "ему",
+  "ей",
+  "нам",
+  "вам",
+  "им",
+]);
+
+const IMPERSONAL_PREDICATES = new Set([
+  "холодно",
+  "жарко",
+  "скучно",
+  "весело",
+  "грустно",
+  "интересно",
+  "трудно",
+  "легко",
+  "теплее",
+  "уютнее",
+]);
+
 const SUBJECT_PRONOUNS = new Set([
   "я",
   "ты",
@@ -45,6 +68,37 @@ export function extractConceptKeysFromAnalysis(analysis: SentenceAnalysisOutput)
       if (caseKey === "accusative") {
         keys.add("accusative_case");
       }
+      if (caseKey === "nominative") {
+        keys.add("nominative_case");
+      }
+      if (caseKey === "prepositional") {
+        keys.add("prepositional_case");
+        keys.add("locative_case");
+      }
+    }
+
+    if (word.partOfSpeech === "noun" && word.number === "plural") {
+      keys.add("plural_nouns");
+    }
+
+    if (word.gender) {
+      keys.add("grammatical_gender");
+    }
+
+    if (word.partOfSpeech === "verb") {
+      const tense = word.tense?.toLowerCase();
+      if (tense === "present" || tense === "présent" || tense === "pres") {
+        keys.add("present_tense");
+        keys.add("verb_conjugation");
+      }
+      const lemma = word.lemma.toLowerCase();
+      if (lemma === "давать" || word.original.toLowerCase().startsWith("давай")) {
+        keys.add("imperative");
+      }
+    }
+
+    if (word.stressMarked && word.stressMarked !== word.original) {
+      keys.add("lexical_stress");
     }
 
     const aspect = word.aspect?.toLowerCase();
@@ -88,6 +142,75 @@ export function extractConceptKeysFromAnalysis(analysis: SentenceAnalysisOutput)
   const hasDative = analysis.words.some((word) => normalizeCaseKey(word.case) === "dative");
   if (hasTransferVerb && hasDative) {
     keys.add("indirect_object");
+  }
+
+  const neIndex = lowerOriginals.indexOf("не");
+  const hasNegatedVerb =
+    neIndex >= 0 &&
+    analysis.words.some(
+      (word) =>
+        word.partOfSpeech === "verb" &&
+        word.position > neIndex &&
+        word.position <= neIndex + 2,
+    );
+  if (hasNegatedVerb) {
+    keys.add("verbal_negation");
+  }
+
+  if (analysis.russianText.includes("?")) {
+    keys.add("questions");
+  }
+  if (
+    analysis.words.some((word) =>
+      ["что", "где", "когда", "как", "почему", "кто", "сколько"].includes(
+        word.lemma.toLowerCase(),
+      ),
+    )
+  ) {
+    keys.add("interrogative_words");
+  }
+
+  if (lowerOriginals.includes("в")) {
+    keys.add("preposition_v");
+  }
+  if (lowerOriginals.includes("на")) {
+    keys.add("preposition_na");
+  }
+
+  const hasDativeExperiencerForm = analysis.words.some((word) =>
+    DATIVE_EXPERIENCER_FORMS.has(word.original.toLowerCase()),
+  );
+  const hasImpersonalPredicate = analysis.words.some((word) =>
+    IMPERSONAL_PREDICATES.has(word.lemma.toLowerCase()),
+  );
+  const dativeExperiencer =
+    hasDativeExperiencerForm &&
+    (hasImpersonalPredicate ||
+      analysis.words.some(
+        (word) =>
+          (word.partOfSpeech === "pronoun" || word.partOfSpeech === "noun") &&
+          (normalizeCaseKey(word.case) === "dative" ||
+            DATIVE_EXPERIENCER_FORMS.has(word.original.toLowerCase())),
+      ));
+  if (dativeExperiencer) {
+    keys.add("dative_experiencer");
+    keys.add("impersonal");
+  }
+
+  const adjectives = analysis.words.filter((word) => word.partOfSpeech === "adjective");
+  const nouns = analysis.words.filter((word) => word.partOfSpeech === "noun");
+  if (
+    adjectives.length > 0 &&
+    nouns.length > 0 &&
+    adjectives.some((adj) =>
+      nouns.some((noun) => adj.gender && noun.gender && adj.gender === noun.gender),
+    )
+  ) {
+    keys.add("adjective_agreement");
+  }
+
+  if (analysis.words.length >= 3 && hasFiniteVerb) {
+    keys.add("word_order_svo");
   }
 
   return [...keys];

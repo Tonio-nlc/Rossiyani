@@ -172,6 +172,7 @@ export async function runTextImportPipelineFast(
 
   const text = await prisma.text.create({
     data: {
+      ...(input.textId ? { id: input.textId } : {}),
       title: input.title,
       level: input.level,
       collectionId: resolveImportCollectionId(input),
