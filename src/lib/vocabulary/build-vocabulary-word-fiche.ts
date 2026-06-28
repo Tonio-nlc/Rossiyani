@@ -384,7 +384,10 @@ export async function buildVocabularyWordFiche(input: {
       : null;
 
   const linguistic: VocabularyLinguisticDetails = {
-    definitions,
+    definitions: definitions.map((definition) => ({
+      meaning: definition.meaning,
+      note: definition.note ?? null,
+    })),
     nuances: knowledge.simpleExplanation,
     frenchComparison: knowledge.frenchComparison,
     falseFriendWarning,

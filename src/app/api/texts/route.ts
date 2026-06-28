@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { listTexts } from "@/features/texts";
+import { listTexts } from "@/features/texts/list-texts";
 import type { CefrLevel } from "@/types";
 
 const LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "Native"];

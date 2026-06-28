@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import { ReaderView } from "@/components/reader/reader-view";
 import { FirstReadingCoach } from "@/components/onboarding/first-reading-coach";
-import { getTextForReader } from "@/features/texts";
+import { getTextForReader } from "@/features/texts/get-text-for-reader";
 
 import ReaderEmptyPage from "./empty-state";
 

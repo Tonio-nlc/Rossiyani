@@ -9,6 +9,8 @@ const DEPTH_LABELS: Record<ReaderPatternCardSection["depth"], string> = {
   L1: "Observation",
   L2: "Insight",
   L3: "Compréhension",
+  L4: "Formalisation",
+  L5: "Nuances",
 };
 
 function section(depth: ReaderPatternCardSection["depth"], content: string): ReaderPatternCardSection {

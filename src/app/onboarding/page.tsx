@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
-import { listTexts } from "@/features/texts";
+import { listTexts } from "@/features/texts/list-texts";
 
 import "../onboarding-workspace.css";
 

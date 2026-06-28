@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { HomeView } from "@/components/home";
 import { getHomeJournalData } from "@/features/home";
-import { listTexts } from "@/features/texts";
+import { listTexts } from "@/features/texts/list-texts";
 
 export const metadata: Metadata = {
   title: "Rossiyani — Votre session de lecture",
