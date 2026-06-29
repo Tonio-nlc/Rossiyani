@@ -119,7 +119,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
 
   const {
     recordSentenceExposure,
-    buildWordExperience,
+    buildWordDepth,
     patternEchoBySentence,
   } = useReaderPatternExperience(text);
 
@@ -419,12 +419,18 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     saveBookmarks(bookmarks);
   }, [text.id]);
 
-  const patternExperience = useMemo(() => {
+  const patternDepth = useMemo(() => {
     if (!selectedWordSnapshot) {
       return null;
     }
-    return buildWordExperience(selectedWordSnapshot.sentenceId, selectedWordSnapshot.position);
-  }, [buildWordExperience, selectedWordSnapshot]);
+    const bearerIds = patternBearerBySentence.get(selectedWordSnapshot.sentenceId);
+    const isBearer = bearerIds?.has(selectedWordSnapshot.id) ?? false;
+    return buildWordDepth(
+      selectedWordSnapshot.sentenceId,
+      selectedWordSnapshot.position,
+      isBearer,
+    );
+  }, [buildWordDepth, selectedWordSnapshot, patternBearerBySentence]);
 
   const guideLinkedWordIds = useMemo(() => {
     if (!selectedWordSnapshot) {
@@ -435,11 +441,11 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     const guide = buildReaderWordGuide({
       text,
       snapshot: selectedWordSnapshot,
-      patternExperience,
+      depth: patternDepth?.depth ?? "none",
       isPatternBearer: isBearer,
     });
     return new Set(guide.linkedWordIds);
-  }, [text, selectedWordSnapshot, patternExperience, patternBearerBySentence]);
+  }, [text, selectedWordSnapshot, patternDepth, patternBearerBySentence]);
 
   const closeWordPanel = useCallback(() => {
     setWordPanelOpen(false);
@@ -465,7 +471,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
           loading={loading}
           snapshot={selectedWordSnapshot}
           textIndex={textIndex}
-          patternExperience={patternExperience}
+          patternDepth={patternDepth}
           onClose={closeWordPanel}
         />
       }

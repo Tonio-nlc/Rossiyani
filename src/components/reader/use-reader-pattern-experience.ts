@@ -13,14 +13,15 @@ import {
   buildOrchestratorInputFromReader,
   decidePedagogicalIntervention,
   mapDecisionToPatternEcho,
-  mapDecisionToReaderExperience,
+  mapDecisionToReaderDepth,
 } from "@/services/learning-orchestrator";
 import {
   getOrchestratorSession,
   recordOrchestratorOutcome,
 } from "@/services/learning-orchestrator/session-store";
 import { isTokenInPatternInstance } from "@/services/learning-orchestrator/encounter-signals";
-import type { ReaderPatternExperienceView } from "@/types/reader-pattern-experience";
+import type { ReaderPatternDepthView } from "@/types/reader-pedagogical-depth";
+import { isDepthAtLeast } from "@/types/reader-pedagogical-depth";
 
 function isFirstReadOfText(textId: string): boolean {
   const progress = getTextReadingProgress(textId);
@@ -29,6 +30,13 @@ function isFirstReadOfText(textId: string): boolean {
   }
   return progress.sentencesSeenIds.length <= 1 && progress.percent < 5;
 }
+
+const SILENT_DEPTH: ReaderPatternDepthView = {
+  depth: "none",
+  patternId: null,
+  suppressLegacyGrammar: false,
+  secondaryPatternCount: 0,
+};
 
 export function useReaderPatternExperience(text: ReaderTextData) {
   const [revision, setRevision] = useState(0);
@@ -73,23 +81,19 @@ export function useReaderPatternExperience(text: ReaderTextData) {
     [text.patternSlice, revision],
   );
 
-  const buildWordExperience = useCallback(
-    (sentenceId: string, wordPosition: number): ReaderPatternExperienceView => {
+  const buildWordDepth = useCallback(
+    (
+      sentenceId: string,
+      wordPosition: number,
+      isPatternBearer: boolean,
+    ): ReaderPatternDepthView => {
+      if (!isPatternBearer) {
+        return SILENT_DEPTH;
+      }
+
       const resolved = resolvePatternContext(sentenceId);
       if (!resolved?.pattern || !resolved.context.instance) {
-        return mapDecisionToReaderExperience(
-          decidePedagogicalIntervention(
-            buildOrchestratorInputFromReader({
-              text,
-              sentenceId,
-              interaction: "explore_word",
-              wordPosition,
-              encounter: null,
-              session: getOrchestratorSession(),
-            }),
-          ),
-          null,
-        );
+        return SILENT_DEPTH;
       }
 
       const triggering = isTokenInPatternInstance(wordPosition, resolved.context.instance);
@@ -106,21 +110,22 @@ export function useReaderPatternExperience(text: ReaderTextData) {
         }),
       );
 
-      const sentence = text.sentences.find((item) => item.id === sentenceId);
-      const word = sentence?.words.find((item) => item.position === wordPosition);
-      const anchorText = word?.stressMarked || word?.original || null;
-
-      const view = mapDecisionToReaderExperience(decision, resolved.pattern, anchorText);
+      const depth = mapDecisionToReaderDepth(decision, { isPatternBearer: true });
 
       if (triggering) {
         recordPatternExplore(resolved.pattern.id);
-        if (view.visible && decision.action !== "SILENCE") {
+        if (isDepthAtLeast(depth, "observe") && decision.action !== "SILENCE") {
           recordOrchestratorOutcome(decision, resolved.pattern.id);
         }
         bump();
       }
 
-      return view;
+      return {
+        depth,
+        patternId: decision.patternId,
+        suppressLegacyGrammar: decision.suppressLegacyGrammar,
+        secondaryPatternCount: decision.deferredPatternIds.length,
+      };
     },
     [bump, resolvePatternContext, text],
   );
@@ -154,7 +159,9 @@ export function useReaderPatternExperience(text: ReaderTextData) {
 
   return {
     recordSentenceExposure,
-    buildWordExperience,
+    buildWordDepth,
+    /** @deprecated Use buildWordDepth */
+    buildWordExperience: buildWordDepth,
     patternEchoBySentence,
   };
 }

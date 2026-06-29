@@ -13,7 +13,7 @@ import {
 } from "@/lib/reader/saved-words";
 import type { ReaderTextData } from "@/features/texts";
 import type { WordDetailGraph } from "@/types/word-detail-graph";
-import type { ReaderPatternExperienceView } from "@/types/reader-pattern-experience";
+import type { ReaderPatternDepthView } from "@/types/reader-pedagogical-depth";
 
 import { ReaderExplorerSkeleton } from "./reader-explorer-skeleton";
 import { ReaderWordGuide } from "./reader-word-guide";
@@ -26,7 +26,7 @@ type ReaderWordPanelProps = {
   loading?: boolean;
   snapshot: ReaderWordSnapshot | null;
   textIndex: ReaderTextPhraseIndex;
-  patternExperience?: ReaderPatternExperienceView | null;
+  patternDepth?: ReaderPatternDepthView | null;
   onClose?: () => void;
 };
 
@@ -40,7 +40,7 @@ export function ReaderWordPanel({
   loading = false,
   snapshot,
   textIndex,
-  patternExperience = null,
+  patternDepth = null,
   onClose,
 }: ReaderWordPanelProps) {
   const [saved, setSaved] = useState(false);
@@ -63,14 +63,14 @@ export function ReaderWordPanel({
     return buildReaderWordGuide({
       text,
       snapshot,
-      patternExperience,
+      depth: patternDepth?.depth ?? "none",
       isPatternBearer: isPatternBearerWord(
         patternBearerBySentence,
         snapshot.sentenceId,
         snapshot.id,
       ),
     });
-  }, [text, snapshot, patternExperience, patternBearerBySentence]);
+  }, [text, snapshot, patternDepth, patternBearerBySentence]);
 
   if (!snapshot) {
     return (
@@ -129,7 +129,7 @@ export function ReaderWordPanel({
       ) : (
         <div className="reader-word-lookup-only">
           <p className="reader-word-lookup-only__hint">
-            Traduction — pas de leçon ici. Les mots soulignés cachent une logique à découvrir.
+            Traduction ci-dessous. Les mots soulignés ouvrent un guide sur la forme.
           </p>
         </div>
       )}

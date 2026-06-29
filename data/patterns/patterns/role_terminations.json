@@ -13,6 +13,16 @@
   "observation": "Dans une phrase russe, un même mot peut apparaître avec des terminaisons différentes.",
   "insight": "Ces terminaisons ne sont pas aléatoires : elles signalent le rôle du mot dans la phrase — un peu comme des étiquettes.",
   "comprehension": "Le russe indique le rôle de chaque nom en modifiant la fin du mot — c'est pour cela que « сестра », « сестры » et « сестру » ne sont pas interchangeables.",
+  "readerGuide": {
+    "headlineWithAnchor": "Pourquoi « {{anchor}} » s'écrit ainsi ?",
+    "headlineDefault": "Pourquoi la même idée change de forme ?",
+    "noticeLead": "Regarde simplement.",
+    "comparePriorLabel": "Tu as déjà vu",
+    "compareCurrentLabel": "Aujourd'hui tu lis",
+    "noticeInvitation": "Regarde cette différence.",
+    "secondEncounter": "Tu as déjà rencontré cette différence. Observe-la.",
+    "exampleLabel": "Dans cette phrase"
+  },
   "formalization": "Les noms changent de forme selon leur fonction dans la phrase.",
   "nuances": "Certains noms ont des désinences irrégulières ; l'animé/inanimé modifie l'accusatif masculin.",
   "examples": [

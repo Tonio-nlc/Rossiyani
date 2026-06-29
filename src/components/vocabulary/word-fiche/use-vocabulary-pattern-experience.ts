@@ -34,6 +34,7 @@ function buildOrchestratorInputForPattern(
         observation: pattern.observation,
         insight: pattern.insight,
         comprehension: pattern.comprehension,
+        guide: pattern.guide,
       },
       instance: {
         span: { startPosition: 0, endPosition: 0 },

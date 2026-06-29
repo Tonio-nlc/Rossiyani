@@ -1,16 +1,10 @@
 import type { PedagogicalDecision } from "@/types/learning-orchestrator";
+import type { ReaderPedagogicalDepth } from "@/types/reader-pedagogical-depth";
 import type {
   ReaderPatternCanon,
   ReaderPatternExperienceView,
   ReaderPatternCardSection,
 } from "@/types/reader-pattern-experience";
-
-const PATTERN_HEADLINE: Record<string, string> = {
-  "lp.verbs.present_conjugation.v1": "Pourquoi la fin du verbe change ?",
-  "lp.morphology.role_terminations.v1": "Pourquoi la même idée change de forme ?",
-  "lp.syntax.possession_existence.v1": "Pourquoi « avoir » ne se dit pas comme en français ?",
-  "lp.foundation.stress_marks.v1": "Que faut-il remarquer dans ce mot ?",
-};
 
 function section(content: string): ReaderPatternCardSection {
   return {
@@ -49,19 +43,36 @@ function phaseFromAction(
   }
 }
 
-function resolveHeadline(pattern: ReaderPatternCanon, anchorText: string | null): string {
-  if (anchorText && pattern.id === "lp.morphology.role_terminations.v1") {
-    return `Pourquoi « ${anchorText} » s'écrit ainsi ?`;
+/**
+ * Maps an orchestrator decision to progressive Reader depth.
+ * Depth only — no copy, no visibility flag.
+ */
+export function mapDecisionToReaderDepth(
+  decision: PedagogicalDecision,
+  options: { isPatternBearer: boolean },
+): ReaderPedagogicalDepth {
+  if (!options.isPatternBearer || !decision.patternId) {
+    return "none";
   }
-  if (anchorText && pattern.id === "lp.syntax.possession_existence.v1") {
-    return "Pourquoi cette phrase ne dit pas « j'ai » ?";
+
+  switch (decision.action) {
+    case "INSIGHT":
+      return decision.depthLevels.includes("L3") ? "understand" : "insight";
+    case "OBSERVATION":
+      return "observe";
+    case "REMINDER":
+      return "reminder";
+    case "DEFER":
+    case "SILENCE":
+      return "notice";
+    default:
+      return "notice";
   }
-  return PATTERN_HEADLINE[pattern.id] ?? "Pourquoi cette phrase est-elle écrite comme ça ?";
 }
 
 /**
- * Maps an orchestrator decision to the Reader vertical-slice view model.
- * User-facing copy only — no engine vocabulary (Observation, Insight, LP…).
+ * Maps an orchestrator decision to the vocabulary fiche view model.
+ * @deprecated Reader word panel uses {@link mapDecisionToReaderDepth} instead.
  */
 export function mapDecisionToReaderExperience(
   decision: PedagogicalDecision,
@@ -73,7 +84,10 @@ export function mapDecisionToReaderExperience(
   }
 
   const sections: ReaderPatternCardSection[] = [];
-  const headline = resolveHeadline(pattern, anchorText ?? null);
+  const headline = pattern.guide.headlineWithAnchor.replace(
+    /\{\{anchor\}\}/g,
+    anchorText?.trim() ?? "",
+  );
 
   if (decision.action === "INSIGHT") {
     sections.push(section(pattern.insight));
@@ -86,7 +100,6 @@ export function mapDecisionToReaderExperience(
       sections.push(section(decision.reminder));
     }
   } else if (decision.action === "DEFER" && decision.softMessage) {
-    // First session maps DEFER → SILENCE; fallback copy if ever shown.
     sections.push(section(decision.softMessage));
   }
 
@@ -99,7 +112,7 @@ export function mapDecisionToReaderExperience(
     visible,
     phase: phaseFromAction(decision.action),
     patternId: decision.patternId,
-    title: headline,
+    title: anchorText?.trim() ? headline : pattern.guide.headlineDefault,
     reminder: null,
     sections,
     anchorText: decision.action === "INSIGHT" ? anchorText ?? null : null,

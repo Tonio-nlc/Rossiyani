@@ -3,15 +3,16 @@ import { describe, expect, it, beforeEach } from "vitest";
 import { decidePedagogicalIntervention } from "@/services/learning-orchestrator";
 import { resetOrchestratorSession } from "@/services/learning-orchestrator/session-store";
 import type { OrchestratorSessionState } from "@/types/learning-orchestrator";
-import type { ReaderPatternCanon, ReaderPatternInstanceSlice } from "@/types/reader-pattern-experience";
+import type { ReaderPatternInstanceSlice } from "@/types/reader-pattern-experience";
+import { patternCanonFixture } from "../fixtures/pattern-canon";
 
-const rolePattern: ReaderPatternCanon = {
+const rolePattern = patternCanonFixture({
   id: "lp.morphology.role_terminations.v1",
   userFacingName: "Les mots changent selon leur rôle",
   observation: "Les terminaisons changent selon le rôle du nom.",
   insight: "Ces terminaisons signalent le rôle du mot — comme des étiquettes.",
   comprehension: "« сестра » et « сестры » ne sont pas interchangeables.",
-};
+});
 
 const instance: ReaderPatternInstanceSlice = {
   span: { startPosition: 1, endPosition: 3 },

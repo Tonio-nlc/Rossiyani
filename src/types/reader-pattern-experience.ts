@@ -1,5 +1,16 @@
 import type { ExplanationDepth } from "@/types/patterns";
 
+export type ReaderPatternGuideCopy = {
+  headlineWithAnchor: string;
+  headlineDefault: string;
+  noticeLead: string;
+  comparePriorLabel: string;
+  compareCurrentLabel: string;
+  noticeInvitation: string;
+  secondEncounter: string;
+  exampleLabel: string;
+};
+
 export type ReaderPatternEncounterPhase =
   | "silent"
   | "first_explore"
@@ -12,6 +23,7 @@ export type ReaderPatternCanon = {
   observation: string;
   insight: string;
   comprehension: string;
+  guide: ReaderPatternGuideCopy;
 };
 
 export type ReaderPatternInstanceSlice = {

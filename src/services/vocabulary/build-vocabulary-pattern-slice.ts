@@ -10,6 +10,7 @@ import type {
   VocabularyPatternRef,
   VocabularyPatternSlice,
 } from "@/types/vocabulary-pattern-experience";
+import { buildReaderGuideCopy } from "@/lib/patterns/build-reader-guide-copy";
 import type { ReaderPatternCanon } from "@/types/reader-pattern-experience";
 
 function toCanon(pattern: LearningPattern): ReaderPatternCanon {
@@ -19,6 +20,7 @@ function toCanon(pattern: LearningPattern): ReaderPatternCanon {
     observation: pattern.observation,
     insight: pattern.insight,
     comprehension: pattern.comprehension,
+    guide: buildReaderGuideCopy(pattern),
   };
 }
 

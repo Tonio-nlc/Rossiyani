@@ -1,24 +1,21 @@
 import { prisma } from "@/lib/prisma";
+import { buildReaderGuideCopy } from "@/lib/patterns/build-reader-guide-copy";
 import { getPatternCatalogService } from "@/services/patterns";
 import type {
   ReaderPatternCanon,
   ReaderPatternSlice,
   ReaderSentencePatternContext,
 } from "@/types/reader-pattern-experience";
+import type { LearningPattern } from "@/types/patterns";
 
-function toCanon(pattern: {
-  id: string;
-  userFacingName: string;
-  observation: string;
-  insight: string;
-  comprehension: string;
-}): ReaderPatternCanon {
+function toCanon(pattern: LearningPattern): ReaderPatternCanon {
   return {
     id: pattern.id,
     userFacingName: pattern.userFacingName,
     observation: pattern.observation,
     insight: pattern.insight,
     comprehension: pattern.comprehension,
+    guide: buildReaderGuideCopy(pattern),
   };
 }
 

@@ -1,4 +1,5 @@
 import type { CefrLevel } from "@/types/domain";
+import type { ReaderPatternGuideCopy } from "@/types/reader-pattern-experience";
 
 export type PatternStatus = "draft" | "canonical" | "deprecated";
 
@@ -99,6 +100,8 @@ export type LearningPattern = {
   masteryConditions: MasteryConditions;
   knowledgeConceptKeys: string[];
   detectionRules: DetectionRule[];
+  /** Reader word-guide micro-copy; falls back to catalog defaults when omitted. */
+  readerGuide?: ReaderPatternGuideCopy;
   createdAt: string;
   updatedAt: string;
   reviewedBy?: string;

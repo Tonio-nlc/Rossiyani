@@ -1,7 +1,10 @@
 import type { ReaderTextData } from "@/features/texts";
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
+import { resolveGuideHeadline } from "@/lib/patterns/build-reader-guide-copy";
+import type { ReaderPedagogicalDepth } from "@/types/reader-pedagogical-depth";
+import { isDepthAtLeast } from "@/types/reader-pedagogical-depth";
 import type { ReaderWordGuideView } from "@/types/reader-word-guide";
-import type { ReaderPatternExperienceView } from "@/types/reader-pattern-experience";
+import type { ReaderPatternCanon } from "@/types/reader-pattern-experience";
 
 function normalizeLemma(lemma: string): string {
   return lemma.trim().toLowerCase();
@@ -11,26 +14,20 @@ function displayForm(word: { stressMarked: string; original: string }): string {
   return word.stressMarked || word.original;
 }
 
-function splitPedagogicalCopy(
-  experience: ReaderPatternExperienceView,
-  hasPriorForm: boolean,
-): {
-  discovery: string | null;
-  explanation: string | null;
-} {
-  const sections = experience.sections.map((s) => s.content.trim()).filter(Boolean);
-
-  if (experience.phase === "insight") {
-    return {
-      discovery: hasPriorForm ? "Ce changement n'est pas aléatoire." : null,
-      explanation: sections[0] ?? null,
-    };
+function resolveSentencePattern(
+  text: ReaderTextData,
+  sentenceId: string,
+): { pattern: ReaderPatternCanon; patternId: string } | null {
+  const context = text.patternSlice.bySentenceId[sentenceId];
+  const patternId = context?.primaryPatternId;
+  if (!patternId || !context?.instance) {
+    return null;
   }
-
-  return {
-    discovery: sections[0] ?? null,
-    explanation: null,
-  };
+  const pattern = text.patternSlice.patterns[patternId];
+  if (!pattern) {
+    return null;
+  }
+  return { pattern, patternId };
 }
 
 /** Earlier occurrence of the same lemma with a different surface form (reading order). */
@@ -72,62 +69,68 @@ function findPriorFormInText(
   return null;
 }
 
+const LOOKUP_VIEW: ReaderWordGuideView = {
+  mode: "lookup",
+  depth: "none",
+  headline: null,
+  copy: null,
+  compare: null,
+  invitation: null,
+  secondEncounter: null,
+  observe: null,
+  insight: null,
+  understand: null,
+  exampleLine: null,
+  linkedWordIds: [],
+};
+
 /**
- * Builds the pedagogical guide panel from orchestrator output + text context.
- * Client-only — does not call the Orchestrator.
+ * Assembles the Reader word guide from Pattern Catalog copy + orchestrator depth.
+ * No pedagogical decisions here — only section visibility by depth.
  */
 export function buildReaderWordGuide(input: {
   text: ReaderTextData;
   snapshot: ReaderWordSnapshot;
-  patternExperience: ReaderPatternExperienceView | null;
+  depth: ReaderPedagogicalDepth;
   isPatternBearer: boolean;
 }): ReaderWordGuideView {
-  const { text, snapshot, patternExperience, isPatternBearer } = input;
-  const currentForm = displayForm(snapshot);
-  const sentence = text.sentences.find((s) => s.id === snapshot.sentenceId);
-  const exampleLine = sentence?.russianText ?? null;
+  const { text, snapshot, depth, isPatternBearer } = input;
 
-  if (!isPatternBearer || !patternExperience?.visible) {
-    return {
-      mode: "lookup",
-      headline: null,
-      notice: null,
-      discovery: null,
-      explanation: null,
-      exampleLine: null,
-      exampleAnchor: null,
-      linkedWordIds: [],
-    };
+  if (!isPatternBearer || depth === "none") {
+    return LOOKUP_VIEW;
   }
 
+  const resolved = resolveSentencePattern(text, snapshot.sentenceId);
+  if (!resolved) {
+    return LOOKUP_VIEW;
+  }
+
+  const currentForm = displayForm(snapshot);
   const prior = findPriorFormInText(text, snapshot);
   const linkedWordIds = [snapshot.id];
   if (prior) {
     linkedWordIds.push(prior.wordId);
   }
 
-  const notice = prior
-    ? {
-        priorForm: prior.form,
-        currentForm,
-        bridge: "Le mot est presque identique — mais quelque chose a changé.",
-      }
-    : {
-        priorForm: null,
-        currentForm,
-        bridge: "Regarde bien cette forme dans la phrase.",
-      };
-
-  const { discovery, explanation } = splitPedagogicalCopy(patternExperience, prior !== null);
+  const sentence = text.sentences.find((s) => s.id === snapshot.sentenceId);
+  const { pattern } = resolved;
+  const copy = pattern.guide;
 
   return {
     mode: "guide",
-    headline: patternExperience.title,
-    notice,
-    discovery,
-    explanation,
-    exampleLine,
-    exampleAnchor: patternExperience.phase === "insight" ? currentForm : null,
+    depth,
+    headline: resolveGuideHeadline(copy, currentForm),
+    copy,
+    compare: {
+      priorForm: prior?.form ?? null,
+      currentForm,
+    },
+    invitation: depth === "notice" ? copy.noticeInvitation : null,
+    secondEncounter: depth === "reminder" ? copy.secondEncounter : null,
+    observe: isDepthAtLeast(depth, "observe") ? pattern.observation : null,
+    insight: isDepthAtLeast(depth, "insight") ? pattern.insight : null,
+    understand: isDepthAtLeast(depth, "understand") ? pattern.comprehension : null,
+    exampleLine: isDepthAtLeast(depth, "insight") ? (sentence?.russianText ?? null) : null,
     linkedWordIds,
   };
 }

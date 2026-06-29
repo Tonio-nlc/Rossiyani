@@ -55,6 +55,7 @@ export {
 } from "./session-store";
 export {
   mapDecisionToReaderExperience,
+  mapDecisionToReaderDepth,
   mapDecisionToSentenceInsightGate,
   mapDecisionToPatternEcho,
 } from "./map-to-reader";

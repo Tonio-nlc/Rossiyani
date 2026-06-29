@@ -9,25 +9,25 @@ import type {
 } from "@/types/learning-orchestrator";
 import type {
   PatternEncounterState,
-  ReaderPatternCanon,
   ReaderPatternInstanceSlice,
 } from "@/types/reader-pattern-experience";
+import { patternCanonFixture } from "../fixtures/pattern-canon";
 
-const possessionPattern: ReaderPatternCanon = {
+const possessionPattern = patternCanonFixture({
   id: "lp.syntax.possession_existence.v1",
   userFacingName: "Avoir, c'est « il y a près de moi »",
   observation: "Pour dire ce qu'on possède, le russe utilise souvent « у » et une forme modifiée du nom.",
   insight: "Imaginez « chez moi, il y a… » plutôt que « je possède… ».",
   comprehension: "У меня есть брат = littéralement « près de moi, il y a un frère ».",
-};
+});
 
-const rolePattern: ReaderPatternCanon = {
+const rolePattern = patternCanonFixture({
   id: "lp.morphology.role_terminations.v1",
   userFacingName: "Les mots changent selon leur rôle",
   observation: "Les terminaisons changent selon le rôle du nom.",
   insight: "Comme des étiquettes de fonction.",
   comprehension: "Le russe marque les rôles à la surface.",
-};
+});
 
 const instance: ReaderPatternInstanceSlice = {
   span: { startPosition: 0, endPosition: 2 },
@@ -62,7 +62,7 @@ function freshSession(overrides: Partial<OrchestratorSessionState> = {}): Orches
 
 function decide(overrides: {
   interaction?: "reading" | "explore_word" | "explore_sentence";
-  pattern?: ReaderPatternCanon;
+  pattern?: import("@/types/reader-pattern-experience").ReaderPatternCanon;
   secondaryPatternIds?: string[];
   encounter?: PatternEncounterState | null;
   session?: OrchestratorSessionState;

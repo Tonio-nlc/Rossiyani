@@ -9,17 +9,17 @@ import {
 } from "@/services/reader/build-reader-pattern-experience";
 import type {
   PatternEncounterState,
-  ReaderPatternCanon,
   ReaderPatternInstanceSlice,
 } from "@/types/reader-pattern-experience";
+import { patternCanonFixture } from "../fixtures/pattern-canon";
 
-const possessionPattern: ReaderPatternCanon = {
+const possessionPattern = patternCanonFixture({
   id: "lp.syntax.possession_existence.v1",
   userFacingName: "Avoir, c'est « il y a près de moi »",
   observation: "Pour dire ce qu'on possède, le russe utilise souvent « у » et une forme modifiée du nom.",
   insight: "Imaginez « chez moi, il y a… » plutôt que « je possède… ».",
   comprehension: "У меня есть брат = littéralement « près de moi, il y a un frère ».",
-};
+});
 
 const instance: ReaderPatternInstanceSlice = {
   span: { startPosition: 0, endPosition: 2 },
@@ -81,7 +81,7 @@ describe("buildReaderPatternExperience", () => {
     expect(view.visible).toBe(true);
     expect(view.phase).toBe("first_explore");
     expect(view.sections).toHaveLength(1);
-    expect(view.sections[0]?.depth).toBe("L1");
+    expect(view.sections[0]?.depth).toBe("L2");
     expect(view.sections[0]?.content).toContain("у");
     expect(view.suppressLegacyGrammar).toBe(true);
   });
@@ -106,9 +106,9 @@ describe("buildReaderPatternExperience", () => {
     });
 
     expect(view.phase).toBe("second_contact");
-    expect(view.reminder).toBe("Vous avez déjà rencontré cette idée.");
-    expect(view.sections).toHaveLength(1);
-    expect(view.sections[0]?.depth).toBe("L1");
+    expect(view.reminder).toBeNull();
+    expect(view.sections).toHaveLength(2);
+    expect(view.sections[1]?.content).toContain("déjà rencontré");
   });
 
   it("shows observation, insight and comprehension when insight-ready", () => {
@@ -131,8 +131,8 @@ describe("buildReaderPatternExperience", () => {
     });
 
     expect(view.phase).toBe("insight");
-    expect(view.sections.map((section) => section.depth)).toEqual(["L1", "L2", "L3"]);
-    expect(view.secondaryPatternCount).toBe(2);
+    expect(view.sections.map((section) => section.depth)).toEqual(["L2", "L2"]);
+    expect(view.secondaryPatternCount).toBe(0);
   });
 
   it("hides the card when there is no pattern", () => {
