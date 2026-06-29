@@ -50,9 +50,7 @@
   "introductionConditions": {
     "minExposureCount": 2,
     "prerequisitePatternIds": [],
-    "editorialTextIds": [
-      "text-a1-intro-01"
-    ]
+    "editorialTextIds": []
   },
   "masteryConditions": {
     "minExposureCount": 6,

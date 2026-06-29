@@ -1,4 +1,5 @@
 import type { ReaderTextData } from "@/features/texts";
+import { getNextFoundationTextId } from "@/lib/reader/foundation-pack-path";
 
 export type ReadingSessionContinueAction = {
   label: string;
@@ -17,6 +18,25 @@ export function buildReadingSessionSummary(
   text: ReaderTextData,
   _seenWordIds: string[],
 ): ReadingSessionSummary {
+  const nextTextId = getNextFoundationTextId(text.id);
+
+  if (nextTextId) {
+    return {
+      continueActions: [
+        {
+          label: "Lire le texte suivant",
+          rationale: "Continuer le parcours — la prochaine étape vous attend",
+          href: `/texts/${nextTextId}`,
+        },
+        {
+          label: "Relire ce texte",
+          rationale: `Repasser sur « ${text.title} » avec ce que vous venez de remarquer`,
+          href: `/texts/${text.id}`,
+        },
+      ],
+    };
+  }
+
   return {
     continueActions: [
       {

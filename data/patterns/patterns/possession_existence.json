@@ -52,8 +52,13 @@
   "frequency": "core",
   "difficulty": 2,
   "introductionConditions": {
-    "prerequisitePatternIds": ["lp.morphology.role_terminations.v1"],
-    "minReaderTextsCompleted": 1
+    "minExposureCount": 3,
+    "prerequisitePatternIds": [
+      "lp.morphology.role_terminations.v1"
+    ],
+    "editorialTextIds": [
+      "text-a1-home-01"
+    ]
   },
   "masteryConditions": {
     "minExposureCount": 6,

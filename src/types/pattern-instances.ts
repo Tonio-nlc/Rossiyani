@@ -75,6 +75,8 @@ export type PatternIndexerKnowledgeContext = {
 export type PatternIndexerInput = {
   sentenceId: string;
   textId: string;
+  /** 0-based sentence position in the text — used for editorial primary LP. */
+  sentencePosition?: number;
   analysis: import("@/services/ai/schemas").SentenceAnalysisOutput;
   catalog: import("@/services/patterns/pattern-catalog-service").PatternCatalogService;
   knowledgeContext?: PatternIndexerKnowledgeContext;

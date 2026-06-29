@@ -42,7 +42,8 @@ async function main() {
     }
 
     let textInstances = 0;
-    for (const sentence of sentences) {
+    for (let sentencePosition = 0; sentencePosition < sentences.length; sentencePosition++) {
+      const sentence = sentences[sentencePosition]!;
       if (!sentence.analysisJson) {
         continue;
       }
@@ -54,14 +55,16 @@ async function main() {
           id: word.id,
           position: word.position,
           original: word.original,
+          formId: null,
         })),
-        phraseGroupIds: [],
+        phraseGroupCount: 0,
       };
 
       const knowledgeContext = await resolveIndexerKnowledgeContext(analysis, storage);
       const index = indexPatternInstances({
         sentenceId: sentence.id,
         textId,
+        sentencePosition,
         analysis,
         catalog,
         knowledgeContext,

@@ -23,6 +23,24 @@ function emptySession(): OrchestratorSessionState {
   };
 }
 
+function normalizeSession(parsed: Partial<OrchestratorSessionState>): OrchestratorSessionState {
+  const fresh = emptySession();
+  if (!parsed?.sessionId || !parsed.startedAt) {
+    return fresh;
+  }
+  return {
+    sessionId: parsed.sessionId,
+    startedAt: parsed.startedAt,
+    insightsDelivered: parsed.insightsDelivered ?? 0,
+    comprehensionsDelivered: parsed.comprehensionsDelivered ?? 0,
+    patternsIntroducedThisSession: Array.isArray(parsed.patternsIntroducedThisSession)
+      ? parsed.patternsIntroducedThisSession
+      : [],
+    lastIntroducedPatternId: parsed.lastIntroducedPatternId ?? null,
+    lastIntroducedAt: parsed.lastIntroducedAt ?? null,
+  };
+}
+
 function readSession(): OrchestratorSessionState {
   if (typeof localStorage === "undefined") {
     return emptySession();
@@ -33,11 +51,8 @@ function readSession(): OrchestratorSessionState {
     if (!raw) {
       return emptySession();
     }
-    const parsed = JSON.parse(raw) as OrchestratorSessionState;
-    if (!parsed?.sessionId || !parsed.startedAt) {
-      return emptySession();
-    }
-    return parsed;
+    const parsed = JSON.parse(raw) as Partial<OrchestratorSessionState>;
+    return normalizeSession(parsed);
   } catch {
     return emptySession();
   }

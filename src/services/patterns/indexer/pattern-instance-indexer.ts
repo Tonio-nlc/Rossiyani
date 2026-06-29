@@ -1,5 +1,6 @@
 import type { PatternIndexerInput, PatternInstance, SentencePatternIndex } from "@/types/pattern-instances";
 
+import { resolveEditorialPrimaryPatternId } from "@/lib/reader/foundation-pack-path";
 import { detectPatternsInSentence, defaultIntroductionLevel } from "./detect-patterns";
 import { mergeKnowledgeContext, findOccurrenceIdForSpan } from "./extract-knowledge-context";
 import { selectPrimaryPattern } from "./prioritize-primary";
@@ -58,6 +59,10 @@ export function indexPatternInstances(input: PatternIndexerInput): SentencePatte
   const { primary, reasons } = selectPrimaryPattern(candidates, input.catalog, {
     textId: input.textId,
     editorialIntroPatternIds: resolveEditorialIntroPatternIds(input.catalog, input.textId),
+    editorialPrimaryPatternId: resolveEditorialPrimaryPatternId(
+      input.textId,
+      input.sentencePosition,
+    ),
   });
 
   const primaryId = primary?.patternId ?? null;

@@ -106,7 +106,11 @@ export function useReaderPatternExperience(text: ReaderTextData) {
         }),
       );
 
-      const view = mapDecisionToReaderExperience(decision, resolved.pattern);
+      const sentence = text.sentences.find((item) => item.id === sentenceId);
+      const word = sentence?.words.find((item) => item.position === wordPosition);
+      const anchorText = word?.stressMarked || word?.original || null;
+
+      const view = mapDecisionToReaderExperience(decision, resolved.pattern, anchorText);
 
       if (triggering) {
         recordPatternExplore(resolved.pattern.id);

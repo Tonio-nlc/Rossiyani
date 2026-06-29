@@ -15,6 +15,7 @@ import { buildReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel
 import { buildReadingSessionSummary } from "@/lib/reader/build-reading-session-summary";
 import type { ReaderWordSnapshot } from "@/lib/reader/build-minimal-word-detail";
 import { getTextReadingProgress, isTextReadingComplete } from "@/lib/reader/reading-progress";
+import { markFirstSessionTextCompleted } from "@/lib/reader/first-session";
 import {
   resolveTranslationVisible,
   shouldShowTranslationToggle,
@@ -154,6 +155,12 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     () => isTextReadingComplete(progress, totalSentences),
     [progress, totalSentences],
   );
+
+  useEffect(() => {
+    if (isReadingComplete) {
+      markFirstSessionTextCompleted(text.id);
+    }
+  }, [isReadingComplete, text.id]);
 
   const interactiveBySentence = useMemo(() => buildInteractiveWordsBySentence(text), [text]);
   const textIndex = useMemo(() => buildReaderTextPhraseIndex(text), [text]);

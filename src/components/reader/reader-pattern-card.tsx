@@ -10,21 +10,16 @@ export function ReaderPatternCard({ experience }: ReaderPatternCardProps) {
   }
 
   return (
-    <article className="reader-pattern-card" aria-label="Idée russe">
-      {experience.reminder ? (
-        <p className="reader-pattern-card__reminder">{experience.reminder}</p>
-      ) : null}
-
+    <article className="reader-pattern-card" aria-label="Pourquoi le russe s'écrit ainsi">
       {experience.title ? (
         <h3 className="reader-pattern-card__title">{experience.title}</h3>
       ) : null}
 
       <div className="reader-pattern-card__sections">
-        {experience.sections.map((section) => (
-          <section key={section.depth} className="reader-pattern-card__section">
-            <p className="reader-pattern-card__section-label">{section.label}</p>
-            <p className="reader-pattern-card__section-body">{section.content}</p>
-          </section>
+        {experience.sections.map((section, index) => (
+          <p key={`${section.depth}-${index}`} className="reader-pattern-card__section-body">
+            {section.content}
+          </p>
         ))}
       </div>
 
@@ -32,14 +27,6 @@ export function ReaderPatternCard({ experience }: ReaderPatternCardProps) {
         <p className="reader-pattern-card__anchor">
           <span className="reader-pattern-card__anchor-label">Ici</span>
           {experience.anchorText}
-        </p>
-      ) : null}
-
-      {experience.secondaryPatternCount > 0 ? (
-        <p className="reader-pattern-card__footnote">
-          {experience.secondaryPatternCount} autre
-          {experience.secondaryPatternCount > 1 ? "s" : ""} régularité
-          {experience.secondaryPatternCount > 1 ? "s" : ""} dans cette phrase — pour plus tard.
         </p>
       ) : null}
     </article>

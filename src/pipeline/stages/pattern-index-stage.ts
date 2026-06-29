@@ -41,6 +41,7 @@ export async function runPatternIndexStage(
       const index = indexPatternInstances({
         sentenceId: storage.sentenceId,
         textId: ctx.textId,
+        sentencePosition: ctx.position,
         analysis,
         catalog,
         knowledgeContext,

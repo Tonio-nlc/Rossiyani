@@ -6,6 +6,8 @@ import type { PrimarySelectionReason } from "@/types/pattern-instances";
 export type PrimarySelectionContext = {
   textId: string;
   editorialIntroPatternIds?: string[];
+  /** When set, strongly prefers this LP if it appears among candidates. */
+  editorialPrimaryPatternId?: string;
 };
 
 const FREQUENCY_WEIGHT: Record<PatternFrequency, number> = {
@@ -61,7 +63,15 @@ export function selectPrimaryPattern(
       weight: score,
     });
 
-    if (editorialIds.has(candidate.patternId)) {
+    if (context.editorialPrimaryPatternId === candidate.patternId) {
+      const bonus = 10_000;
+      score += bonus;
+      reasons.push({
+        code: "editorial_introduction",
+        message: "LP primaire éditorial pour ce texte",
+        weight: bonus,
+      });
+    } else if (editorialIds.has(candidate.patternId)) {
       const bonus = 1000;
       score += bonus;
       reasons.push({

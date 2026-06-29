@@ -13,6 +13,7 @@ const MANIFEST = path.join(process.cwd(), "content", "a1-foundation-pack", "mani
 
 type TextSpec = {
   id: string;
+  slug?: string;
   introduces?: string[];
 };
 

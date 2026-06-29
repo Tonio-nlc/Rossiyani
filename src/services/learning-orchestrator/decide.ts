@@ -19,6 +19,7 @@ import {
   isShortSession,
   actionConsumesNoveltyBudget,
 } from "./session-store";
+import { applyFirstSessionStrategy } from "./first-session-strategy";
 
 function reason(
   code: PedagogicalDecisionReason["code"],
@@ -42,6 +43,20 @@ function silent(overrides: Partial<PedagogicalDecision> = {}): PedagogicalDecisi
     reasons: [reason("reading_sovereign", "Silence pédagogique")],
     ...overrides,
   };
+}
+
+function finalize(input: OrchestratorInput, decision: PedagogicalDecision): PedagogicalDecision {
+  return applyFirstSessionStrategy(input, withDeferredSecondaries(input, decision));
+}
+
+function finalizeWithConstraints(
+  input: OrchestratorInput,
+  decision: PedagogicalDecision,
+): PedagogicalDecision {
+  return applyFirstSessionStrategy(
+    input,
+    withDeferredSecondaries(input, applySessionConstraints(input, decision)),
+  );
 }
 
 function withDeferredSecondaries(input: OrchestratorInput, decision: PedagogicalDecision): PedagogicalDecision {
@@ -181,7 +196,7 @@ function baseDecision(input: OrchestratorInput): PedagogicalDecision {
  */
 export function decidePedagogicalIntervention(input: OrchestratorInput): PedagogicalDecision {
   if (input.interaction === "reading") {
-    return withDeferredSecondaries(
+    return finalize(
       input,
       silent({
         primaryPatternId: input.primaryPattern?.patternId ?? null,
@@ -192,7 +207,7 @@ export function decidePedagogicalIntervention(input: OrchestratorInput): Pedagog
   }
 
   if (input.preferences?.immersiveReading) {
-    return withDeferredSecondaries(
+    return finalize(
       input,
       silent({
         primaryPatternId: input.primaryPattern?.patternId ?? null,
@@ -249,20 +264,20 @@ export function decidePedagogicalIntervention(input: OrchestratorInput): Pedagog
       };
     }
 
-    return withDeferredSecondaries(input, vocabularyDecision);
+    return finalize(input, vocabularyDecision);
   }
 
   if (input.sentence.isFirstReadOfText) {
-    return withDeferredSecondaries(
+    return finalizeWithConstraints(
       input,
-      applySessionConstraints(input, {
+      {
         ...decision,
         action: "DEFER",
         patternId,
         suppressLegacyGrammar: true,
         softMessage: "Première lecture du texte — laissez l'histoire installer le contexte.",
         reasons: [reason("first_text_pass_silent", "Première passe narrative sans leçon", 1)],
-      }),
+      },
     );
   }
 
@@ -290,12 +305,12 @@ export function decidePedagogicalIntervention(input: OrchestratorInput): Pedagog
       };
     }
 
-    return withDeferredSecondaries(input, applySessionConstraints(input, decision));
+    return finalizeWithConstraints(input, decision);
   }
 
   const wordPosition = input.sentence.wordPosition;
   if (wordPosition === null || wordPosition === undefined) {
-    return withDeferredSecondaries(
+    return finalize(
       input,
       silent({
         primaryPatternId: patternId,
@@ -305,7 +320,7 @@ export function decidePedagogicalIntervention(input: OrchestratorInput): Pedagog
   }
 
   if (!isTokenInPatternInstance(wordPosition, instance)) {
-    return withDeferredSecondaries(
+    return finalize(
       input,
       silent({
         primaryPatternId: patternId,
@@ -363,5 +378,5 @@ export function decidePedagogicalIntervention(input: OrchestratorInput): Pedagog
     };
   }
 
-  return withDeferredSecondaries(input, applySessionConstraints(input, decision));
+  return finalizeWithConstraints(input, decision);
 }

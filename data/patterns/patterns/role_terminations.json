@@ -12,8 +12,8 @@
   "cognitiveSurprise": "En français, « ma sœur » ne change pas de forme selon le verbe ; en russe, le nom se modifie souvent.",
   "observation": "Dans une phrase russe, un même mot peut apparaître avec des terminaisons différentes.",
   "insight": "Ces terminaisons ne sont pas aléatoires : elles signalent le rôle du mot dans la phrase — un peu comme des étiquettes.",
-  "comprehension": "Le russe indique grammaticalement le rôle de chaque nom en modifiant la fin du mot. C'est pour cela que « сестра », « сестры », « сестре » ne sont pas interchangeables.",
-  "formalization": "Les noms se déclinent en six cas : nominatif, génitif, datif, accusatif, instrumental, prépositionnel.",
+  "comprehension": "Le russe indique le rôle de chaque nom en modifiant la fin du mot — c'est pour cela que « сестра », « сестры » et « сестру » ne sont pas interchangeables.",
+  "formalization": "Les noms changent de forme selon leur fonction dans la phrase.",
   "nuances": "Certains noms ont des désinences irrégulières ; l'animé/inanimé modifie l'accusatif masculin.",
   "examples": [
     {
