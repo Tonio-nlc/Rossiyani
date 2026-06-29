@@ -10,6 +10,8 @@ import { isLearnableLemma } from "@/lib/linguistics/lexical-metadata";
 import { setLastReadTextId } from "@/lib/last-read-text";
 import type { ReaderSearchEntry } from "@/lib/reader/build-reader-search-index";
 import { buildInteractiveWordsBySentence } from "@/lib/reader/build-interactive-words";
+import { buildPatternBearerWordIds } from "@/lib/reader/build-pattern-bearer-words";
+import { buildReaderWordGuide } from "@/lib/reader/build-reader-word-guide";
 import { buildTextIntroduction } from "@/lib/reader/build-text-introduction";
 import { buildReaderTextPhraseIndex } from "@/lib/reader/build-reader-word-panel-data";
 import { buildReadingSessionSummary } from "@/lib/reader/build-reading-session-summary";
@@ -163,6 +165,7 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
   }, [isReadingComplete, text.id]);
 
   const interactiveBySentence = useMemo(() => buildInteractiveWordsBySentence(text), [text]);
+  const patternBearerBySentence = useMemo(() => buildPatternBearerWordIds(text), [text]);
   const textIndex = useMemo(() => buildReaderTextPhraseIndex(text), [text]);
   const textIntroduction = useMemo(
     () => buildTextIntroduction(text, estimatedMinutes),
@@ -423,6 +426,21 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
     return buildWordExperience(selectedWordSnapshot.sentenceId, selectedWordSnapshot.position);
   }, [buildWordExperience, selectedWordSnapshot]);
 
+  const guideLinkedWordIds = useMemo(() => {
+    if (!selectedWordSnapshot) {
+      return new Set<string>();
+    }
+    const bearerIds = patternBearerBySentence.get(selectedWordSnapshot.sentenceId);
+    const isBearer = bearerIds?.has(selectedWordSnapshot.id) ?? false;
+    const guide = buildReaderWordGuide({
+      text,
+      snapshot: selectedWordSnapshot,
+      patternExperience,
+      isPatternBearer: isBearer,
+    });
+    return new Set(guide.linkedWordIds);
+  }, [text, selectedWordSnapshot, patternExperience, patternBearerBySentence]);
+
   const closeWordPanel = useCallback(() => {
     setWordPanelOpen(false);
     setSelectedWordSnapshot(null);
@@ -441,6 +459,8 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
       }
       wordPanel={
         <ReaderWordPanel
+          text={text}
+          patternBearerBySentence={patternBearerBySentence}
           detail={detail}
           loading={loading}
           snapshot={selectedWordSnapshot}
@@ -546,6 +566,10 @@ export function ReaderWorkspace({ text }: ReaderWorkspaceProps) {
                   naturalTranslation={sentence.naturalTranslation}
                   words={mapSentenceWords(sentence.words)}
                   interactiveWordKinds={interactiveBySentence.get(sentence.id) ?? new Map()}
+                  patternBearerWordIds={patternBearerBySentence.get(sentence.id)}
+                  guideLinkedWordIds={
+                    selectedWordSnapshot?.sentenceId === sentence.id ? guideLinkedWordIds : undefined
+                  }
                   selectedWordId={selectedWordId}
                   hoveredWordId={hoveredWordId}
                   searchMatchWordIds={searchMatchWordIds}

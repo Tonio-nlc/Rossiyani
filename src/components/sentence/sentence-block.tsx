@@ -39,6 +39,8 @@ type SentenceBlockProps = {
   onToggleTranslation?: () => void;
   words: SentenceBlockWord[];
   interactiveWordKinds: Map<string, WordHighlightKind>;
+  patternBearerWordIds?: Set<string>;
+  guideLinkedWordIds?: Set<string>;
   selectedWordId: string | null;
   hoveredWordId?: string | null;
   searchMatchWordIds?: Set<string>;
@@ -60,6 +62,8 @@ export const SentenceBlock = memo(function SentenceBlock({
   onToggleTranslation,
   words,
   interactiveWordKinds,
+  patternBearerWordIds,
+  guideLinkedWordIds,
   selectedWordId,
   hoveredWordId = null,
   searchMatchWordIds,
@@ -91,8 +95,12 @@ export const SentenceBlock = memo(function SentenceBlock({
 
           const word = resolveSentenceBlockWord(sentenceId, segment, wordByPosition);
           const isOrphan = !wordByPosition.has(segment.position);
-          const highlightKind = interactiveWordKinds.get(word.id) ?? null;
-          const interactive = highlightKind !== null;
+          const isPatternBearer = patternBearerWordIds?.has(word.id) ?? false;
+          const highlightKind: WordHighlightKind | null = isPatternBearer
+            ? "pattern"
+            : (interactiveWordKinds.get(word.id) ?? null);
+          const interactive = !isOrphan;
+          const guideLinked = guideLinkedWordIds?.has(word.id) ?? false;
 
           return (
             <span
@@ -114,6 +122,7 @@ export const SentenceBlock = memo(function SentenceBlock({
                 searchActive={searchActiveWordId === word.id}
                 interactive={interactive}
                 highlightKind={highlightKind}
+                guideLinked={guideLinked}
                 onClick={() => onSelectWord(word)}
                 onPointerEnter={
                   interactive && onHoverWord ? () => onHoverWord(word) : undefined

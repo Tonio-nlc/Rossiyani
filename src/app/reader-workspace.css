@@ -1,4 +1,6 @@
 /* ─── Reader Workspace — Stitch / modern SaaS ─── */
+@import "./reader-workspace-guide.css";
+
 .reader-ws {
   --rw-primary: #2563eb;
   --rw-primary-hover: #1d4ed8;

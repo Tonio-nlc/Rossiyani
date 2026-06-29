@@ -18,12 +18,14 @@ type WordTokenProps = {
   searchActive?: boolean;
   interactive?: boolean;
   highlightKind?: WordHighlightKind | null;
+  guideLinked?: boolean;
   onClick?: () => void;
   onPointerEnter?: () => void;
   onPointerLeave?: () => void;
 };
 
 const HIGHLIGHT_CLASS: Record<WordHighlightKind, string> = {
+  pattern: "reader-word-pattern",
   verb: "reader-word-verb",
   construction: "reader-word-construction",
   grammar: "reader-word-grammar",
@@ -39,6 +41,7 @@ export const WordToken = memo(function WordToken({
   searchActive,
   interactive = false,
   highlightKind = null,
+  guideLinked = false,
   onClick,
   onPointerEnter,
   onPointerLeave,
@@ -62,6 +65,7 @@ export const WordToken = memo(function WordToken({
         "reader-word-interactive focus-kb inline cursor-pointer border-0 bg-transparent p-0 align-baseline font-reader text-inherit",
         "transition-[background-color,text-decoration-color] duration-150",
         highlightKind ? HIGHLIGHT_CLASS[highlightKind] : "",
+        guideLinked ? "reader-word-guide-linked" : "",
         selected
           ? "reader-word-selected"
           : searchActive

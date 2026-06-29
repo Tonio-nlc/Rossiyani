@@ -15,6 +15,8 @@ type ReaderSentenceProps = {
   naturalTranslation: string;
   words: SentenceBlockWord[];
   interactiveWordKinds: Map<string, WordHighlightKind>;
+  patternBearerWordIds?: Set<string>;
+  guideLinkedWordIds?: Set<string>;
   selectedWordId: string | null;
   hoveredWordId: string | null;
   searchMatchWordIds: Set<string>;
@@ -39,6 +41,8 @@ export const ReaderSentence = memo(function ReaderSentence({
   naturalTranslation,
   words,
   interactiveWordKinds,
+  patternBearerWordIds,
+  guideLinkedWordIds,
   selectedWordId,
   hoveredWordId,
   searchMatchWordIds,
@@ -86,6 +90,8 @@ export const ReaderSentence = memo(function ReaderSentence({
         onToggleTranslation={onToggleTranslation}
         words={words}
         interactiveWordKinds={interactiveWordKinds}
+        patternBearerWordIds={patternBearerWordIds}
+        guideLinkedWordIds={guideLinkedWordIds}
         selectedWordId={selectedWordId}
         hoveredWordId={hoveredWordId}
         searchMatchWordIds={searchMatchWordIds}

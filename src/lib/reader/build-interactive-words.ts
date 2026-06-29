@@ -1,6 +1,6 @@
 import type { ReaderTextData } from "@/features/texts";
 
-export type WordHighlightKind = "verb" | "construction" | "grammar" | "noun";
+export type WordHighlightKind = "pattern" | "verb" | "construction" | "grammar" | "noun";
 
 export type InteractiveWordEntry = {
   id: string;
